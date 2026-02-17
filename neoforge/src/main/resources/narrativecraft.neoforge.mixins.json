@@ -4,9 +4,7 @@
   "package": "fr.loudo.narrativecraft.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
-  "client": [
-    "GuiGraphicsNeoForgeMixin"
-  ],
+  "client": [],
   "server": [],
   "injectors": {
     "defaultRequire": 1

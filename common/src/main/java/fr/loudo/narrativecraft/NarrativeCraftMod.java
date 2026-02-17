@@ -23,15 +23,39 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.file.NarrativeCraftFile;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NarrativeCraftMod {
     public static final String MOD_ID = "narrativecraft";
     public static final String MOD_NAME = "NarrativeCraft";
-    public static final String MAJOR_VERSION = "1.0.0";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
+    private static final NarrativeCraftMod instance = new NarrativeCraftMod();
+
+    private final ChapterManager chapterManager = new ChapterManager();
+    private final CharacterManager characterManager = new CharacterManager();
+
+    private final NarrativeCraftFile file = new NarrativeCraftFile();
 
     public static void commonInit() {
+    }
+
+    public ChapterManager getChapterManager() {
+        return chapterManager;
+    }
+
+    public CharacterManager getCharacterManager() {
+        return characterManager;
+    }
+
+    public NarrativeCraftFile getFile() {
+        return file;
+    }
+
+    public static NarrativeCraftMod getInstance() {
+        return instance;
     }
 }

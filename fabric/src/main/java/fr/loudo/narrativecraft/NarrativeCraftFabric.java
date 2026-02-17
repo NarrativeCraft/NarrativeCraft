@@ -23,12 +23,16 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.register.FabricEventList;
 import net.fabricmc.api.ModInitializer;
 
 public class NarrativeCraftFabric implements ModInitializer {
 
+    private final FabricEventList eventList = new FabricEventList();
+
     @Override
     public void onInitialize() {
+        eventList.register();
         NarrativeCraftMod.commonInit();
     }
 }
