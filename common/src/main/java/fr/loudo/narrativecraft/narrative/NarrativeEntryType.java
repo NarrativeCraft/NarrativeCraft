@@ -21,14 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.narrative;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
-public interface IPacketSender {
+public enum NarrativeEntryType {
+    CHAPTER(Chapter.class, Chapter.STREAM_CODEC);
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+    private final Class<? extends NarrativeEntry> clazz;
+    private final StreamCodec<? super ByteBuf, ? extends NarrativeEntry> codec;
 
-    void sendToServer(CustomPacketPayload packet);
+    <T extends NarrativeEntry> NarrativeEntryType(Class<T> clazz, StreamCodec<? super ByteBuf, T> codec) {
+        this.clazz = clazz;
+        this.codec = codec;
+    }
+
+    public static NarrativeEntryType fromClass(Class<? extends NarrativeEntry> clazz) {
+        for (NarrativeEntryType type : values()) {
+            if (type.clazz.equals(clazz)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Unknown NarrativeEntry type: " + clazz.getName());
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends NarrativeEntry> StreamCodec<? super ByteBuf, T> getCodec() {
+        return (StreamCodec<? super ByteBuf, T>) codec;
+    }
 }

@@ -21,14 +21,32 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.events;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.network.ClientPacketHandlerNeoForge;
+import fr.loudo.narrativecraft.network.S2CSyncNarrativeEntryPacket;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-public interface IPacketSender {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnPacketRegisterEventNeoForge {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+    public OnPacketRegisterEventNeoForge(IEventBus modBus) {
+        modBus.addListener(OnPacketRegisterEventNeoForge::onPacketRegister);
+    }
 
-    void sendToServer(CustomPacketPayload packet);
+    private static void onPacketRegister(RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar("1");
+        registerS2CPackets(registrar);
+    }
+
+    private static void registerS2CPackets(PayloadRegistrar registrar) {
+        registrar.playToClient(
+                S2CSyncNarrativeEntryPacket.TYPE,
+                S2CSyncNarrativeEntryPacket.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::syncNarrativeEntry);
+    }
 }

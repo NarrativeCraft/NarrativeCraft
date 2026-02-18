@@ -21,14 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.client.narrative.chapter;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.client.NarrativeCraftClientMod;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryProcessor;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 
-public interface IPacketSender {
-
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
-
-    void sendToServer(CustomPacketPayload packet);
+public class ChapterProcessorClient implements NarrativeEntryProcessor<Chapter> {
+    @Override
+    public void process(NarrativeEntryAction action, Chapter entry) {
+        ChapterManager chapterManager = NarrativeCraftClientMod.getInstance().getChapterManager();
+        switch (action) {
+            case ADD:
+                chapterManager.add(entry);
+                break;
+            case EDIT:
+                Chapter oldChapter = chapterManager.getById(entry.getId());
+                if (oldChapter == null) return;
+                oldChapter.setName(entry.getName());
+                oldChapter.setDescription(entry.getDescription());
+                break;
+            case REMOVE:
+                chapterManager.remove(entry);
+                break;
+        }
+    }
 }

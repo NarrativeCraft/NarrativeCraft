@@ -21,12 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft;
+package fr.loudo.narrativecraft.network;
 
-public class NarrativeCraftClientMod {
-    private static final NarrativeCraftClientMod instance = new NarrativeCraftClientMod();
+import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-    public static NarrativeCraftClientMod getInstance() {
-        return instance;
+public class ClientPacketHandlerNeoForge {
+
+    public static void syncNarrativeEntry(S2CSyncNarrativeEntryPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.narrativeEntry(packet);
+        });
     }
 }

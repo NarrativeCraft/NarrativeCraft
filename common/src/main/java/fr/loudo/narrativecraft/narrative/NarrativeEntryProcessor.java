@@ -21,6 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.narrative;
 
-public class OnClientTickNeoForge {}
+import fr.loudo.narrativecraft.network.NarrativeEntryAction;
+
+public interface NarrativeEntryProcessor<T extends NarrativeEntry> {
+    void process(NarrativeEntryAction action, T entry);
+}

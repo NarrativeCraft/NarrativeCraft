@@ -21,14 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.events;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
-public interface IPacketSender {
+public class OnPlayerJoinEvent {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
-
-    void sendToServer(CustomPacketPayload packet);
+    public static void onPlayerJoin(ServerPlayer player) {}
 }

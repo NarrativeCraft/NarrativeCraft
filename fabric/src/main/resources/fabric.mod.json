@@ -18,6 +18,9 @@
   "entrypoints": {
     "main": [
       "fr.loudo.narrativecraft.NarrativeCraftFabric"
+    ],
+    "client": [
+      "fr.loudo.narrativecraft.NarrativeCraftFabricClient"
     ]
   },
   "mixins": [

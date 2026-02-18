@@ -21,14 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.events;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftClientMod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
-public interface IPacketSender {
+@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
+public class OnClientInitEventNeoForge {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
-
-    void sendToServer(CustomPacketPayload packet);
+    @SubscribeEvent
+    public static void clientInit(FMLClientSetupEvent event) {
+        NarrativeCraftClientMod.commonInit();
+    }
 }

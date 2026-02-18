@@ -21,14 +21,17 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.client.NarrativeCraftClientMod;
+import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerFabric;
+import net.fabricmc.api.ClientModInitializer;
 
-public interface IPacketSender {
+public class NarrativeCraftFabricClient implements ClientModInitializer {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
-
-    void sendToServer(CustomPacketPayload packet);
+    @Override
+    public void onInitializeClient() {
+        NarrativeCraftClientMod.commonInit();
+        ClientPacketHandlerFabric.handle();
+    }
 }

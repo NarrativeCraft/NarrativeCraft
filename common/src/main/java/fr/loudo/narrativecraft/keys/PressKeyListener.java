@@ -23,7 +23,8 @@
 
 package fr.loudo.narrativecraft.keys;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftClientMod;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.screens.PaginationsItemsScreen;
 import fr.loudo.narrativecraft.screens.components.Paginationitem;
 import java.util.ArrayList;
@@ -41,13 +42,11 @@ public class PressKeyListener {
     public static void onKeyPressed(Minecraft minecraft) {
         handleKeyPress(ModKeys.STORY_MANAGER, () -> {
             List<Paginationitem> items = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
-                int finalI = i;
-                items.add(new Paginationitem(String.format("Item %d", i), () -> {
-                    NarrativeCraftMod.LOGGER.info("Item {} clicked", finalI);
-                }));
+            for (Chapter chapter :
+                    NarrativeCraftClientMod.getInstance().getChapterManager().getList()) {
+                items.add(new Paginationitem(chapter.getName(), null));
             }
-            PaginationsItemsScreen screen = new PaginationsItemsScreen(Component.literal("Items"), items);
+            PaginationsItemsScreen screen = new PaginationsItemsScreen(Component.literal("Chapters"), items);
             minecraft.setScreen(screen);
         });
     }

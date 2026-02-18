@@ -21,14 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.network;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.Identifier;
 
-public interface IPacketSender {
+public record S2CSyncNarrativeEntryPacket(NarrativeEntry entry, NarrativeEntryAction action)
+        implements CustomPacketPayload {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+    public static final Type<S2CSyncNarrativeEntryPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sync_narrative_entry"));
 
-    void sendToServer(CustomPacketPayload packet);
+    public static final StreamCodec<ByteBuf, S2CSyncNarrativeEntryPacket> STREAM_CODEC = StreamCodec.composite(
+            NarrativeEntry.STREAM_CODEC,
+            S2CSyncNarrativeEntryPacket::entry,
+            ByteBufCodecs.idMapper(i -> NarrativeEntryAction.values()[i], NarrativeEntryAction::ordinal),
+            S2CSyncNarrativeEntryPacket::action,
+            S2CSyncNarrativeEntryPacket::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

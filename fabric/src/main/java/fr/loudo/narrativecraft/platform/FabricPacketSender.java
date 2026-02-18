@@ -21,14 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.platform;
 
+import fr.loudo.narrativecraft.platform.services.IPacketSender;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
-public interface IPacketSender {
+public class FabricPacketSender implements IPacketSender {
+    @Override
+    public void sendToPlayer(ServerPlayer player, CustomPacketPayload packet) {
+        ServerPlayNetworking.send(player, packet);
+    }
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
-
-    void sendToServer(CustomPacketPayload packet);
+    @Override
+    public void sendToServer(CustomPacketPayload packet) {
+        ClientPlayNetworking.send(packet);
+    }
 }

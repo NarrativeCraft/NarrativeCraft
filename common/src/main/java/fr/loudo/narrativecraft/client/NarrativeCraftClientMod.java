@@ -21,14 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.client;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.client.narrative.ClientNarrativeManager;
+import fr.loudo.narrativecraft.client.narrative.chapter.ChapterProcessorClient;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 
-public interface IPacketSender {
+public class NarrativeCraftClientMod {
+    private static final NarrativeCraftClientMod instance = new NarrativeCraftClientMod();
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+    private final ChapterManager chapterManager = new ChapterManager();
 
-    void sendToServer(CustomPacketPayload packet);
+    public static void commonInit() {
+        ClientNarrativeManager.registerProcessor(Chapter.class, new ChapterProcessorClient());
+    }
+
+    public ChapterManager getChapterManager() {
+        return chapterManager;
+    }
+
+    public static NarrativeCraftClientMod getInstance() {
+        return instance;
+    }
 }

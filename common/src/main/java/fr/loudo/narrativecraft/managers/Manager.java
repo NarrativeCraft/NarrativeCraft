@@ -26,10 +26,20 @@ package fr.loudo.narrativecraft.managers;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class Manager<T extends NarrativeEntry> {
 
     protected List<T> list = new ArrayList<>();
+
+    public T getById(UUID uuid) {
+        for (T entry : list) {
+            if (entry.getId().equals(uuid)) {
+                return entry;
+            }
+        }
+        return null;
+    }
 
     public T getByName(String name) {
         for (T item : list) {

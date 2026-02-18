@@ -21,14 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.network.handlers;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.network.S2CSyncNarrativeEntryPacket;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
-public interface IPacketSender {
+public class ClientPacketHandlerFabric {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
-
-    void sendToServer(CustomPacketPayload packet);
+    public static void handle() {
+        ClientPlayNetworking.registerGlobalReceiver(S2CSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
+            ClientPacketHandler.narrativeEntry(packet);
+        });
+    }
 }

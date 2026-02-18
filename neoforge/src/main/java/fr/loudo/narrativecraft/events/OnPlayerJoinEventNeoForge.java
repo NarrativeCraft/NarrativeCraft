@@ -21,14 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.events;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
-public interface IPacketSender {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnPlayerJoinEventNeoForge {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+    public OnPlayerJoinEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnPlayerJoinEventNeoForge::onPlayerJoin);
+    }
 
-    void sendToServer(CustomPacketPayload packet);
+    private static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        OnPlayerJoinEvent.onPlayerJoin((ServerPlayer) event.getEntity());
+    }
 }

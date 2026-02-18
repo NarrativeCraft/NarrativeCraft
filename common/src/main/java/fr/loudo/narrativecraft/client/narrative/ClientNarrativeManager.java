@@ -21,14 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.client.narrative;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryProcessor;
+import fr.loudo.narrativecraft.network.NarrativeEntryAction;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface IPacketSender {
+public class ClientNarrativeManager {
+    private static final Map<Class<? extends NarrativeEntry>, NarrativeEntryProcessor<?>> PROCESSORS = new HashMap<>();
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+    public static <T extends NarrativeEntry> void registerProcessor(
+            Class<T> clazz, NarrativeEntryProcessor<T> processor) {
+        PROCESSORS.put(clazz, processor);
+    }
 
-    void sendToServer(CustomPacketPayload packet);
+    @SuppressWarnings("unchecked")
+    public static <T extends NarrativeEntry> void dispatch(NarrativeEntryAction action, T entry) {
+        NarrativeEntryProcessor<T> processor = (NarrativeEntryProcessor<T>) PROCESSORS.get(entry.getClass());
+        if (processor != null) {
+            processor.process(action, entry);
+        } else {
+            NarrativeCraftMod.LOGGER.warn("Narrative entry processor not found for class {}", entry.getClass());
+        }
+    }
 }

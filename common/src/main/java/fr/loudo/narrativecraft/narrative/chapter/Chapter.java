@@ -24,10 +24,31 @@
 package fr.loudo.narrativecraft.narrative.chapter;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import io.netty.buffer.ByteBuf;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public class Chapter extends NarrativeEntry {
 
+    public static final StreamCodec<ByteBuf, Chapter> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC,
+            Chapter::getId,
+            ByteBufCodecs.STRING_UTF8,
+            Chapter::getName,
+            ByteBufCodecs.STRING_UTF8,
+            Chapter::getDescription,
+            ByteBufCodecs.VAR_INT,
+            Chapter::getChapterIndex,
+            Chapter::new);
+
     private int chapterIndex;
+
+    public Chapter(UUID uuid, String name, String description, int chapterIndex) {
+        super(uuid, name, description);
+        this.chapterIndex = chapterIndex;
+    }
 
     public Chapter(String name, String description, int chapterIndex) {
         super(name, description);
