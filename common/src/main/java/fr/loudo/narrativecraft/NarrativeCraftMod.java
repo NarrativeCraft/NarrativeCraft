@@ -40,8 +40,7 @@ public class NarrativeCraftMod {
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
 
-    public static void commonInit() {
-    }
+    public static void commonInit() {}
 
     public ChapterManager getChapterManager() {
         return chapterManager;

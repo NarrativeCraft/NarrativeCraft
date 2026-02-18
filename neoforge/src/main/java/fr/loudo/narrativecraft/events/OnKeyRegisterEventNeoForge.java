@@ -21,48 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.managers;
+package fr.loudo.narrativecraft.events;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.keys.ModKeys;
+import net.minecraft.client.KeyMapping;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
-public abstract class Manager<T extends NarrativeEntry> {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnKeyRegisterEventNeoForge {
 
-    protected List<T> list = new ArrayList<>();
+    public OnKeyRegisterEventNeoForge(IEventBus bus) {
+        bus.addListener(OnKeyRegisterEventNeoForge::onKeyRegister);
+    }
 
-    public T getByName(String name) {
-        for (T item : list) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                return item;
-            }
+    private static void onKeyRegister(RegisterKeyMappingsEvent event) {
+        for (KeyMapping key : ModKeys.ALL_KEYS) {
+            event.register(key);
         }
-        return null;
-    }
-
-    public void add(T item) {
-        if (!list.contains(item)) {
-            list.add(item);
-        }
-    }
-
-    public void remove(T item) {
-        list.remove(item);
-    }
-
-    public void clear() {
-        list.clear();
-    }
-
-    public List<T> getList() {
-        return list;
-    }
-
-    public T get(int index) {
-        return list.get(index);
-    }
-
-    public int size() {
-        return list.size();
     }
 }

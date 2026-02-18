@@ -21,48 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.managers;
+package fr.loudo.narrativecraft.screens.components;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import java.util.ArrayList;
-import java.util.List;
+public class Paginationitem {
 
-public abstract class Manager<T extends NarrativeEntry> {
+    private final Runnable onClick;
+    private String displayName;
 
-    protected List<T> list = new ArrayList<>();
-
-    public T getByName(String name) {
-        for (T item : list) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                return item;
-            }
-        }
-        return null;
+    public Paginationitem(String displayName, Runnable onClick) {
+        this.displayName = displayName;
+        this.onClick = onClick;
     }
 
-    public void add(T item) {
-        if (!list.contains(item)) {
-            list.add(item);
-        }
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void remove(T item) {
-        list.remove(item);
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
-    public void clear() {
-        list.clear();
-    }
-
-    public List<T> getList() {
-        return list;
-    }
-
-    public T get(int index) {
-        return list.get(index);
-    }
-
-    public int size() {
-        return list.size();
+    public Runnable getOnClick() {
+        return onClick;
     }
 }

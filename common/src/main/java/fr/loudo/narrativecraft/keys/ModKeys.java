@@ -21,48 +21,26 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.managers;
+package fr.loudo.narrativecraft.keys;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import com.mojang.blaze3d.platform.InputConstants;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 
-public abstract class Manager<T extends NarrativeEntry> {
+public class ModKeys {
 
-    protected List<T> list = new ArrayList<>();
+    private static final KeyMapping.Category CATEGORY =
+            new KeyMapping.Category(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main"));
 
-    public T getByName(String name) {
-        for (T item : list) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                return item;
-            }
-        }
-        return null;
-    }
+    public static final List<KeyMapping> ALL_KEYS = new ArrayList<>();
+    public static final KeyMapping STORY_MANAGER = registerKey("key.screen.story.open", InputConstants.KEY_N);
 
-    public void add(T item) {
-        if (!list.contains(item)) {
-            list.add(item);
-        }
-    }
-
-    public void remove(T item) {
-        list.remove(item);
-    }
-
-    public void clear() {
-        list.clear();
-    }
-
-    public List<T> getList() {
-        return list;
-    }
-
-    public T get(int index) {
-        return list.get(index);
-    }
-
-    public int size() {
-        return list.size();
+    private static KeyMapping registerKey(String translationKey, int code) {
+        KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);
+        ALL_KEYS.add(key);
+        return key;
     }
 }

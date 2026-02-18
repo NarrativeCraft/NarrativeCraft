@@ -1,3 +1,7 @@
 {
+  "narrativecraft.chapter": "Chapter",
 
+  "narrativecraft.screen.pagination.page": "Page %d",
+  "narrativecraft.screen.pagination.page_out_of": "Page %d out of %d",
+  "narrativecraft.screen.pagination.skip_to_page_tootip": "Skip to page"
 }
