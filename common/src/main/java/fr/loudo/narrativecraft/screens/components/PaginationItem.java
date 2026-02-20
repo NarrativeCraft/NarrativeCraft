@@ -21,37 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.keys;
+package fr.loudo.narrativecraft.screens.components;
 
-import fr.loudo.narrativecraft.client.NarrativeCraftClientMod;
-import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
-import fr.loudo.narrativecraft.utils.Translation;
-import java.util.HashMap;
-import java.util.Map;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
+public class PaginationItem {
 
-public class PressKeyListener {
+    private final Runnable onClick;
+    private String displayName;
 
-    private static final Map<KeyMapping, Boolean> PREVIOUS_STATES_KEY_MAPPING = new HashMap<>();
-
-    public static void onKeyPressed(Minecraft minecraft) {
-        handleKeyPress(ModKeys.STORY_MANAGER, () -> {
-            NarrativeEntryListScreen screen = new NarrativeEntryListScreen(
-                    Translation.message("chapter"),
-                    NarrativeCraftClientMod.getInstance().getChapterManager().getList());
-            minecraft.setScreen(screen);
-        });
+    public PaginationItem(String displayName, Runnable onClick) {
+        this.displayName = displayName;
+        this.onClick = onClick;
     }
 
-    public static void handleKeyPress(KeyMapping key, Runnable action) {
-        boolean isDown = key.isDown();
-        boolean wasDown = PREVIOUS_STATES_KEY_MAPPING.getOrDefault(key, false);
+    public String getDisplayName() {
+        return displayName;
+    }
 
-        if (isDown && !wasDown) {
-            action.run();
-        }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
-        PREVIOUS_STATES_KEY_MAPPING.put(key, isDown);
+    public Runnable getOnClick() {
+        return onClick;
     }
 }

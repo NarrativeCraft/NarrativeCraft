@@ -23,25 +23,12 @@
 
 package fr.loudo.narrativecraft.screens.components;
 
-public class Paginationitem {
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.network.chat.Component;
 
-    private final Runnable onClick;
-    private String displayName;
-
-    public Paginationitem(String displayName, Runnable onClick) {
-        this.displayName = displayName;
-        this.onClick = onClick;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public Runnable getOnClick() {
-        return onClick;
+public class Breadcrumb extends StringWidget {
+    public Breadcrumb(Component message, Font font) {
+        super(message, font);
     }
 }

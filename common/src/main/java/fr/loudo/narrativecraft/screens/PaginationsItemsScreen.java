@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.screens;
 
-import fr.loudo.narrativecraft.screens.components.Paginationitem;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
@@ -33,24 +32,32 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class PaginationsItemsScreen extends Screen {
+public abstract class PaginationsItemsScreen<T> extends Screen {
 
-    private final List<Paginationitem> list;
-    private int page = 1;
-    private int maxItemsPerPage = 5;
-    private int gap = 10;
-    private int buttonWidth = 200;
-    private int buttonHeight = 20;
+    protected List<T> list;
+    protected int page = 1;
+    protected int maxItemsPerPage = 5;
+    protected int gap = 10;
+    protected int buttonWidth = 170;
+    protected int buttonHeight = 20;
 
-    public PaginationsItemsScreen(Component title, List<Paginationitem> list) {
+    protected PaginationsItemsScreen(Component title) {
+        super(title);
+    }
+
+    public PaginationsItemsScreen(Component title, List<T> list) {
         super(title);
         this.list = list;
     }
 
-    public PaginationsItemsScreen(Component title, List<Paginationitem> list, int page) {
+    public PaginationsItemsScreen(Component title, List<T> list, int page) {
         this(title, list);
         this.page = page;
     }
+
+    protected abstract String getItemName(T item);
+
+    protected abstract void onItemClicked(T item);
 
     @Override
     protected void init() {
@@ -61,7 +68,7 @@ public class PaginationsItemsScreen extends Screen {
             return;
         }
 
-        List<Paginationitem> itemsToDisplay = list.subList(startIndex, endIndex);
+        List<T> itemsToDisplay = list.subList(startIndex, endIndex);
 
         int totalContentHeight = (itemsToDisplay.size() * buttonHeight) + ((itemsToDisplay.size() - 1) * gap);
         int startY = (this.height - totalContentHeight) / 2;
@@ -74,18 +81,8 @@ public class PaginationsItemsScreen extends Screen {
         title.setPosition(this.width / 2 - title.getWidth() / 2, 20);
         this.addRenderableWidget(title);
 
-        // Items
-        for (Paginationitem item : itemsToDisplay) {
-            Button button = Button.builder(Component.literal(item.getDisplayName()), b -> {
-                        Runnable onClick = item.getOnClick();
-                        if (onClick != null) {
-                            onClick.run();
-                        }
-                    })
-                    .bounds(middleX, currentY, buttonWidth, buttonHeight)
-                    .build();
-
-            this.addRenderableWidget(button);
+        for (T item : itemsToDisplay) {
+            addWidgetsForItem(middleX, currentY, item);
             currentY += buttonHeight + gap;
         }
 
@@ -136,6 +133,16 @@ public class PaginationsItemsScreen extends Screen {
                 .bounds(this.width / 2, navigationPageY + 25, 20, 20)
                 .build();
         this.addRenderableWidget(skipToPageButton);
+    }
+
+    public void addWidgetsForItem(int x, int y, T item) {
+        Button button = Button.builder(Component.literal(getItemName(item)), b -> {
+                    onItemClicked(item);
+                })
+                .bounds(x, y, buttonWidth, buttonHeight)
+                .build();
+
+        this.addRenderableWidget(button);
     }
 
     private void changePage(int page) {

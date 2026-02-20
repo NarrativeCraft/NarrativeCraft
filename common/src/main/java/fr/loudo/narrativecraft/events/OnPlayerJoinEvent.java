@@ -23,9 +23,18 @@
 
 package fr.loudo.narrativecraft.events;
 
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.network.NarrativeEntryAction;
+import fr.loudo.narrativecraft.network.S2CSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.server.level.ServerPlayer;
 
 public class OnPlayerJoinEvent {
 
-    public static void onPlayerJoin(ServerPlayer player) {}
+    public static void onPlayerJoin(ServerPlayer player) {
+        for (int i = 0; i < 10; i++) {
+            Chapter chapter = new Chapter("test" + i, "test", i);
+            Services.PACKET.sendToPlayer(player, new S2CSyncNarrativeEntryPacket(chapter, NarrativeEntryAction.ADD));
+        }
+    }
 }
