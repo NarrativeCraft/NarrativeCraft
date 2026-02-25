@@ -23,13 +23,13 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
-import fr.loudo.narrativecraft.network.S2CSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
 
     public static void handle() {
-        ClientPlayNetworking.registerGlobalReceiver(S2CSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
+        ClientPlayNetworking.registerGlobalReceiver(BiSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
             ClientPacketHandler.narrativeEntry(packet);
         });
     }

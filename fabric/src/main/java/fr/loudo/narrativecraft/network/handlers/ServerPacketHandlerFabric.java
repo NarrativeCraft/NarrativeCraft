@@ -21,30 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative;
+package fr.loudo.narrativecraft.network.handlers;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryProcessor;
-import fr.loudo.narrativecraft.network.NarrativeEntryAction;
-import java.util.HashMap;
-import java.util.Map;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
-public class ClientNarrativeManager {
-    private static final Map<Class<? extends NarrativeEntry>, NarrativeEntryProcessor<?>> PROCESSORS = new HashMap<>();
+public class ServerPacketHandlerFabric {
 
-    public static <T extends NarrativeEntry> void registerProcessor(
-            Class<T> clazz, NarrativeEntryProcessor<T> processor) {
-        PROCESSORS.put(clazz, processor);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends NarrativeEntry> void dispatch(NarrativeEntryAction action, T entry) {
-        NarrativeEntryProcessor<T> processor = (NarrativeEntryProcessor<T>) PROCESSORS.get(entry.getClass());
-        if (processor != null) {
-            processor.process(action, entry);
-        } else {
-            NarrativeCraftMod.LOGGER.warn("Narrative entry processor not found for class {}", entry.getClass());
-        }
+    public static void handle() {
+        ServerPlayNetworking.registerGlobalReceiver(BiSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
+            ServerPacketHandler.narrativeEntry(packet);
+        });
     }
 }

@@ -21,32 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.network.handlers;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnPacketRegisterEventNeoForge {
+public class ServerPacketHandlerNeoForge {
 
-    public OnPacketRegisterEventNeoForge(IEventBus modBus) {
-        modBus.addListener(OnPacketRegisterEventNeoForge::onPacketRegister);
-    }
-
-    private static void onPacketRegister(RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar("1");
-        registerS2CPackets(registrar);
-    }
-
-    private static void registerS2CPackets(PayloadRegistrar registrar) {
-        registrar.playBidirectional(
-                BiSyncNarrativeEntryPacket.TYPE,
-                BiSyncNarrativeEntryPacket.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::syncNarrativeEntry);
+    public static void syncNarrativeEntry(BiSyncNarrativeEntryPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ServerPacketHandler.narrativeEntry(packet);
+        });
     }
 }

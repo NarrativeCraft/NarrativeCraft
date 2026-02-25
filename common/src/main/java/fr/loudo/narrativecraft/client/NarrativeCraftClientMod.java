@@ -23,19 +23,14 @@
 
 package fr.loudo.narrativecraft.client;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeManager;
-import fr.loudo.narrativecraft.client.narrative.chapter.ChapterProcessorClient;
 import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 
 public class NarrativeCraftClientMod {
     private static final NarrativeCraftClientMod instance = new NarrativeCraftClientMod();
 
     private final ChapterManager chapterManager = new ChapterManager();
 
-    public static void commonInit() {
-        ClientNarrativeManager.registerProcessor(Chapter.class, new ChapterProcessorClient());
-    }
+    public static void commonInit() {}
 
     public ChapterManager getChapterManager() {
         return chapterManager;

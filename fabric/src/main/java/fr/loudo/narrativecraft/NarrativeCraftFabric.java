@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.network.ServerPacketRegisterFabric;
+import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerFabric;
 import fr.loudo.narrativecraft.register.FabricEventList;
 import net.fabricmc.api.ModInitializer;
 
@@ -33,6 +35,10 @@ public class NarrativeCraftFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         eventList.register();
+
+        ServerPacketRegisterFabric.register();
+        ServerPacketHandlerFabric.handle();
+
         NarrativeCraftMod.commonInit();
     }
 }

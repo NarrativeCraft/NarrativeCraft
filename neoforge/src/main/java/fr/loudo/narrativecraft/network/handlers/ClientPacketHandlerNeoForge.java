@@ -21,31 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.handlers;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record S2CSyncNarrativeEntryPacket(NarrativeEntry entry, NarrativeEntryAction action)
-        implements CustomPacketPayload {
+public class ClientPacketHandlerNeoForge {
 
-    public static final Type<S2CSyncNarrativeEntryPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sync_narrative_entry"));
-
-    public static final StreamCodec<ByteBuf, S2CSyncNarrativeEntryPacket> STREAM_CODEC = StreamCodec.composite(
-            NarrativeEntry.STREAM_CODEC,
-            S2CSyncNarrativeEntryPacket::entry,
-            ByteBufCodecs.idMapper(i -> NarrativeEntryAction.values()[i], NarrativeEntryAction::ordinal),
-            S2CSyncNarrativeEntryPacket::action,
-            S2CSyncNarrativeEntryPacket::new);
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public static void syncNarrativeEntry(BiSyncNarrativeEntryPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.narrativeEntry(packet);
+        });
     }
 }

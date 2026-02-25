@@ -23,9 +23,7 @@
 
 package fr.loudo.narrativecraft.screens;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
@@ -40,14 +38,12 @@ public class NarrativeEntryListScreen extends PaginationsItemsScreen<NarrativeEn
     @Override
     public void addWidgetsForItem(int x, int y, NarrativeEntry item) {
         super.addWidgetsForItem(x - 20, y, item);
-        Button editButton = Button.builder(
-                        Component.literal("✎"), b -> ClientNarrativeManager.dispatch(NarrativeEntryAction.EDIT, item))
+        Button editButton = Button.builder(Component.literal("✎"), b -> {})
                 .bounds(x + buttonWidth - 15, y, 20, 20)
                 .build();
         this.addRenderableWidget(editButton);
 
-        Button deleteButton = Button.builder(
-                        Component.literal("✖"), b -> ClientNarrativeManager.dispatch(NarrativeEntryAction.REMOVE, item))
+        Button deleteButton = Button.builder(Component.literal("✖"), b -> {})
                 .bounds(editButton.getX() + editButton.getWidth() + 5, y, 20, 20)
                 .build();
         this.addRenderableWidget(deleteButton);

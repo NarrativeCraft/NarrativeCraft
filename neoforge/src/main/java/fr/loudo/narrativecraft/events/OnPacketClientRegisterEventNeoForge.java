@@ -21,10 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative;
+package fr.loudo.narrativecraft.events;
 
-import fr.loudo.narrativecraft.network.NarrativeEntryAction;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
 
-public interface NarrativeEntryProcessor<T extends NarrativeEntry> {
-    void process(NarrativeEntryAction action, T entry);
+@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
+public class OnPacketClientRegisterEventNeoForge {
+
+    @SubscribeEvent
+    private static void onClientPacketRegister(RegisterClientPayloadHandlersEvent event) {
+        event.register(BiSyncNarrativeEntryPacket.TYPE, ClientPacketHandlerNeoForge::syncNarrativeEntry);
+    }
 }

@@ -23,16 +23,17 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeManager;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.network.S2CSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.platform.Services;
 
 public class ClientPacketHandler {
 
-    public static void narrativeEntry(S2CSyncNarrativeEntryPacket packet) {
+    public static void narrativeEntry(BiSyncNarrativeEntryPacket packet) {
+        NarrativeCraftMod.LOGGER.info(packet.toString() + " CLIENT");
+        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(packet.entry(), packet.action()));
         NarrativeEntry entry = packet.entry();
         if (entry == null) return;
-
-        ClientNarrativeManager.dispatch(packet.action(), entry);
     }
 }

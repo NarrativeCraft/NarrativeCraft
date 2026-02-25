@@ -23,14 +23,12 @@
 
 package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
-public class ClientPacketHandlerNeoForge {
+public class ServerPacketRegisterFabric {
 
-    public static void syncNarrativeEntry(S2CSyncNarrativeEntryPacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            ClientPacketHandler.narrativeEntry(packet);
-        });
+    public static void register() {
+        PayloadTypeRegistry.playC2S()
+                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
     }
 }

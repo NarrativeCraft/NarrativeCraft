@@ -21,31 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative.chapter;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.client.NarrativeCraftClientMod;
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryProcessor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.network.NarrativeEntryAction;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class ChapterProcessorClient implements NarrativeEntryProcessor<Chapter> {
+public record BiSyncNarrativeEntryPacket(NarrativeEntry entry, NarrativeEntryAction action)
+        implements CustomPacketPayload {
+
+    public static final Type<BiSyncNarrativeEntryPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sync_narrative_entry"));
+
+    public static final StreamCodec<ByteBuf, BiSyncNarrativeEntryPacket> STREAM_CODEC = StreamCodec.composite(
+            NarrativeEntry.STREAM_CODEC,
+            BiSyncNarrativeEntryPacket::entry,
+            ByteBufCodecs.idMapper(i -> NarrativeEntryAction.values()[i], NarrativeEntryAction::ordinal),
+            BiSyncNarrativeEntryPacket::action,
+            BiSyncNarrativeEntryPacket::new);
+
     @Override
-    public void process(NarrativeEntryAction action, Chapter entry) {
-        ChapterManager chapterManager = NarrativeCraftClientMod.getInstance().getChapterManager();
-        switch (action) {
-            case ADD:
-                chapterManager.add(entry);
-                break;
-            case EDIT:
-                Chapter oldChapter = chapterManager.getById(entry.getId());
-                if (oldChapter == null) return;
-                oldChapter.setName(entry.getName());
-                oldChapter.setDescription(entry.getDescription());
-                break;
-            case REMOVE:
-                chapterManager.remove(entry);
-                break;
-        }
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
