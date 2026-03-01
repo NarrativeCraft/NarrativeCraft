@@ -24,9 +24,10 @@
 package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.file.NarrativeCraftFile;
+import fr.loudo.narrativecraft.file.NarrativeCraftFileEditorsRegister;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +46,8 @@ public class NarrativeCraftMod {
     private MinecraftServer server;
 
     public static void commonInit() {
-        getInstance().getFile().registerEditors();
-        NarrativeEntryEditorRegistry.registerEditors();
+        NarrativeCraftFileEditorsRegister.register();
+        NarrativeEditorsRegister.register();
     }
 
     public ChapterManager getChapterManager() {

@@ -24,15 +24,13 @@
 package fr.loudo.narrativecraft.client.narrative;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Editor manager <b>client-side</b>.
- * When implementing {@link ClientNarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link #registerEditors()}.
+ * When implementing {@link ClientNarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link ClientNarrativeEditorsRegister#register()}.
  * using {@link #register(Class, ClientNarrativeEntryEditor)}.
  * <br>
  * The difference between the <b>server-side</b> one is that it only handles with the client managers instead of the world files.
@@ -49,10 +47,6 @@ public class ClientNarrativeEntryEditorRegistry {
 
     public static ClientNarrativeEntryEditorRegistry getInstance() {
         return INSTANCE;
-    }
-
-    public static void registerEditors() {
-        getInstance().register(Chapter.class, new ClientChapterEditor());
     }
 
     public <T extends NarrativeEntry> void register(Class<T> entryClass, ClientNarrativeEntryEditor<T> editor) {

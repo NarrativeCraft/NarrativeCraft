@@ -21,25 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client;
+package fr.loudo.narrativecraft.narrative;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
-import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.chapter.ChapterEditor;
 
-public class ClientNarrativeCraftMod {
-    private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
+public class NarrativeEditorsRegister {
 
-    private final ChapterManager chapterManager = new ChapterManager();
-
-    public static void commonInit() {
-        ClientNarrativeEditorsRegister.register();
-    }
-
-    public ChapterManager getChapterManager() {
-        return chapterManager;
-    }
-
-    public static ClientNarrativeCraftMod getInstance() {
-        return instance;
+    public static void register() {
+        NarrativeEntryEditorRegistry.getInstance().register(Chapter.class, new ChapterEditor());
     }
 }

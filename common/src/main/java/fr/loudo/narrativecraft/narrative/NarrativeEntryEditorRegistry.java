@@ -24,15 +24,13 @@
 package fr.loudo.narrativecraft.narrative;
 
 import fr.loudo.narrativecraft.file.NarrativeCraftFile;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.ChapterEditor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 /**
  * Editor manager <b>server-side</b>.
- * When implementing {@link NarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link #registerEditors()}.
+ * When implementing {@link NarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link NarrativeEditorsRegister#register()}.
  * using {@link #register(Class, NarrativeEntryEditor)}.
  * <br>
  * This class should be used to deal with managers <b>and</b> world files using {@link NarrativeCraftFile}.
@@ -45,10 +43,6 @@ public class NarrativeEntryEditorRegistry {
     private final Map<Class<? extends NarrativeEntry>, NarrativeEntryEditor<?>> registry = new HashMap<>();
 
     private NarrativeEntryEditorRegistry() {}
-
-    public static void registerEditors() {
-        getInstance().register(Chapter.class, new ChapterEditor());
-    }
 
     public static NarrativeEntryEditorRegistry getInstance() {
         return INSTANCE;
