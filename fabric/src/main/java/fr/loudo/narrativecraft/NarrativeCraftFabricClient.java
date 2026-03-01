@@ -23,18 +23,23 @@
 
 package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.client.NarrativeCraftClientMod;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.network.ClientPacketRegisterFabric;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerFabric;
+import fr.loudo.narrativecraft.register.ClientFabricEventList;
 import net.fabricmc.api.ClientModInitializer;
 
 public class NarrativeCraftFabricClient implements ClientModInitializer {
 
+    private final ClientFabricEventList clientFabricEventList = new ClientFabricEventList();
+
     @Override
     public void onInitializeClient() {
-        NarrativeCraftClientMod.commonInit();
+        ClientNarrativeCraftMod.commonInit();
 
         ClientPacketRegisterFabric.register();
         ClientPacketHandlerFabric.handle();
+
+        clientFabricEventList.register();
     }
 }

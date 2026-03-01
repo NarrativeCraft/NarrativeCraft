@@ -21,20 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.client.narrative;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class OnClientInitEventNeoForge {
-
-    @SubscribeEvent
-    public static void clientInit(FMLClientSetupEvent event) {
-        ClientNarrativeCraftMod.commonInit();
-    }
-}
+public interface ClientNarrativeEntryEditor<T extends NarrativeEntry> extends NarrativeEntryEditor<T> {}

@@ -1,0 +1,62 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.narrative;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Centralized class to dispatch unique ways to add, edit and delete an {@link NarrativeEntry} from their respective manager.
+ * @param <E>
+ */
+public abstract class AbstractNarrativeEntryEditorManager<E extends NarrativeEntryEditor<?>> {
+
+    protected final Map<Class<? extends NarrativeEntry>, E> registry = new HashMap<>();
+
+    @SuppressWarnings("unchecked")
+    protected <T extends NarrativeEntry> void registerInternal(Class<T> entryClass, NarrativeEntryEditor<T> editor) {
+        registry.put(entryClass, (E) editor);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends NarrativeEntry> NarrativeEntryEditor<T> getEditor(T entry) {
+        if (entry == null) return null;
+        return (NarrativeEntryEditor<T>) registry.get(entry.getClass());
+    }
+
+    public <T extends NarrativeEntry> void add(T entry) {
+        NarrativeEntryEditor<T> editor = getEditor(entry);
+        if (editor != null) editor.add(entry);
+    }
+
+    public <T extends NarrativeEntry> void edit(T entry) {
+        NarrativeEntryEditor<T> editor = getEditor(entry);
+        if (editor != null) editor.edit(entry);
+    }
+
+    public <T extends NarrativeEntry> void delete(T entry) {
+        NarrativeEntryEditor<T> editor = getEditor(entry);
+        if (editor != null) editor.delete(entry);
+    }
+}

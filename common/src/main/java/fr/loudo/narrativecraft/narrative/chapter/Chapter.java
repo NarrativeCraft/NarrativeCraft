@@ -23,7 +23,10 @@
 
 package fr.loudo.narrativecraft.narrative.chapter;
 
+import fr.loudo.narrativecraft.managers.Manager;
+import fr.loudo.narrativecraft.managers.SceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
@@ -44,6 +47,7 @@ public class Chapter extends NarrativeEntry {
             Chapter::new);
 
     private int chapterIndex;
+    private final Manager<Scene> sceneManager = new SceneManager();
 
     public Chapter(UUID uuid, String name, String description, int chapterIndex) {
         super(uuid, name, description);
@@ -61,5 +65,9 @@ public class Chapter extends NarrativeEntry {
 
     public void setChapterIndex(int chapterIndex) {
         this.chapterIndex = chapterIndex;
+    }
+
+    public Manager<Scene> getSceneManager() {
+        return sceneManager;
     }
 }

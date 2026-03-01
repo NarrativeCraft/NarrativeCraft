@@ -21,22 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.events.IFabricEventRegister;
+import fr.loudo.narrativecraft.events.OnClientTick;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
-public class NarrativeCraftClientMod {
-    private static final NarrativeCraftClientMod instance = new NarrativeCraftClientMod();
+public class OnClientTickFabric implements IFabricEventRegister {
 
-    private final ChapterManager chapterManager = new ChapterManager();
-
-    public static void commonInit() {}
-
-    public ChapterManager getChapterManager() {
-        return chapterManager;
-    }
-
-    public static NarrativeCraftClientMod getInstance() {
-        return instance;
+    public void register() {
+        ClientTickEvents.END_CLIENT_TICK.register(OnClientTick::tick);
     }
 }

@@ -21,13 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.client.narrative.chapter;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 
-public class OnServerStartFabric implements IFabricEventRegister {
+public class ClientChapterEditor implements ClientNarrativeEntryEditor<Chapter> {
 
-    public void register() {
-        ServerLifecycleEvents.SERVER_STARTED.register(OnServerStart::serverStart);
+    final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
+
+    @Override
+    public void add(Chapter entry) {
+        chapterManager.add(entry);
     }
+
+    @Override
+    public void edit(Chapter entry) {}
+
+    @Override
+    public void delete(Chapter entry) {}
 }

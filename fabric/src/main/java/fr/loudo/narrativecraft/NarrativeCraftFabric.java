@@ -30,15 +30,16 @@ import net.fabricmc.api.ModInitializer;
 
 public class NarrativeCraftFabric implements ModInitializer {
 
-    private final FabricEventList eventList = new FabricEventList();
+    private final FabricEventList fabricEventList = new FabricEventList();
 
     @Override
     public void onInitialize() {
-        eventList.register();
 
         ServerPacketRegisterFabric.register();
         ServerPacketHandlerFabric.handle();
 
         NarrativeCraftMod.commonInit();
+
+        fabricEventList.register();
     }
 }

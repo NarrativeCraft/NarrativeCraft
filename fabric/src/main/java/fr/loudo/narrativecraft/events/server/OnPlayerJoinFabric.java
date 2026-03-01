@@ -21,13 +21,17 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.events.server;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import fr.loudo.narrativecraft.events.IFabricEventRegister;
+import fr.loudo.narrativecraft.events.OnPlayerJoinEvent;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
-public class OnClientTickFabric implements IFabricEventRegister {
-
+public class OnPlayerJoinFabric implements IFabricEventRegister {
+    @Override
     public void register() {
-        ClientTickEvents.END_CLIENT_TICK.register(OnClientTick::tick);
+        ServerPlayConnectionEvents.JOIN.register((serverGamePacketListener, packetSender, minecraftServer) -> {
+            OnPlayerJoinEvent.onPlayerJoin(serverGamePacketListener.getPlayer());
+        });
     }
 }

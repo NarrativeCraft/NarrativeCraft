@@ -21,20 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.narrative;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import fr.loudo.narrativecraft.file.NarrativeCraftFile;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class OnClientInitEventNeoForge {
+/**
+ * Editor manager <b>server-side</b>.
+ * When implementing {@link NarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link NarrativeCraftMod#commonInit()}.
+ * using {@link #register(Class, NarrativeEntryEditor)}.
+ * <br>
+ * This class should be used to deal with managers <b>and</b> world files using {@link NarrativeCraftFile}.
+ *
+ */
+public class NarrativeEntryEditorManager extends AbstractNarrativeEntryEditorManager<NarrativeEntryEditor<?>> {
 
-    @SubscribeEvent
-    public static void clientInit(FMLClientSetupEvent event) {
-        ClientNarrativeCraftMod.commonInit();
+    private static final NarrativeEntryEditorManager INSTANCE = new NarrativeEntryEditorManager();
+
+    private NarrativeEntryEditorManager() {}
+
+    public static NarrativeEntryEditorManager getInstance() {
+        return INSTANCE;
+    }
+
+    public <T extends NarrativeEntry> void register(Class<T> entryClass, NarrativeEntryEditor<T> editor) {
+        registerInternal(entryClass, editor);
     }
 }

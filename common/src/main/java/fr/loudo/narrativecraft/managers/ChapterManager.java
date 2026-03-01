@@ -24,13 +24,20 @@
 package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 
 public class ChapterManager extends Manager<Chapter> {
+
+    private final Manager<Scene> sceneManager = new SceneManager();
 
     public Chapter getChapterByIndex(int index) {
         for (Chapter chapter : list) {
             if (chapter.getChapterIndex() == index) return chapter;
         }
         return null;
+    }
+
+    public Manager<Scene> getSceneManager() {
+        return sceneManager;
     }
 }

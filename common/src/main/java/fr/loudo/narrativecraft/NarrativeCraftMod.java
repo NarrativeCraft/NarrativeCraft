@@ -23,9 +23,12 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
 import fr.loudo.narrativecraft.file.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +43,9 @@ public class NarrativeCraftMod {
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
 
-    public static void commonInit() {}
+    public static void commonInit() {
+        NarrativeEntryEditorManager.getInstance().register(Chapter.class, new ClientChapterEditor());
+    }
 
     public ChapterManager getChapterManager() {
         return chapterManager;

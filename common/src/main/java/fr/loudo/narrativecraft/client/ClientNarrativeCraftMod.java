@@ -21,20 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.client;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorManager;
+import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class OnClientInitEventNeoForge {
+public class ClientNarrativeCraftMod {
+    private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
 
-    @SubscribeEvent
-    public static void clientInit(FMLClientSetupEvent event) {
-        ClientNarrativeCraftMod.commonInit();
+    private final ChapterManager chapterManager = new ChapterManager();
+
+    public static void commonInit() {
+        ClientNarrativeEntryEditorManager.getInstance().register(Chapter.class, new ClientChapterEditor());
+    }
+
+    public ChapterManager getChapterManager() {
+        return chapterManager;
+    }
+
+    public static ClientNarrativeCraftMod getInstance() {
+        return instance;
     }
 }
