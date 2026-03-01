@@ -23,20 +23,39 @@
 
 package fr.loudo.narrativecraft.narrative;
 
+import fr.loudo.narrativecraft.file.NarrativeCraftFile;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.chapter.ChapterEditor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
- * Centralized class to dispatch unique ways to add, edit and delete an {@link NarrativeEntry} from their respective manager.
- * @param <E>
+ * Editor manager <b>server-side</b>.
+ * When implementing {@link NarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link #registerEditors()}.
+ * using {@link #register(Class, NarrativeEntryEditor)}.
+ * <br>
+ * This class should be used to deal with managers <b>and</b> world files using {@link NarrativeCraftFile}.
+ *
  */
-public abstract class AbstractNarrativeEntryEditorManager<E extends NarrativeEntryEditor<?>> {
+public class NarrativeEntryEditorRegistry {
 
-    protected final Map<Class<? extends NarrativeEntry>, E> registry = new HashMap<>();
+    private static final NarrativeEntryEditorRegistry INSTANCE = new NarrativeEntryEditorRegistry();
 
-    @SuppressWarnings("unchecked")
-    protected <T extends NarrativeEntry> void registerInternal(Class<T> entryClass, NarrativeEntryEditor<T> editor) {
-        registry.put(entryClass, (E) editor);
+    private final Map<Class<? extends NarrativeEntry>, NarrativeEntryEditor<?>> registry = new HashMap<>();
+
+    private NarrativeEntryEditorRegistry() {}
+
+    public static void registerEditors() {
+        getInstance().register(Chapter.class, new ChapterEditor());
+    }
+
+    public static NarrativeEntryEditorRegistry getInstance() {
+        return INSTANCE;
+    }
+
+    public <T extends NarrativeEntry> void register(Class<T> entryClass, NarrativeEntryEditor<T> editor) {
+        registry.put(entryClass, editor);
     }
 
     @SuppressWarnings("unchecked")
@@ -45,18 +64,18 @@ public abstract class AbstractNarrativeEntryEditorManager<E extends NarrativeEnt
         return (NarrativeEntryEditor<T>) registry.get(entry.getClass());
     }
 
-    public <T extends NarrativeEntry> void add(T entry) {
+    public <T extends NarrativeEntry> void add(T entry, UUID playerId) {
         NarrativeEntryEditor<T> editor = getEditor(entry);
-        if (editor != null) editor.add(entry);
+        if (editor != null) editor.add(entry, playerId);
     }
 
-    public <T extends NarrativeEntry> void edit(T entry) {
+    public <T extends NarrativeEntry> void edit(T entry, UUID playerId) {
         NarrativeEntryEditor<T> editor = getEditor(entry);
-        if (editor != null) editor.edit(entry);
+        if (editor != null) editor.edit(entry, playerId);
     }
 
-    public <T extends NarrativeEntry> void delete(T entry) {
+    public <T extends NarrativeEntry> void delete(T entry, UUID playerId) {
         NarrativeEntryEditor<T> editor = getEditor(entry);
-        if (editor != null) editor.delete(entry);
+        if (editor != null) editor.delete(entry, playerId);
     }
 }

@@ -21,30 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative;
+package fr.loudo.narrativecraft.utils;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.file.NarrativeCraftFile;
+import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
 
-/**
- * Editor manager <b>server-side</b>.
- * When implementing {@link NarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link NarrativeCraftMod#commonInit()}.
- * using {@link #register(Class, NarrativeEntryEditor)}.
- * <br>
- * This class should be used to deal with managers <b>and</b> world files using {@link NarrativeCraftFile}.
- *
- */
-public class NarrativeEntryEditorManager extends AbstractNarrativeEntryEditorManager<NarrativeEntryEditor<?>> {
+public class UtilsServer {
 
-    private static final NarrativeEntryEditorManager INSTANCE = new NarrativeEntryEditorManager();
-
-    private NarrativeEntryEditorManager() {}
-
-    public static NarrativeEntryEditorManager getInstance() {
-        return INSTANCE;
-    }
-
-    public <T extends NarrativeEntry> void register(Class<T> entryClass, NarrativeEntryEditor<T> editor) {
-        registerInternal(entryClass, editor);
+    public static ServerPlayer getPlayerByUUID(UUID playerId) {
+        return NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayer(playerId);
     }
 }

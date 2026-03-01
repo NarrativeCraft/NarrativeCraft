@@ -30,7 +30,7 @@ public class ServerPacketHandlerNeoForge {
 
     public static void syncNarrativeEntry(BiSyncNarrativeEntryPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ServerPacketHandler.narrativeEntry(packet);
+            ServerPacketHandler.narrativeEntry(packet, context.player());
         });
     }
 }

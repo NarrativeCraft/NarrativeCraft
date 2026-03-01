@@ -21,19 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.handlers;
+package fr.loudo.narrativecraft.file;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import net.minecraft.world.entity.player.Player;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 
-public class ServerPacketHandler {
+public interface NarrativeCraftFileEditor<T extends NarrativeEntry> {
 
-    public static void narrativeEntry(BiSyncNarrativeEntryPacket packet, Player player) {
-        switch (packet.action()) {
-            case ADD -> NarrativeEntryEditorRegistry.getInstance().add(packet.entry(), player.getUUID());
-            case EDIT -> NarrativeEntryEditorRegistry.getInstance().edit(packet.entry(), player.getUUID());
-            case DELETE -> NarrativeEntryEditorRegistry.getInstance().delete(packet.entry(), player.getUUID());
-        }
-    }
+    int OPERATION_SUCCESS = 0;
+    int OPERATION_FAILED = 1;
+
+    int create(T entry);
+
+    int edit(T entry);
+
+    int delete(T entry);
 }

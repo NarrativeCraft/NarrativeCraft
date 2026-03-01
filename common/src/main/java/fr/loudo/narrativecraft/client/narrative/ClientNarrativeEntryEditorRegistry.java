@@ -24,37 +24,59 @@
 package fr.loudo.narrativecraft.client.narrative;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.AbstractNarrativeEntryEditorManager;
+import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Editor manager <b>client-side</b>.
- * When implementing {@link ClientNarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link ClientNarrativeCraftMod#commonInit()}.
+ * When implementing {@link ClientNarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link #registerEditors()}.
  * using {@link #register(Class, ClientNarrativeEntryEditor)}.
  * <br>
  * The difference between the <b>server-side</b> one is that it only handles with the client managers instead of the world files.
  *
  * @see NarrativeCraftMod#commonInit()
  */
-public class ClientNarrativeEntryEditorManager
-        extends AbstractNarrativeEntryEditorManager<ClientNarrativeEntryEditor<?>> {
+public class ClientNarrativeEntryEditorRegistry {
 
-    private static final ClientNarrativeEntryEditorManager INSTANCE = new ClientNarrativeEntryEditorManager();
+    private static final ClientNarrativeEntryEditorRegistry INSTANCE = new ClientNarrativeEntryEditorRegistry();
 
-    private ClientNarrativeEntryEditorManager() {}
+    private final Map<Class<? extends NarrativeEntry>, ClientNarrativeEntryEditor<?>> registry = new HashMap<>();
 
-    public static ClientNarrativeEntryEditorManager getInstance() {
+    private ClientNarrativeEntryEditorRegistry() {}
+
+    public static ClientNarrativeEntryEditorRegistry getInstance() {
         return INSTANCE;
     }
 
+    public static void registerEditors() {
+        getInstance().register(Chapter.class, new ClientChapterEditor());
+    }
+
     public <T extends NarrativeEntry> void register(Class<T> entryClass, ClientNarrativeEntryEditor<T> editor) {
-        registerInternal(entryClass, editor);
+        registry.put(entryClass, editor);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends NarrativeEntry> ClientNarrativeEntryEditor<T> getClientEditor(T entry) {
         if (entry == null) return null;
         return (ClientNarrativeEntryEditor<T>) registry.get(entry.getClass());
+    }
+
+    public <T extends NarrativeEntry> void add(T entry) {
+        ClientNarrativeEntryEditor<T> editor = getClientEditor(entry);
+        if (editor != null) editor.add(entry);
+    }
+
+    public <T extends NarrativeEntry> void edit(T entry) {
+        ClientNarrativeEntryEditor<T> editor = getClientEditor(entry);
+        if (editor != null) editor.edit(entry);
+    }
+
+    public <T extends NarrativeEntry> void delete(T entry) {
+        ClientNarrativeEntryEditor<T> editor = getClientEditor(entry);
+        if (editor != null) editor.delete(entry);
     }
 }

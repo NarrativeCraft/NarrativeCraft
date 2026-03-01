@@ -30,7 +30,7 @@ public class ServerPacketHandlerFabric {
 
     public static void handle() {
         ServerPlayNetworking.registerGlobalReceiver(BiSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
-            ServerPacketHandler.narrativeEntry(packet);
+            ServerPacketHandler.narrativeEntry(packet, context.player());
         });
     }
 }

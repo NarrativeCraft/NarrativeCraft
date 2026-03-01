@@ -23,10 +23,8 @@
 
 package fr.loudo.narrativecraft.client;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorManager;
-import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
+import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 
 public class ClientNarrativeCraftMod {
     private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
@@ -34,7 +32,7 @@ public class ClientNarrativeCraftMod {
     private final ChapterManager chapterManager = new ChapterManager();
 
     public static void commonInit() {
-        ClientNarrativeEntryEditorManager.getInstance().register(Chapter.class, new ClientChapterEditor());
+        ClientNarrativeEntryEditorRegistry.registerEditors();
     }
 
     public ChapterManager getChapterManager() {

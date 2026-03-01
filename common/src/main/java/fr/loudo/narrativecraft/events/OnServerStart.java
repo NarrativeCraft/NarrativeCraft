@@ -33,5 +33,6 @@ public class OnServerStart {
     public static void serverStart(MinecraftServer server) {
         File rootDirectory = server.getWorldPath(LevelResource.ROOT).toFile();
         NarrativeCraftMod.getInstance().getFile().getInit().init(rootDirectory);
+        NarrativeCraftMod.getInstance().setServer(server);
     }
 }

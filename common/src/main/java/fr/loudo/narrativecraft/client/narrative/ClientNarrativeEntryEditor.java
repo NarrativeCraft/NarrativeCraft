@@ -24,6 +24,11 @@
 package fr.loudo.narrativecraft.client.narrative;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
 
-public interface ClientNarrativeEntryEditor<T extends NarrativeEntry> extends NarrativeEntryEditor<T> {}
+public interface ClientNarrativeEntryEditor<T extends NarrativeEntry> {
+    void add(T entry);
+
+    void edit(T entry);
+
+    void delete(T entry);
+}

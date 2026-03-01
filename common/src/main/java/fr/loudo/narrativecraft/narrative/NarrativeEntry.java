@@ -71,6 +71,10 @@ public class NarrativeEntry {
         }
     };
 
+    public String toRawJson() {
+        return String.format("{\"id\": %s,\"name\":\"%s\",\"description\":\"%s\"}", uuid.toString(), name, description);
+    }
+
     public String getName() {
         return name;
     }

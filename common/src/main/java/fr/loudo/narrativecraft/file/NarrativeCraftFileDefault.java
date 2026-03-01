@@ -29,15 +29,19 @@ import java.io.IOException;
 
 public class NarrativeCraftFileDefault {
 
-    protected static final String EXTENSION_SCRIPT_FILE = ".ink";
+    public static final String EXTENSION_SCRIPT_FILE = ".ink";
     public static final String EXTENSION_DATA_FILE = ".json";
+    public static final String DATA_FILE_NAME = "data" + EXTENSION_DATA_FILE;
 
     protected final String DIRECTORY_NAME = NarrativeCraftMod.MOD_ID;
 
     protected File createDirectory(File parent, String name) {
         File directory = new File(parent, name);
         if (!directory.exists()) {
-            if (!directory.mkdir()) NarrativeCraftMod.LOGGER.error("Couldn't create directory {}!", name);
+            if (!directory.mkdir()) {
+                NarrativeCraftMod.LOGGER.error("Couldn't create directory {}!", name);
+                return null;
+            }
         }
         return directory;
     }
@@ -46,10 +50,13 @@ public class NarrativeCraftFileDefault {
         File file = new File(parent, name);
         if (!file.exists()) {
             try {
-                if (!file.createNewFile())
+                if (!file.createNewFile()) {
                     NarrativeCraftMod.LOGGER.error("Couldn't create file {}!", file.getAbsolutePath());
+                    return null;
+                }
             } catch (IOException e) {
                 NarrativeCraftMod.LOGGER.error("Couldn't create file {}! Cause: {}", file.getAbsolutePath(), e);
+                return null;
             }
         }
         return file;

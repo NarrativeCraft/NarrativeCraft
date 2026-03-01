@@ -23,15 +23,48 @@
 
 package fr.loudo.narrativecraft.narrative.chapter;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.file.NarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.file.NarrativeCraftFileRegistry;
+import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.NarrativeEntryAction;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
 
 public class ChapterEditor implements NarrativeEntryEditor<Chapter> {
-    @Override
-    public void add(Chapter entry) {}
+
+    final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
 
     @Override
-    public void edit(Chapter entry) {}
+    public void add(Chapter entry, UUID playerId) {
+        ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
+
+        int result = NarrativeCraftFileRegistry.getInstance().create(entry);
+        if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
+            chapterManager.add(entry);
+        } else {
+            if (player == null) return;
+            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(entry, NarrativeEntryAction.DELETE));
+        }
+    }
 
     @Override
-    public void delete(Chapter entry) {}
+    public void edit(Chapter entry, UUID playerId) {}
+
+    @Override
+    public void delete(Chapter entry, UUID playerId) {
+        ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
+
+        int result = NarrativeCraftFileRegistry.getInstance().delete(entry);
+        if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
+            chapterManager.remove(entry);
+        } else {
+            if (player == null) return;
+            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(entry, NarrativeEntryAction.ADD));
+        }
+    }
 }

@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.screens;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorManager;
+import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class NarrativeEntryListScreen extends PaginationsItemsScreen<NarrativeEn
 
         Button deleteButton = Button.builder(
                         Component.literal("✖"),
-                        b -> ClientNarrativeEntryEditorManager.getInstance().delete(item))
+                        b -> ClientNarrativeEntryEditorRegistry.getInstance().delete(item))
                 .bounds(editButton.getX() + editButton.getWidth() + 5, y, 20, 20)
                 .build();
         this.addRenderableWidget(deleteButton);

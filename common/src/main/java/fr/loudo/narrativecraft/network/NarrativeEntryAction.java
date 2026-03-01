@@ -26,5 +26,5 @@ package fr.loudo.narrativecraft.network;
 public enum NarrativeEntryAction {
     ADD,
     EDIT,
-    REMOVE,
+    DELETE,
 }

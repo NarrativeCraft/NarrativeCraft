@@ -23,11 +23,18 @@
 
 package fr.loudo.narrativecraft.file;
 
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+
 public class NarrativeCraftFile {
 
     private final NarrativeCraftFileInit init = new NarrativeCraftFileInit();
 
     public NarrativeCraftFileInit getInit() {
         return init;
+    }
+
+    public void registerEditors() {
+        NarrativeCraftFileRegistry.getInstance()
+                .register(Chapter.class, new NarrativeCraftFileChapter(init.getChaptersDirectory()));
     }
 }
