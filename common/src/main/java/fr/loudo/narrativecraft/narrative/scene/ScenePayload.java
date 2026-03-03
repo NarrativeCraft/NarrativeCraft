@@ -21,36 +21,36 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative;
+package fr.loudo.narrativecraft.narrative.scene;
 
-import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
-import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import io.netty.buffer.ByteBuf;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public enum NarrativeEntryType {
-    CHAPTER(ChapterPayload.class, ChapterPayload.STREAM_CODEC),
-    SCENE(ScenePayload.class, ScenePayload.STREAM_CODEC);
+public class ScenePayload extends NarrativeEntryPayload {
 
-    private final Class<? extends NarrativeEntryPayload> clazz;
-    private final StreamCodec<? super ByteBuf, ? extends NarrativeEntryPayload> codec;
+    public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC,
+            ScenePayload::getId,
+            ByteBufCodecs.STRING_UTF8,
+            ScenePayload::getName,
+            ByteBufCodecs.STRING_UTF8,
+            ScenePayload::getDescription,
+            UUIDUtil.STREAM_CODEC,
+            ScenePayload::getChapterId,
+            ScenePayload::new);
 
-    <T extends NarrativeEntryPayload> NarrativeEntryType(Class<T> clazz, StreamCodec<? super ByteBuf, T> codec) {
-        this.clazz = clazz;
-        this.codec = codec;
+    private final UUID chapterId;
+
+    public ScenePayload(UUID uuid, String name, String description, UUID chapterId) {
+        super(uuid, name, description);
+        this.chapterId = chapterId;
     }
 
-    public static NarrativeEntryType fromClass(Class<? extends NarrativeEntryPayload> clazz) {
-        for (NarrativeEntryType type : values()) {
-            if (type.clazz.equals(clazz)) {
-                return type;
-            }
-        }
-        throw new IllegalArgumentException("Unknown NarrativeEntry type: " + clazz.getName());
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntryPayload> StreamCodec<? super ByteBuf, T> getCodec() {
-        return (StreamCodec<? super ByteBuf, T>) codec;
+    public UUID getChapterId() {
+        return chapterId;
     }
 }

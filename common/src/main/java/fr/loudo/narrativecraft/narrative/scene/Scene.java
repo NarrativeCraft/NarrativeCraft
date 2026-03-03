@@ -24,9 +24,29 @@
 package fr.loudo.narrativecraft.narrative.scene;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import java.util.UUID;
 
-public class Scene extends NarrativeEntry {
-    public Scene(String name, String description) {
+public class Scene extends NarrativeEntry<ScenePayload> {
+
+    private final Chapter chapter;
+
+    public Scene(UUID uuid, String name, String description, Chapter chapter) {
+        super(uuid, name, description);
+        this.chapter = chapter;
+    }
+
+    public Scene(String name, String description, Chapter chapter) {
         super(name, description);
+        this.chapter = chapter;
+    }
+
+    public Chapter getChapter() {
+        return chapter;
+    }
+
+    @Override
+    public ScenePayload toPayload() {
+        return new ScenePayload(uuid, name, description, chapter.getId());
     }
 }

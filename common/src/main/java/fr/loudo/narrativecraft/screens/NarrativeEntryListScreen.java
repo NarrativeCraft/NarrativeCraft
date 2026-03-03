@@ -28,16 +28,37 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class NarrativeEntryListScreen extends PaginationsItemsScreen<NarrativeEntry> {
+public class NarrativeEntryListScreen extends PaginationsItemsScreen<NarrativeEntry<?>> {
 
-    public NarrativeEntryListScreen(Component title, List<? extends NarrativeEntry> entries) {
+    private Screen backScreen;
+
+    public NarrativeEntryListScreen(Component title, List<? extends NarrativeEntry<?>> entries) {
         super(title, new ArrayList<>(entries));
     }
 
+    public NarrativeEntryListScreen(Component title, List<? extends NarrativeEntry<?>> entries, Screen backScreen) {
+        this(title, entries);
+        this.backScreen = backScreen;
+    }
+
     @Override
-    public void addWidgetsForItem(int x, int y, NarrativeEntry item) {
+    protected void init() {
+        super.init();
+        if (backScreen == null) return;
+
+        Button backButton = Button.builder(Component.literal("<"), (b) -> {
+                    minecraft.setScreen(backScreen);
+                })
+                .bounds(this.width / 2 - buttonWidth / 2, 20, 20, 20)
+                .build();
+        this.addRenderableWidget(backButton);
+    }
+
+    @Override
+    public void addWidgetsForItem(int x, int y, NarrativeEntry<?> item) {
         super.addWidgetsForItem(x - 20, y, item);
         Button editButton = Button.builder(Component.literal("✎"), b -> {})
                 .bounds(x + buttonWidth - 15, y, 20, 20)
@@ -46,17 +67,22 @@ public class NarrativeEntryListScreen extends PaginationsItemsScreen<NarrativeEn
 
         Button deleteButton = Button.builder(
                         Component.literal("✖"),
-                        b -> ClientNarrativeEntryEditorRegistry.getInstance().delete(item))
+                        b -> ClientNarrativeEntryEditorRegistry.getInstance().delete(item.toPayload()))
                 .bounds(editButton.getX() + editButton.getWidth() + 5, y, 20, 20)
                 .build();
         this.addRenderableWidget(deleteButton);
     }
 
     @Override
-    protected String getItemName(NarrativeEntry item) {
+    protected String getItemName(NarrativeEntry<?> item) {
         return item.getName();
     }
 
     @Override
-    protected void onItemClicked(NarrativeEntry item) {}
+    protected void onItemClicked(NarrativeEntry<?> item) {}
+
+    @Override
+    protected boolean isItemClickable(NarrativeEntry<?> item) {
+        return true;
+    }
 }

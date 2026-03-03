@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.platform.Services;
@@ -35,6 +36,11 @@ public class OnPlayerJoinEvent {
         for (int i = 0; i < 10; i++) {
             Chapter chapter = new Chapter("test" + i, "test", i);
             Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(chapter, NarrativeEntryAction.ADD));
+            for (int j = 0; j < 5; j++) {
+                Scene scene = new Scene("scene" + j, "test", chapter);
+                chapter.getSceneManager().add(scene);
+                Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(scene, NarrativeEntryAction.ADD));
+            }
         }
     }
 }

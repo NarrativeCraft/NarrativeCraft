@@ -23,34 +23,46 @@
 
 package fr.loudo.narrativecraft.narrative;
 
-import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
-import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import io.netty.buffer.ByteBuf;
+import java.util.UUID;
 import net.minecraft.network.codec.StreamCodec;
 
-public enum NarrativeEntryType {
-    CHAPTER(ChapterPayload.class, ChapterPayload.STREAM_CODEC),
-    SCENE(ScenePayload.class, ScenePayload.STREAM_CODEC);
+public class NarrativeEntryPayload {
+    private final UUID uuid;
+    private final String name;
+    private final String description;
 
-    private final Class<? extends NarrativeEntryPayload> clazz;
-    private final StreamCodec<? super ByteBuf, ? extends NarrativeEntryPayload> codec;
-
-    <T extends NarrativeEntryPayload> NarrativeEntryType(Class<T> clazz, StreamCodec<? super ByteBuf, T> codec) {
-        this.clazz = clazz;
-        this.codec = codec;
-    }
-
-    public static NarrativeEntryType fromClass(Class<? extends NarrativeEntryPayload> clazz) {
-        for (NarrativeEntryType type : values()) {
-            if (type.clazz.equals(clazz)) {
-                return type;
-            }
+    public static final StreamCodec<ByteBuf, NarrativeEntryPayload> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public NarrativeEntryPayload decode(ByteBuf buffer) {
+            int ordinal = buffer.readInt();
+            NarrativeEntryType type = NarrativeEntryType.values()[ordinal];
+            return type.getCodec().decode(buffer);
         }
-        throw new IllegalArgumentException("Unknown NarrativeEntry type: " + clazz.getName());
+
+        @Override
+        public void encode(ByteBuf buffer, NarrativeEntryPayload value) {
+            NarrativeEntryType type = NarrativeEntryType.fromClass(value.getClass());
+            buffer.writeInt(type.ordinal());
+            type.getCodec().encode(buffer, value);
+        }
+    };
+
+    public NarrativeEntryPayload(UUID uuid, String name, String description) {
+        this.uuid = uuid;
+        this.name = name;
+        this.description = description;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntryPayload> StreamCodec<? super ByteBuf, T> getCodec() {
-        return (StreamCodec<? super ByteBuf, T>) codec;
+    public UUID getId() {
+        return uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

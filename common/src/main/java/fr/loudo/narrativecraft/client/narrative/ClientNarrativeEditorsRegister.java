@@ -24,11 +24,14 @@
 package fr.loudo.narrativecraft.client.narrative;
 
 import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.client.narrative.scene.ClientSceneEditor;
+import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
+import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 
 public class ClientNarrativeEditorsRegister {
 
     public static void register() {
-        ClientNarrativeEntryEditorRegistry.getInstance().register(Chapter.class, new ClientChapterEditor());
+        ClientNarrativeEntryEditorRegistry.getInstance().register(ChapterPayload.class, new ClientChapterEditor());
+        ClientNarrativeEntryEditorRegistry.getInstance().register(ScenePayload.class, new ClientSceneEditor());
     }
 }

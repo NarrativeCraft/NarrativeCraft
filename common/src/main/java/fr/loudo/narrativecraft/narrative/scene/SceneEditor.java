@@ -21,58 +21,39 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.managers;
+package fr.loudo.narrativecraft.narrative.scene;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import java.util.UUID;
 
-public abstract class Manager<T extends NarrativeEntry<?>> {
+public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
 
-    protected List<T> list = new ArrayList<>();
+    final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
 
-    public T getById(UUID uuid) {
-        for (T entry : list) {
-            if (entry.getId().equals(uuid)) {
-                return entry;
-            }
-        }
-        return null;
+    @Override
+    public Scene resolve(ScenePayload payload) {
+        Chapter chapter = chapterManager.getById(payload.getChapterId());
+        if (chapter == null) return null;
+
+        return chapter.getSceneManager().getById(payload.getId());
     }
 
-    public T getByName(String name) {
-        for (T item : list) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                return item;
-            }
-        }
-        return null;
+    @Override
+    public void add(ScenePayload payload, UUID playerId) {
+
+        Chapter chapter = chapterManager.getById(payload.getChapterId());
+        if (chapter == null) return;
+
+        Scene scene = new Scene(payload.getName(), payload.getDescription(), chapter);
+        scene.getChapter().getSceneManager().add(scene);
     }
 
-    public void add(T item) {
-        if (!list.contains(item)) {
-            list.add(item);
-        }
-    }
+    @Override
+    public void edit(ScenePayload payload, UUID playerId) {}
 
-    public void remove(T item) {
-        list.remove(item);
-    }
-
-    public void clear() {
-        list.clear();
-    }
-
-    public List<T> getList() {
-        return list;
-    }
-
-    public T get(int index) {
-        return list.get(index);
-    }
-
-    public int size() {
-        return list.size();
-    }
+    @Override
+    public void delete(ScenePayload payload, UUID playerId) {}
 }

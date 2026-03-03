@@ -59,6 +59,8 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
 
     protected abstract void onItemClicked(T item);
 
+    protected abstract boolean isItemClickable(T item);
+
     @Override
     protected void init() {
         int startIndex = (page - 1) * maxItemsPerPage;
@@ -141,6 +143,7 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
                 })
                 .bounds(x, y, buttonWidth, buttonHeight)
                 .build();
+        button.active = isItemClickable(item);
 
         this.addRenderableWidget(button);
     }

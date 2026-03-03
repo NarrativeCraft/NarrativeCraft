@@ -24,21 +24,21 @@
 package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record BiSyncNarrativeEntryPacket(NarrativeEntry entry, NarrativeEntryAction action)
+public record BiSyncNarrativeEntryPacket(NarrativeEntryPayload entry, NarrativeEntryAction action)
         implements CustomPacketPayload {
 
     public static final Type<BiSyncNarrativeEntryPacket> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sync_narrative_entry"));
 
     public static final StreamCodec<ByteBuf, BiSyncNarrativeEntryPacket> STREAM_CODEC = StreamCodec.composite(
-            NarrativeEntry.STREAM_CODEC,
+            NarrativeEntryPayload.STREAM_CODEC,
             BiSyncNarrativeEntryPacket::entry,
             ByteBufCodecs.idMapper(i -> NarrativeEntryAction.values()[i], NarrativeEntryAction::ordinal),
             BiSyncNarrativeEntryPacket::action,

@@ -27,24 +27,9 @@ import fr.loudo.narrativecraft.managers.Manager;
 import fr.loudo.narrativecraft.managers.SceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
-public class Chapter extends NarrativeEntry {
-
-    public static final StreamCodec<ByteBuf, Chapter> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            Chapter::getId,
-            ByteBufCodecs.STRING_UTF8,
-            Chapter::getName,
-            ByteBufCodecs.STRING_UTF8,
-            Chapter::getDescription,
-            ByteBufCodecs.VAR_INT,
-            Chapter::getChapterIndex,
-            Chapter::new);
+public class Chapter extends NarrativeEntry<ChapterPayload> {
 
     private int chapterIndex;
     private final Manager<Scene> sceneManager = new SceneManager();
@@ -69,5 +54,14 @@ public class Chapter extends NarrativeEntry {
 
     public Manager<Scene> getSceneManager() {
         return sceneManager;
+    }
+
+    public String formattedName() {
+        return chapterIndex + " - " + name;
+    }
+
+    @Override
+    public ChapterPayload toPayload() {
+        return new ChapterPayload(uuid, name, description, chapterIndex);
     }
 }

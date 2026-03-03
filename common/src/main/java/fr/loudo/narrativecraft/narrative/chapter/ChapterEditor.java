@@ -35,36 +35,46 @@ import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 
-public class ChapterEditor implements NarrativeEntryEditor<Chapter> {
+public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapter> {
 
     final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
 
     @Override
-    public void add(Chapter entry, UUID playerId) {
+    public Chapter resolve(ChapterPayload payload) {
+        return chapterManager.getById(payload.getId());
+    }
+
+    @Override
+    public void add(ChapterPayload payload, UUID playerId) {
+        Chapter chapter =
+                new Chapter(payload.getId(), payload.getName(), payload.getDescription(), payload.getChapterIndex());
+
         ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
 
-        int result = NarrativeCraftFileRegistry.getInstance().create(entry);
+        int result = NarrativeCraftFileRegistry.getInstance().create(chapter);
         if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
-            chapterManager.add(entry);
+            chapterManager.add(chapter);
         } else {
             if (player == null) return;
-            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(entry, NarrativeEntryAction.DELETE));
+            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.DELETE));
         }
     }
 
     @Override
-    public void edit(Chapter entry, UUID playerId) {}
+    public void edit(ChapterPayload payload, UUID playerId) {}
 
     @Override
-    public void delete(Chapter entry, UUID playerId) {
+    public void delete(ChapterPayload payload, UUID playerId) {
+        Chapter chapter = resolve(payload);
+
         ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
 
-        int result = NarrativeCraftFileRegistry.getInstance().delete(entry);
+        int result = NarrativeCraftFileRegistry.getInstance().delete(chapter);
         if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
-            chapterManager.remove(entry);
+            chapterManager.remove(chapter);
         } else {
             if (player == null) return;
-            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(entry, NarrativeEntryAction.ADD));
+            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.ADD));
         }
     }
 }

@@ -21,48 +21,57 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative.chapter;
+package fr.loudo.narrativecraft.client.narrative.scene;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.platform.Services;
 
-public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPayload, Chapter> {
+public class ClientSceneEditor implements ClientNarrativeEntryEditor<ScenePayload, Scene> {
 
     final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
 
     @Override
-    public Chapter resolve(ChapterPayload payload) {
-        return chapterManager.getById(payload.getId());
+    public Scene resolve(ScenePayload payload) {
+        Chapter chapter = chapterManager.getById(payload.getChapterId());
+        if (chapter == null) return null;
+        return chapter.getSceneManager().getById(payload.getId());
     }
 
     @Override
-    public void add(ChapterPayload payload) {
-        Chapter chapter =
-                new Chapter(payload.getId(), payload.getName(), payload.getDescription(), payload.getChapterIndex());
+    public void add(ScenePayload payload) {
+        Chapter chapter = chapterManager.getById(payload.getChapterId());
+        if (chapter == null) return;
 
-        chapterManager.add(chapter);
+        Scene scene = new Scene(payload.getId(), payload.getName(), payload.getDescription(), chapter);
+
+        scene.getChapter().getSceneManager().add(scene);
         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.ADD));
     }
 
     @Override
-    public void edit(ChapterPayload payload) {
-        Chapter oldChapter = resolve(payload);
-        oldChapter.setName(payload.getName());
-        oldChapter.setDescription(payload.getDescription());
-        oldChapter.setChapterIndex(payload.getChapterIndex());
+    public void edit(ScenePayload payload) {
+        Scene scene = resolve(payload);
+        if (scene == null) return;
+
+        scene.setName(payload.getName());
+        scene.setDescription(payload.getDescription());
+
         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.EDIT));
     }
 
     @Override
-    public void delete(ChapterPayload payload) {
-        Chapter chapter = resolve(payload);
-        chapterManager.remove(chapter);
+    public void delete(ScenePayload payload) {
+        Scene scene = resolve(payload);
+        if (scene == null) return;
+
+        scene.getChapter().getSceneManager().remove(scene);
         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.DELETE));
     }
 }

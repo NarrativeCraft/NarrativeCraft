@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.narrative;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +42,8 @@ public class ClientNarrativeEntryEditorRegistry {
 
     private static final ClientNarrativeEntryEditorRegistry INSTANCE = new ClientNarrativeEntryEditorRegistry();
 
-    private final Map<Class<? extends NarrativeEntry>, ClientNarrativeEntryEditor<?>> registry = new HashMap<>();
+    private final Map<Class<? extends NarrativeEntryPayload>, ClientNarrativeEntryEditor<?, ?>> registry =
+            new HashMap<>();
 
     private ClientNarrativeEntryEditorRegistry() {}
 
@@ -49,28 +51,30 @@ public class ClientNarrativeEntryEditorRegistry {
         return INSTANCE;
     }
 
-    public <T extends NarrativeEntry> void register(Class<T> entryClass, ClientNarrativeEntryEditor<T> editor) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void register(
+            Class<T> entryClass, ClientNarrativeEntryEditor<T, E> editor) {
         registry.put(entryClass, editor);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntry> ClientNarrativeEntryEditor<T> getClientEditor(T entry) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>>
+            ClientNarrativeEntryEditor<T, E> getClientEditor(T entry) {
         if (entry == null) return null;
-        return (ClientNarrativeEntryEditor<T>) registry.get(entry.getClass());
+        return (ClientNarrativeEntryEditor<T, E>) registry.get(entry.getClass());
     }
 
-    public <T extends NarrativeEntry> void add(T entry) {
-        ClientNarrativeEntryEditor<T> editor = getClientEditor(entry);
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void add(T entry) {
+        ClientNarrativeEntryEditor<T, E> editor = getClientEditor(entry);
         if (editor != null) editor.add(entry);
     }
 
-    public <T extends NarrativeEntry> void edit(T entry) {
-        ClientNarrativeEntryEditor<T> editor = getClientEditor(entry);
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void edit(T entry) {
+        ClientNarrativeEntryEditor<T, E> editor = getClientEditor(entry);
         if (editor != null) editor.edit(entry);
     }
 
-    public <T extends NarrativeEntry> void delete(T entry) {
-        ClientNarrativeEntryEditor<T> editor = getClientEditor(entry);
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void delete(T entry) {
+        ClientNarrativeEntryEditor<T, E> editor = getClientEditor(entry);
         if (editor != null) editor.delete(entry);
     }
 }

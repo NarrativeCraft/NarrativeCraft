@@ -23,13 +23,9 @@
 
 package fr.loudo.narrativecraft.narrative;
 
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
-public class NarrativeEntry {
+public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
     protected final UUID uuid;
     protected String name;
     protected String description;
@@ -45,31 +41,6 @@ public class NarrativeEntry {
         this.name = name;
         this.description = description;
     }
-
-    public static final StreamCodec<ByteBuf, NarrativeEntry> BASE_STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            NarrativeEntry::getId,
-            ByteBufCodecs.STRING_UTF8,
-            NarrativeEntry::getName,
-            ByteBufCodecs.STRING_UTF8,
-            NarrativeEntry::getDescription,
-            NarrativeEntry::new);
-
-    public static final StreamCodec<ByteBuf, NarrativeEntry> STREAM_CODEC = new StreamCodec<>() {
-        @Override
-        public NarrativeEntry decode(ByteBuf buffer) {
-            int ordinal = buffer.readInt();
-            NarrativeEntryType type = NarrativeEntryType.values()[ordinal];
-            return type.getCodec().decode(buffer);
-        }
-
-        @Override
-        public void encode(ByteBuf buffer, NarrativeEntry value) {
-            NarrativeEntryType type = NarrativeEntryType.fromClass(value.getClass());
-            buffer.writeInt(type.ordinal());
-            type.getCodec().encode(buffer, value);
-        }
-    };
 
     public String toRawJson() {
         return String.format("{\"id\": %s,\"name\":\"%s\",\"description\":\"%s\"}", uuid.toString(), name, description);
@@ -94,4 +65,6 @@ public class NarrativeEntry {
     public UUID getId() {
         return uuid;
     }
+
+    public abstract T toPayload();
 }

@@ -40,7 +40,7 @@ public class NarrativeEntryEditorRegistry {
 
     private static final NarrativeEntryEditorRegistry INSTANCE = new NarrativeEntryEditorRegistry();
 
-    private final Map<Class<? extends NarrativeEntry>, NarrativeEntryEditor<?>> registry = new HashMap<>();
+    private final Map<Class<? extends NarrativeEntryPayload>, NarrativeEntryEditor<?, ?>> registry = new HashMap<>();
 
     private NarrativeEntryEditorRegistry() {}
 
@@ -48,28 +48,30 @@ public class NarrativeEntryEditorRegistry {
         return INSTANCE;
     }
 
-    public <T extends NarrativeEntry> void register(Class<T> entryClass, NarrativeEntryEditor<T> editor) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void register(
+            Class<T> entryClass, NarrativeEntryEditor<T, E> editor) {
         registry.put(entryClass, editor);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntry> NarrativeEntryEditor<T> getEditor(T entry) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> NarrativeEntryEditor<T, E> getEditor(
+            T entry) {
         if (entry == null) return null;
-        return (NarrativeEntryEditor<T>) registry.get(entry.getClass());
+        return (NarrativeEntryEditor<T, E>) registry.get(entry.getClass());
     }
 
-    public <T extends NarrativeEntry> void add(T entry, UUID playerId) {
-        NarrativeEntryEditor<T> editor = getEditor(entry);
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void add(T entry, UUID playerId) {
+        NarrativeEntryEditor<T, E> editor = getEditor(entry);
         if (editor != null) editor.add(entry, playerId);
     }
 
-    public <T extends NarrativeEntry> void edit(T entry, UUID playerId) {
-        NarrativeEntryEditor<T> editor = getEditor(entry);
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void edit(T entry, UUID playerId) {
+        NarrativeEntryEditor<T, E> editor = getEditor(entry);
         if (editor != null) editor.edit(entry, playerId);
     }
 
-    public <T extends NarrativeEntry> void delete(T entry, UUID playerId) {
-        NarrativeEntryEditor<T> editor = getEditor(entry);
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void delete(T entry, UUID playerId) {
+        NarrativeEntryEditor<T, E> editor = getEditor(entry);
         if (editor != null) editor.delete(entry, playerId);
     }
 }

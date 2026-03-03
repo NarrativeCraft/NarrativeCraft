@@ -1,5 +1,7 @@
 {
   "narrativecraft.chapter": "Chapter",
+  "narrativecraft.scene": "Scene",
+  "narrativecraft.back": "Back",
 
   "narrativecraft.screen.pagination.page": "Page %d",
   "narrativecraft.screen.pagination.page_out_of": "Page %d out of %d",

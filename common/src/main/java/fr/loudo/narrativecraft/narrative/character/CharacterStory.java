@@ -25,8 +25,13 @@ package fr.loudo.narrativecraft.narrative.character;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 
-public class CharacterStory extends NarrativeEntry {
+public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
     public CharacterStory(String name, String description) {
         super(name, description);
+    }
+
+    @Override
+    public CharacterStoryPayload toPayload() {
+        return new CharacterStoryPayload(uuid, name, description);
     }
 }
