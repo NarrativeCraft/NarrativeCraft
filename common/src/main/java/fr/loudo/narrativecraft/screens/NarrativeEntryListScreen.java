@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens;
 
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,10 +80,12 @@ public class NarrativeEntryListScreen extends PaginationsItemsScreen<NarrativeEn
     }
 
     @Override
-    protected void onItemClicked(NarrativeEntry<?> item) {}
+    protected void onItemClicked(NarrativeEntry<?> item) {
+        minecraft.setScreen(ClientNarrativeUIActionRegistry.getInstance().subScreen(item, this));
+    }
 
     @Override
     protected boolean isItemClickable(NarrativeEntry<?> item) {
-        return true;
+        return ClientNarrativeUIActionRegistry.getInstance().hasSubScreen(item);
     }
 }

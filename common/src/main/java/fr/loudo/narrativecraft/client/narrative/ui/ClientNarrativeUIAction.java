@@ -21,27 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client;
+package fr.loudo.narrativecraft.client.narrative.ui;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
-import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegister;
-import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import net.minecraft.client.gui.screens.Screen;
 
-public class ClientNarrativeCraftMod {
-    private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
+public interface ClientNarrativeUIAction<T extends NarrativeEntry<?>> {
 
-    private final ChapterManager chapterManager = new ChapterManager();
+    Screen subScreen(T entry, Screen parent);
 
-    public static void commonInit() {
-        ClientNarrativeEditorsRegister.register();
-        ClientNarrativeUIActionRegister.register();
-    }
-
-    public ChapterManager getChapterManager() {
-        return chapterManager;
-    }
-
-    public static ClientNarrativeCraftMod getInstance() {
-        return instance;
-    }
+    boolean hasSubScreen();
 }

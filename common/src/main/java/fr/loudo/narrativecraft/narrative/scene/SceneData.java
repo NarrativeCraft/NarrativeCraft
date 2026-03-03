@@ -25,12 +25,14 @@ package fr.loudo.narrativecraft.narrative.scene;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 
-public class SceneData extends NarrativeEntry {
+import java.util.UUID;
+
+public class SceneData extends NarrativeEntry<SceneDataPayload> {
 
     protected Scene scene;
 
-    public SceneData(String name, String description, Scene scene) {
-        super(name, description);
+    public SceneData(UUID uuid, String name, String description, Scene scene) {
+        super(uuid, name, description);
         this.scene = scene;
     }
 
@@ -40,5 +42,10 @@ public class SceneData extends NarrativeEntry {
 
     public void setScene(Scene scene) {
         this.scene = scene;
+    }
+
+    @Override
+    public SceneDataPayload toPayload() {
+        return new SceneDataPayload(uuid, name, description);
     }
 }

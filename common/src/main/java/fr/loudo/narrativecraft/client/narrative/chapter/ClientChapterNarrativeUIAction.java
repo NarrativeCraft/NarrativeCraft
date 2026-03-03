@@ -21,27 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client;
+package fr.loudo.narrativecraft.client.narrative.chapter;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
-import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegister;
-import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.client.gui.screens.Screen;
 
-public class ClientNarrativeCraftMod {
-    private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
-
-    private final ChapterManager chapterManager = new ChapterManager();
-
-    public static void commonInit() {
-        ClientNarrativeEditorsRegister.register();
-        ClientNarrativeUIActionRegister.register();
+public class ClientChapterNarrativeUIAction implements ClientNarrativeUIAction<Chapter> {
+    @Override
+    public Screen subScreen(Chapter entry, Screen parent) {
+        return new NarrativeEntryListScreen(
+                Translation.message("scene"), entry.getSceneManager().getList(), parent);
     }
 
-    public ChapterManager getChapterManager() {
-        return chapterManager;
-    }
-
-    public static ClientNarrativeCraftMod getInstance() {
-        return instance;
+    @Override
+    public boolean hasSubScreen() {
+        return true;
     }
 }

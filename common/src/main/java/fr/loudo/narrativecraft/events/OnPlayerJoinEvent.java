@@ -35,11 +35,13 @@ public class OnPlayerJoinEvent {
     public static void onPlayerJoin(ServerPlayer player) {
         for (int i = 0; i < 10; i++) {
             Chapter chapter = new Chapter("test" + i, "test", i);
-            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(chapter, NarrativeEntryAction.ADD));
+            Services.PACKET.sendToPlayer(
+                    player, new BiSyncNarrativeEntryPacket(chapter.toPayload(), NarrativeEntryAction.ADD));
             for (int j = 0; j < 5; j++) {
                 Scene scene = new Scene("scene" + j, "test", chapter);
                 chapter.getSceneManager().add(scene);
-                Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(scene, NarrativeEntryAction.ADD));
+                Services.PACKET.sendToPlayer(
+                        player, new BiSyncNarrativeEntryPacket(scene.toPayload(), NarrativeEntryAction.ADD));
             }
         }
     }
