@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.keys;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.HashMap;
@@ -37,9 +38,10 @@ public class PressKeyListener {
 
     public static void onKeyPressed(Minecraft minecraft) {
         handleKeyPress(ModKeys.STORY_MANAGER, () -> {
-            NarrativeEntryListScreen screen = new NarrativeEntryListScreen(
+            NarrativeEntryListScreen<Chapter> screen = new NarrativeEntryListScreen<>(
                     Translation.message("chapter"),
-                    ClientNarrativeCraftMod.getInstance().getChapterManager().getList());
+                    ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
+                    Chapter.class);
             minecraft.setScreen(screen);
         });
     }

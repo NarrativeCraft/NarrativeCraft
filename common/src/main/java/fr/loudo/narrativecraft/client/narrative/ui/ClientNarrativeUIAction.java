@@ -24,11 +24,14 @@
 package fr.loudo.narrativecraft.client.narrative.ui;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
 import net.minecraft.client.gui.screens.Screen;
 
 public interface ClientNarrativeUIAction<T extends NarrativeEntry<?>> {
 
-    Screen subScreen(T entry, Screen parent);
+    Screen subListSubScreen(T entry, Screen parent);
 
     boolean hasSubScreen();
+
+    AbstractNarrativeEntryEditScreen<T> showEditScreen(T entry, Screen lastScreen);
 }

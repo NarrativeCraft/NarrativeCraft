@@ -21,20 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.file;
+package fr.loudo.narrativecraft.screens.narrative.chapter;
 
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import net.minecraft.client.gui.screens.Screen;
 
-public class NarrativeCraftFile {
+public class ChapterEntryEditScreen extends AbstractNarrativeEntryEditScreen<Chapter> {
 
-    private final NarrativeCraftFileInit init = new NarrativeCraftFileInit();
-
-    public NarrativeCraftFileInit getInit() {
-        return init;
+    public ChapterEntryEditScreen(Screen lastScreen) {
+        super(lastScreen);
     }
 
-    public void registerEditors() {
-        NarrativeCraftFileRegistry.getInstance()
-                .register(Chapter.class, new NarrativeCraftFileChapter(init.getChaptersDirectory()));
+    public ChapterEntryEditScreen(Chapter entry, Screen lastScreen) {
+        super(entry, lastScreen);
+    }
+
+    @Override
+    protected void addCustomFields() {}
+
+    @Override
+    protected Chapter handleValidation() {
+        return new Chapter(getName(), getDescription(), 0);
     }
 }

@@ -26,42 +26,64 @@ package fr.loudo.narrativecraft.screens;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class NarrativeEntryListScreen extends PaginationsItemsScreen<NarrativeEntry<?>> {
+public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends PaginationsItemsScreen<E> {
 
-    private Screen backScreen;
+    private Screen lastScreen;
+    private Class<? extends NarrativeEntry<?>> entryClass;
 
-    public NarrativeEntryListScreen(Component title, List<? extends NarrativeEntry<?>> entries) {
-        super(title, new ArrayList<>(entries));
+    public NarrativeEntryListScreen(Component title, List<E> entries, Class<E> entryClass) {
+        super(title, entries);
+        this.entryClass = entryClass;
     }
 
-    public NarrativeEntryListScreen(Component title, List<? extends NarrativeEntry<?>> entries, Screen backScreen) {
-        this(title, entries);
-        this.backScreen = backScreen;
+    public NarrativeEntryListScreen(Component title, List<E> entries, Screen backScreen, Class<E> entryClass) {
+        this(title, entries, entryClass);
+        this.lastScreen = backScreen;
+        this.entryClass = entryClass;
     }
 
     @Override
     protected void init() {
         super.init();
-        if (backScreen == null) return;
 
-        Button backButton = Button.builder(Component.literal("<"), (b) -> {
-                    minecraft.setScreen(backScreen);
-                })
-                .bounds(this.width / 2 - buttonWidth / 2, 20, 20, 20)
-                .build();
-        this.addRenderableWidget(backButton);
+        if (lastScreen != null) {
+            Button backButton = Button.builder(Component.literal("<"), (b) -> {
+                        minecraft.setScreen(lastScreen);
+                    })
+                    .bounds(this.width / 2 - buttonWidth / 2, 20, 20, 20)
+                    .build();
+            this.addRenderableWidget(backButton);
+        }
+
+        Screen createScreen = ClientNarrativeUIActionRegistry.getInstance().showCreateScreen(entryClass, this);
+        if (createScreen != null) {
+            Button addButton = Button.builder(Component.literal("+"), (b) -> {
+                        minecraft.setScreen(
+                                ClientNarrativeUIActionRegistry.getInstance().showCreateScreen(entryClass, this));
+                    })
+                    .bounds(this.width / 2 + buttonWidth / 2, 20, 20, 20)
+                    .build();
+            this.addRenderableWidget(addButton);
+        }
+    }
+
+    public void reload() {
+        this.clearWidgets();
+        init();
     }
 
     @Override
-    public void addWidgetsForItem(int x, int y, NarrativeEntry<?> item) {
+    public void addWidgetsForItem(int x, int y, E item) {
         super.addWidgetsForItem(x - 20, y, item);
-        Button editButton = Button.builder(Component.literal("✎"), b -> {})
+        Button editButton = Button.builder(Component.literal("✎"), b -> {
+                    minecraft.setScreen(
+                            ClientNarrativeUIActionRegistry.getInstance().showEditScreen(item, this));
+                })
                 .bounds(x + buttonWidth - 15, y, 20, 20)
                 .build();
         this.addRenderableWidget(editButton);
@@ -75,17 +97,17 @@ public class NarrativeEntryListScreen extends PaginationsItemsScreen<NarrativeEn
     }
 
     @Override
-    protected String getItemName(NarrativeEntry<?> item) {
+    protected String getItemName(E item) {
         return item.getName();
     }
 
     @Override
-    protected void onItemClicked(NarrativeEntry<?> item) {
-        minecraft.setScreen(ClientNarrativeUIActionRegistry.getInstance().subScreen(item, this));
+    protected void onItemClicked(E item) {
+        minecraft.setScreen(ClientNarrativeUIActionRegistry.getInstance().showListSubScreen(item, this));
     }
 
     @Override
-    protected boolean isItemClickable(NarrativeEntry<?> item) {
+    protected boolean isItemClickable(E item) {
         return ClientNarrativeUIActionRegistry.getInstance().hasSubScreen(item);
     }
 }

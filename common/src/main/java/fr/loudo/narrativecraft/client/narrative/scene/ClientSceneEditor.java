@@ -29,9 +29,6 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.NarrativeEntryAction;
-import fr.loudo.narrativecraft.platform.Services;
 
 public class ClientSceneEditor implements ClientNarrativeEntryEditor<ScenePayload, Scene> {
 
@@ -52,7 +49,6 @@ public class ClientSceneEditor implements ClientNarrativeEntryEditor<ScenePayloa
         Scene scene = new Scene(payload.getId(), payload.getName(), payload.getDescription(), chapter);
 
         scene.getChapter().getSceneManager().add(scene);
-        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.ADD));
     }
 
     @Override
@@ -62,8 +58,6 @@ public class ClientSceneEditor implements ClientNarrativeEntryEditor<ScenePayloa
 
         scene.setName(payload.getName());
         scene.setDescription(payload.getDescription());
-
-        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.EDIT));
     }
 
     @Override
@@ -72,6 +66,5 @@ public class ClientSceneEditor implements ClientNarrativeEntryEditor<ScenePayloa
         if (scene == null) return;
 
         scene.getChapter().getSceneManager().remove(scene);
-        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.DELETE));
     }
 }

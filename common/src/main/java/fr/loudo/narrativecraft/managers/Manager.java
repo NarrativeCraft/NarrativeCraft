@@ -51,7 +51,7 @@ public abstract class Manager<T extends NarrativeEntry<?>> {
     }
 
     public void add(T item) {
-        if (!list.contains(item)) {
+        if (!list.contains(item) && this.getById(item.getId()) == null) {
             list.add(item);
         }
     }

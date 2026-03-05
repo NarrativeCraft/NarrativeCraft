@@ -21,30 +21,13 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.files;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import java.util.UUID;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 
-public class SceneData extends NarrativeEntry<SceneDataPayload> {
+public class NarrativeCraftFileEditorsRegister {
 
-    protected Scene scene;
-
-    public SceneData(UUID uuid, String name, String description, Scene scene) {
-        super(uuid, name, description);
-        this.scene = scene;
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    @Override
-    public SceneDataPayload toPayload() {
-        return new SceneDataPayload(uuid, name, description);
+    public static void register() {
+        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
     }
 }

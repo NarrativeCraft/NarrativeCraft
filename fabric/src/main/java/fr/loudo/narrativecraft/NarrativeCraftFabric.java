@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.network.BiPacketRegister;
 import fr.loudo.narrativecraft.network.ServerPacketRegisterFabric;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerFabric;
 import fr.loudo.narrativecraft.register.FabricEventList;
@@ -35,6 +36,7 @@ public class NarrativeCraftFabric implements ModInitializer {
     @Override
     public void onInitialize() {
 
+        BiPacketRegister.register();
         ServerPacketRegisterFabric.register();
         ServerPacketHandlerFabric.handle();
 

@@ -24,13 +24,12 @@
 package fr.loudo.narrativecraft.narrative.chapter;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.file.NarrativeCraftFileEditor;
-import fr.loudo.narrativecraft.file.NarrativeCraftFileRegistry;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
-import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
@@ -54,9 +53,10 @@ public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapt
         int result = NarrativeCraftFileRegistry.getInstance().create(chapter);
         if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
             chapterManager.add(chapter);
+            UtilsServer.broadcastPacket(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.ADD));
         } else {
             if (player == null) return;
-            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.DELETE));
+            // TODO: send error
         }
     }
 
@@ -72,9 +72,9 @@ public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapt
         int result = NarrativeCraftFileRegistry.getInstance().delete(chapter);
         if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
             chapterManager.remove(chapter);
+            UtilsServer.broadcastPacket(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.ADD));
         } else {
             if (player == null) return;
-            Services.PACKET.sendToPlayer(player, new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.ADD));
         }
     }
 }

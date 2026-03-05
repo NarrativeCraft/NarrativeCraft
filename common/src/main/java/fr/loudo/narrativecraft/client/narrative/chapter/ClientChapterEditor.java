@@ -28,9 +28,7 @@ import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.NarrativeEntryAction;
-import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.UtilsClient;
 
 public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPayload, Chapter> {
 
@@ -47,7 +45,7 @@ public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPa
                 new Chapter(payload.getId(), payload.getName(), payload.getDescription(), payload.getChapterIndex());
 
         chapterManager.add(chapter);
-        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.ADD));
+        UtilsClient.reloadListScreen();
     }
 
     @Override
@@ -56,13 +54,13 @@ public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPa
         oldChapter.setName(payload.getName());
         oldChapter.setDescription(payload.getDescription());
         oldChapter.setChapterIndex(payload.getChapterIndex());
-        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.EDIT));
+        UtilsClient.reloadListScreen();
     }
 
     @Override
     public void delete(ChapterPayload payload) {
         Chapter chapter = resolve(payload);
         chapterManager.remove(chapter);
-        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(payload, NarrativeEntryAction.DELETE));
+        UtilsClient.reloadListScreen();
     }
 }

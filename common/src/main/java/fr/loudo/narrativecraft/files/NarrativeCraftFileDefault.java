@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.file;
+package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import java.io.File;

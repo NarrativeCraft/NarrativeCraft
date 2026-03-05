@@ -63,17 +63,19 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
 
     @Override
     protected void init() {
+        int maxPage = Math.max(1, (list.size() + maxItemsPerPage - 1) / maxItemsPerPage);
+        this.page = Math.max(1, Math.min(this.page, maxPage));
+
         int startIndex = (page - 1) * maxItemsPerPage;
         int endIndex = Math.min(startIndex + maxItemsPerPage, list.size());
 
-        if (startIndex >= list.size() || startIndex < 0) {
-            return;
-        }
-
         List<T> itemsToDisplay = list.subList(startIndex, endIndex);
 
-        int totalContentHeight = (itemsToDisplay.size() * buttonHeight) + ((itemsToDisplay.size() - 1) * gap);
-        int startY = (this.height - totalContentHeight) / 2;
+        int totalContentHeight = itemsToDisplay.isEmpty()
+                ? 0
+                : (itemsToDisplay.size() * buttonHeight) + ((itemsToDisplay.size() - 1) * gap);
+        int startY = itemsToDisplay.isEmpty() ? (this.height / 2) : (this.height - totalContentHeight) / 2;
+
         int currentY = startY;
         int middleX = (this.width - this.buttonWidth) / 2;
         int listBottomY = startY + totalContentHeight;
@@ -92,7 +94,6 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
         int navigationPageY = listBottomY + (this.height - listBottomY) / 2 - 10;
         int previousPageButtonX = this.width / 2 - this.buttonWidth / 2;
         int nextPageButtonX = this.width / 2 + this.buttonWidth / 2 - 20;
-        int maxPage = list.size() / maxItemsPerPage;
 
         if (page > 1) {
             Button previousPageButton = Button.builder(Component.literal("<"), b -> {
@@ -105,7 +106,7 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
             this.addRenderableWidget(previousPageButton);
         }
 
-        if (endIndex < list.size() - 1) {
+        if (page < maxPage) {
             Button nextPageButton = Button.builder(Component.literal(">"), b -> {
                         changePage(page + 1);
                     })
@@ -135,6 +136,13 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
                 .bounds(this.width / 2, navigationPageY + 25, 20, 20)
                 .build();
         this.addRenderableWidget(skipToPageButton);
+
+        if (itemsToDisplay.isEmpty()) {
+            StringWidget emptyText = new StringWidget(Translation.message("screen.pagination.empty"), this.font);
+            emptyText.setPosition(
+                    this.width / 2 - emptyText.getWidth() / 2, this.height / 2 - this.font.lineHeight / 2);
+            this.addRenderableWidget(emptyText);
+        }
     }
 
     public void addWidgetsForItem(int x, int y, T item) {
@@ -149,8 +157,8 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
     }
 
     private void changePage(int page) {
-        int maxPage = list.size() / maxItemsPerPage;
-        this.page = Math.min(page, maxPage);
+        int maxPage = Math.max(1, (list.size() + maxItemsPerPage - 1) / maxItemsPerPage);
+        this.page = Math.max(1, Math.min(page, maxPage));
         this.clearWidgets();
         this.init();
     }

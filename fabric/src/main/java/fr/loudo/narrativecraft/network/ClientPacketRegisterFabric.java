@@ -23,12 +23,7 @@
 
 package fr.loudo.narrativecraft.network;
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-
 public class ClientPacketRegisterFabric {
 
-    public static void register() {
-        PayloadTypeRegistry.playS2C()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-    }
+    public static void register() {}
 }

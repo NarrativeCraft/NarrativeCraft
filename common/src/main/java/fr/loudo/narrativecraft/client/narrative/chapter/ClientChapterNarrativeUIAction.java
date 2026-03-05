@@ -25,19 +25,28 @@ package fr.loudo.narrativecraft.client.narrative.chapter;
 
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.screens.narrative.chapter.ChapterEntryEditScreen;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.screens.Screen;
 
 public class ClientChapterNarrativeUIAction implements ClientNarrativeUIAction<Chapter> {
+
     @Override
-    public Screen subScreen(Chapter entry, Screen parent) {
-        return new NarrativeEntryListScreen(
-                Translation.message("scene"), entry.getSceneManager().getList(), parent);
+    public Screen subListSubScreen(Chapter entry, Screen parent) {
+        return new NarrativeEntryListScreen<>(
+                Translation.message("scene"), entry.getSceneManager().getList(), parent, Scene.class);
     }
 
     @Override
     public boolean hasSubScreen() {
         return true;
+    }
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Chapter> showEditScreen(Chapter entry, Screen lastScreen) {
+        return entry == null ? new ChapterEntryEditScreen(lastScreen) : new ChapterEntryEditScreen(entry, lastScreen);
     }
 }

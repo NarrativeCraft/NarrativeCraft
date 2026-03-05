@@ -43,7 +43,8 @@ public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
     }
 
     public String toRawJson() {
-        return String.format("{\"id\": %s,\"name\":\"%s\",\"description\":\"%s\"}", uuid.toString(), name, description);
+        return String.format(
+                "{\"id\": \"%s\",\"name\":\"%s\",\"description\":\"%s\"}", uuid.toString(), name, description);
     }
 
     public String getName() {

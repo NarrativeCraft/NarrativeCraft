@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.file.NarrativeCraftFile;
-import fr.loudo.narrativecraft.file.NarrativeCraftFileEditorsRegister;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileEditorsRegister;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;

@@ -24,12 +24,21 @@
 package fr.loudo.narrativecraft.utils;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.platform.Services;
 import java.util.UUID;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
 public class UtilsServer {
 
     public static ServerPlayer getPlayerByUUID(UUID playerId) {
         return NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayer(playerId);
+    }
+
+    public static void broadcastPacket(CustomPacketPayload packet) {
+        for (ServerPlayer player :
+                NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayers()) {
+            Services.PACKET.sendToPlayer(player, packet);
+        }
     }
 }

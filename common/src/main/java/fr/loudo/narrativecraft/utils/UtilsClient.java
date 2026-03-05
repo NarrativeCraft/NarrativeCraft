@@ -21,18 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.file;
+package fr.loudo.narrativecraft.utils;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
+import net.minecraft.client.Minecraft;
 
-public interface NarrativeCraftFileEditor<T extends NarrativeEntry> {
+public class UtilsClient {
 
-    int OPERATION_SUCCESS = 0;
-    int OPERATION_FAILED = 1;
+    private static final Minecraft minecraft = Minecraft.getInstance();
 
-    int create(T entry);
+    public static void reloadListScreen() {
+        // If player was on edit screen and has sent a payload on clicking "Send" button, bring back to last screen
+        if (minecraft.screen instanceof AbstractNarrativeEntryEditScreen<?> screen && screen.payloadSent()) {
+            minecraft.setScreen(screen.getLastScreen());
+        }
 
-    int edit(T entry);
-
-    int delete(T entry);
+        // Reload list for player if a new NarrativeEntry element was added
+        if (minecraft.screen instanceof NarrativeEntryListScreen<?> screen) {
+            screen.reload();
+        }
+    }
 }

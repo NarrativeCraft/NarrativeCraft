@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.client.narrative.ui;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.client.gui.screens.Screen;
@@ -50,9 +51,9 @@ public class ClientNarrativeUIActionRegistry {
         return (ClientNarrativeUIAction<T>) registry.get(entry.getClass());
     }
 
-    public <T extends NarrativeEntry<?>> Screen subScreen(T entry, Screen parent) {
+    public <T extends NarrativeEntry<?>> Screen showListSubScreen(T entry, Screen parent) {
         ClientNarrativeUIAction<T> editor = getClientEditor(entry);
-        if (editor != null) return editor.subScreen(entry, parent);
+        if (editor != null) return editor.subListSubScreen(entry, parent);
         return null;
     }
 
@@ -60,5 +61,20 @@ public class ClientNarrativeUIActionRegistry {
         ClientNarrativeUIAction<T> editor = getClientEditor(entry);
         if (editor != null) return editor.hasSubScreen();
         return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends NarrativeEntry<?>> AbstractNarrativeEntryEditScreen<T> showCreateScreen(
+            Class<? extends NarrativeEntry<?>> entryClass, Screen lastScreen) {
+        ClientNarrativeUIAction<T> editor = (ClientNarrativeUIAction<T>) registry.get(entryClass);
+        if (editor != null) return editor.showEditScreen(null, lastScreen);
+        return null;
+    }
+
+    public <T extends NarrativeEntry<?>> AbstractNarrativeEntryEditScreen<T> showEditScreen(
+            T entry, Screen lastScreen) {
+        ClientNarrativeUIAction<T> editor = getClientEditor(entry);
+        if (editor != null) return editor.showEditScreen(entry, lastScreen);
+        return null;
     }
 }

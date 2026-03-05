@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 
 public interface ClientNarrativeEntryEditor<T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> {
+
     void add(T payload);
 
     void edit(T payload);

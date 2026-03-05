@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative;
 
-import fr.loudo.narrativecraft.file.NarrativeCraftFile;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.file;
+package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -29,16 +29,10 @@ import java.io.*;
 
 public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<Chapter> {
 
-    private final File chaptersDirectory;
-
-    public NarrativeCraftFileChapter(File chaptersDirectory) {
-        this.chaptersDirectory = chaptersDirectory;
-    }
-
     @Override
     public int create(Chapter entry) {
 
-        File chapterDirectory = createDirectory(chaptersDirectory, String.valueOf(entry.getChapterIndex()));
+        File chapterDirectory = createDirectory(getWorkingFolder(), String.valueOf(entry.getChapterIndex()));
         if (chapterDirectory == null) {
             return OPERATION_FAILED;
         }
@@ -49,7 +43,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int edit(Chapter entry) {
 
-        File chapterDirectory = new File(chaptersDirectory, String.valueOf(entry.getChapterIndex()));
+        File chapterDirectory = new File(getWorkingFolder(), String.valueOf(entry.getChapterIndex()));
         if (!chapterDirectory.exists()) {
             return OPERATION_FAILED;
         }
@@ -59,8 +53,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             writer.write(entry.toRawJson());
         } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error(
-                    "Couldn't write chapter {} - {} data!", entry.getChapterIndex(), entry.getName());
+            NarrativeCraftMod.LOGGER.error("Couldn't write chapter {} data!", entry.formattedName());
             return OPERATION_FAILED;
         }
 
@@ -70,11 +63,16 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int delete(Chapter entry) {
 
-        File chapterDirectory = new File(chaptersDirectory, String.valueOf(entry.getChapterIndex()));
+        File chapterDirectory = new File(getWorkingFolder(), String.valueOf(entry.getChapterIndex()));
         if (!chapterDirectory.exists()) {
             return OPERATION_FAILED;
         }
 
         return chapterDirectory.delete() ? OPERATION_SUCCESS : OPERATION_FAILED;
+    }
+
+    @Override
+    public File getWorkingFolder() {
+        return NarrativeCraftMod.getInstance().getFile().getInit().getChaptersDirectory();
     }
 }

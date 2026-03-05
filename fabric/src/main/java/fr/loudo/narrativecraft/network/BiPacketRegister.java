@@ -21,20 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.file;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
-public class NarrativeCraftFileEditorsRegister {
+public class BiPacketRegister {
 
     public static void register() {
-        NarrativeCraftFileRegistry.getInstance()
-                .register(
-                        Chapter.class,
-                        new NarrativeCraftFileChapter(NarrativeCraftMod.getInstance()
-                                .getFile()
-                                .getInit()
-                                .getChaptersDirectory()));
+        PayloadTypeRegistry.playS2C()
+                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S()
+                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
     }
 }

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.file;
+package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.HashMap;
@@ -31,31 +31,31 @@ public class NarrativeCraftFileRegistry {
 
     private static final NarrativeCraftFileRegistry INSTANCE = new NarrativeCraftFileRegistry();
 
-    private final Map<Class<? extends NarrativeEntry>, NarrativeCraftFileEditor<?>> registry = new HashMap<>();
+    private final Map<Class<? extends NarrativeEntry<?>>, NarrativeCraftFileEditor<?>> registry = new HashMap<>();
 
-    public <T extends NarrativeEntry> void register(Class<T> entryClass, NarrativeCraftFileEditor<T> editor) {
+    public <T extends NarrativeEntry<?>> void register(Class<T> entryClass, NarrativeCraftFileEditor<T> editor) {
         registry.put(entryClass, editor);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntry> NarrativeCraftFileEditor<T> getEditor(T entry) {
+    public <T extends NarrativeEntry<?>> NarrativeCraftFileEditor<T> getEditor(T entry) {
         if (entry == null) return null;
         return (NarrativeCraftFileEditor<T>) registry.get(entry.getClass());
     }
 
-    public <T extends NarrativeEntry> int create(T entry) {
+    public <T extends NarrativeEntry<?>> int create(T entry) {
         NarrativeCraftFileEditor<T> editor = getEditor(entry);
         if (editor != null) return editor.create(entry);
         return NarrativeCraftFileEditor.OPERATION_FAILED;
     }
 
-    public <T extends NarrativeEntry> int edit(T entry) {
+    public <T extends NarrativeEntry<?>> int edit(T entry) {
         NarrativeCraftFileEditor<T> editor = getEditor(entry);
         if (editor != null) return editor.edit(entry);
         return NarrativeCraftFileEditor.OPERATION_FAILED;
     }
 
-    public <T extends NarrativeEntry> int delete(T entry) {
+    public <T extends NarrativeEntry<?>> int delete(T entry) {
         NarrativeCraftFileEditor<T> editor = getEditor(entry);
         if (editor != null) return editor.delete(entry);
         return NarrativeCraftFileEditor.OPERATION_FAILED;
