@@ -23,9 +23,10 @@
 
 package fr.loudo.narrativecraft.screens;
 
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.platform.Services;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -90,7 +91,8 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
 
         Button deleteButton = Button.builder(
                         Component.literal("✖"),
-                        b -> ClientNarrativeEntryEditorRegistry.getInstance().delete(item.toPayload()))
+                        b -> Services.PACKET.sendToServer(
+                                BiSyncNarrativeEntryPacket.delete(item.getId(), item.toPayload())))
                 .bounds(editButton.getX() + editButton.getWidth() + 5, y, 20, 20)
                 .build();
         this.addRenderableWidget(deleteButton);

@@ -27,11 +27,11 @@ import java.util.UUID;
 
 public interface NarrativeEntryEditor<T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> {
 
-    void add(T payload, UUID playerId);
+    void add(UUID entryId, T payload, UUID playerId);
 
-    void edit(T payload, UUID playerId);
+    void edit(UUID entryId, T payload, UUID playerId);
 
-    void delete(T payload, UUID playerId);
+    void delete(UUID entryId, T payload, UUID playerId);
 
-    E resolve(T payload);
+    E resolve(UUID entryId, T payload);
 }

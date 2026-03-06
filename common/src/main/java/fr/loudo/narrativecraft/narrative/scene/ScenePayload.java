@@ -33,8 +33,6 @@ import net.minecraft.network.codec.StreamCodec;
 public class ScenePayload extends NarrativeEntryPayload {
 
     public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            ScenePayload::getId,
             ByteBufCodecs.STRING_UTF8,
             ScenePayload::getName,
             ByteBufCodecs.STRING_UTF8,
@@ -45,8 +43,8 @@ public class ScenePayload extends NarrativeEntryPayload {
 
     private final UUID chapterId;
 
-    public ScenePayload(UUID uuid, String name, String description, UUID chapterId) {
-        super(uuid, name, description);
+    public ScenePayload(String name, String description, UUID chapterId) {
+        super(name, description);
         this.chapterId = chapterId;
     }
 

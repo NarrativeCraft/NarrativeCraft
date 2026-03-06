@@ -31,9 +31,12 @@ public class ServerPacketHandler {
 
     public static void narrativeEntry(BiSyncNarrativeEntryPacket packet, Player player) {
         switch (packet.action()) {
-            case ADD -> NarrativeEntryEditorRegistry.getInstance().add(packet.entry(), player.getUUID());
-            case EDIT -> NarrativeEntryEditorRegistry.getInstance().edit(packet.entry(), player.getUUID());
-            case DELETE -> NarrativeEntryEditorRegistry.getInstance().delete(packet.entry(), player.getUUID());
+            case ADD ->
+                NarrativeEntryEditorRegistry.getInstance().add(packet.entryId(), packet.entry(), player.getUUID());
+            case EDIT ->
+                NarrativeEntryEditorRegistry.getInstance().edit(packet.entryId(), packet.entry(), player.getUUID());
+            case DELETE ->
+                NarrativeEntryEditorRegistry.getInstance().delete(packet.entryId(), packet.entry(), player.getUUID());
         }
     }
 }

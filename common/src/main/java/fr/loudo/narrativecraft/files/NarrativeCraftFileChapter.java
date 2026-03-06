@@ -68,7 +68,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
             return OPERATION_FAILED;
         }
 
-        return chapterDirectory.delete() ? OPERATION_SUCCESS : OPERATION_FAILED;
+        return deleteDirectory(chapterDirectory) ? OPERATION_SUCCESS : OPERATION_FAILED;
     }
 
     @Override

@@ -34,15 +34,15 @@ public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
     final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
 
     @Override
-    public Scene resolve(ScenePayload payload) {
+    public Scene resolve(UUID entryId, ScenePayload payload) {
         Chapter chapter = chapterManager.getById(payload.getChapterId());
         if (chapter == null) return null;
 
-        return chapter.getSceneManager().getById(payload.getId());
+        return chapter.getSceneManager().getById(entryId);
     }
 
     @Override
-    public void add(ScenePayload payload, UUID playerId) {
+    public void add(UUID entryId, ScenePayload payload, UUID playerId) {
 
         Chapter chapter = chapterManager.getById(payload.getChapterId());
         if (chapter == null) return;
@@ -52,8 +52,8 @@ public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
     }
 
     @Override
-    public void edit(ScenePayload payload, UUID playerId) {}
+    public void edit(UUID entryId, ScenePayload payload, UUID playerId) {}
 
     @Override
-    public void delete(ScenePayload payload, UUID playerId) {}
+    public void delete(UUID entryId, ScenePayload payload, UUID playerId) {}
 }

@@ -24,11 +24,9 @@
 package fr.loudo.narrativecraft.narrative;
 
 import io.netty.buffer.ByteBuf;
-import java.util.UUID;
 import net.minecraft.network.codec.StreamCodec;
 
 public class NarrativeEntryPayload {
-    private final UUID uuid;
     private final String name;
     private final String description;
 
@@ -48,14 +46,9 @@ public class NarrativeEntryPayload {
         }
     };
 
-    public NarrativeEntryPayload(UUID uuid, String name, String description) {
-        this.uuid = uuid;
+    public NarrativeEntryPayload(String name, String description) {
         this.name = name;
         this.description = description;
-    }
-
-    public UUID getId() {
-        return uuid;
     }
 
     public String getName() {

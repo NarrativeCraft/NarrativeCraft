@@ -47,6 +47,6 @@ public class Scene extends NarrativeEntry<ScenePayload> {
 
     @Override
     public ScenePayload toPayload() {
-        return new ScenePayload(uuid, name, description, chapter.getId());
+        return new ScenePayload(name, description, chapter.getId());
     }
 }

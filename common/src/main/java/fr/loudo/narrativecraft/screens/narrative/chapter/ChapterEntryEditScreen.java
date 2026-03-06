@@ -25,9 +25,17 @@ package fr.loudo.narrativecraft.screens.narrative.chapter;
 
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 
 public class ChapterEntryEditScreen extends AbstractNarrativeEntryEditScreen<Chapter> {
+
+    private EditBox chapterIndexField;
+    private StringWidget chapterIndexLabel;
 
     public ChapterEntryEditScreen(Screen lastScreen) {
         super(lastScreen);
@@ -38,10 +46,30 @@ public class ChapterEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cha
     }
 
     @Override
-    protected void addCustomFields() {}
+    protected void addCustomFields() {
+        chapterIndexField = new EditBox(this.font, 20, 20, Translation.message("chapter_index"));
+        chapterIndexField.setFilter(s -> s.matches(Utils.ONLY_NUMBERS));
+        chapterIndexField.setValue(entry != null ? String.valueOf(entry.getChapterIndex()) : "");
+        widgets.add(chapterIndexField);
+
+        chapterIndexLabel = new StringWidget(Translation.message("chapter_index"), this.font);
+    }
+
+    @Override
+    protected void renderWidget(AbstractWidget widget, int x, int y) {
+        super.renderWidget(widget, x, y);
+        if (widget.equals(chapterIndexField)) {
+            chapterIndexLabel.setPosition(x, y + this.font.lineHeight / 2 + 2);
+            chapterIndexField.setPosition(x + chapterIndexLabel.getWidth() + GAP, y);
+        }
+    }
+
+    private int getChapterIndex() {
+        return Integer.parseInt(chapterIndexField.getValue());
+    }
 
     @Override
     protected Chapter handleValidation() {
-        return new Chapter(getName(), getDescription(), 0);
+        return new Chapter(getName(), getDescription(), getChapterIndex());
     }
 }

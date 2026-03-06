@@ -69,6 +69,6 @@ public class Chapter extends NarrativeEntry<ChapterPayload> {
 
     @Override
     public ChapterPayload toPayload() {
-        return new ChapterPayload(uuid, name, description, chapterIndex);
+        return new ChapterPayload(name, description, chapterIndex);
     }
 }

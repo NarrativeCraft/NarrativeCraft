@@ -29,31 +29,32 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
+import java.util.UUID;
 
 public class ClientSceneEditor implements ClientNarrativeEntryEditor<ScenePayload, Scene> {
 
     final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
 
     @Override
-    public Scene resolve(ScenePayload payload) {
+    public Scene resolve(UUID entryId, ScenePayload payload) {
         Chapter chapter = chapterManager.getById(payload.getChapterId());
         if (chapter == null) return null;
-        return chapter.getSceneManager().getById(payload.getId());
+        return chapter.getSceneManager().getById(entryId);
     }
 
     @Override
-    public void add(ScenePayload payload) {
+    public void add(UUID entryId, ScenePayload payload) {
         Chapter chapter = chapterManager.getById(payload.getChapterId());
         if (chapter == null) return;
 
-        Scene scene = new Scene(payload.getId(), payload.getName(), payload.getDescription(), chapter);
+        Scene scene = new Scene(entryId, payload.getName(), payload.getDescription(), chapter);
 
         scene.getChapter().getSceneManager().add(scene);
     }
 
     @Override
-    public void edit(ScenePayload payload) {
-        Scene scene = resolve(payload);
+    public void edit(UUID entryId, ScenePayload payload) {
+        Scene scene = resolve(entryId, payload);
         if (scene == null) return;
 
         scene.setName(payload.getName());
@@ -61,8 +62,8 @@ public class ClientSceneEditor implements ClientNarrativeEntryEditor<ScenePayloa
     }
 
     @Override
-    public void delete(ScenePayload payload) {
-        Scene scene = resolve(payload);
+    public void delete(UUID entryId, ScenePayload payload) {
+        Scene scene = resolve(entryId, payload);
         if (scene == null) return;
 
         scene.getChapter().getSceneManager().remove(scene);

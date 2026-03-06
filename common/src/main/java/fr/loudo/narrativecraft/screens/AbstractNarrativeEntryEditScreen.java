@@ -68,19 +68,21 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
         nameText = new StringWidget(Translation.message("name"), this.font);
         nameBox = new EditBox(this.font, GLOBAL_WIDTH, 20, Translation.message("name"));
+        nameBox.setValue(entry != null ? entry.getName() : "");
 
         descriptionText = new StringWidget(Translation.message("description"), this.font);
         descriptionBox =
                 new MultiLineEditBox.Builder().build(this.font, GLOBAL_WIDTH, 90, Translation.message("description"));
+        descriptionBox.setValue(entry != null ? entry.getDescription() : "");
 
         sendButton = Button.builder(Translation.message("send"), (b) -> {
                     T validated = handleValidation();
                     if (entry == null) {
-                        Services.PACKET.sendToServer(
-                                new BiSyncNarrativeEntryPacket(validated.toPayload(), NarrativeEntryAction.ADD));
+                        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
+                                validated.getId(), validated.toPayload(), NarrativeEntryAction.ADD));
                     } else {
-                        Services.PACKET.sendToServer(
-                                new BiSyncNarrativeEntryPacket(validated.toPayload(), NarrativeEntryAction.EDIT));
+                        Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
+                                entry.getId(), validated.toPayload(), NarrativeEntryAction.EDIT));
                     }
                     b.active = false;
                     payloadSent = true;
@@ -126,14 +128,18 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
         int y = getStartYPos();
 
         for (AbstractWidget widget : widgets) {
-            widget.setPosition(x, y);
-            addRenderableWidget(widget);
+            renderWidget(widget, x, y);
             y += widget.getHeight() + GAP;
         }
     }
 
     protected int getXPos() {
         return this.width / 2 - GLOBAL_WIDTH / 2;
+    }
+
+    protected void renderWidget(AbstractWidget widget, int x, int y) {
+        widget.setPosition(x, y);
+        addRenderableWidget(widget);
     }
 
     protected int getStartYPos() {

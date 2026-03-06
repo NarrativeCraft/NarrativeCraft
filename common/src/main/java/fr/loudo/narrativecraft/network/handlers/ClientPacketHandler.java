@@ -30,9 +30,9 @@ public class ClientPacketHandler {
 
     public static void narrativeEntry(BiSyncNarrativeEntryPacket packet) {
         switch (packet.action()) {
-            case ADD -> ClientNarrativeEntryEditorRegistry.getInstance().add(packet.entry());
-            case EDIT -> ClientNarrativeEntryEditorRegistry.getInstance().edit(packet.entry());
-            case DELETE -> ClientNarrativeEntryEditorRegistry.getInstance().delete(packet.entry());
+            case ADD -> ClientNarrativeEntryEditorRegistry.getInstance().add(packet.entryId(), packet.entry());
+            case EDIT -> ClientNarrativeEntryEditorRegistry.getInstance().edit(packet.entryId(), packet.entry());
+            case DELETE -> ClientNarrativeEntryEditorRegistry.getInstance().delete(packet.entryId(), packet.entry());
         }
     }
 }

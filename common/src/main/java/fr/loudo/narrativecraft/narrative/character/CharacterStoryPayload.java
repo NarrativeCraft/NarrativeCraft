@@ -24,10 +24,9 @@
 package fr.loudo.narrativecraft.narrative.character;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import java.util.UUID;
 
 public class CharacterStoryPayload extends NarrativeEntryPayload {
-    public CharacterStoryPayload(UUID uuid, String name, String description) {
-        super(uuid, name, description);
+    public CharacterStoryPayload(String name, String description) {
+        super(name, description);
     }
 }

@@ -62,13 +62,13 @@ public class NarrativeCraftFileDefault {
         return file;
     }
 
-    protected void deleteDirectory(File directoryToBeDeleted) {
+    protected boolean deleteDirectory(File directoryToBeDeleted) {
         File[] allContents = directoryToBeDeleted.listFiles();
         if (allContents != null) {
             for (File file : allContents) {
                 deleteDirectory(file);
             }
         }
-        directoryToBeDeleted.delete();
+        return directoryToBeDeleted.delete();
     }
 }

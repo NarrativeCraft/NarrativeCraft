@@ -21,32 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.chapter;
+package fr.loudo.narrativecraft.utils;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+public class Utils {
 
-public class ChapterPayload extends NarrativeEntryPayload {
-
-    public static final StreamCodec<ByteBuf, ChapterPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ChapterPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            ChapterPayload::getDescription,
-            ByteBufCodecs.VAR_INT,
-            ChapterPayload::getChapterIndex,
-            ChapterPayload::new);
-
-    private final int chapterIndex;
-
-    public ChapterPayload(String name, String description, int chapterIndex) {
-        super(name, description);
-        this.chapterIndex = chapterIndex;
-    }
-
-    public int getChapterIndex() {
-        return chapterIndex;
-    }
+    public static final String ONLY_NUMBERS = "^[0-9]*$";
 }

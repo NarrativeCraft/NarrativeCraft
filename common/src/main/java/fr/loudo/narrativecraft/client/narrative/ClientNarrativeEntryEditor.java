@@ -25,14 +25,15 @@ package fr.loudo.narrativecraft.client.narrative;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import java.util.UUID;
 
 public interface ClientNarrativeEntryEditor<T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> {
 
-    void add(T payload);
+    void add(UUID entryId, T payload);
 
-    void edit(T payload);
+    void edit(UUID entryId, T payload);
 
-    void delete(T payload);
+    void delete(UUID entryId, T payload);
 
-    E resolve(T payload);
+    E resolve(UUID entryId, T payload);
 }

@@ -60,18 +60,21 @@ public class NarrativeEntryEditorRegistry {
         return (NarrativeEntryEditor<T, E>) registry.get(entry.getClass());
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void add(T entry, UUID playerId) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void add(
+            UUID entryId, T entry, UUID playerId) {
         NarrativeEntryEditor<T, E> editor = getEditor(entry);
-        if (editor != null) editor.add(entry, playerId);
+        if (editor != null) editor.add(entryId, entry, playerId);
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void edit(T entry, UUID playerId) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void edit(
+            UUID entryId, T entry, UUID playerId) {
         NarrativeEntryEditor<T, E> editor = getEditor(entry);
-        if (editor != null) editor.edit(entry, playerId);
+        if (editor != null) editor.edit(entryId, entry, playerId);
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void delete(T entry, UUID playerId) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void delete(
+            UUID entryId, T entry, UUID playerId) {
         NarrativeEntryEditor<T, E> editor = getEditor(entry);
-        if (editor != null) editor.delete(entry, playerId);
+        if (editor != null) editor.delete(entryId, entry, playerId);
     }
 }

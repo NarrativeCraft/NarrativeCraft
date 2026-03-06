@@ -45,6 +45,6 @@ public class SceneData extends NarrativeEntry<SceneDataPayload> {
 
     @Override
     public SceneDataPayload toPayload() {
-        return new SceneDataPayload(uuid, name, description);
+        return new SceneDataPayload(name, description);
     }
 }

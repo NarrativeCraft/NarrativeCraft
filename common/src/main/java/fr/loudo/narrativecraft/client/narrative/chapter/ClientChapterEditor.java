@@ -29,28 +29,28 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.UUID;
 
 public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPayload, Chapter> {
 
     final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
 
     @Override
-    public Chapter resolve(ChapterPayload payload) {
-        return chapterManager.getById(payload.getId());
+    public Chapter resolve(UUID entryId, ChapterPayload payload) {
+        return chapterManager.getById(entryId);
     }
 
     @Override
-    public void add(ChapterPayload payload) {
-        Chapter chapter =
-                new Chapter(payload.getId(), payload.getName(), payload.getDescription(), payload.getChapterIndex());
+    public void add(UUID entryId, ChapterPayload payload) {
+        Chapter chapter = new Chapter(entryId, payload.getName(), payload.getDescription(), payload.getChapterIndex());
 
         chapterManager.add(chapter);
         UtilsClient.reloadListScreen();
     }
 
     @Override
-    public void edit(ChapterPayload payload) {
-        Chapter oldChapter = resolve(payload);
+    public void edit(UUID entryId, ChapterPayload payload) {
+        Chapter oldChapter = resolve(entryId, payload);
         oldChapter.setName(payload.getName());
         oldChapter.setDescription(payload.getDescription());
         oldChapter.setChapterIndex(payload.getChapterIndex());
@@ -58,8 +58,8 @@ public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPa
     }
 
     @Override
-    public void delete(ChapterPayload payload) {
-        Chapter chapter = resolve(payload);
+    public void delete(UUID entryId, ChapterPayload payload) {
+        Chapter chapter = resolve(entryId, payload);
         chapterManager.remove(chapter);
         UtilsClient.reloadListScreen();
     }

@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Editor manager <b>client-side</b>.
@@ -63,18 +64,18 @@ public class ClientNarrativeEntryEditorRegistry {
         return (ClientNarrativeEntryEditor<T, E>) registry.get(entry.getClass());
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void add(T entry) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void add(UUID entryId, T entry) {
         ClientNarrativeEntryEditor<T, E> editor = getClientEditor(entry);
-        if (editor != null) editor.add(entry);
+        if (editor != null) editor.add(entryId, entry);
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void edit(T entry) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void edit(UUID entryId, T entry) {
         ClientNarrativeEntryEditor<T, E> editor = getClientEditor(entry);
-        if (editor != null) editor.edit(entry);
+        if (editor != null) editor.edit(entryId, entry);
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void delete(T entry) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void delete(UUID entryId, T entry) {
         ClientNarrativeEntryEditor<T, E> editor = getClientEditor(entry);
-        if (editor != null) editor.delete(entry);
+        if (editor != null) editor.delete(entryId, entry);
     }
 }

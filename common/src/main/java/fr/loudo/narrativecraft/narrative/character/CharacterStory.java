@@ -32,6 +32,6 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
 
     @Override
     public CharacterStoryPayload toPayload() {
-        return new CharacterStoryPayload(uuid, name, description);
+        return new CharacterStoryPayload(name, description);
     }
 }
