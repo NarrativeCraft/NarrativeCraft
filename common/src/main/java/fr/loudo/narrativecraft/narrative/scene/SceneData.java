@@ -47,4 +47,14 @@ public class SceneData extends NarrativeEntry<SceneDataPayload> {
     public SceneDataPayload toPayload() {
         return new SceneDataPayload(name, description);
     }
+
+    @Override
+    public String formattedName() {
+        return name;
+    }
+
+    @Override
+    public String toFileName() {
+        return "";
+    }
 }

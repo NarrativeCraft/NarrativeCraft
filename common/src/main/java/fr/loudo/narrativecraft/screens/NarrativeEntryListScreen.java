@@ -27,8 +27,10 @@ import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegist
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -42,9 +44,9 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
         this.entryClass = entryClass;
     }
 
-    public NarrativeEntryListScreen(Component title, List<E> entries, Screen backScreen, Class<E> entryClass) {
+    public NarrativeEntryListScreen(Component title, List<E> entries, Screen lastScreen, Class<E> entryClass) {
         this(title, entries, entryClass);
-        this.lastScreen = backScreen;
+        this.lastScreen = lastScreen;
         this.entryClass = entryClass;
     }
 
@@ -54,7 +56,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
 
         if (lastScreen != null) {
             Button backButton = Button.builder(Component.literal("<"), (b) -> {
-                        minecraft.setScreen(lastScreen);
+                        onClose();
                     })
                     .bounds(this.width / 2 - buttonWidth / 2, 20, 20, 20)
                     .build();
@@ -79,6 +81,11 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
     }
 
     @Override
+    public void onClose() {
+        minecraft.setScreen(lastScreen);
+    }
+
+    @Override
     public void addWidgetsForItem(int x, int y, E item) {
         super.addWidgetsForItem(x - 20, y, item);
         Button editButton = Button.builder(Component.literal("✎"), b -> {
@@ -89,10 +96,17 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                 .build();
         this.addRenderableWidget(editButton);
 
-        Button deleteButton = Button.builder(
-                        Component.literal("✖"),
-                        b -> Services.PACKET.sendToServer(
-                                BiSyncNarrativeEntryPacket.delete(item.getId(), item.toPayload())))
+        ConfirmScreen confirmScreen = new ConfirmScreen(
+                b -> {
+                    if (b) {
+                        Services.PACKET.sendToServer(BiSyncNarrativeEntryPacket.delete(item.getId(), item.toPayload()));
+                    }
+                    minecraft.setScreen(this);
+                },
+                Translation.message("screen.confirm.title"),
+                Translation.message("screen.confirm.message", item.getName()));
+
+        Button deleteButton = Button.builder(Component.literal("✖"), b -> minecraft.setScreen(confirmScreen))
                 .bounds(editButton.getX() + editButton.getWidth() + 5, y, 20, 20)
                 .build();
         this.addRenderableWidget(deleteButton);
@@ -100,7 +114,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
 
     @Override
     protected String getItemName(E item) {
-        return item.getName();
+        return item.formattedName();
     }
 
     @Override

@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.util.Comparator;
+import java.util.List;
 
 public class ChapterManager extends Manager<Chapter> {
 
@@ -35,6 +37,16 @@ public class ChapterManager extends Manager<Chapter> {
             if (chapter.getChapterIndex() == index) return chapter;
         }
         return null;
+    }
+
+    @Override
+    public List<Chapter> getList() {
+        this.list.sort(Comparator.comparingInt(Chapter::getChapterIndex));
+        return this.list;
+    }
+
+    public void forceSort() {
+        this.list.sort(Comparator.comparingInt(Chapter::getChapterIndex));
     }
 
     public Manager<Scene> getSceneManager() {

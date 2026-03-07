@@ -71,4 +71,9 @@ public class Chapter extends NarrativeEntry<ChapterPayload> {
     public ChapterPayload toPayload() {
         return new ChapterPayload(name, description, chapterIndex);
     }
+
+    @Override
+    public String toFileName() {
+        return chapterIndex + "_" + name.toLowerCase();
+    }
 }

@@ -24,8 +24,7 @@
 package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public class NarrativeCraftFileDefault {
 
@@ -51,11 +50,11 @@ public class NarrativeCraftFileDefault {
         if (!file.exists()) {
             try {
                 if (!file.createNewFile()) {
-                    NarrativeCraftMod.LOGGER.error("Couldn't create file {}!", file.getAbsolutePath());
+                    NarrativeCraftMod.LOGGER.error("Failed to create file {}!", file.getAbsolutePath());
                     return null;
                 }
             } catch (IOException e) {
-                NarrativeCraftMod.LOGGER.error("Couldn't create file {}! Cause: {}", file.getAbsolutePath(), e);
+                NarrativeCraftMod.LOGGER.error("Failed to create file {}", file.getAbsolutePath(), e);
                 return null;
             }
         }

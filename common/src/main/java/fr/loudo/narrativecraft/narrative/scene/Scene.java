@@ -30,6 +30,7 @@ import java.util.UUID;
 public class Scene extends NarrativeEntry<ScenePayload> {
 
     private final Chapter chapter;
+    private int rank;
 
     public Scene(UUID uuid, String name, String description, Chapter chapter) {
         super(uuid, name, description);
@@ -46,7 +47,26 @@ public class Scene extends NarrativeEntry<ScenePayload> {
     }
 
     @Override
+    public void setName(String name) {
+        super.setName(name);
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    @Override
+    public String formattedName() {
+        return name;
+    }
+
+    @Override
     public ScenePayload toPayload() {
         return new ScenePayload(name, description, chapter.getId());
+    }
+
+    @Override
+    public String toFileName() {
+        return rank + "_" + name.toLowerCase();
     }
 }

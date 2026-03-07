@@ -68,4 +68,12 @@ public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
     }
 
     public abstract T toPayload();
+
+    /**
+     * If your entry needs extra info in the name, otherwise juste return the current name
+     * @return formatted name
+     */
+    public abstract String formattedName();
+
+    public abstract String toFileName();
 }

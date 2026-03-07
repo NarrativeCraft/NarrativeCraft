@@ -24,15 +24,18 @@
 package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import java.io.*;
+import java.nio.file.Files;
 
 public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<Chapter> {
 
     @Override
     public int create(Chapter entry) {
 
-        File chapterDirectory = createDirectory(getWorkingFolder(), String.valueOf(entry.getChapterIndex()));
+        File chapterDirectory = createDirectory(getWorkingFolder(), entry.toFileName());
         if (chapterDirectory == null) {
             return OPERATION_FAILED;
         }
@@ -43,17 +46,52 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int edit(Chapter entry) {
 
-        File chapterDirectory = new File(getWorkingFolder(), String.valueOf(entry.getChapterIndex()));
-        if (!chapterDirectory.exists()) {
-            return OPERATION_FAILED;
-        }
+        File workingFolder = getWorkingFolder();
+        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+        Chapter oldChapter = chapterManager.getById(entry.getId());
 
-        File dataFile = createFile(chapterDirectory, DATA_FILE_NAME);
+        try {
 
-        try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
-            writer.write(entry.toRawJson());
+            // If the user wants to change the chapter index, then let's move everything...
+            if (oldChapter != null && oldChapter.getChapterIndex() != entry.getChapterIndex()) {
+                int oldIndex = oldChapter.getChapterIndex();
+                int newIndex = entry.getChapterIndex();
+
+                if (newIndex > oldIndex) {
+                    // Shift chapters left to free the target slot
+                    if (!shiftChapterRange(chapterManager, workingFolder, oldIndex + 1, newIndex, -1, true)) {
+                        return OPERATION_FAILED;
+                    }
+                } else {
+                    // Shift chapters right to free the target slot
+                    if (!shiftChapterRange(chapterManager, workingFolder, oldIndex - 1, newIndex, 1, false)) {
+                        return OPERATION_FAILED;
+                    }
+                }
+
+                File oldChapterDirectory = new File(workingFolder, oldChapter.toFileName());
+                File newChapterDirectory = new File(workingFolder, entry.toFileName());
+
+                if (newChapterDirectory.exists()) {
+                    return OPERATION_FAILED;
+                }
+
+                Files.move(oldChapterDirectory.toPath(), newChapterDirectory.toPath());
+            }
+
+            File chapterDirectory = new File(workingFolder, entry.toFileName());
+            if (!chapterDirectory.exists()) {
+                return OPERATION_FAILED;
+            }
+
+            File dataFile = createFile(chapterDirectory, DATA_FILE_NAME);
+
+            try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
+                writer.write(entry.toRawJson());
+            }
+
         } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Couldn't write chapter {} data!", entry.formattedName());
+            NarrativeCraftMod.LOGGER.error("Couldn't edit chapter {}", entry.formattedName(), e);
             return OPERATION_FAILED;
         }
 
@@ -63,12 +101,92 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int delete(Chapter entry) {
 
-        File chapterDirectory = new File(getWorkingFolder(), String.valueOf(entry.getChapterIndex()));
+        File workingFolder = getWorkingFolder();
+        File chapterDirectory = new File(workingFolder, entry.toFileName());
         if (!chapterDirectory.exists()) {
             return OPERATION_FAILED;
         }
 
-        return deleteDirectory(chapterDirectory) ? OPERATION_SUCCESS : OPERATION_FAILED;
+        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+
+        try {
+            if (!deleteDirectory(chapterDirectory)) {
+                return OPERATION_FAILED;
+            }
+
+            // Shift every chapter after the deleted one to fill the gap
+            int deletedIndex = entry.getChapterIndex();
+            int lastIndex = getLastChapterIndex(chapterManager);
+
+            if (deletedIndex < lastIndex) {
+                if (!shiftChapterRange(chapterManager, workingFolder, deletedIndex + 1, lastIndex, -1, true)) {
+                    return OPERATION_FAILED;
+                }
+            }
+
+            return OPERATION_SUCCESS;
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error("Couldn't delete chapter {}", entry.formattedName(), e);
+            return OPERATION_FAILED;
+        }
+    }
+
+    private boolean shiftChapterRange(
+            ChapterManager chapterManager,
+            File workingFolder,
+            int fromInclusive,
+            int toInclusive,
+            int offset,
+            boolean ascending)
+            throws IOException {
+        if (ascending) {
+            for (int i = fromInclusive; i <= toInclusive; i++) {
+                if (!shiftSingleChapter(chapterManager, workingFolder, i, offset)) {
+                    return false;
+                }
+            }
+        } else {
+            for (int i = fromInclusive; i >= toInclusive; i--) {
+                if (!shiftSingleChapter(chapterManager, workingFolder, i, offset)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private boolean shiftSingleChapter(ChapterManager chapterManager, File workingFolder, int currentIndex, int offset)
+            throws IOException {
+        Chapter chapterToShift = chapterManager.getChapterByIndex(currentIndex);
+        if (chapterToShift == null) {
+            return true;
+        }
+
+        File oldFolder = new File(workingFolder, chapterToShift.toFileName());
+
+        int targetIndex = currentIndex + offset;
+        chapterToShift.setChapterIndex(targetIndex);
+
+        File newFolder = new File(workingFolder, chapterToShift.toFileName());
+
+        if (newFolder.exists()) {
+            return false;
+        }
+
+        Files.move(oldFolder.toPath(), newFolder.toPath());
+
+        NarrativeEntryEditorRegistry.getInstance().edit(chapterToShift.getId(), chapterToShift.toPayload(), null);
+
+        return true;
+    }
+
+    private int getLastChapterIndex(ChapterManager chapterManager) {
+        int index = 0;
+        while (chapterManager.getChapterByIndex(index + 1) != null) {
+            index++;
+        }
+        return index;
     }
 
     @Override

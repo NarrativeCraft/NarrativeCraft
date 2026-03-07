@@ -26,4 +26,5 @@ package fr.loudo.narrativecraft.utils;
 public class Utils {
 
     public static final String ONLY_NUMBERS = "^[0-9]*$";
+    public static final String NO_SPECIAL_CHARACTERS = "^[a-zA-Z0-9äöüÄÖÜ]*$";
 }

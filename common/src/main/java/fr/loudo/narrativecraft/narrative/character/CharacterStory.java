@@ -34,4 +34,14 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
     public CharacterStoryPayload toPayload() {
         return new CharacterStoryPayload(name, description);
     }
+
+    @Override
+    public String formattedName() {
+        return name;
+    }
+
+    @Override
+    public String toFileName() {
+        return name.toLowerCase();
+    }
 }

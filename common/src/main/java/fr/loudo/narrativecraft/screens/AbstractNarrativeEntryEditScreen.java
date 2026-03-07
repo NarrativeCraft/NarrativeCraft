@@ -28,9 +28,11 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -68,6 +70,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
         nameText = new StringWidget(Translation.message("name"), this.font);
         nameBox = new EditBox(this.font, GLOBAL_WIDTH, 20, Translation.message("name"));
+        nameBox.setFilter(s -> s.matches(Utils.NO_SPECIAL_CHARACTERS));
         nameBox.setValue(entry != null ? entry.getName() : "");
 
         descriptionText = new StringWidget(Translation.message("description"), this.font);
@@ -76,13 +79,16 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
         descriptionBox.setValue(entry != null ? entry.getDescription() : "");
 
         sendButton = Button.builder(Translation.message("send"), (b) -> {
-                    T validated = handleValidation();
+                    boolean validated = hasValidated();
+                    if (!validated) return;
+
+                    T instance = createInstance();
                     if (entry == null) {
                         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
-                                validated.getId(), validated.toPayload(), NarrativeEntryAction.ADD));
+                                instance.getId(), instance.toPayload(), NarrativeEntryAction.ADD));
                     } else {
                         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
-                                entry.getId(), validated.toPayload(), NarrativeEntryAction.EDIT));
+                                entry.getId(), instance.toPayload(), NarrativeEntryAction.EDIT));
                     }
                     b.active = false;
                     payloadSent = true;
@@ -119,6 +125,19 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
     protected void addElementToWidgetsList(AbstractWidget widget) {
         widgets.add(widget);
+    }
+
+    protected boolean hasValidated() {
+        String name = getName();
+        if (name.isEmpty()) {
+            sendToastError(Translation.message("error"), Translation.message("error.must_have_name"));
+            return false;
+        }
+        return true;
+    }
+
+    protected void sendToastError(Component title, Component message) {
+        minecraft.getToastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
     }
 
     protected abstract void addCustomFields();
@@ -166,5 +185,5 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
         return payloadSent;
     }
 
-    protected abstract T handleValidation();
+    protected abstract T createInstance();
 }

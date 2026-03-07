@@ -72,9 +72,14 @@ public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapt
         }
 
         Chapter oldChapter = resolve(entryId, payload);
+
+        int oldIndex = oldChapter.getChapterIndex();
         oldChapter.setName(payload.getName());
         oldChapter.setDescription(payload.getDescription());
         oldChapter.setChapterIndex(payload.getChapterIndex());
+        if (oldIndex != payload.getChapterIndex()) {
+            chapterManager.forceSort();
+        }
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }

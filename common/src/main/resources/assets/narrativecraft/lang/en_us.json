@@ -6,12 +6,19 @@
   "narrativecraft.description": "Description",
   "narrativecraft.send": "Send",
   "narrativecraft.close": "Close",
+  "narrativecraft.error": "Error",
 
   "narrativecraft.screen.pagination.page": "Page %d",
   "narrativecraft.screen.pagination.page_out_of": "Page %d out of %d",
   "narrativecraft.screen.pagination.skip_to_page_tootip": "Skip to page",
   "narrativecraft.screen.pagination.empty": "Feeling a bit empty...",
 
+  "narrativecraft.screen.confirm.title": "Confirm",
+  "narrativecraft.screen.confirm.message": "Are you sure you want to delete %s?",
+
   "narrativecraft.error.delete": "Failed to remove %s %s.",
-  "narrativecraft.error.add": "Failed to add %s %s."
+  "narrativecraft.error.add": "Failed to add %s %s.",
+  "narrativecraft.error.must_have_name": "Must have a name!",
+  "narrativecraft.error.must_have_chapter_index": "Must have a chapter index!",
+  "narrativecraft.error.chapter_index_greather_than_size": "Chapter index %s is higher than the last chapter index %s"
 }

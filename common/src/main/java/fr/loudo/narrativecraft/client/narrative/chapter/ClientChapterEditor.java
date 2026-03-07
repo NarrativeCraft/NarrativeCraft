@@ -51,9 +51,13 @@ public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPa
     @Override
     public void edit(UUID entryId, ChapterPayload payload) {
         Chapter oldChapter = resolve(entryId, payload);
+        int oldIndex = oldChapter.getChapterIndex();
         oldChapter.setName(payload.getName());
         oldChapter.setDescription(payload.getDescription());
         oldChapter.setChapterIndex(payload.getChapterIndex());
+        if (oldIndex != payload.getChapterIndex()) {
+            chapterManager.forceSort();
+        }
         UtilsClient.reloadListScreen();
     }
 

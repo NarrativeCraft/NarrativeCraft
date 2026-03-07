@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.narrative.chapter;
 
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -47,6 +48,7 @@ public class ChapterEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cha
 
     @Override
     protected void addCustomFields() {
+        if (entry == null) return; // If we're creating a new chapter, don't show chapter index field
         chapterIndexField = new EditBox(this.font, 20, 20, Translation.message("chapter_index"));
         chapterIndexField.setFilter(s -> s.matches(Utils.ONLY_NUMBERS));
         chapterIndexField.setValue(entry != null ? String.valueOf(entry.getChapterIndex()) : "");
@@ -56,20 +58,49 @@ public class ChapterEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cha
     }
 
     @Override
+    protected boolean hasValidated() {
+        if (!super.hasValidated()) {
+            return false;
+        }
+
+        int chapterIndex = getChapterIndex();
+        if (chapterIndex == -1) {
+            sendToastError(Translation.message("error"), Translation.message("error.must_have_chapter_index"));
+            return false;
+        }
+
+        int maxSize = ClientNarrativeCraftMod.getInstance().getChapterManager().size();
+        if (chapterIndex > maxSize && entry != null) {
+            sendToastError(
+                    Translation.message("error"),
+                    Translation.message("error.chapter_index_greather_than_size", chapterIndex, maxSize));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     protected void renderWidget(AbstractWidget widget, int x, int y) {
         super.renderWidget(widget, x, y);
         if (widget.equals(chapterIndexField)) {
             chapterIndexLabel.setPosition(x, y + this.font.lineHeight / 2 + 2);
             chapterIndexField.setPosition(x + chapterIndexLabel.getWidth() + GAP, y);
+            addRenderableWidget(chapterIndexLabel);
         }
     }
 
     private int getChapterIndex() {
+        // If we're creating a new chapter, set the chapter index automatically
+        if (entry == null) {
+            return ClientNarrativeCraftMod.getInstance().getChapterManager().size() + 1;
+        }
+        if (chapterIndexField.getValue().isEmpty()) return -1;
         return Integer.parseInt(chapterIndexField.getValue());
     }
 
     @Override
-    protected Chapter handleValidation() {
+    protected Chapter createInstance() {
         return new Chapter(getName(), getDescription(), getChapterIndex());
     }
 }
