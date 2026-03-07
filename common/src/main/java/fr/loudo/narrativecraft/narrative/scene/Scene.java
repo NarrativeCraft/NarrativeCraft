@@ -32,14 +32,25 @@ public class Scene extends NarrativeEntry<ScenePayload> {
     private final Chapter chapter;
     private int rank;
 
-    public Scene(UUID uuid, String name, String description, Chapter chapter) {
+    public Scene(UUID uuid, String name, String description, Chapter chapter, int rank) {
         super(uuid, name, description);
         this.chapter = chapter;
+        this.rank = rank;
     }
 
     public Scene(String name, String description, Chapter chapter) {
         super(name, description);
         this.chapter = chapter;
+    }
+
+    public Scene(String name, String description, Chapter chapter, int rank) {
+        super(name, description);
+        this.chapter = chapter;
+        this.rank = rank;
+    }
+
+    public int getChapterIndex() {
+        return chapter.getChapterIndex();
     }
 
     public Chapter getChapter() {
@@ -55,18 +66,29 @@ public class Scene extends NarrativeEntry<ScenePayload> {
         return rank;
     }
 
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
     @Override
     public String formattedName() {
         return name;
     }
 
     @Override
+    public String toRawJson() {
+        return String.format(
+                "{\"id\": \"%s\",\"name\":\"%s\",\"description\":\"%s\", \"chapterId\":\"%s\",\"rank\":\"%s\"}",
+                uuid.toString(), name, description, chapter.getId(), rank);
+    }
+
+    @Override
     public ScenePayload toPayload() {
-        return new ScenePayload(name, description, chapter.getId());
+        return new ScenePayload(name, description, chapter.getId(), rank);
     }
 
     @Override
     public String toFileName() {
-        return rank + "_" + name.toLowerCase();
+        return chapter.getChapterIndex() + "_" + rank + "_" + name.toLowerCase();
     }
 }

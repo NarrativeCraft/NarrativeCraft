@@ -24,9 +24,13 @@
 package fr.loudo.narrativecraft.narrative.scene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
 
 public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
@@ -47,13 +51,57 @@ public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
         Chapter chapter = chapterManager.getById(payload.getChapterId());
         if (chapter == null) return;
 
-        Scene scene = new Scene(payload.getName(), payload.getDescription(), chapter);
+        Scene scene = new Scene(entryId, payload.getName(), payload.getDescription(), chapter, payload.getRank());
+        int result = NarrativeCraftFileRegistry.getInstance().create(scene);
+
+        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
+            return;
+        }
+
         scene.getChapter().getSceneManager().add(scene);
+        scene.setRank(chapter.getSceneManager().size());
+
+        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(entryId, payload));
     }
 
     @Override
-    public void edit(UUID entryId, ScenePayload payload, UUID playerId) {}
+    public void edit(UUID entryId, ScenePayload payload, UUID playerId) {
+
+        Scene oldScene = resolve(entryId, payload);
+        if (oldScene == null) {
+            return;
+        }
+
+        Scene newScene = new Scene(
+                entryId, payload.getName(), payload.getDescription(), oldScene.getChapter(), payload.getRank());
+        int result = NarrativeCraftFileRegistry.getInstance().edit(newScene);
+        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
+            return;
+        }
+
+        int oldRank = oldScene.getRank();
+        oldScene.setName(payload.getName());
+        oldScene.setDescription(payload.getDescription());
+        oldScene.setRank(payload.getRank());
+        if (oldRank != payload.getRank()) {
+            oldScene.getChapter().getSceneManager().forceSort();
+        }
+
+        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
+    }
 
     @Override
-    public void delete(UUID entryId, ScenePayload payload, UUID playerId) {}
+    public void delete(UUID entryId, ScenePayload payload, UUID playerId) {
+
+        Scene scene = resolve(entryId, payload);
+        if (scene == null) return;
+
+        int result = NarrativeCraftFileRegistry.getInstance().delete(scene);
+        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
+            return;
+        }
+
+        scene.getChapter().getSceneManager().remove(scene);
+        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.delete(entryId, payload));
+    }
 }

@@ -38,6 +38,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
 
     private Screen lastScreen;
     private Class<? extends NarrativeEntry<?>> entryClass;
+    private NarrativeEntry<?> parentEntry;
 
     public NarrativeEntryListScreen(Component title, List<E> entries, Class<E> entryClass) {
         super(title, entries);
@@ -45,9 +46,15 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
     }
 
     public NarrativeEntryListScreen(Component title, List<E> entries, Screen lastScreen, Class<E> entryClass) {
+        this(title, entries, lastScreen, entryClass, null);
+    }
+
+    public NarrativeEntryListScreen(
+            Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, NarrativeEntry<?> parentEntry) {
         this(title, entries, entryClass);
         this.lastScreen = lastScreen;
         this.entryClass = entryClass;
+        this.parentEntry = parentEntry;
     }
 
     @Override
@@ -63,11 +70,12 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
             this.addRenderableWidget(backButton);
         }
 
-        Screen createScreen = ClientNarrativeUIActionRegistry.getInstance().showCreateScreen(entryClass, this);
+        Screen createScreen =
+                ClientNarrativeUIActionRegistry.getInstance().showCreateScreen(entryClass, this, parentEntry);
         if (createScreen != null) {
             Button addButton = Button.builder(Component.literal("+"), (b) -> {
-                        minecraft.setScreen(
-                                ClientNarrativeUIActionRegistry.getInstance().showCreateScreen(entryClass, this));
+                        minecraft.setScreen(ClientNarrativeUIActionRegistry.getInstance()
+                                .showCreateScreen(entryClass, this, parentEntry));
                     })
                     .bounds(this.width / 2 + buttonWidth / 2, 20, 20, 20)
                     .build();

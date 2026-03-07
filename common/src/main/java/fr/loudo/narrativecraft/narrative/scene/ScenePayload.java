@@ -39,16 +39,24 @@ public class ScenePayload extends NarrativeEntryPayload {
             ScenePayload::getDescription,
             UUIDUtil.STREAM_CODEC,
             ScenePayload::getChapterId,
+            ByteBufCodecs.INT,
+            ScenePayload::getRank,
             ScenePayload::new);
 
     private final UUID chapterId;
+    private final int rank;
 
-    public ScenePayload(String name, String description, UUID chapterId) {
+    public ScenePayload(String name, String description, UUID chapterId, int rank) {
         super(name, description);
         this.chapterId = chapterId;
+        this.rank = rank;
     }
 
     public UUID getChapterId() {
         return chapterId;
+    }
+
+    public int getRank() {
+        return rank;
     }
 }

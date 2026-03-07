@@ -21,9 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.files.narrrative.chapter;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -40,7 +42,17 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
             return OPERATION_FAILED;
         }
 
-        return edit(entry) == OPERATION_SUCCESS ? OPERATION_SUCCESS : OPERATION_FAILED;
+        int result = edit(entry);
+        if (result == OPERATION_FAILED) {
+            return OPERATION_FAILED;
+        }
+
+        File scenesFolder = createDirectory(chapterDirectory, SCENES_FOLDER_NAME);
+        if (scenesFolder == null) {
+            return OPERATION_FAILED;
+        }
+
+        return OPERATION_SUCCESS;
     }
 
     @Override
@@ -52,28 +64,29 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
         try {
 
-            // If the user wants to change the chapter index, then let's move everything...
-            if (oldChapter != null && oldChapter.getChapterIndex() != entry.getChapterIndex()) {
-                int oldIndex = oldChapter.getChapterIndex();
-                int newIndex = entry.getChapterIndex();
-
-                if (newIndex > oldIndex) {
-                    // Shift chapters left to free the target slot
-                    if (!shiftChapterRange(chapterManager, workingFolder, oldIndex + 1, newIndex, -1, true)) {
-                        return OPERATION_FAILED;
-                    }
-                } else {
-                    // Shift chapters right to free the target slot
-                    if (!shiftChapterRange(chapterManager, workingFolder, oldIndex - 1, newIndex, 1, false)) {
-                        return OPERATION_FAILED;
-                    }
-                }
-
+            // If user is editing chapter
+            if (oldChapter != null) {
                 File oldChapterDirectory = new File(workingFolder, oldChapter.toFileName());
                 File newChapterDirectory = new File(workingFolder, entry.toFileName());
+                // If the user wants to change the chapter index, then let's move everything...
+                if (oldChapter.getChapterIndex() != entry.getChapterIndex()) {
+                    int oldIndex = oldChapter.getChapterIndex();
+                    int newIndex = entry.getChapterIndex();
 
-                if (newChapterDirectory.exists()) {
-                    return OPERATION_FAILED;
+                    if (newIndex > oldIndex) {
+                        // Shift chapters left to free the target slot
+                        if (!shiftChapterRange(chapterManager, workingFolder, oldIndex + 1, newIndex, -1, true)) {
+                            return OPERATION_FAILED;
+                        }
+                    } else {
+                        // Shift chapters right to free the target slot
+                        if (!shiftChapterRange(chapterManager, workingFolder, oldIndex - 1, newIndex, 1, false)) {
+                            return OPERATION_FAILED;
+                        }
+                    }
+                    if (newChapterDirectory.exists()) {
+                        return OPERATION_FAILED;
+                    }
                 }
 
                 Files.move(oldChapterDirectory.toPath(), newChapterDirectory.toPath());
@@ -91,7 +104,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
             }
 
         } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Couldn't edit chapter {}", entry.formattedName(), e);
+            NarrativeCraftMod.LOGGER.error("Failed to edit chapter {}", entry.formattedName(), e);
             return OPERATION_FAILED;
         }
 
@@ -126,7 +139,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
             return OPERATION_SUCCESS;
         } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Couldn't delete chapter {}", entry.formattedName(), e);
+            NarrativeCraftMod.LOGGER.error("Failed to delete chapter {}", entry.formattedName(), e);
             return OPERATION_FAILED;
         }
     }

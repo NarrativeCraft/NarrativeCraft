@@ -65,9 +65,9 @@ public class ClientNarrativeUIActionRegistry {
 
     @SuppressWarnings("unchecked")
     public <T extends NarrativeEntry<?>> AbstractNarrativeEntryEditScreen<T> showCreateScreen(
-            Class<? extends NarrativeEntry<?>> entryClass, Screen lastScreen) {
+            Class<? extends NarrativeEntry<?>> entryClass, Screen lastScreen, NarrativeEntry<?> parent) {
         ClientNarrativeUIAction<T> editor = (ClientNarrativeUIAction<T>) registry.get(entryClass);
-        if (editor != null) return editor.showEditScreen(null, lastScreen);
+        if (editor != null) return editor.showCreateScreen(parent, lastScreen);
         return null;
     }
 

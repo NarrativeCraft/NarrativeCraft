@@ -61,6 +61,12 @@ public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapt
     @Override
     public void edit(UUID entryId, ChapterPayload payload, UUID playerId) {
 
+        Chapter oldChapter = resolve(entryId, payload);
+
+        if (oldChapter == null) {
+            return;
+        }
+
         Chapter newChapter =
                 new Chapter(entryId, payload.getName(), payload.getDescription(), payload.getChapterIndex());
         int result = NarrativeCraftFileRegistry.getInstance().edit(newChapter);
@@ -70,8 +76,6 @@ public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapt
             // TODO: send error
             return;
         }
-
-        Chapter oldChapter = resolve(entryId, payload);
 
         int oldIndex = oldChapter.getChapterIndex();
         oldChapter.setName(payload.getName());

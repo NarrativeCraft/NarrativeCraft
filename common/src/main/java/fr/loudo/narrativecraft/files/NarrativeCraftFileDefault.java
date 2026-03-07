@@ -31,6 +31,7 @@ public class NarrativeCraftFileDefault {
     public static final String EXTENSION_SCRIPT_FILE = ".ink";
     public static final String EXTENSION_DATA_FILE = ".json";
     public static final String DATA_FILE_NAME = "data" + EXTENSION_DATA_FILE;
+    public static final String SCENES_FOLDER_NAME = "scenes";
 
     protected final String DIRECTORY_NAME = NarrativeCraftMod.MOD_ID;
 
@@ -38,7 +39,7 @@ public class NarrativeCraftFileDefault {
         File directory = new File(parent, name);
         if (!directory.exists()) {
             if (!directory.mkdir()) {
-                NarrativeCraftMod.LOGGER.error("Couldn't create directory {}!", name);
+                NarrativeCraftMod.LOGGER.error("Failed to create directory {}", name);
                 return null;
             }
         }

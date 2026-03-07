@@ -24,5 +24,27 @@
 package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.util.Comparator;
+import java.util.List;
 
-public class SceneManager extends Manager<Scene> {}
+public class SceneManager extends Manager<Scene> {
+
+    public Scene getByRank(int currentRank) {
+        for (Scene scene : list) {
+            if (scene.getRank() == currentRank) {
+                return scene;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<Scene> getList() {
+        this.list.sort(Comparator.comparingInt(Scene::getRank));
+        return this.list;
+    }
+
+    public void forceSort() {
+        this.list.sort(Comparator.comparingInt(Scene::getRank));
+    }
+}

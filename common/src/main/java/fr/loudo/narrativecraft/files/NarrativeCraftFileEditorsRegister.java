@@ -23,11 +23,15 @@
 
 package fr.loudo.narrativecraft.files;
 
+import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
+import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 
 public class NarrativeCraftFileEditorsRegister {
 
     public static void register() {
         NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
+        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
     }
 }

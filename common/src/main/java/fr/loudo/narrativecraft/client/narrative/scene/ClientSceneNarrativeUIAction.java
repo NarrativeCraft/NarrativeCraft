@@ -21,21 +21,43 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative.ui;
+package fr.loudo.narrativecraft.client.narrative.scene;
 
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.screens.narrative.scene.SceneEntryEditScreen;
+import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.screens.Screen;
 
-public interface ClientNarrativeUIAction<T extends NarrativeEntry<?>> {
+public class ClientSceneNarrativeUIAction implements ClientNarrativeUIAction<Scene> {
+    @Override
+    public Screen subListSubScreen(Scene entry, Screen parent) {
+        return new NarrativeEntryListScreen<>(
+                Translation.message("scene"),
+                entry.getChapter().getSceneManager().getList(),
+                parent,
+                Scene.class);
+    }
 
-    Screen subListSubScreen(T entry, Screen parent);
+    @Override
+    public boolean hasSubScreen() {
+        return true;
+    }
 
-    boolean hasSubScreen();
+    @Override
+    public AbstractNarrativeEntryEditScreen<Scene> showEditScreen(Scene entry, Screen lastScreen) {
+        return new SceneEntryEditScreen(entry, lastScreen);
+    }
 
-    AbstractNarrativeEntryEditScreen<T> showEditScreen(T entry, Screen lastScreen);
-
-    default AbstractNarrativeEntryEditScreen<T> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
+    @Override
+    public AbstractNarrativeEntryEditScreen<Scene> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
+        if (parent instanceof Chapter chapter) {
+            return new SceneEntryEditScreen(chapter, lastScreen);
+        }
         return showEditScreen(null, lastScreen);
     }
 }
