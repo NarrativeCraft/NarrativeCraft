@@ -7,6 +7,14 @@
   "narrativecraft.send": "Send",
   "narrativecraft.close": "Close",
   "narrativecraft.error": "Error",
+  "narrativecraft.scene_rank": "Rank",
+
+  "narrativecraft.screen.scene_menu.animations": "Animations",
+  "narrativecraft.screen.scene_menu.camera_angles": "Camera angles",
+  "narrativecraft.screen.scene_menu.cutscenes": "Cutscenes",
+  "narrativecraft.screen.scene_menu.interactions": "Interactions",
+  "narrativecraft.screen.scene_menu.npc": "Npc",
+  "narrativecraft.screen.scene_menu.subscenes": "Subscenes",
 
   "narrativecraft.screen.pagination.page": "Page %d",
   "narrativecraft.screen.pagination.page_out_of": "Page %d out of %d",

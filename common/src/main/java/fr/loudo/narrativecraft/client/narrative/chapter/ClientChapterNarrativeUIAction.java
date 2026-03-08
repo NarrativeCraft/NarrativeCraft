@@ -37,7 +37,7 @@ public class ClientChapterNarrativeUIAction implements ClientNarrativeUIAction<C
     @Override
     public Screen subListSubScreen(Chapter entry, Screen parent) {
         return new NarrativeEntryListScreen<>(
-                Translation.message("scene"), entry.getSceneManager().getList(), parent, Scene.class, entry);
+                Translation.message("scene"), entry.getSceneManager().getList(), parent, Scene.class, entry, entry.getName());
     }
 
     @Override

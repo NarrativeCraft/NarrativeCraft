@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegist
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
@@ -39,19 +40,21 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
     private Screen lastScreen;
     private Class<? extends NarrativeEntry<?>> entryClass;
     private NarrativeEntry<?> parentEntry;
+    private String breadCrumb;
 
-    public NarrativeEntryListScreen(Component title, List<E> entries, Class<E> entryClass) {
+    public NarrativeEntryListScreen(Component title, List<E> entries, Class<E> entryClass, String breadCrumb) {
         super(title, entries);
         this.entryClass = entryClass;
+        this.breadCrumb = breadCrumb;
     }
 
-    public NarrativeEntryListScreen(Component title, List<E> entries, Screen lastScreen, Class<E> entryClass) {
-        this(title, entries, lastScreen, entryClass, null);
+    public NarrativeEntryListScreen(Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, String breadCrumb) {
+        this(title, entries, lastScreen, entryClass, null, breadCrumb);
     }
 
     public NarrativeEntryListScreen(
-            Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, NarrativeEntry<?> parentEntry) {
-        this(title, entries, entryClass);
+            Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, NarrativeEntry<?> parentEntry, String breadCrumb) {
+        this(title, entries, entryClass, breadCrumb);
         this.lastScreen = lastScreen;
         this.entryClass = entryClass;
         this.parentEntry = parentEntry;
@@ -65,7 +68,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
             Button backButton = Button.builder(Component.literal("<"), (b) -> {
                         onClose();
                     })
-                    .bounds(this.width / 2 - buttonWidth / 2, 20, 20, 20)
+                    .bounds(this.width / 2 - buttonWidth / 2 - 20, 20, 20, 20)
                     .build();
             this.addRenderableWidget(backButton);
         }
@@ -77,10 +80,15 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                         minecraft.setScreen(ClientNarrativeUIActionRegistry.getInstance()
                                 .showCreateScreen(entryClass, this, parentEntry));
                     })
-                    .bounds(this.width / 2 + buttonWidth / 2, 20, 20, 20)
+                    .bounds(this.width / 2 + buttonWidth / 2 + 10, 20, 20, 20)
                     .build();
             this.addRenderableWidget(addButton);
         }
+
+        if (!breadCrumb.isEmpty()) {
+            addRenderableWidget(new BreadcrumbWidget(20, 20, breadCrumb, this.font));
+        }
+
     }
 
     public void reload() {
