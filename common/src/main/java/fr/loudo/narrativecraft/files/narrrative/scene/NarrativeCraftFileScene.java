@@ -23,25 +23,29 @@
 
 package fr.loudo.narrativecraft.files.narrrative.scene;
 
+import com.google.gson.Gson;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.managers.SceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.scene.SceneDeserializer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<Scene> {
 
     @Override
     public int create(Scene entry) {
 
-        File sceneFile = createDirectory(getWorkingFolder(entry.getChapter()), entry.toFileName());
+        File sceneFile = createDirectory(getScenesFolder(entry.getChapter()), entry.toFileName());
         if (sceneFile == null) {
             return OPERATION_FAILED;
         }
@@ -52,7 +56,7 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
     @Override
     public int edit(Scene entry) {
 
-        File workingFolder = getWorkingFolder(entry.getChapter());
+        File workingFolder = getScenesFolder(entry.getChapter());
         SceneManager sceneManager = entry.getChapter().getSceneManager();
         Scene oldScene = sceneManager.getById(entry.getId());
 
@@ -110,7 +114,7 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
     @Override
     public int delete(Scene entry) {
 
-        File workingFolder = getWorkingFolder(entry.getChapter());
+        File workingFolder = getScenesFolder(entry.getChapter());
         File sceneFile = new File(workingFolder, entry.toFileName());
         if (!sceneFile.exists()) {
             return OPERATION_FAILED;
@@ -138,6 +142,50 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             NarrativeCraftMod.LOGGER.error("Failed to delete scene {}", entry.formattedName(), e);
             return OPERATION_FAILED;
         }
+    }
+
+    @Override
+    public List<DeserializationResult<Scene>> deserialize() {
+
+        List<DeserializationResult<Scene>> deserializationResults = new ArrayList<>();
+
+        File chaptersFolder = getChaptersFolder();
+        File[] allContents = chaptersFolder.listFiles();
+
+        if (allContents == null) {
+            return null;
+        }
+
+        gsonBuilder.registerTypeAdapter(Scene.class, new SceneDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        for (File file : allContents) {
+            File scenesFolder = new File(file, SCENES_FOLDER_NAME);
+            File[] scenes = scenesFolder.listFiles();
+            if (scenes == null) {
+                continue;
+            }
+
+            for (File file1 : scenes) {
+                File dataFile = new File(file1, DATA_FILE_NAME);
+                try {
+                    String content = Files.readString(dataFile.toPath());
+                    Scene scene = gson.fromJson(content, Scene.class);
+                    if (scene == null) {
+                        throw new Exception(String.format(
+                                "Scene %s of chapter %s deserialization returned null",
+                                file1.getName(), file.getName()));
+                    }
+                    deserializationResults.add(new DeserializationResult<>(scene, false, file1.getName()));
+                } catch (Exception e) {
+                    NarrativeCraftMod.LOGGER.error(
+                            "Failed to init scene {} of chapter {}", file.getName(), file1.getName(), e);
+                    deserializationResults.add(new DeserializationResult<>(null, true, file1.getName()));
+                }
+            }
+        }
+
+        return deserializationResults;
     }
 
     private boolean shiftSceneRange(
@@ -196,16 +244,5 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             rank++;
         }
         return rank;
-    }
-
-    public File getWorkingFolder(Chapter entry) {
-        File chaptersFolder = getWorkingFolder();
-        File chapterFolder = new File(chaptersFolder, entry.toFileName());
-        return new File(chapterFolder, SCENES_FOLDER_NAME);
-    }
-
-    @Override
-    public File getWorkingFolder() {
-        return NarrativeCraftMod.getInstance().getFile().getInit().getChaptersDirectory();
     }
 }

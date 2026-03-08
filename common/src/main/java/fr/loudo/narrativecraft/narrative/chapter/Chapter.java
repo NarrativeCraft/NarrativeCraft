@@ -32,8 +32,8 @@ public class Chapter extends NarrativeEntry<ChapterPayload> {
     private int chapterIndex;
     private final SceneManager sceneManager = new SceneManager();
 
-    public Chapter(UUID uuid, String name, String description, int chapterIndex) {
-        super(uuid, name, description);
+    public Chapter(UUID id, String name, String description, int chapterIndex) {
+        super(id, name, description);
         this.chapterIndex = chapterIndex;
     }
 
@@ -58,7 +58,7 @@ public class Chapter extends NarrativeEntry<ChapterPayload> {
     public String toRawJson() {
         return String.format(
                 "{\"id\": \"%s\",\"name\":\"%s\",\"description\":\"%s\",\"chapterIndex\": %s}",
-                uuid.toString(), name, description, chapterIndex);
+                id.toString(), name, description, chapterIndex);
     }
 
     public String formattedName() {

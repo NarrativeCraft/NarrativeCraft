@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NarrativeCraftFileRegistry {
@@ -59,6 +60,14 @@ public class NarrativeCraftFileRegistry {
         NarrativeCraftFileEditor<T> editor = getEditor(entry);
         if (editor != null) return editor.delete(entry);
         return NarrativeCraftFileEditor.OPERATION_FAILED;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends NarrativeEntry<?>> List<DeserializationResult<T>> deserialize(
+            Class<? extends NarrativeEntry<?>> entryClass) {
+        NarrativeCraftFileEditor<T> editor = (NarrativeCraftFileEditor<T>) registry.get(entryClass);
+        if (editor != null) return editor.deserialize();
+        return null;
     }
 
     public static NarrativeCraftFileRegistry getInstance() {

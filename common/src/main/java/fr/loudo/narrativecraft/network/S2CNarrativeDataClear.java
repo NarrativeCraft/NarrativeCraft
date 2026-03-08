@@ -23,11 +23,23 @@
 
 package fr.loudo.narrativecraft.network;
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class ServerPacketRegisterFabric {
+public class S2CNarrativeDataClear implements CustomPacketPayload {
 
-    public static void register() {
-        PayloadTypeRegistry.playS2C().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
+    public static final S2CNarrativeDataClear INSTANCE = new S2CNarrativeDataClear();
+
+    public static final Type<S2CNarrativeDataClear> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "clear_narrative_data"));
+
+    public static final StreamCodec<ByteBuf, S2CNarrativeDataClear> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

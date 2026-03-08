@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
 import java.io.File;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
@@ -34,5 +35,6 @@ public class OnServerStart {
         File rootDirectory = server.getWorldPath(LevelResource.ROOT).toFile();
         NarrativeCraftMod.getInstance().getFile().getInit().init(rootDirectory);
         NarrativeCraftMod.getInstance().setServer(server);
+        NarrativeEntryInit.init();
     }
 }

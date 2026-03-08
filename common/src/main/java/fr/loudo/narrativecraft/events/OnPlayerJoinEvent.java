@@ -23,9 +23,20 @@
 
 package fr.loudo.narrativecraft.events;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
+import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.server.level.ServerPlayer;
 
 public class OnPlayerJoinEvent {
 
-    public static void onPlayerJoin(ServerPlayer player) {}
+    public static void onPlayerJoin(ServerPlayer player) {
+        NarrativeEntryInit.sendDataToPlayer(player);
+        for (DeserializationResult<?> deserializationResult :
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization()) {
+            Utils.sendError(Translation.message("error.corrupted_entry", deserializationResult.folderName()), player);
+        }
+    }
 }

@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
+import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -48,5 +50,9 @@ public class OnPacketRegisterEventNeoForge {
                 BiSyncNarrativeEntryPacket.TYPE,
                 BiSyncNarrativeEntryPacket.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::syncNarrativeEntry);
+        registrar.playToClient(
+                S2CNarrativeDataClear.TYPE,
+                S2CNarrativeDataClear.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::clearNarrativeData);
     }
 }

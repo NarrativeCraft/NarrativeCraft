@@ -23,11 +23,14 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditorsRegister;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ public class NarrativeCraftMod {
 
     private final ChapterManager chapterManager = new ChapterManager();
     private final CharacterManager characterManager = new CharacterManager();
+    private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
 
@@ -64,6 +68,10 @@ public class NarrativeCraftMod {
 
     public MinecraftServer getServer() {
         return server;
+    }
+
+    public List<DeserializationResult<?>> getCorruptedDeserialization() {
+        return corruptedDeserialization;
     }
 
     public void setServer(MinecraftServer server) {

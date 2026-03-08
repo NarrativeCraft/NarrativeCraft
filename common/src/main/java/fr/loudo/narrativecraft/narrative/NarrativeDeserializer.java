@@ -21,13 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.narrative;
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonObject;
+import java.util.UUID;
 
-public class ServerPacketRegisterFabric {
+public abstract class NarrativeDeserializer<T> implements JsonDeserializer<T> {
 
-    public static void register() {
-        PayloadTypeRegistry.playS2C().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
+    protected UUID parseId(JsonObject json) {
+        return UUID.fromString(json.get("id").getAsString());
+    }
+
+    protected String parseName(JsonObject json) {
+        return json.get("name").getAsString();
+    }
+
+    protected String parseDescription(JsonObject json) {
+        return json.get("description").getAsString();
     }
 }

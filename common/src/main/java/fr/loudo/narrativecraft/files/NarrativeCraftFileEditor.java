@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import java.io.File;
+import java.util.List;
 
 public interface NarrativeCraftFileEditor<T extends NarrativeEntry<?>> {
 
@@ -37,5 +37,5 @@ public interface NarrativeCraftFileEditor<T extends NarrativeEntry<?>> {
 
     int delete(T entry);
 
-    File getWorkingFolder();
+    List<DeserializationResult<T>> deserialize();
 }

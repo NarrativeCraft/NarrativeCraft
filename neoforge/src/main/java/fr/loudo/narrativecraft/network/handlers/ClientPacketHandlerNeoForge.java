@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
@@ -32,5 +33,9 @@ public class ClientPacketHandlerNeoForge {
         context.enqueueWork(() -> {
             ClientPacketHandler.narrativeEntry(packet);
         });
+    }
+
+    public static void clearNarrativeData(S2CNarrativeDataClear s2CNarrativeDataClear, IPayloadContext context) {
+        context.enqueueWork(ClientPacketHandler::clearNarrativeData);
     }
 }

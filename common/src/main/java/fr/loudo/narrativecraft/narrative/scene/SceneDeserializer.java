@@ -21,13 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.narrative.scene;
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import com.google.gson.*;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import java.lang.reflect.Type;
+import java.util.UUID;
 
-public class ServerPacketRegisterFabric {
+public class SceneDeserializer extends NarrativeDeserializer<Scene> {
+    @Override
+    public Scene deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
+        JsonObject jsonObject = json.getAsJsonObject();
 
-    public static void register() {
-        PayloadTypeRegistry.playS2C().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
+        if (!jsonObject.has("chapterId")) {
+            return null;
+        }
+
+        UUID id = parseId(jsonObject);
+        String name = parseName(jsonObject);
+        String description = parseDescription(jsonObject);
+        UUID chapterId = UUID.fromString(jsonObject.get("chapterId").getAsString());
+        int rank = Integer.parseInt(jsonObject.get("rank").getAsString());
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(chapterId);
+        if (chapter == null) {
+            return null;
+        }
+        return new Scene(id, name, description, chapter, rank);
     }
 }

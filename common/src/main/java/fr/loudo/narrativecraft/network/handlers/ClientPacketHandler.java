@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 
@@ -34,5 +35,9 @@ public class ClientPacketHandler {
             case EDIT -> ClientNarrativeEntryEditorRegistry.getInstance().edit(packet.entryId(), packet.entry());
             case DELETE -> ClientNarrativeEntryEditorRegistry.getInstance().delete(packet.entryId(), packet.entry());
         }
+    }
+
+    public static void clearNarrativeData() {
+        ClientNarrativeCraftMod.getInstance().getChapterManager().clear();
     }
 }

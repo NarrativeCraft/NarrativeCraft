@@ -21,13 +21,8 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.files;
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 
-public class ServerPacketRegisterFabric {
-
-    public static void register() {
-        PayloadTypeRegistry.playS2C().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
-    }
-}
+public record DeserializationResult<T extends NarrativeEntry<?>>(T entry, boolean corrupted, String folderName) {}

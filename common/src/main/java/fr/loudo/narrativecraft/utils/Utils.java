@@ -23,8 +23,21 @@
 
 package fr.loudo.narrativecraft.utils;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+
 public class Utils {
 
     public static final String ONLY_NUMBERS = "^[0-9]*$";
     public static final String NO_SPECIAL_CHARACTERS = "^[a-zA-Z0-9äöüÄÖÜ]*$";
+
+    public static void sendError(Component message, Player player) {
+        Component errorMsg = Component.empty()
+                .append("[" + NarrativeCraftMod.MOD_NAME + "] ")
+                .append(message)
+                .withStyle(ChatFormatting.RED);
+        player.displayClientMessage(errorMsg, false);
+    }
 }

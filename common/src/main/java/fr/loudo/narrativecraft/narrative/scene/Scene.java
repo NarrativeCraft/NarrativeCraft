@@ -32,8 +32,8 @@ public class Scene extends NarrativeEntry<ScenePayload> {
     private final Chapter chapter;
     private int rank;
 
-    public Scene(UUID uuid, String name, String description, Chapter chapter, int rank) {
-        super(uuid, name, description);
+    public Scene(UUID id, String name, String description, Chapter chapter, int rank) {
+        super(id, name, description);
         this.chapter = chapter;
         this.rank = rank;
     }
@@ -79,7 +79,7 @@ public class Scene extends NarrativeEntry<ScenePayload> {
     public String toRawJson() {
         return String.format(
                 "{\"id\": \"%s\",\"name\":\"%s\",\"description\":\"%s\", \"chapterId\":\"%s\",\"rank\":\"%s\"}",
-                uuid.toString(), name, description, chapter.getId(), rank);
+                id.toString(), name, description, chapter.getId(), rank);
     }
 
     @Override

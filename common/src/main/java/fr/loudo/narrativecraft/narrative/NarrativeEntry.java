@@ -26,25 +26,25 @@ package fr.loudo.narrativecraft.narrative;
 import java.util.UUID;
 
 public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
-    protected final UUID uuid;
+    protected final UUID id;
     protected String name;
     protected String description;
 
-    public NarrativeEntry(UUID uuid, String name, String description) {
-        this.uuid = uuid;
+    public NarrativeEntry(UUID id, String name, String description) {
+        this.id = id;
         this.name = name;
         this.description = description;
     }
 
     public NarrativeEntry(String name, String description) {
-        this.uuid = UUID.randomUUID();
+        this.id = UUID.randomUUID();
         this.name = name;
         this.description = description;
     }
 
     public String toRawJson() {
         return String.format(
-                "{\"id\": \"%s\",\"name\":\"%s\",\"description\":\"%s\"}", uuid.toString(), name, description);
+                "{\"id\": \"%s\",\"name\":\"%s\",\"description\":\"%s\"}", id.toString(), name, description);
     }
 
     public String getName() {
@@ -64,7 +64,7 @@ public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
     }
 
     public UUID getId() {
-        return uuid;
+        return id;
     }
 
     public abstract T toPayload();

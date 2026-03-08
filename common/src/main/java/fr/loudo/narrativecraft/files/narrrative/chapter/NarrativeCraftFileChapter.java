@@ -23,21 +23,26 @@
 
 package fr.loudo.narrativecraft.files.narrrative.chapter;
 
+import com.google.gson.Gson;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.chapter.ChapterDeserializer;
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<Chapter> {
 
     @Override
     public int create(Chapter entry) {
 
-        File chapterDirectory = createDirectory(getWorkingFolder(), entry.toFileName());
+        File chapterDirectory = createDirectory(getChaptersFolder(), entry.toFileName());
         if (chapterDirectory == null) {
             return OPERATION_FAILED;
         }
@@ -58,7 +63,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int edit(Chapter entry) {
 
-        File workingFolder = getWorkingFolder();
+        File workingFolder = getChaptersFolder();
         ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
         Chapter oldChapter = chapterManager.getById(entry.getId());
 
@@ -114,7 +119,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int delete(Chapter entry) {
 
-        File workingFolder = getWorkingFolder();
+        File workingFolder = getChaptersFolder();
         File chapterDirectory = new File(workingFolder, entry.toFileName());
         if (!chapterDirectory.exists()) {
             return OPERATION_FAILED;
@@ -142,6 +147,38 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
             NarrativeCraftMod.LOGGER.error("Failed to delete chapter {}", entry.formattedName(), e);
             return OPERATION_FAILED;
         }
+    }
+
+    @Override
+    public List<DeserializationResult<Chapter>> deserialize() {
+
+        List<DeserializationResult<Chapter>> deserializationResults = new ArrayList<>();
+
+        File chaptersFolder = getChaptersFolder();
+        File[] allContents = chaptersFolder.listFiles();
+        if (allContents == null) {
+            return null;
+        }
+
+        gsonBuilder.registerTypeAdapter(Chapter.class, new ChapterDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        for (File file : allContents) {
+            try {
+                File dataFile = new File(file, DATA_FILE_NAME);
+                String content = Files.readString(dataFile.toPath());
+                Chapter chapter = gson.fromJson(content, Chapter.class);
+                if (chapter == null) {
+                    throw new Exception(String.format("Chapter %s deserialization returned null", file.getName()));
+                }
+                deserializationResults.add(new DeserializationResult<>(chapter, false, file.getName()));
+            } catch (Exception e) {
+                NarrativeCraftMod.LOGGER.error("Failed to init chapter {}", file.getName(), e);
+                deserializationResults.add(new DeserializationResult<>(null, true, file.getName()));
+            }
+        }
+
+        return deserializationResults;
     }
 
     private boolean shiftChapterRange(
@@ -200,10 +237,5 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
             index++;
         }
         return index;
-    }
-
-    @Override
-    public File getWorkingFolder() {
-        return NarrativeCraftMod.getInstance().getFile().getInit().getChaptersDirectory();
     }
 }

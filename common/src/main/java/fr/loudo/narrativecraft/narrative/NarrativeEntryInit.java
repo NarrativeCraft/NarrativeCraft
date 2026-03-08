@@ -1,0 +1,88 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.narrative;
+
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
+import fr.loudo.narrativecraft.platform.Services;
+import java.util.List;
+import net.minecraft.server.level.ServerPlayer;
+
+public class NarrativeEntryInit {
+
+    public static void init() {
+        // Not supposed to be populated on servers, but on singleplayer world it stills on memory so data aren't updated
+        NarrativeCraftMod.getInstance().getChapterManager().clear();
+        NarrativeCraftMod.getInstance().getCorruptedDeserialization().clear();
+
+        // Order is important!! e.g. Chapters must be initialized before scenes of chapter can be initialized.
+        chapters();
+        scenes();
+    }
+
+    private static void chapters() {
+        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+        List<DeserializationResult<Chapter>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Chapter.class);
+
+        for (DeserializationResult<Chapter> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Chapter chapter = deserializationResult.entry();
+            chapterManager.add(chapter);
+        }
+    }
+
+    private static void scenes() {
+        List<DeserializationResult<Scene>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Scene.class);
+        for (DeserializationResult<Scene> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Scene scene = deserializationResult.entry();
+            scene.getChapter().getSceneManager().add(scene);
+        }
+    }
+
+    public static void sendDataToPlayer(ServerPlayer player) {
+        Services.PACKET.sendToPlayer(player, S2CNarrativeDataClear.INSTANCE);
+        for (Chapter chapter :
+                NarrativeCraftMod.getInstance().getChapterManager().getList()) {
+            Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(chapter.getId(), chapter.toPayload()));
+            for (Scene scene : chapter.getSceneManager().getList()) {
+                Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(scene.getId(), scene.toPayload()));
+            }
+        }
+    }
+}
