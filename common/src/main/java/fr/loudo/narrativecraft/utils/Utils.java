@@ -34,6 +34,7 @@ public class Utils {
     public static final String NO_SPECIAL_CHARACTERS = "^[a-zA-Z0-9_ ]*$";
 
     public static void sendError(Component message, Player player) {
+        if (player == null) return;
         Component errorMsg = Component.empty()
                 .append("[" + NarrativeCraftMod.MOD_NAME + "] ")
                 .append(message)

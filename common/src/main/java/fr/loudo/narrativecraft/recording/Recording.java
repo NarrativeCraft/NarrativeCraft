@@ -21,26 +21,6 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.handlers;
+package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
-import fr.loudo.narrativecraft.network.S2CScreenClear;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-
-public class ClientPacketHandlerNeoForge {
-
-    public static void syncNarrativeEntry(BiSyncNarrativeEntryPacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            ClientPacketHandler.narrativeEntry(packet);
-        });
-    }
-
-    public static void clearNarrativeData(S2CNarrativeDataClear packet, IPayloadContext context) {
-        context.enqueueWork(ClientPacketHandler::clearNarrativeData);
-    }
-
-    public static void clearScreen(S2CScreenClear packet, IPayloadContext context) {
-        context.enqueueWork(ClientPacketHandler::clearScreen);
-    }
-}
+public class Recording {}

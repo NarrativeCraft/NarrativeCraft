@@ -21,26 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.handlers;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
-import fr.loudo.narrativecraft.network.S2CScreenClear;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class ClientPacketHandlerNeoForge {
+public class S2CScreenClear implements CustomPacketPayload {
 
-    public static void syncNarrativeEntry(BiSyncNarrativeEntryPacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            ClientPacketHandler.narrativeEntry(packet);
-        });
-    }
+    public static final S2CScreenClear INSTANCE = new S2CScreenClear();
 
-    public static void clearNarrativeData(S2CNarrativeDataClear packet, IPayloadContext context) {
-        context.enqueueWork(ClientPacketHandler::clearNarrativeData);
-    }
+    public static final Type<S2CScreenClear> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "clear_screen"));
 
-    public static void clearScreen(S2CScreenClear packet, IPayloadContext context) {
-        context.enqueueWork(ClientPacketHandler::clearScreen);
+    public static final StreamCodec<ByteBuf, S2CScreenClear> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

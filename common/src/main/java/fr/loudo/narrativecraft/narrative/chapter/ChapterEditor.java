@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
@@ -53,8 +54,7 @@ public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapt
             chapterManager.add(chapter);
             UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(entryId, payload));
         } else {
-            if (player == null) return;
-            // TODO: send error
+            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.add", payload.getName()), player);
         }
     }
 
@@ -73,7 +73,7 @@ public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapt
 
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
             ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            // TODO: send error
+            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
             return;
         }
 
@@ -99,8 +99,7 @@ public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapt
             chapterManager.remove(chapter);
             UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.delete(entryId, payload));
         } else {
-            if (player == null) return;
-            // TODO: send error
+            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.delete", payload.getName()), player);
         }
     }
 }

@@ -29,5 +29,8 @@
   "narrativecraft.error.must_have_name": "Must have a name!",
   "narrativecraft.error.must_have_chapter_index": "Must have a chapter index!",
   "narrativecraft.error.chapter_index_greather_than_size": "Chapter index %s is higher than the last chapter index %s",
-  "narrativecraft.error.corrupted_entry": "Entry %s failed to deserialize. Something went wrong when decoding data."
+  "narrativecraft.error.corrupted_entry": "Entry %s failed to deserialize. Something went wrong when decoding data.",
+  "narrativecraft.error.crud.add": "Failed to add %s",
+  "narrativecraft.error.crud.edit": "Failed to edit %s",
+  "narrativecraft.error.crud.delete": "Failed to delete %s"
 }

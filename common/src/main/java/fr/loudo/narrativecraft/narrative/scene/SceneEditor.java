@@ -30,8 +30,10 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
 
 public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
 
@@ -55,6 +57,8 @@ public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
         int result = NarrativeCraftFileRegistry.getInstance().create(scene);
 
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
+            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
+            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.add", payload.getName()), player);
             return;
         }
 
@@ -76,6 +80,8 @@ public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
                 entryId, payload.getName(), payload.getDescription(), oldScene.getChapter(), payload.getRank());
         int result = NarrativeCraftFileRegistry.getInstance().edit(newScene);
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
+            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
+            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
             return;
         }
 
@@ -98,6 +104,8 @@ public class SceneEditor implements NarrativeEntryEditor<ScenePayload, Scene> {
 
         int result = NarrativeCraftFileRegistry.getInstance().delete(scene);
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
+            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
+            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.delete", payload.getName()), player);
             return;
         }
 

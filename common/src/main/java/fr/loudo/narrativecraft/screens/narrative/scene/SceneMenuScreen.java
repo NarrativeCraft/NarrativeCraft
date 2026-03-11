@@ -26,12 +26,11 @@ package fr.loudo.narrativecraft.screens.narrative.scene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class SceneMenuScreen extends Screen {
 
@@ -66,9 +65,10 @@ public class SceneMenuScreen extends Screen {
         int i = 0;
         for (Map.Entry<Component, Runnable> entry : labels.entrySet()) {
             int y = startY + i * (BUTTON_HEIGHT + BUTTON_GAP);
-            this.addRenderableWidget(Button.builder(entry.getKey(), b -> entry.getValue().run())
-                    .bounds(buttonX, y, BUTTON_WIDTH, BUTTON_HEIGHT)
-                    .build());
+            this.addRenderableWidget(
+                    Button.builder(entry.getKey(), b -> entry.getValue().run())
+                            .bounds(buttonX, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+                            .build());
             i++;
         }
 

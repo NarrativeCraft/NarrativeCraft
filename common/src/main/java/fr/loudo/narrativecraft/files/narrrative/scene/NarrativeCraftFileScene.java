@@ -47,6 +47,7 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
 
         File sceneFile = createDirectory(getScenesFolder(entry.getChapter()), entry.toFileName());
         if (sceneFile == null) {
+            NarrativeCraftMod.LOGGER.error("Failed to create scene directory {}", entry.getName());
             return OPERATION_FAILED;
         }
 
@@ -71,20 +72,26 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
                 if (oldScene.getRank() != entry.getRank()) {
                     int oldRank = oldScene.getRank();
                     int newRank = entry.getRank();
+                    String errorMsg = String.format("Failed to shift scene directory %s", oldScene.getName());
 
                     if (newRank > oldRank) {
                         // Shift scenes left to free the target slot
                         if (!shiftSceneRange(sceneManager, workingFolder, oldRank + 1, newRank, -1, true)) {
+                            NarrativeCraftMod.LOGGER.error(errorMsg);
                             return OPERATION_FAILED;
                         }
                     } else {
                         // Shift scenes right to free the target slot
                         if (!shiftSceneRange(sceneManager, workingFolder, oldRank - 1, newRank, 1, false)) {
+                            NarrativeCraftMod.LOGGER.error(errorMsg);
                             return OPERATION_FAILED;
                         }
                     }
 
                     if (newSceneDirectory.exists()) {
+                        NarrativeCraftMod.LOGGER.error(
+                                "Failed to rename scene {} because target directory already exists",
+                                oldScene.getName());
                         return OPERATION_FAILED;
                     }
                 }
@@ -94,6 +101,7 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
 
             File sceneFile = new File(workingFolder, entry.toFileName());
             if (!sceneFile.exists()) {
+                NarrativeCraftMod.LOGGER.error("Failed to shift scene directory {}", entry.getName());
                 return OPERATION_FAILED;
             }
 
@@ -104,7 +112,7 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             }
 
         } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Failed to edit scene {}", entry.formattedName(), e);
+            NarrativeCraftMod.LOGGER.error("Failed to write scene data {}", entry.formattedName(), e);
             return OPERATION_FAILED;
         }
 
@@ -117,6 +125,10 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
         File workingFolder = getScenesFolder(entry.getChapter());
         File sceneFile = new File(workingFolder, entry.toFileName());
         if (!sceneFile.exists()) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Failed to delete scene {} because target directory {} doesn't exists",
+                    entry.getName(),
+                    entry.toFileName());
             return OPERATION_FAILED;
         }
 
@@ -124,6 +136,7 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
 
         try {
             if (!deleteDirectory(sceneFile)) {
+                NarrativeCraftMod.LOGGER.error("Failed to delete scene {}", entry.getName());
                 return OPERATION_FAILED;
             }
 

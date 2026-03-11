@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
+import fr.loudo.narrativecraft.network.S2CScreenClear;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
@@ -35,6 +36,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CNarrativeDataClear.TYPE, (packet, context) -> {
             ClientPacketHandler.clearNarrativeData();
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CScreenClear.TYPE, (payload, context) -> {
+            ClientPacketHandler.clearScreen();
         });
     }
 }

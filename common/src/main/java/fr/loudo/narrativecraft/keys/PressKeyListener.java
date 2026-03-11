@@ -41,7 +41,8 @@ public class PressKeyListener {
             NarrativeEntryListScreen<Chapter> screen = new NarrativeEntryListScreen<>(
                     Translation.message("chapter"),
                     ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
-                    Chapter.class, "");
+                    Chapter.class,
+                    "");
             minecraft.setScreen(screen);
         });
     }

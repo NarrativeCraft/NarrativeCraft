@@ -44,6 +44,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
         File chapterDirectory = createDirectory(getChaptersFolder(), entry.toFileName());
         if (chapterDirectory == null) {
+            NarrativeCraftMod.LOGGER.error("Failed to create chapter directory {}", entry.getName());
             return OPERATION_FAILED;
         }
 
@@ -54,6 +55,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
         File scenesFolder = createDirectory(chapterDirectory, SCENES_FOLDER_NAME);
         if (scenesFolder == null) {
+            NarrativeCraftMod.LOGGER.error("Failed to create scenes directory of chapter {}", entry.getName());
             return OPERATION_FAILED;
         }
 
@@ -77,19 +79,25 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
                 if (oldChapter.getChapterIndex() != entry.getChapterIndex()) {
                     int oldIndex = oldChapter.getChapterIndex();
                     int newIndex = entry.getChapterIndex();
+                    String errorMsg = String.format("Failed to shift chapter directory %s", oldChapter.getName());
 
                     if (newIndex > oldIndex) {
                         // Shift chapters left to free the target slot
                         if (!shiftChapterRange(chapterManager, workingFolder, oldIndex + 1, newIndex, -1, true)) {
+                            NarrativeCraftMod.LOGGER.error(errorMsg);
                             return OPERATION_FAILED;
                         }
                     } else {
                         // Shift chapters right to free the target slot
                         if (!shiftChapterRange(chapterManager, workingFolder, oldIndex - 1, newIndex, 1, false)) {
+                            NarrativeCraftMod.LOGGER.error(errorMsg);
                             return OPERATION_FAILED;
                         }
                     }
                     if (newChapterDirectory.exists()) {
+                        NarrativeCraftMod.LOGGER.error(
+                                "Failed to rename chapter {} because target directory already exists",
+                                oldChapter.getName());
                         return OPERATION_FAILED;
                     }
                 }
@@ -99,6 +107,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
             File chapterDirectory = new File(workingFolder, entry.toFileName());
             if (!chapterDirectory.exists()) {
+                NarrativeCraftMod.LOGGER.error("Failed to shift chapter directory {}", entry.getName());
                 return OPERATION_FAILED;
             }
 
@@ -109,7 +118,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
             }
 
         } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Failed to edit chapter {}", entry.formattedName(), e);
+            NarrativeCraftMod.LOGGER.error("Failed to write chapter data {}", entry.formattedName(), e);
             return OPERATION_FAILED;
         }
 
@@ -122,6 +131,10 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
         File workingFolder = getChaptersFolder();
         File chapterDirectory = new File(workingFolder, entry.toFileName());
         if (!chapterDirectory.exists()) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Failed to delete chapter {} because target directory {} doesn't exists",
+                    entry.getName(),
+                    entry.toFileName());
             return OPERATION_FAILED;
         }
 
@@ -129,6 +142,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
         try {
             if (!deleteDirectory(chapterDirectory)) {
+                NarrativeCraftMod.LOGGER.error("Failed to delete chapter {}", entry.getName());
                 return OPERATION_FAILED;
             }
 
@@ -138,6 +152,9 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
             if (deletedIndex < lastIndex) {
                 if (!shiftChapterRange(chapterManager, workingFolder, deletedIndex + 1, lastIndex, -1, true)) {
+                    NarrativeCraftMod.LOGGER.error(
+                            "Failed to delete chapter {} because changing index order operation failed",
+                            entry.getName());
                     return OPERATION_FAILED;
                 }
             }

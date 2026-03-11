@@ -70,8 +70,7 @@ public class BreadcrumbWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         for (String section : sections) {
             narrationElementOutput.add(
-                    net.minecraft.client.gui.narration.NarratedElementType.TITLE,
-                    Component.literal(section));
+                    net.minecraft.client.gui.narration.NarratedElementType.TITLE, Component.literal(section));
         }
     }
 

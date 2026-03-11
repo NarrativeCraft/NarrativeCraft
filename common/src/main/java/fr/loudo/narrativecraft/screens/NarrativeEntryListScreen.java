@@ -48,12 +48,18 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
         this.breadCrumb = breadCrumb;
     }
 
-    public NarrativeEntryListScreen(Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, String breadCrumb) {
+    public NarrativeEntryListScreen(
+            Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, String breadCrumb) {
         this(title, entries, lastScreen, entryClass, null, breadCrumb);
     }
 
     public NarrativeEntryListScreen(
-            Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, NarrativeEntry<?> parentEntry, String breadCrumb) {
+            Component title,
+            List<E> entries,
+            Screen lastScreen,
+            Class<E> entryClass,
+            NarrativeEntry<?> parentEntry,
+            String breadCrumb) {
         this(title, entries, entryClass, breadCrumb);
         this.lastScreen = lastScreen;
         this.entryClass = entryClass;
@@ -88,7 +94,6 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
         if (!breadCrumb.isEmpty()) {
             addRenderableWidget(new BreadcrumbWidget(20, 20, breadCrumb, this.font));
         }
-
     }
 
     public void reload() {

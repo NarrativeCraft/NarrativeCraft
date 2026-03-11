@@ -26,8 +26,11 @@ package fr.loudo.narrativecraft.network.handlers;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import net.minecraft.client.Minecraft;
 
 public class ClientPacketHandler {
+
+    public static final Minecraft MINECRAFT = Minecraft.getInstance();
 
     public static void narrativeEntry(BiSyncNarrativeEntryPacket packet) {
         switch (packet.action()) {
@@ -39,5 +42,9 @@ public class ClientPacketHandler {
 
     public static void clearNarrativeData() {
         ClientNarrativeCraftMod.getInstance().getChapterManager().clear();
+    }
+
+    public static void clearScreen() {
+        MINECRAFT.setScreen(null);
     }
 }

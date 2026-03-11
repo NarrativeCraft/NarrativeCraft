@@ -29,5 +29,6 @@ public class ServerPacketRegisterFabric {
 
     public static void register() {
         PayloadTypeRegistry.playS2C().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
     }
 }
