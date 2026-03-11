@@ -23,41 +23,33 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.recording.actions.AbstractAction;
+import fr.loudo.narrativecraft.recording.actions.MovementAction;
+import java.util.function.IntFunction;
 
-public class Recording {
+public enum RecordingActionType {
+    MOVEMENT(1, MovementAction::new);
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
+    private final int id;
+    private final IntFunction<AbstractAction> factory;
 
-    public Recording(ServerPlayer player) {
-        this.player = player;
+    RecordingActionType(int id, IntFunction<AbstractAction> factory) {
+        this.id = id;
+        this.factory = factory;
     }
 
-    public void tick() {
-        if (!isRecording) return;
-    }
-
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
-    public ServerPlayer getPlayer() {
-        return player;
+    public AbstractAction createAction(int tick) {
+        return factory.apply(tick);
     }
 
-    public boolean isRecording() {
-        return isRecording;
-    }
-
-    public void setRecording(boolean recording) {
-        isRecording = recording;
-    }
-
-    public RecordingData getRecordingData() {
-        return recordingData;
+    public static RecordingActionType getById(int id) {
+        for (RecordingActionType type : values()) {
+            if (type.id == id) return type;
+        }
+        throw new IllegalArgumentException("Unknown action type id: " + id);
     }
 }

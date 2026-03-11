@@ -21,22 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import fr.loudo.narrativecraft.events.IFabricEventRegister;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnServerStartNeoForge {
+public class OnClientTickEventFabric implements IFabricEventRegister {
 
-    public OnServerStartNeoForge(IEventBus modBus) {
-        NeoForge.EVENT_BUS.addListener(OnServerStartNeoForge::onServerStart);
-    }
-
-    private static void onServerStart(ServerStartedEvent event) {
-        OnServerStart.serverStart(event.getServer());
+    public void register() {
+        ClientTickEvents.END_CLIENT_TICK.register(OnClientTickEvent::tick);
     }
 }

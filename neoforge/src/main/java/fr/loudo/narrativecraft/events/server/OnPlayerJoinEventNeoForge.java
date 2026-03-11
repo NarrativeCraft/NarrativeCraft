@@ -21,43 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.events.server;
 
-import java.util.UUID;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
-public class Recording {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnPlayerJoinEventNeoForge {
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
-
-    public Recording(ServerPlayer player) {
-        this.player = player;
+    public OnPlayerJoinEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnPlayerJoinEventNeoForge::onPlayerJoin);
     }
 
-    public void tick() {
-        if (!isRecording) return;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public ServerPlayer getPlayer() {
-        return player;
-    }
-
-    public boolean isRecording() {
-        return isRecording;
-    }
-
-    public void setRecording(boolean recording) {
-        isRecording = recording;
-    }
-
-    public RecordingData getRecordingData() {
-        return recordingData;
+    private static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        OnPlayerJoinEvent.onPlayerJoin((ServerPlayer) event.getEntity());
     }
 }

@@ -21,23 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.keys.ModKeys;
+import net.minecraft.client.KeyMapping;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
 @Mod(NarrativeCraftMod.MOD_ID)
-public class OnPlayerJoinEventNeoForge {
+public class OnKeyRegisterEventNeoForge {
 
-    public OnPlayerJoinEventNeoForge(IEventBus modBus) {
-        NeoForge.EVENT_BUS.addListener(OnPlayerJoinEventNeoForge::onPlayerJoin);
+    public OnKeyRegisterEventNeoForge(IEventBus bus) {
+        bus.addListener(OnKeyRegisterEventNeoForge::onKeyRegister);
     }
 
-    private static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        OnPlayerJoinEvent.onPlayerJoin((ServerPlayer) event.getEntity());
+    private static void onKeyRegister(RegisterKeyMappingsEvent event) {
+        for (KeyMapping key : ModKeys.ALL_KEYS) {
+            event.register(key);
+        }
     }
 }

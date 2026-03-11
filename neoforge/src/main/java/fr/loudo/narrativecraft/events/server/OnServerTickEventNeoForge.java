@@ -21,21 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class OnPacketClientRegisterEventNeoForge {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnServerTickEventNeoForge {
 
-    @SubscribeEvent
-    private static void onClientPacketRegister(RegisterClientPayloadHandlersEvent event) {
-        event.register(BiSyncNarrativeEntryPacket.TYPE, ClientPacketHandlerNeoForge::syncNarrativeEntry);
+    public OnServerTickEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnServerTickEventNeoForge::onServerTick);
+    }
+
+    private static void onServerTick(ServerTickEvent.Post event) {
+        OnServerTickEvent.tick(event.getServer());
     }
 }

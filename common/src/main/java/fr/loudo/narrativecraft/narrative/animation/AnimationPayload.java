@@ -21,14 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.narrative.animation;
 
-import fr.loudo.narrativecraft.keys.PressKeyListener;
-import net.minecraft.client.Minecraft;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 
-public class OnClientTick {
-
-    public static void tick(Minecraft minecraft) {
-        PressKeyListener.onKeyPressed(minecraft);
+public class AnimationPayload extends NarrativeEntryPayload {
+    public AnimationPayload(String name, String description) {
+        super(name, description);
     }
 }

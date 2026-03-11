@@ -21,22 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.DeserializationResult;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.Utils;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.client.Minecraft;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
-public class OnPlayerJoinEvent {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnClientTickEventNeoForge {
 
-    public static void onPlayerJoin(ServerPlayer player) {
-        NarrativeEntryInit.sendDataToPlayer(player);
-        for (DeserializationResult<?> deserializationResult :
-                NarrativeCraftMod.getInstance().getCorruptedDeserialization()) {
-            Utils.sendError(Translation.message("error.corrupted_entry", deserializationResult.folderName()), player);
-        }
+    public OnClientTickEventNeoForge(IEventBus eventBus) {
+        NeoForge.EVENT_BUS.addListener(OnClientTickEventNeoForge::onClientTick);
+    }
+
+    public static void onClientTick(ClientTickEvent.Post event) {
+        OnClientTickEvent.tick(Minecraft.getInstance());
     }
 }

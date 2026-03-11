@@ -21,20 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
+import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
+import net.minecraft.server.level.ServerPlayer;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class OnClientInitEventNeoForge {
+public class OnPlayerJoinEvent {
 
-    @SubscribeEvent
-    public static void clientInit(FMLClientSetupEvent event) {
-        ClientNarrativeCraftMod.commonInit();
+    public static void onPlayerJoin(ServerPlayer player) {
+        NarrativeEntryInit.sendDataToPlayer(player);
+        for (DeserializationResult<?> deserializationResult :
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization()) {
+            Utils.sendError(Translation.message("error.corrupted_entry", deserializationResult.folderName()), player);
+        }
     }
 }

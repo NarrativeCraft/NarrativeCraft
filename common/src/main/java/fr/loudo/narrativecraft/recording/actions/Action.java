@@ -21,23 +21,43 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.client.Minecraft;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import java.io.IOException;
+import java.util.UUID;
+import net.minecraft.world.phys.Vec3;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnClientTickEventNeoForge {
+public interface Action {
 
-    public OnClientTickEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(OnClientTickEventNeoForge::onClientTick);
+    interface Writer {
+        void addByte(byte value) throws IOException;
+
+        void addInt(int value) throws IOException;
+
+        void addLong(long value) throws IOException;
+
+        void addDouble(double value) throws IOException;
+
+        void addFloat(float value) throws IOException;
+
+        void addUUID(UUID uuid) throws IOException;
+
+        void addVec3(Vec3 pos) throws IOException;
     }
 
-    public static void onClientTick(ClientTickEvent.Post event) {
-        OnClientTick.tick(Minecraft.getInstance());
+    interface Reader {
+        byte readByte() throws IOException;
+
+        long readLong() throws IOException;
+
+        int readInt() throws IOException;
+
+        double readDouble() throws IOException;
+
+        float readFloat() throws IOException;
+
+        UUID readUUID() throws IOException;
+
+        Vec3 readVec3() throws IOException;
     }
 }

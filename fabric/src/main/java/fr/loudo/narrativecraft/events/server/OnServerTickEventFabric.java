@@ -21,15 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.client;
+package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.OnClientTick;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
-public class OnClientTickFabric implements IFabricEventRegister {
-
+public class OnServerTickEventFabric implements IFabricEventRegister {
+    @Override
     public void register() {
-        ClientTickEvents.END_CLIENT_TICK.register(OnClientTick::tick);
+        ServerTickEvents.END_SERVER_TICK.register(OnServerTickEvent::tick);
     }
 }

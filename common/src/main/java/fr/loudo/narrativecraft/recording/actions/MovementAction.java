@@ -21,20 +21,47 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
-import java.io.File;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.storage.LevelResource;
+import fr.loudo.narrativecraft.recording.RecordingActionType;
+import java.io.IOException;
+import net.minecraft.world.phys.Vec3;
 
-public class OnServerStart {
+public class MovementAction extends AbstractAction {
 
-    public static void serverStart(MinecraftServer server) {
-        File rootDirectory = server.getWorldPath(LevelResource.ROOT).toFile();
-        NarrativeCraftMod.getInstance().getFile().getInit().init(rootDirectory);
-        NarrativeCraftMod.getInstance().setServer(server);
-        NarrativeEntryInit.init();
+    private Vec3 pos;
+    private float pitch, yaw, headYaw;
+
+    public MovementAction(int tick, Vec3 vec3, float pitch, float yaw, float headYaw) {
+        super(tick);
+        this.pos = vec3;
+        this.pitch = pitch;
+        this.yaw = yaw;
+        this.headYaw = headYaw;
+    }
+
+    public MovementAction(int tick) {
+        super(tick);
+    }
+
+    @Override
+    public RecordingActionType getType() {
+        return RecordingActionType.MOVEMENT;
+    }
+
+    @Override
+    public void write(Writer writer) throws IOException {
+        writer.addVec3(pos);
+        writer.addFloat(pitch);
+        writer.addFloat(yaw);
+        writer.addFloat(headYaw);
+    }
+
+    @Override
+    public void read(Reader reader) throws IOException {
+        pos = reader.readVec3();
+        pitch = reader.readFloat();
+        yaw = reader.readFloat();
+        headYaw = reader.readFloat();
     }
 }

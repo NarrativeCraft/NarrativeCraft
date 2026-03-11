@@ -23,13 +23,17 @@
 
 package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.OnServerStart;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.Recording;
+import net.minecraft.server.MinecraftServer;
 
-public class OnServerStartFabric implements IFabricEventRegister {
+public class OnServerTickEvent {
 
-    public void register() {
-        ServerLifecycleEvents.SERVER_STARTED.register(OnServerStart::serverStart);
+    public static void tick(MinecraftServer server) {
+
+        for (Recording recording :
+                NarrativeCraftMod.getInstance().getRecordingManager().getList()) {
+            recording.tick();
+        }
     }
 }

@@ -23,15 +23,20 @@
 
 package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.OnPlayerJoinEvent;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
-public class OnPlayerJoinFabric implements IFabricEventRegister {
-    @Override
-    public void register() {
-        ServerPlayConnectionEvents.JOIN.register((serverGamePacketListener, packetSender, minecraftServer) -> {
-            OnPlayerJoinEvent.onPlayerJoin(serverGamePacketListener.getPlayer());
-        });
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnServerStartEventNeoForge {
+
+    public OnServerStartEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnServerStartEventNeoForge::onServerStart);
+    }
+
+    private static void onServerStart(ServerStartedEvent event) {
+        OnServerStartEvent.serverStart(event.getServer());
     }
 }

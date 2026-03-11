@@ -21,43 +21,28 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.narrative;
 
+import fr.loudo.narrativecraft.managers.Manager;
 import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
 
-public class Recording {
+public class NarrativeManager<T extends NarrativeEntry<?>> extends Manager<T> {
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
-
-    public Recording(ServerPlayer player) {
-        this.player = player;
+    public T getById(UUID id) {
+        for (T entry : list) {
+            if (entry.getId().equals(id)) {
+                return entry;
+            }
+        }
+        return null;
     }
 
-    public void tick() {
-        if (!isRecording) return;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public ServerPlayer getPlayer() {
-        return player;
-    }
-
-    public boolean isRecording() {
-        return isRecording;
-    }
-
-    public void setRecording(boolean recording) {
-        isRecording = recording;
-    }
-
-    public RecordingData getRecordingData() {
-        return recordingData;
+    public T getByName(String name) {
+        for (T item : list) {
+            if (item.getName().equalsIgnoreCase(name)) {
+                return item;
+            }
+        }
+        return null;
     }
 }

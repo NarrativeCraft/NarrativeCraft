@@ -21,25 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.keys.ModKeys;
-import net.minecraft.client.KeyMapping;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import fr.loudo.narrativecraft.keys.PressKeyListener;
+import net.minecraft.client.Minecraft;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnKeyRegisterEventNeoForge {
+public class OnClientTickEvent {
 
-    public OnKeyRegisterEventNeoForge(IEventBus bus) {
-        bus.addListener(OnKeyRegisterEventNeoForge::onKeyRegister);
-    }
-
-    private static void onKeyRegister(RegisterKeyMappingsEvent event) {
-        for (KeyMapping key : ModKeys.ALL_KEYS) {
-            event.register(key);
-        }
+    public static void tick(Minecraft minecraft) {
+        PressKeyListener.onKeyPressed(minecraft);
     }
 }

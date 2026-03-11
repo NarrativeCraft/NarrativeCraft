@@ -21,43 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.events.server;
 
-import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.events.IFabricEventRegister;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
-public class Recording {
+public class OnServerStartEventFabric implements IFabricEventRegister {
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
-
-    public Recording(ServerPlayer player) {
-        this.player = player;
-    }
-
-    public void tick() {
-        if (!isRecording) return;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public ServerPlayer getPlayer() {
-        return player;
-    }
-
-    public boolean isRecording() {
-        return isRecording;
-    }
-
-    public void setRecording(boolean recording) {
-        isRecording = recording;
-    }
-
-    public RecordingData getRecordingData() {
-        return recordingData;
+    public void register() {
+        ServerLifecycleEvents.SERVER_STARTED.register(OnServerStartEvent::serverStart);
     }
 }

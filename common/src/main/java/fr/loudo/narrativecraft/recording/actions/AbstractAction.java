@@ -21,43 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.recording.actions;
 
-import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.recording.RecordingActionType;
+import java.io.IOException;
 
-public class Recording {
+public abstract class AbstractAction implements Action {
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
+    private int tick;
 
-    public Recording(ServerPlayer player) {
-        this.player = player;
+    public AbstractAction(int tick) {
+        this.tick = tick;
     }
 
-    public void tick() {
-        if (!isRecording) return;
+    public abstract RecordingActionType getType();
+
+    public abstract void write(Writer writer) throws IOException;
+
+    public abstract void read(Reader reader) throws IOException;
+
+    public int getTick() {
+        return tick;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public ServerPlayer getPlayer() {
-        return player;
-    }
-
-    public boolean isRecording() {
-        return isRecording;
-    }
-
-    public void setRecording(boolean recording) {
-        isRecording = recording;
-    }
-
-    public RecordingData getRecordingData() {
-        return recordingData;
+    public void setTick(int tick) {
+        this.tick = tick;
     }
 }

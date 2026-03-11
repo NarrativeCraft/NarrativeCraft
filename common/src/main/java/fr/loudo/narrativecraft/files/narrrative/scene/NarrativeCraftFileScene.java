@@ -51,6 +51,12 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             return OPERATION_FAILED;
         }
 
+        File animationsFolder = createDirectory(sceneFile, ANIMATIONS_FOLDER_NAME);
+        if (animationsFolder == null) {
+            NarrativeCraftMod.LOGGER.error("Failed to create animations directory of scene {}", entry.getName());
+            return OPERATION_FAILED;
+        }
+
         return edit(entry);
     }
 

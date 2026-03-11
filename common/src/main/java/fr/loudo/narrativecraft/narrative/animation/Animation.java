@@ -21,43 +21,33 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.narrative.animation;
 
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
 
-public class Recording {
+public class Animation extends NarrativeEntry<AnimationPayload> {
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
-
-    public Recording(ServerPlayer player) {
-        this.player = player;
+    public Animation(UUID id, String name, String description) {
+        super(id, name, description);
     }
 
-    public void tick() {
-        if (!isRecording) return;
+    public Animation(String name, String description) {
+        super(name, description);
     }
 
-    public UUID getId() {
-        return id;
+    @Override
+    public AnimationPayload toPayload() {
+        return new AnimationPayload(name, description);
     }
 
-    public ServerPlayer getPlayer() {
-        return player;
+    @Override
+    public String formattedName() {
+        return name;
     }
 
-    public boolean isRecording() {
-        return isRecording;
-    }
-
-    public void setRecording(boolean recording) {
-        isRecording = recording;
-    }
-
-    public RecordingData getRecordingData() {
-        return recordingData;
+    @Override
+    public String toFileName() {
+        return name.toLowerCase();
     }
 }

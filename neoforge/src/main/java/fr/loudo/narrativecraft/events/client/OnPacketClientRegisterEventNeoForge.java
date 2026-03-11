@@ -21,43 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.events.client;
 
-import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
 
-public class Recording {
+@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
+public class OnPacketClientRegisterEventNeoForge {
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
-
-    public Recording(ServerPlayer player) {
-        this.player = player;
-    }
-
-    public void tick() {
-        if (!isRecording) return;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public ServerPlayer getPlayer() {
-        return player;
-    }
-
-    public boolean isRecording() {
-        return isRecording;
-    }
-
-    public void setRecording(boolean recording) {
-        isRecording = recording;
-    }
-
-    public RecordingData getRecordingData() {
-        return recordingData;
+    @SubscribeEvent
+    private static void onClientPacketRegister(RegisterClientPayloadHandlersEvent event) {
+        event.register(BiSyncNarrativeEntryPacket.TYPE, ClientPacketHandlerNeoForge::syncNarrativeEntry);
     }
 }

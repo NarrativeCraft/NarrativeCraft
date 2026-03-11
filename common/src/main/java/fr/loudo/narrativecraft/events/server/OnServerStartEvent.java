@@ -21,43 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.events.server;
 
-import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
+import java.io.File;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
 
-public class Recording {
+public class OnServerStartEvent {
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
-
-    public Recording(ServerPlayer player) {
-        this.player = player;
-    }
-
-    public void tick() {
-        if (!isRecording) return;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public ServerPlayer getPlayer() {
-        return player;
-    }
-
-    public boolean isRecording() {
-        return isRecording;
-    }
-
-    public void setRecording(boolean recording) {
-        isRecording = recording;
-    }
-
-    public RecordingData getRecordingData() {
-        return recordingData;
+    public static void serverStart(MinecraftServer server) {
+        File rootDirectory = server.getWorldPath(LevelResource.ROOT).toFile();
+        NarrativeCraftMod.getInstance().getFile().getInit().init(rootDirectory);
+        NarrativeCraftMod.getInstance().setServer(server);
+        NarrativeEntryInit.init();
     }
 }
