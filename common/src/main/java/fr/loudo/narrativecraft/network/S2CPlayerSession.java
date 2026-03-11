@@ -21,20 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class NarrativeCraftFileEditorsRegister {
+public record S2CPlayerSession(UUID chapterId, UUID sceneId) implements CustomPacketPayload {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    public static final Type<S2CPlayerSession> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "player_session"));
+
+    public static final StreamCodec<ByteBuf, S2CPlayerSession> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC,
+            S2CPlayerSession::chapterId,
+            UUIDUtil.STREAM_CODEC,
+            S2CPlayerSession::sceneId,
+            S2CPlayerSession::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

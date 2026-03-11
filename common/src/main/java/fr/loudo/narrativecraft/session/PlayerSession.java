@@ -21,20 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.session;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import net.minecraft.server.level.ServerPlayer;
 
-public class NarrativeCraftFileEditorsRegister {
+public class PlayerSession extends AbstractPlayerSession {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    private final ServerPlayer player;
+
+    public PlayerSession(ServerPlayer player, Chapter chapter, Scene scene) {
+        super(chapter, scene);
+        this.player = player;
+    }
+
+    public PlayerSession(ServerPlayer player) {
+        super(null, null);
+        this.player = player;
+    }
+
+    public ServerPlayer getPlayer() {
+        return player;
     }
 }

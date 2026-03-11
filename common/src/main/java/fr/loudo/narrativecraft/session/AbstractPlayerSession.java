@@ -21,20 +21,48 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.session;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 
-public class NarrativeCraftFileEditorsRegister {
+public class AbstractPlayerSession {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    private Chapter chapter;
+    private Scene scene;
+
+    public AbstractPlayerSession(Chapter chapter, Scene scene) {
+        this.chapter = chapter;
+        this.scene = scene;
+    }
+
+    public void apply(Chapter chapter, Scene scene) {
+        this.chapter = chapter;
+        this.scene = scene;
+    }
+
+    public void clear() {
+        chapter = null;
+        scene = null;
+    }
+
+    public boolean sessionSet() {
+        return chapter == null && scene == null;
+    }
+
+    public Chapter getChapter() {
+        return chapter;
+    }
+
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 }

@@ -75,7 +75,7 @@ public class RecordingReader implements Action.Reader {
         return new Vec3(inputStream.readDouble(), inputStream.readDouble(), inputStream.readDouble());
     }
 
-    public record RecordingHeader(UUID recordingId, UUID playerUUID, int actionCount) {}
+    public record RecordingHeader(UUID recordingId, UUID playerUUID, String name, int actionCount) {}
 
     public RecordingHeader readHeader() throws IOException {
         byte magic0 = inputStream.readByte();
@@ -86,8 +86,9 @@ public class RecordingReader implements Action.Reader {
         inputStream.readByte(); // version, reserved for future format migrations
         UUID recordingId = readUUID();
         UUID playerUUID = readUUID();
+        String name = inputStream.readUTF();
         int actionCount = inputStream.readInt();
-        return new RecordingHeader(recordingId, playerUUID, actionCount);
+        return new RecordingHeader(recordingId, playerUUID, name, actionCount);
     }
 
     public List<AbstractAction> readAllActions(int count) throws IOException {

@@ -24,9 +24,7 @@
 package fr.loudo.narrativecraft.register;
 
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.server.OnPlayerJoinEventFabric;
-import fr.loudo.narrativecraft.events.server.OnServerStartEventFabric;
-import fr.loudo.narrativecraft.events.server.OnServerTickEventFabric;
+import fr.loudo.narrativecraft.events.server.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +35,9 @@ public class FabricEventList {
     public FabricEventList() {
         events.add(new OnServerStartEventFabric());
         events.add(new OnPlayerJoinEventFabric());
+        events.add(new OnPlayerLeaveEventFabric());
         events.add(new OnServerTickEventFabric());
+        events.add(new OnCommandRegisterEventFabric());
     }
 
     public void register() {

@@ -24,8 +24,10 @@
 package fr.loudo.narrativecraft.utils;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.UUID;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -48,5 +50,16 @@ public class UtilsServer {
         if (player == null) return;
         Utils.sendError(message, player);
         Services.PACKET.sendToPlayer(player, S2CScreenClear.INSTANCE);
+    }
+
+    public static PlayerSession getPlayerSessionByPlayer(ServerPlayer player) {
+        PlayerSessionManager playerSessionManager =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession playerSession = playerSessionManager.getByPlayer(player);
+        if (playerSession == null) {
+            playerSession = new PlayerSession(player);
+            playerSessionManager.add(playerSession);
+        }
+        return playerSession;
     }
 }

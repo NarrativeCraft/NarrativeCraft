@@ -21,20 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.commands.PlayerSessionCommand;
+import fr.loudo.narrativecraft.commands.RecordCommand;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
-public class NarrativeCraftFileEditorsRegister {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnCommandRegisterEventNeoForge {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    public OnCommandRegisterEventNeoForge(IEventBus eventBus) {
+        NeoForge.EVENT_BUS.addListener(OnCommandRegisterEventNeoForge::registerCommand);
+    }
+
+    private static void registerCommand(RegisterCommandsEvent event) {
+        RecordCommand.register(event.getDispatcher());
+        PlayerSessionCommand.register(event.getDispatcher());
     }
 }

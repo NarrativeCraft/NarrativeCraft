@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -42,7 +43,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int create(Chapter entry) {
 
-        File chapterDirectory = createDirectory(getChaptersFolder(), entry.toFileName());
+        File chapterDirectory = createDirectory(NarrativeCraftFileUtil.getChaptersFolder(), entry.toFileName());
         if (chapterDirectory == null) {
             NarrativeCraftMod.LOGGER.error("Failed to create chapter directory {}", entry.getName());
             return OPERATION_FAILED;
@@ -65,7 +66,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int edit(Chapter entry) {
 
-        File workingFolder = getChaptersFolder();
+        File workingFolder = NarrativeCraftFileUtil.getChaptersFolder();
         ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
         Chapter oldChapter = chapterManager.getById(entry.getId());
 
@@ -128,7 +129,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
     @Override
     public int delete(Chapter entry) {
 
-        File workingFolder = getChaptersFolder();
+        File workingFolder = NarrativeCraftFileUtil.getChaptersFolder();
         File chapterDirectory = new File(workingFolder, entry.toFileName());
         if (!chapterDirectory.exists()) {
             NarrativeCraftMod.LOGGER.error(
@@ -171,7 +172,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
         List<DeserializationResult<Chapter>> deserializationResults = new ArrayList<>();
 
-        File chaptersFolder = getChaptersFolder();
+        File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
         File[] allContents = chaptersFolder.listFiles();
         if (allContents == null) {
             return null;

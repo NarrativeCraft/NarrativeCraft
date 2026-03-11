@@ -40,12 +40,13 @@ public class RecordingWriter implements Action.Writer {
         this.outputStream = outputStream;
     }
 
-    public void writeHeader(UUID recordingId, UUID playerUUID, int actionCount) throws IOException {
+    public void writeHeader(UUID recordingId, UUID playerUUID, String name, int actionCount) throws IOException {
         outputStream.writeByte('N');
         outputStream.writeByte('C');
         outputStream.writeByte(VERSION);
         addUUID(recordingId);
         addUUID(playerUUID);
+        outputStream.writeUTF(name);
         outputStream.writeInt(actionCount);
     }
 

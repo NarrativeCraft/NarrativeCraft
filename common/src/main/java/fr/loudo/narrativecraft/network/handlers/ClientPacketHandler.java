@@ -25,7 +25,11 @@ package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import net.minecraft.client.Minecraft;
 
 public class ClientPacketHandler {
@@ -46,5 +50,17 @@ public class ClientPacketHandler {
 
     public static void clearScreen() {
         MINECRAFT.setScreen(null);
+    }
+
+    public static void setSession(S2CPlayerSession packet) {
+
+        ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
+        Chapter chapter = chapterManager.getById(packet.chapterId());
+        if (chapter == null) return;
+
+        Scene scene = chapter.getSceneManager().getById(packet.sceneId());
+        if (scene == null) return;
+
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().apply(chapter, scene);
     }
 }

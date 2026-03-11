@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
@@ -45,6 +46,7 @@ public class NarrativeEntryInit {
         // Order is important!! e.g. Chapters must be initialized before scenes of chapter can be initialized.
         chapters();
         scenes();
+        animations();
     }
 
     private static void chapters() {
@@ -75,6 +77,19 @@ public class NarrativeEntryInit {
         }
     }
 
+    private static void animations() {
+        List<DeserializationResult<Animation>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Animation.class);
+        for (DeserializationResult<Animation> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Animation animation = deserializationResult.entry();
+            animation.getScene().getAnimationManager().add(animation);
+        }
+    }
+
     public static void sendDataToPlayer(ServerPlayer player) {
         Services.PACKET.sendToPlayer(player, S2CNarrativeDataClear.INSTANCE);
         for (Chapter chapter :
@@ -82,6 +97,10 @@ public class NarrativeEntryInit {
             Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(chapter.getId(), chapter.toPayload()));
             for (Scene scene : chapter.getSceneManager().getList()) {
                 Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(scene.getId(), scene.toPayload()));
+                for (Animation animation : scene.getAnimationManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
+                }
             }
         }
     }

@@ -21,20 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import net.minecraft.server.level.ServerPlayer;
 
-public class NarrativeCraftFileEditorsRegister {
+public class OnPlayerLeaveEvent {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    public static void onPlayerLeave(ServerPlayer player) {
+
+        PlayerSessionManager playerSessionManager =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession playerSession = playerSessionManager.getByPlayer(player);
+        if (playerSession != null) {
+            playerSessionManager.remove(playerSession);
+        }
     }
 }

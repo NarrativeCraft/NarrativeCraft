@@ -23,18 +23,30 @@
 
 package fr.loudo.narrativecraft.files;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.io.File;
 
-public class NarrativeCraftFileEditorsRegister {
+public class NarrativeCraftFileUtil {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    public static File getChaptersFolder() {
+        return NarrativeCraftMod.getInstance().getFile().getInit().getChaptersDirectory();
+    }
+
+    public static File getScenesFolder(Chapter chapter) {
+        File chaptersFolder = getChaptersFolder();
+        File chapterFolder = new File(chaptersFolder, chapter.toFileName());
+        return new File(chapterFolder, NarrativeCraftFileDefault.SCENES_FOLDER_NAME);
+    }
+
+    public static File getSceneFolder(Scene scene) {
+        File scenesFolder = getScenesFolder(scene.getChapter());
+        return new File(scenesFolder, scene.toFileName());
+    }
+
+    public static File getAnimationsFolder(Scene scene) {
+        File sceneFolder = getSceneFolder(scene);
+        return new File(sceneFolder, NarrativeCraftFileDefault.ANIMATIONS_FOLDER_NAME);
     }
 }

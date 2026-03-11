@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
+import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
@@ -57,5 +58,7 @@ public class OnPacketRegisterEventNeoForge {
                 ClientPacketHandlerNeoForge::clearNarrativeData);
         registrar.playToClient(
                 S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC, ClientPacketHandlerNeoForge::clearScreen);
+        registrar.playToClient(
+                S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC, ClientPacketHandlerNeoForge::setSession);
     }
 }

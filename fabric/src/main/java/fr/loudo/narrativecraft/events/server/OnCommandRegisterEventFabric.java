@@ -21,20 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.commands.PlayerSessionCommand;
+import fr.loudo.narrativecraft.commands.RecordCommand;
+import fr.loudo.narrativecraft.events.IFabricEventRegister;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
-public class NarrativeCraftFileEditorsRegister {
+public class OnCommandRegisterEventFabric implements IFabricEventRegister {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    @Override
+    public void register() {
+        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
+            RecordCommand.register(commandDispatcher);
+            PlayerSessionCommand.register(commandDispatcher);
+        });
     }
 }

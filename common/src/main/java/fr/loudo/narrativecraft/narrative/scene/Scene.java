@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.scene;
 
+import fr.loudo.narrativecraft.managers.AnimationManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import java.util.UUID;
@@ -30,6 +31,8 @@ import java.util.UUID;
 public class Scene extends NarrativeEntry<ScenePayload> {
 
     private final Chapter chapter;
+    private final AnimationManager animationManager = new AnimationManager();
+
     private int rank;
 
     public Scene(UUID id, String name, String description, Chapter chapter, int rank) {
@@ -55,6 +58,10 @@ public class Scene extends NarrativeEntry<ScenePayload> {
 
     public Chapter getChapter() {
         return chapter;
+    }
+
+    public AnimationManager getAnimationManager() {
+        return animationManager;
     }
 
     @Override

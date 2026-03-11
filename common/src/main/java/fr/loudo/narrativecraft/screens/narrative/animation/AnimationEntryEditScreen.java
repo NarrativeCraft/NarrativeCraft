@@ -21,20 +21,41 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.screens.narrative.animation;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import net.minecraft.client.gui.screens.Screen;
 
-public class NarrativeCraftFileEditorsRegister {
+public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<Animation> {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    private final Scene scene;
+
+    public AnimationEntryEditScreen(Animation entry, Screen lastScreen, Scene scene) {
+        super(entry, lastScreen);
+        this.scene = scene;
+    }
+
+    public AnimationEntryEditScreen(Animation entry, Screen lastScreen) {
+        super(entry, lastScreen);
+        this.scene = entry.getScene();
+    }
+
+    public AnimationEntryEditScreen(Scene scene, Screen lastScreen) {
+        super(null, lastScreen);
+        this.scene = scene;
+    }
+
+    @Override
+    protected void addCustomFields() {
+        // hack lol
+        widgets.removeIf(widget -> widget.equals(descriptionText));
+        widgets.removeIf(widget -> widget.equals(descriptionBox));
+    }
+
+    @Override
+    protected Animation createInstance() {
+        return new Animation(getName(), scene);
     }
 }

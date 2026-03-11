@@ -23,10 +23,10 @@
 
 package fr.loudo.narrativecraft.recording;
 
+import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +44,7 @@ public class RecordingData {
         this.playerUUID = recording.getPlayer().getUUID();
     }
 
-    RecordingData(UUID recordingId, UUID playerUUID) {
+    public RecordingData(UUID recordingId, UUID playerUUID) {
         this.recordingId = recordingId;
         this.playerUUID = playerUUID;
     }
@@ -53,27 +53,13 @@ public class RecordingData {
         actions.computeIfAbsent(action.getTick(), k -> new ArrayList<>()).add(action);
     }
 
-    public void save(DataOutputStream stream) throws IOException {
+    public boolean save(Animation animation) {
         List<AbstractAction> sortedActions = actions.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .flatMap(e -> e.getValue().stream())
                 .toList();
-
-        RecordingWriter writer = new RecordingWriter(stream);
-        writer.writeHeader(recordingId, playerUUID, sortedActions.size());
-        for (AbstractAction action : sortedActions) {
-            writer.writeActionRecord(action);
-        }
-    }
-
-    public static RecordingData load(DataInputStream stream) throws IOException {
-        RecordingReader reader = new RecordingReader(stream);
-        RecordingReader.RecordingHeader header = reader.readHeader();
-        RecordingData data = new RecordingData(header.recordingId(), header.playerUUID());
-        for (AbstractAction action : reader.readAllActions(header.actionCount())) {
-            data.addAction(action);
-        }
-        return data;
+        animation.setActions(sortedActions);
+        return NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_SUCCESS;
     }
 
     public Map<Integer, List<AbstractAction>> getActions() {

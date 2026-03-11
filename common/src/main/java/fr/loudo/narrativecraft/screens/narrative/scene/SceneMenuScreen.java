@@ -23,7 +23,9 @@
 
 package fr.loudo.narrativecraft.screens.narrative.scene;
 
+import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.LinkedHashMap;
@@ -51,7 +53,20 @@ public class SceneMenuScreen extends Screen {
     protected void init() {
         Map<Component, Runnable> labels = new LinkedHashMap<>();
 
-        labels.put(Translation.message("screen.scene_menu.animations"), () -> {});
+        labels.put(Translation.message("screen.scene_menu.animations"), () -> {
+            minecraft.setScreen(new NarrativeEntryListScreen<>(
+                    Translation.message("animation"),
+                    scene.getAnimationManager().getList(),
+                    this,
+                    Animation.class,
+                    scene,
+                    String.format(
+                            "%s;%s;%s",
+                            scene.getChapter().getName(),
+                            scene.getName(),
+                            Translation.message("animation").getString())));
+        });
+
         labels.put(Translation.message("screen.scene_menu.camera_angles"), () -> {});
         labels.put(Translation.message("screen.scene_menu.cutscenes"), () -> {});
         labels.put(Translation.message("screen.scene_menu.interactions"), () -> {});

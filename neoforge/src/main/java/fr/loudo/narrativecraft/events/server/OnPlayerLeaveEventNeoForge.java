@@ -21,40 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import java.util.UUID;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
-public class SceneData extends NarrativeEntry<SceneDataPayload> {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnPlayerLeaveEventNeoForge {
 
-    protected Scene scene;
-
-    public SceneData(UUID uuid, String name, String description, Scene scene) {
-        super(uuid, name, description);
-        this.scene = scene;
+    public OnPlayerLeaveEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnPlayerLeaveEventNeoForge::onPlayerLeave);
     }
 
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    @Override
-    public SceneDataPayload toPayload() {
-        return new SceneDataPayload(name, description);
-    }
-
-    @Override
-    public String formattedName() {
-        return name;
-    }
-
-    @Override
-    public String toFileName() {
-        return "";
+    private static void onPlayerLeave(PlayerEvent.PlayerLoggedInEvent event) {
+        OnPlayerLeaveEvent.onPlayerLeave((ServerPlayer) event.getEntity());
     }
 }

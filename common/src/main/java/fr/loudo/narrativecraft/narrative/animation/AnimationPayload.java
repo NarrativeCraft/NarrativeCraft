@@ -24,9 +24,39 @@
 package fr.loudo.narrativecraft.narrative.animation;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import io.netty.buffer.ByteBuf;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public class AnimationPayload extends NarrativeEntryPayload {
-    public AnimationPayload(String name, String description) {
+
+    private final UUID chapterId;
+    private final UUID sceneId;
+
+    public static final StreamCodec<ByteBuf, AnimationPayload> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8,
+            AnimationPayload::getName,
+            ByteBufCodecs.STRING_UTF8,
+            AnimationPayload::getDescription,
+            UUIDUtil.STREAM_CODEC,
+            AnimationPayload::getSceneId,
+            UUIDUtil.STREAM_CODEC,
+            AnimationPayload::getChapterId,
+            AnimationPayload::new);
+
+    public AnimationPayload(String name, String description, UUID sceneId, UUID chapterId) {
         super(name, description);
+        this.chapterId = chapterId;
+        this.sceneId = sceneId;
+    }
+
+    public UUID getChapterId() {
+        return chapterId;
+    }
+
+    public UUID getSceneId() {
+        return sceneId;
     }
 }

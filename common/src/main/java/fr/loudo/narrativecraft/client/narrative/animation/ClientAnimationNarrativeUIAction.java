@@ -21,20 +21,33 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.client.narrative.animation;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.screens.narrative.animation.AnimationEntryEditScreen;
+import net.minecraft.client.gui.screens.Screen;
 
-public class NarrativeCraftFileEditorsRegister {
+public class ClientAnimationNarrativeUIAction implements ClientNarrativeUIAction<Animation> {
+    @Override
+    public Screen subListSubScreen(Animation entry, Screen parent) {
+        return null;
+    }
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
+    @Override
+    public boolean hasSubScreen() {
+        return false;
+    }
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Animation> showEditScreen(Animation entry, Screen lastScreen) {
+        return new AnimationEntryEditScreen(entry, lastScreen);
+    }
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Animation> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
+        return null;
     }
 }

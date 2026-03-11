@@ -25,12 +25,31 @@ package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.recording.Recording;
 import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
 
 public class RecordingManager extends Manager<Recording> {
 
     public Recording getById(UUID id) {
         for (Recording recording : list) {
             if (recording.getId().equals(id)) {
+                return recording;
+            }
+        }
+        return null;
+    }
+
+    public boolean isRecording(ServerPlayer player) {
+        for (Recording recording : list) {
+            if (recording.getPlayer().getUUID().equals(player.getUUID()) && recording.isRecording()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Recording getRecording(ServerPlayer player) {
+        for (Recording recording : list) {
+            if (recording.getPlayer().getUUID().equals(player.getUUID())) {
                 return recording;
             }
         }

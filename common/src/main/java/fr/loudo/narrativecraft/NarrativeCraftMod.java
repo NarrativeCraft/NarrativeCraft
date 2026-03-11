@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditorsRegister;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class NarrativeCraftMod {
     private final ChapterManager chapterManager = new ChapterManager();
     private final CharacterManager characterManager = new CharacterManager();
     private final RecordingManager recordingManager = new RecordingManager();
+    private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
@@ -66,6 +68,10 @@ public class NarrativeCraftMod {
 
     public RecordingManager getRecordingManager() {
         return recordingManager;
+    }
+
+    public PlayerSessionManager getPlayerSessionManager() {
+        return playerSessionManager;
     }
 
     public NarrativeCraftFile getFile() {

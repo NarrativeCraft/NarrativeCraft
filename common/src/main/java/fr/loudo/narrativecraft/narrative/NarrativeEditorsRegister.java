@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative;
 
+import fr.loudo.narrativecraft.narrative.animation.AnimationEditor;
+import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterEditor;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
 import fr.loudo.narrativecraft.narrative.scene.SceneEditor;
@@ -33,5 +35,6 @@ public class NarrativeEditorsRegister {
     public static void register() {
         NarrativeEntryEditorRegistry.getInstance().register(ChapterPayload.class, new ChapterEditor());
         NarrativeEntryEditorRegistry.getInstance().register(ScenePayload.class, new SceneEditor());
+        NarrativeEntryEditorRegistry.getInstance().register(AnimationPayload.class, new AnimationEditor());
     }
 }

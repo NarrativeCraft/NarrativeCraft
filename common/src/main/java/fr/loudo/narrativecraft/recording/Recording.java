@@ -23,22 +23,59 @@
 
 package fr.loudo.narrativecraft.recording;
 
+import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.recording.actions.MovementAction;
+import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 
 public class Recording {
 
-    private final UUID id = UUID.randomUUID();
-    private final ServerPlayer player;
-    private final RecordingData recordingData = new RecordingData(this);
-    private boolean isRecording = false;
+    public static final String RECORDING_EXTENSION = ".ncr";
 
-    public Recording(ServerPlayer player) {
-        this.player = player;
+    private final UUID id = UUID.randomUUID();
+    private final PlayerSession playerSession;
+    private final RecordingData recordingData;
+    private boolean isRecording = false;
+    private int tick = 0;
+
+    public Recording(PlayerSession playerSession) {
+        this.playerSession = playerSession;
+        recordingData = new RecordingData(this);
     }
 
     public void tick() {
         if (!isRecording) return;
+        ServerPlayer player = playerSession.getPlayer();
+        recordingData.addAction(
+                new MovementAction(tick, player.position(), player.getXRot(), player.getYRot(), player.getYHeadRot()));
+
+        tick++;
+    }
+
+    public void start() {
+        isRecording = true;
+    }
+
+    public void stop() {
+        isRecording = false;
+    }
+
+    public boolean save(String name) {
+
+        Animation animation = new Animation(recordingData.getRecordingId(), name, playerSession.getScene());
+
+        if (!recordingData.save(animation)) {
+            return false;
+        }
+
+        playerSession.getScene().getAnimationManager().add(animation);
+        Services.PACKET.sendToPlayer(
+                getPlayer(), BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
+
+        return true;
     }
 
     public UUID getId() {
@@ -46,7 +83,11 @@ public class Recording {
     }
 
     public ServerPlayer getPlayer() {
-        return player;
+        return playerSession.getPlayer();
+    }
+
+    public PlayerSession getPlayerSession() {
+        return playerSession;
     }
 
     public boolean isRecording() {
@@ -55,6 +96,10 @@ public class Recording {
 
     public void setRecording(boolean recording) {
         isRecording = recording;
+    }
+
+    public int getTick() {
+        return tick;
     }
 
     public RecordingData getRecordingData() {

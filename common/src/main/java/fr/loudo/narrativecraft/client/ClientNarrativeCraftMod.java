@@ -25,12 +25,14 @@ package fr.loudo.narrativecraft.client;
 
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegister;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 
 public class ClientNarrativeCraftMod {
     private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
 
     private final ChapterManager chapterManager = new ChapterManager();
+    private final ClientPlayerSession playerSession = new ClientPlayerSession();
 
     public static void commonInit() {
         ClientNarrativeEditorsRegister.register();
@@ -39,6 +41,10 @@ public class ClientNarrativeCraftMod {
 
     public ChapterManager getChapterManager() {
         return chapterManager;
+    }
+
+    public ClientPlayerSession getPlayerSession() {
+        return playerSession;
     }
 
     public static ClientNarrativeCraftMod getInstance() {

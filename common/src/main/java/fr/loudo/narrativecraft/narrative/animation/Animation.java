@@ -24,21 +24,42 @@
 package fr.loudo.narrativecraft.narrative.animation;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.actions.AbstractAction;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Animation extends NarrativeEntry<AnimationPayload> {
 
-    public Animation(UUID id, String name, String description) {
+    private final Scene scene;
+    private List<AbstractAction> actions = new ArrayList<>();
+
+    public Animation(UUID id, String name, String description, Scene scene) {
         super(id, name, description);
+        this.scene = scene;
     }
 
-    public Animation(String name, String description) {
+    public Animation(String name, String description, Scene scene) {
         super(name, description);
+        this.scene = scene;
+    }
+
+    public Animation(String name, Scene scene) {
+        super(name, "");
+        this.scene = scene;
+    }
+
+    public Animation(UUID id, String name, Scene scene) {
+        super(id, name, "");
+        this.scene = scene;
     }
 
     @Override
     public AnimationPayload toPayload() {
-        return new AnimationPayload(name, description);
+        return new AnimationPayload(
+                name, description, scene.getId(), scene.getChapter().getId());
     }
 
     @Override
@@ -48,6 +69,18 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
 
     @Override
     public String toFileName() {
-        return name.toLowerCase();
+        return name.replace(" ", "_").toLowerCase() + Recording.RECORDING_EXTENSION;
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public List<AbstractAction> getActions() {
+        return actions;
+    }
+
+    public void setActions(List<AbstractAction> actions) {
+        this.actions = actions;
     }
 }

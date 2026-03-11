@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.files;
 
 import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import java.io.*;
 
 public class NarrativeCraftFileDefault {
@@ -74,15 +73,5 @@ public class NarrativeCraftFileDefault {
             }
         }
         return directoryToBeDeleted.delete();
-    }
-
-    protected File getChaptersFolder() {
-        return NarrativeCraftMod.getInstance().getFile().getInit().getChaptersDirectory();
-    }
-
-    protected File getScenesFolder(Chapter chapter) {
-        File chaptersFolder = getChaptersFolder();
-        File chapterFolder = new File(chaptersFolder, chapter.toFileName());
-        return new File(chapterFolder, SCENES_FOLDER_NAME);
     }
 }

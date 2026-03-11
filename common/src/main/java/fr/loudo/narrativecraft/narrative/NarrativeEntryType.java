@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative;
 
+import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
 import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import io.netty.buffer.ByteBuf;
@@ -30,7 +31,8 @@ import net.minecraft.network.codec.StreamCodec;
 
 public enum NarrativeEntryType {
     CHAPTER(ChapterPayload.class, ChapterPayload.STREAM_CODEC),
-    SCENE(ScenePayload.class, ScenePayload.STREAM_CODEC);
+    SCENE(ScenePayload.class, ScenePayload.STREAM_CODEC),
+    ANIMATION(AnimationPayload.class, AnimationPayload.STREAM_CODEC);
 
     private final Class<? extends NarrativeEntryPayload> clazz;
     private final StreamCodec<? super ByteBuf, ? extends NarrativeEntryPayload> codec;
