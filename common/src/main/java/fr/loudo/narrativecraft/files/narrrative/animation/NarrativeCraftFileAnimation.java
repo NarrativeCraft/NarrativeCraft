@@ -39,6 +39,7 @@ import fr.loudo.narrativecraft.recording.actions.AbstractAction;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
         implements NarrativeCraftFileEditor<Animation> {
@@ -59,6 +60,11 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
 
         RecordingData recordingData = recording.getRecordingData();
 
+        List<AbstractAction> sortedActions = entry.getActions().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .flatMap(e -> e.getValue().stream())
+                .toList();
+
         try (DataOutputStream stream =
                 new DataOutputStream(new FileOutputStream(new File(animationsFolder, entry.toFileName())))) {
             RecordingWriter writer = new RecordingWriter(stream);
@@ -66,8 +72,8 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                     recordingData.getRecordingId(),
                     recordingData.getPlayerUUID(),
                     entry.getName(),
-                    entry.getActions().size());
-            for (AbstractAction action : entry.getActions()) {
+                    sortedActions.size());
+            for (AbstractAction action : sortedActions) {
                 writer.writeActionRecord(action);
             }
         } catch (IOException e) {
@@ -158,6 +164,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                             data.addAction(action);
                         }
                         Animation animation = new Animation(header.recordingId(), header.name(), scene);
+                        animation.setActions(data.getActions());
                         deserializationResults.add(new DeserializationResult<>(animation, false, file.getName()));
                     } catch (IOException e) {
                         deserializationResults.add(new DeserializationResult<>(null, true, file.getName()));

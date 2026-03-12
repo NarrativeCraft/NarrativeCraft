@@ -47,7 +47,7 @@ public class AbstractPlayerSession {
     }
 
     public boolean sessionSet() {
-        return chapter == null && scene == null;
+        return chapter != null && scene != null;
     }
 
     public Chapter getChapter() {

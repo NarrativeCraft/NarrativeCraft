@@ -23,11 +23,14 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
+import fr.loudo.narrativecraft.playback.PlaybackContext;
 import java.io.IOException;
 import java.util.UUID;
 import net.minecraft.world.phys.Vec3;
 
 public interface Action {
+
+    ActionResult execute(PlaybackContext context);
 
     interface Writer {
         void addByte(byte value) throws IOException;

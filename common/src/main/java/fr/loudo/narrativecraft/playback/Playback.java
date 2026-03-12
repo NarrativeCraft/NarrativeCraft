@@ -21,47 +21,70 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.playback;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
 
-public class RecordingData {
+public class Playback {
 
-    private final Map<Integer, List<AbstractAction>> actions = new HashMap<>();
-    private final UUID recordingId;
-    private final UUID playerUUID;
+    private final UUID id = UUID.randomUUID();
+    private final Animation animation;
+    private final ServerPlayer requester;
+    private final PlaybackContext context;
+    private int tick = 0;
+    private boolean isPlaying;
 
-    public RecordingData(Recording recording) {
-        this.recordingId = recording.getId();
-        this.playerUUID = recording.getPlayer().getUUID();
+    public Playback(Animation animation, ServerPlayer requester) {
+        this.animation = animation;
+        this.requester = requester;
+        context = new PlaybackContext(this, requester.level());
     }
 
-    public RecordingData(UUID recordingId, UUID playerUUID) {
-        this.recordingId = recordingId;
-        this.playerUUID = playerUUID;
+    public void start() {
+        isPlaying = true;
+        context.start();
     }
 
-    public void addAction(AbstractAction action) {
-        actions.computeIfAbsent(action.getTick(), k -> new ArrayList<>()).add(action);
+    public void stop() {
+        isPlaying = false;
+        context.stop();
     }
 
-    public Map<Integer, List<AbstractAction>> getActions() {
-        return actions;
+    public void tick() {
+        if (!isPlaying) return;
+
+        if (tick == animation.getActions().size()) {
+            stop();
+        }
+
+        context.tick();
+        tick++;
+
     }
 
-    public UUID getRecordingId() {
-        return recordingId;
+    public UUID getId() {
+        return id;
     }
 
-    public UUID getPlayerUUID() {
-        return playerUUID;
+    public Animation getAnimation() {
+        return animation;
+    }
+
+    public ServerPlayer getRequester() {
+        return requester;
+    }
+
+    public int getTick() {
+        return tick;
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public void setPlaying(boolean playing) {
+        isPlaying = playing;
     }
 }

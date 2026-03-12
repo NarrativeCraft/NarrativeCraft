@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.recording;
 
+import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
@@ -67,7 +69,7 @@ public class Recording {
 
         Animation animation = new Animation(recordingData.getRecordingId(), name, playerSession.getScene());
 
-        if (!recordingData.save(animation)) {
+        if (NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_FAILED) {
             return false;
         }
 

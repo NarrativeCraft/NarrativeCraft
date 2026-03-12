@@ -36,6 +36,7 @@
   "narrativecraft.error.crud.edit": "Failed to edit %s",
   "narrativecraft.error.crud.delete": "Failed to delete %s",
   "narrativecraft.error.record.save": "Failed to save recording!",
+  "narrativecraft.errror.playback": "An error happened during a playback! Animation: %s - Tick: %s - Action: %s",
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",

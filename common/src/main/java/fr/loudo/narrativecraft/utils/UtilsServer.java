@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.UUID;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -43,6 +44,13 @@ public class UtilsServer {
         for (ServerPlayer player :
                 NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayers()) {
             Services.PACKET.sendToPlayer(player, packet);
+        }
+    }
+
+    public static void broadcastPacket(Packet<?> packet) {
+        for (ServerPlayer player :
+                NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayers()) {
+            player.connection.send(packet);
         }
     }
 

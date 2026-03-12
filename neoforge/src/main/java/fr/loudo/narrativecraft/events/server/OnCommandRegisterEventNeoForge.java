@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.commands.PlaybackCommand;
 import fr.loudo.narrativecraft.commands.PlayerSessionCommand;
 import fr.loudo.narrativecraft.commands.RecordCommand;
 import net.neoforged.bus.api.IEventBus;
@@ -41,5 +42,6 @@ public class OnCommandRegisterEventNeoForge {
     private static void registerCommand(RegisterCommandsEvent event) {
         RecordCommand.register(event.getDispatcher());
         PlayerSessionCommand.register(event.getDispatcher());
+        PlaybackCommand.register(event.getDispatcher());
     }
 }

@@ -21,24 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.playback;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.playback.Playback;
-import fr.loudo.narrativecraft.recording.Recording;
-import net.minecraft.server.MinecraftServer;
+import fr.loudo.narrativecraft.managers.Manager;
+import java.util.UUID;
 
-public class OnServerTickEvent {
+public class PlaybackManager extends Manager<Playback> {
 
-    public static void tick(MinecraftServer server) {
-
-        for (Recording recording :
-                NarrativeCraftMod.getInstance().getRecordingManager().getList()) {
-            recording.tick();
+    public Playback getById(UUID id) {
+        for (Playback playback : list) {
+            if (playback.getId().equals(id)) {
+                return playback;
+            }
         }
 
-        for (Playback playback : NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
-            playback.tick();
-        }
+        return null;
     }
 }

@@ -33,6 +33,8 @@ import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.loudo.narrativecraft.playback.PlaybackManager;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,7 @@ public class NarrativeCraftMod {
     private final ChapterManager chapterManager = new ChapterManager();
     private final CharacterManager characterManager = new CharacterManager();
     private final RecordingManager recordingManager = new RecordingManager();
+    private final PlaybackManager playbackManager = new PlaybackManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
 
@@ -64,6 +67,10 @@ public class NarrativeCraftMod {
 
     public CharacterManager getCharacterManager() {
         return characterManager;
+    }
+
+    public PlaybackManager getPlaybackManager() {
+        return playbackManager;
     }
 
     public RecordingManager getRecordingManager() {

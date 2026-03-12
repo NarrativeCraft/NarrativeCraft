@@ -27,14 +27,13 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
 
 public class Animation extends NarrativeEntry<AnimationPayload> {
 
     private final Scene scene;
-    private List<AbstractAction> actions = new ArrayList<>();
+    private Map<Integer, List<AbstractAction>> actions = new HashMap<>();
 
     public Animation(UUID id, String name, String description, Scene scene) {
         super(id, name, description);
@@ -76,11 +75,11 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
         return scene;
     }
 
-    public List<AbstractAction> getActions() {
+    public Map<Integer, List<AbstractAction>> getActions() {
         return actions;
     }
 
-    public void setActions(List<AbstractAction> actions) {
+    public void setActions(Map<Integer, List<AbstractAction>> actions) {
         this.actions = actions;
     }
 }

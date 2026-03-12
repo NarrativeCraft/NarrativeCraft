@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.events.server;
 
+import fr.loudo.narrativecraft.commands.PlaybackCommand;
 import fr.loudo.narrativecraft.commands.PlayerSessionCommand;
 import fr.loudo.narrativecraft.commands.RecordCommand;
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
@@ -35,6 +36,7 @@ public class OnCommandRegisterEventFabric implements IFabricEventRegister {
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
             RecordCommand.register(commandDispatcher);
             PlayerSessionCommand.register(commandDispatcher);
+            PlaybackCommand.register(commandDispatcher);
         });
     }
 }

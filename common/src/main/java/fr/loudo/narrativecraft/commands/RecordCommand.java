@@ -45,7 +45,7 @@ public class RecordCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
-        dispatcher.register(Commands.literal("narrativecraft")
+        dispatcher.register(Commands.literal("nc")
                 .requires(commandSourceStack ->
                         commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("record").then(Commands.literal("start").executes(RecordCommand::startRecord)))
