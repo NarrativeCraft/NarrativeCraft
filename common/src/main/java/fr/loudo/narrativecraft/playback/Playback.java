@@ -39,6 +39,7 @@ public class Playback {
     private int tick = 0;
     private int totalTicks = 0;
     private boolean isPlaying;
+    private boolean ended = false;
 
     public Playback(Animation animation, ServerPlayer requester) {
         this.animation = animation;
@@ -69,6 +70,7 @@ public class Playback {
 
         if (tick == totalTicks) {
             stop();
+            ended = true;
             return;
         }
 
@@ -77,6 +79,10 @@ public class Playback {
         }
 
         tick++;
+    }
+
+    public boolean isEnded() {
+        return ended;
     }
 
     public UUID getId() {

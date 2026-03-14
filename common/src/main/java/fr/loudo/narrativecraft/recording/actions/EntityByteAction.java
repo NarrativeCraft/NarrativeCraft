@@ -23,32 +23,53 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
+import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
+import fr.loudo.narrativecraft.playback.PlaybackContext;
 import fr.loudo.narrativecraft.recording.RecordingActionType;
 import java.io.IOException;
+import net.minecraft.network.syncher.SynchedEntityData;
 
-public abstract class AbstractAction implements Action {
+public class EntityByteAction extends AbstractAction {
 
-    private int tick;
+    private byte entityByte;
 
-    public AbstractAction(int tick) {
-        this.tick = tick;
+    public EntityByteAction(int tick, byte entityByte) {
+        super(tick);
+        this.entityByte = entityByte;
     }
 
-    public abstract RecordingActionType getType();
+    public EntityByteAction(int tick) {
+        super(tick);
+    }
 
-    public abstract void write(Writer writer) throws IOException;
-
-    public abstract void read(Reader reader) throws IOException;
-
+    @Override
     public boolean differs(AbstractAction other) {
-        return true;
+        if (!(other instanceof EntityByteAction otherEntityByteAction)) {
+            return true;
+        }
+        return this.entityByte != otherEntityByteAction.entityByte;
     }
 
-    public int getTick() {
-        return tick;
+    @Override
+    public RecordingActionType getType() {
+        return RecordingActionType.ENTITY_BYTE;
     }
 
-    public void setTick(int tick) {
-        this.tick = tick;
+    @Override
+    public void write(Writer writer) throws IOException {
+        writer.addByte(entityByte);
+    }
+
+    @Override
+    public void read(Reader reader) throws IOException {
+        entityByte = reader.readByte();
+    }
+
+    @Override
+    public ActionResult execute(PlaybackContext context) {
+        SynchedEntityData entityData = context.getEntity().getEntityData();
+        entityData.set(EntityAccessor.getDATA_SHARED_FLAGS_ID(), entityByte);
+
+        return ActionResult.OK;
     }
 }

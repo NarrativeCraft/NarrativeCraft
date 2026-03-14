@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.Recording;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.server.MinecraftServer;
 
 public class OnServerTickEvent {
@@ -37,9 +39,16 @@ public class OnServerTickEvent {
             recording.tick();
         }
 
+        List<Playback> toRemove = new ArrayList<>();
+
         for (Playback playback :
                 NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
             playback.tick();
+            if (playback.isEnded()) {
+                toRemove.add(playback);
+            }
         }
+
+        NarrativeCraftMod.getInstance().getPlaybackManager().getList().removeAll(toRemove);
     }
 }

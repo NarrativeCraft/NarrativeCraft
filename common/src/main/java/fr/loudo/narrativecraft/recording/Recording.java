@@ -25,10 +25,13 @@ package fr.loudo.narrativecraft.recording;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
+import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
+import fr.loudo.narrativecraft.recording.actions.PoseAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +60,10 @@ public class Recording {
             Entity entity = recordingEntityData.getEntity();
             recordingEntityData.addAction(new MovementAction(
                     tick, entity.position(), entity.getXRot(), entity.getYRot(), entity.getYHeadRot()));
+            recordingEntityData.addAction(new PoseAction(tick, entity.getPose()));
+            recordingEntityData.addAction(
+                    new EntityByteAction(tick, entity.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID())));
         }
-
         tick++;
     }
 

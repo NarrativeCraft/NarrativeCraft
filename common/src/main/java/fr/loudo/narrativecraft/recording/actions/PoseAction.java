@@ -21,39 +21,57 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
-import fr.loudo.narrativecraft.recording.actions.MovementAction;
-import fr.loudo.narrativecraft.recording.actions.PoseAction;
-import java.util.function.IntFunction;
+import fr.loudo.narrativecraft.playback.PlaybackContext;
+import fr.loudo.narrativecraft.recording.RecordingActionType;
+import java.io.IOException;
+import net.minecraft.world.entity.Pose;
 
-public enum RecordingActionType {
-    MOVEMENT(1, MovementAction::new),
-    POSE(2, PoseAction::new),
-    ENTITY_BYTE(3, EntityByteAction::new);
+public class PoseAction extends AbstractAction {
 
-    private final int id;
-    private final IntFunction<AbstractAction> factory;
+    private Pose pose;
 
-    RecordingActionType(int id, IntFunction<AbstractAction> factory) {
-        this.id = id;
-        this.factory = factory;
+    public PoseAction(int tick) {
+        super(tick);
     }
 
-    public int getId() {
-        return id;
+    public PoseAction(int tick, Pose pose) {
+        super(tick);
+        this.pose = pose;
     }
 
-    public AbstractAction createAction(int tick) {
-        return factory.apply(tick);
+    @Override
+    public RecordingActionType getType() {
+        return RecordingActionType.POSE;
     }
 
-    public static RecordingActionType getById(int id) {
-        for (RecordingActionType type : values()) {
-            if (type.id == id) return type;
+    @Override
+    public boolean differs(AbstractAction other) {
+        if (!(other instanceof PoseAction otherPose)) {
+            return true;
         }
-        throw new IllegalArgumentException("Unknown action type id: " + id);
+        return this.pose != otherPose.pose;
+    }
+
+    @Override
+    public void write(Writer writer) throws IOException {
+        writer.addInt(pose.id());
+    }
+
+    @Override
+    public void read(Reader reader) throws IOException {
+        pose = Pose.BY_ID.apply(reader.readInt());
+    }
+
+    @Override
+    public ActionResult execute(PlaybackContext context) {
+        if (pose == null) {
+            return ActionResult.ERROR;
+        }
+
+        context.getEntity().setPose(pose);
+
+        return ActionResult.OK;
     }
 }

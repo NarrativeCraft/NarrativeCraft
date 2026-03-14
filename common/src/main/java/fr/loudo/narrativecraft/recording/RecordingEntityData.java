@@ -24,6 +24,8 @@
 package fr.loudo.narrativecraft.recording;
 
 import fr.loudo.narrativecraft.recording.actions.AbstractAction;
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.world.entity.Entity;
 
 public class RecordingEntityData {
@@ -32,6 +34,7 @@ public class RecordingEntityData {
     private final int recordingId;
     private final Entity entity;
     private boolean isTracked;
+    private final Map<RecordingActionType, AbstractAction> lastActions = new HashMap<>();
 
     public RecordingEntityData(int recordingId, Entity entity, boolean isTracked) {
         recordingData = new RecordingData(entity);
@@ -41,7 +44,11 @@ public class RecordingEntityData {
     }
 
     public void addAction(AbstractAction action) {
-        recordingData.addAction(action);
+        AbstractAction lastAction = lastActions.get(action.getType());
+        if (lastAction == null || action.differs(lastAction)) {
+            recordingData.addAction(action);
+            lastActions.put(action.getType(), action);
+        }
     }
 
     public RecordingData getRecordingData() {

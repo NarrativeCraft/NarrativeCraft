@@ -4,7 +4,9 @@
   "package": "fr.loudo.narrativecraft.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_18",
-  "mixins": [],
+  "mixins": [
+    "accessor.EntityAccessor"
+  ],
   "client": [],
   "server": [],
   "injectors": {

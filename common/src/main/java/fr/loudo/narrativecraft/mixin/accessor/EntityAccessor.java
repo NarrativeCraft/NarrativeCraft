@@ -21,39 +21,17 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.mixin.accessor;
 
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
-import fr.loudo.narrativecraft.recording.actions.MovementAction;
-import fr.loudo.narrativecraft.recording.actions.PoseAction;
-import java.util.function.IntFunction;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.world.entity.Entity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-public enum RecordingActionType {
-    MOVEMENT(1, MovementAction::new),
-    POSE(2, PoseAction::new),
-    ENTITY_BYTE(3, EntityByteAction::new);
-
-    private final int id;
-    private final IntFunction<AbstractAction> factory;
-
-    RecordingActionType(int id, IntFunction<AbstractAction> factory) {
-        this.id = id;
-        this.factory = factory;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public AbstractAction createAction(int tick) {
-        return factory.apply(tick);
-    }
-
-    public static RecordingActionType getById(int id) {
-        for (RecordingActionType type : values()) {
-            if (type.id == id) return type;
-        }
-        throw new IllegalArgumentException("Unknown action type id: " + id);
+@Mixin(Entity.class)
+public interface EntityAccessor {
+    @Accessor
+    static EntityDataAccessor<Byte> getDATA_SHARED_FLAGS_ID() {
+        return null;
     }
 }
