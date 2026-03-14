@@ -51,8 +51,7 @@ public class PlaybackCommand {
                                 .then(Commands.argument("animation_name", StringArgumentType.string())
                                         .suggests(PlaybackCommand::suggestAnimations)
                                         .executes(context -> startPlayback(
-                                                context,
-                                                StringArgumentType.getString(context, "animation_name")))))));
+                                                context, StringArgumentType.getString(context, "animation_name")))))));
     }
 
     private static int startPlayback(CommandContext<CommandSourceStack> context, String animationName) {
@@ -70,6 +69,10 @@ public class PlaybackCommand {
             context.getSource()
                     .sendFailure(Translation.message(
                             "error.not_exists", Translation.message("animation").getString(), animationName));
+            return 0;
+        }
+        if (!animation.initialize()) {
+            context.getSource().sendFailure(Translation.message("error.animation.initialize", animation.getName()));
             return 0;
         }
 

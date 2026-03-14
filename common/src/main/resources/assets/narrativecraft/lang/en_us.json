@@ -36,7 +36,10 @@
   "narrativecraft.error.crud.edit": "Failed to edit %s",
   "narrativecraft.error.crud.delete": "Failed to delete %s",
   "narrativecraft.error.record.save": "Failed to save recording!",
-  "narrativecraft.errror.playback": "An error happened during a playback! Animation: %s - Tick: %s - Action: %s",
+  "narrativecraft.error.playback": "An error happened during a playback! Animation: %s - Tick: %s - Action: %s",
+  "narrativecraft.error.playback_entity_type": "Failed to spawn entity %s because this type is unknown.",
+  "narrativecraft.error.playback_entity_null": "Failed to spawn entity %s because it returned null.",
+  "narrativecraft.error.animation.initialize": "Failed to load animation %s.",
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",

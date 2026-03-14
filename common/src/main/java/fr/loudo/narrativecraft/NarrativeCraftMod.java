@@ -31,10 +31,9 @@ import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
+import fr.loudo.narrativecraft.playback.PlaybackManager;
 import java.util.ArrayList;
 import java.util.List;
-
-import fr.loudo.narrativecraft.playback.PlaybackManager;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

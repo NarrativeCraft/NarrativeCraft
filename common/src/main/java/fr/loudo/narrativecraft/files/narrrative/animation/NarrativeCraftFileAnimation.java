@@ -31,10 +31,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.recording.Recording;
-import fr.loudo.narrativecraft.recording.RecordingData;
-import fr.loudo.narrativecraft.recording.RecordingReader;
-import fr.loudo.narrativecraft.recording.RecordingWriter;
+import fr.loudo.narrativecraft.recording.*;
 import fr.loudo.narrativecraft.recording.actions.AbstractAction;
 import java.io.*;
 import java.util.ArrayList;
@@ -58,23 +55,28 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
             return NarrativeCraftFileEditor.OPERATION_FAILED;
         }
 
-        RecordingData recordingData = recording.getRecordingData();
-
-        List<AbstractAction> sortedActions = entry.getActions().entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .flatMap(e -> e.getValue().stream())
-                .toList();
-
         try (DataOutputStream stream =
                 new DataOutputStream(new FileOutputStream(new File(animationsFolder, entry.toFileName())))) {
             RecordingWriter writer = new RecordingWriter(stream);
             writer.writeHeader(
-                    recordingData.getRecordingId(),
-                    recordingData.getPlayerUUID(),
+                    recording.getId(),
                     entry.getName(),
-                    sortedActions.size());
-            for (AbstractAction action : sortedActions) {
-                writer.writeActionRecord(action);
+                    recording.getRecordingEntityData().size());
+            for (RecordingEntityData recordingEntityData : recording.getRecordingEntityData()) {
+
+                writer.writeEntityHeader(
+                        recordingEntityData,
+                        recordingEntityData.getRecordingData().getActions().size());
+
+                List<AbstractAction> sortedActions =
+                        recordingEntityData.getRecordingData().getActions().entrySet().stream()
+                                .sorted(Map.Entry.comparingByKey())
+                                .flatMap(e -> e.getValue().stream())
+                                .toList();
+
+                for (AbstractAction action : sortedActions) {
+                    writer.writeActionRecord(action);
+                }
             }
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to save animation {}!", entry.getName(), e);
@@ -97,13 +99,21 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
         try (DataInputStream inStream = new DataInputStream(new FileInputStream(oldFileRecord))) {
             RecordingReader reader = new RecordingReader(inStream);
             RecordingReader.RecordingHeader header = reader.readHeader();
-            List<AbstractAction> actions = reader.readAllActions(header.actionCount());
 
             try (DataOutputStream outStream = new DataOutputStream(new FileOutputStream(newFileRecord))) {
                 RecordingWriter writer = new RecordingWriter(outStream);
-                writer.writeHeader(header.recordingId(), header.playerUUID(), entry.getName(), actions.size());
-                for (AbstractAction action : actions) {
-                    writer.writeActionRecord(action);
+                writer.writeHeader(header.recordingId(), entry.getName(), header.entityCount());
+
+                for (int i = 0; i < header.entityCount(); i++) {
+                    RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();
+
+                    outStream.writeInt(entityHeader.entityRecordingId());
+                    outStream.writeUTF(entityHeader.entityType());
+                    outStream.writeInt(entityHeader.actionCount());
+
+                    for (AbstractAction action : reader.readAllActions(entityHeader.actionCount())) {
+                        writer.writeActionRecord(action);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -159,12 +169,8 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                     try (DataInputStream stream = new DataInputStream(new FileInputStream(file))) {
                         RecordingReader reader = new RecordingReader(stream);
                         RecordingReader.RecordingHeader header = reader.readHeader();
-                        RecordingData data = new RecordingData(header.recordingId(), header.playerUUID());
-                        for (AbstractAction action : reader.readAllActions(header.actionCount())) {
-                            data.addAction(action);
-                        }
                         Animation animation = new Animation(header.recordingId(), header.name(), scene);
-                        animation.setActions(data.getActions());
+
                         deserializationResults.add(new DeserializationResult<>(animation, false, file.getName()));
                     } catch (IOException e) {
                         deserializationResults.add(new DeserializationResult<>(null, true, file.getName()));

@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.recording.actions;
 import fr.loudo.narrativecraft.playback.PlaybackContext;
 import fr.loudo.narrativecraft.recording.RecordingActionType;
 import java.io.IOException;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementAction extends AbstractAction {
@@ -48,7 +48,7 @@ public class MovementAction extends AbstractAction {
 
     @Override
     public ActionResult execute(PlaybackContext context) {
-        LivingEntity entity = context.getEntity();
+        Entity entity = context.getEntity();
         entity.setPos(pos);
         entity.setXRot(pitch);
         entity.setYRot(yaw);

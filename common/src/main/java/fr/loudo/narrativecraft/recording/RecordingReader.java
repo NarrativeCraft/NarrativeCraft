@@ -75,7 +75,9 @@ public class RecordingReader implements Action.Reader {
         return new Vec3(inputStream.readDouble(), inputStream.readDouble(), inputStream.readDouble());
     }
 
-    public record RecordingHeader(UUID recordingId, UUID playerUUID, String name, int actionCount) {}
+    public record RecordingHeader(UUID recordingId, String name, int entityCount) {}
+
+    public record EntityHeader(int entityRecordingId, String entityType, int actionCount) {}
 
     public RecordingHeader readHeader() throws IOException {
         byte magic0 = inputStream.readByte();
@@ -85,10 +87,16 @@ public class RecordingReader implements Action.Reader {
         }
         inputStream.readByte(); // version, reserved for future format migrations
         UUID recordingId = readUUID();
-        UUID playerUUID = readUUID();
         String name = inputStream.readUTF();
+        int entityCount = inputStream.readInt();
+        return new RecordingHeader(recordingId, name, entityCount);
+    }
+
+    public EntityHeader readEntityHeader() throws IOException {
+        int entityRecordingId = inputStream.readInt();
+        String entityType = inputStream.readUTF();
         int actionCount = inputStream.readInt();
-        return new RecordingHeader(recordingId, playerUUID, name, actionCount);
+        return new EntityHeader(entityRecordingId, entityType, actionCount);
     }
 
     public List<AbstractAction> readAllActions(int count) throws IOException {

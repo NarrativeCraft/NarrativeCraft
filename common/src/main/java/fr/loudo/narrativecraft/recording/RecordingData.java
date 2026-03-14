@@ -23,30 +23,25 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.actions.AbstractAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 
 public class RecordingData {
 
     private final Map<Integer, List<AbstractAction>> actions = new HashMap<>();
-    private final UUID recordingId;
-    private final UUID playerUUID;
+    private final String entityId;
 
-    public RecordingData(Recording recording) {
-        this.recordingId = recording.getId();
-        this.playerUUID = recording.getPlayer().getUUID();
+    public RecordingData(Entity entity) {
+        this.entityId = EntityType.getKey(entity.getType()).toString();
     }
 
-    public RecordingData(UUID recordingId, UUID playerUUID) {
-        this.recordingId = recordingId;
-        this.playerUUID = playerUUID;
+    public RecordingData(String entityId) {
+        this.entityId = entityId;
     }
 
     public void addAction(AbstractAction action) {
@@ -57,11 +52,7 @@ public class RecordingData {
         return actions;
     }
 
-    public UUID getRecordingId() {
-        return recordingId;
-    }
-
-    public UUID getPlayerUUID() {
-        return playerUUID;
+    public String getEntityId() {
+        return entityId;
     }
 }

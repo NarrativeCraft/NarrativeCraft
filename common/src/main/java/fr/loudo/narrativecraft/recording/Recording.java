@@ -30,8 +30,11 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
 public class Recording {
 
@@ -39,20 +42,22 @@ public class Recording {
 
     private final UUID id = UUID.randomUUID();
     private final PlayerSession playerSession;
-    private final RecordingData recordingData;
+    private final List<RecordingEntityData> recordingEntityData = new ArrayList<>();
     private boolean isRecording = false;
     private int tick = 0;
 
     public Recording(PlayerSession playerSession) {
         this.playerSession = playerSession;
-        recordingData = new RecordingData(this);
+        recordingEntityData.add(new RecordingEntityData(0, playerSession.getPlayer(), true));
     }
 
     public void tick() {
         if (!isRecording) return;
-        ServerPlayer player = playerSession.getPlayer();
-        recordingData.addAction(
-                new MovementAction(tick, player.position(), player.getXRot(), player.getYRot(), player.getYHeadRot()));
+        for (RecordingEntityData recordingEntityData : recordingEntityData) {
+            Entity entity = recordingEntityData.getEntity();
+            recordingEntityData.addAction(new MovementAction(
+                    tick, entity.position(), entity.getXRot(), entity.getYRot(), entity.getYHeadRot()));
+        }
 
         tick++;
     }
@@ -65,12 +70,26 @@ public class Recording {
         isRecording = false;
     }
 
+    public Entity getEntityByRecordingId(Entity entity) {
+        for (RecordingEntityData recordingEntityData : recordingEntityData) {
+            if (recordingEntityData.getEntity().getUUID().equals(entity.getUUID())) {
+                return recordingEntityData.getEntity();
+            }
+        }
+        return null;
+    }
+
     public boolean save(String name) {
 
-        Animation animation = new Animation(recordingData.getRecordingId(), name, playerSession.getScene());
+        Animation animation = new Animation(id, name, playerSession.getScene());
 
         if (NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_FAILED) {
             return false;
+        }
+
+        for (RecordingEntityData recordingEntityData : recordingEntityData) {
+            if (!recordingEntityData.isTracked()) continue;
+            animation.getRecordingDataList().add(recordingEntityData.getRecordingData());
         }
 
         playerSession.getScene().getAnimationManager().add(animation);
@@ -104,7 +123,7 @@ public class Recording {
         return tick;
     }
 
-    public RecordingData getRecordingData() {
-        return recordingData;
+    public List<RecordingEntityData> getRecordingEntityData() {
+        return recordingEntityData;
     }
 }

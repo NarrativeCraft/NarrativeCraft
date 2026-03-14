@@ -23,17 +23,24 @@
 
 package fr.loudo.narrativecraft.narrative.animation;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingData;
+import fr.loudo.narrativecraft.recording.RecordingReader;
 import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 
 public class Animation extends NarrativeEntry<AnimationPayload> {
 
     private final Scene scene;
-    private Map<Integer, List<AbstractAction>> actions = new HashMap<>();
+    private final List<RecordingData> recordingDataList = new ArrayList<>();
 
     public Animation(UUID id, String name, String description, Scene scene) {
         super(id, name, description);
@@ -53,6 +60,44 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
     public Animation(UUID id, String name, Scene scene) {
         super(id, name, "");
         this.scene = scene;
+    }
+
+    // Why deserialization's here : to not have all animations in memory when the server start.
+    // By moving this here, we take the data when we need it, then it's on cache.
+    public boolean initialize() {
+        if (!recordingDataList.isEmpty()) return true;
+
+        File animationsFolder = NarrativeCraftFileUtil.getAnimationsFolder(scene);
+        File animationFile = new File(animationsFolder, toFileName());
+
+        if (!animationFile.exists()) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Animation file {} does not exist. Chapter {} scene {}",
+                    toFileName(),
+                    scene.getChapter().getChapterIndex(),
+                    scene.getName());
+            return false;
+        }
+
+        try (DataInputStream stream = new DataInputStream(new FileInputStream(animationFile))) {
+            RecordingReader reader = new RecordingReader(stream);
+            RecordingReader.RecordingHeader header = reader.readHeader();
+
+            for (int i = 0; i < header.entityCount(); i++) {
+                RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();
+                RecordingData recordingData = new RecordingData(entityHeader.entityType());
+                for (AbstractAction action : reader.readAllActions(entityHeader.actionCount())) {
+                    recordingData.addAction(action);
+                }
+                recordingDataList.add(recordingData);
+            }
+
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Could not read recording data of animation {}", toFileName(), e);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -75,11 +120,7 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
         return scene;
     }
 
-    public Map<Integer, List<AbstractAction>> getActions() {
-        return actions;
-    }
-
-    public void setActions(Map<Integer, List<AbstractAction>> actions) {
-        this.actions = actions;
+    public List<RecordingData> getRecordingDataList() {
+        return recordingDataList;
     }
 }

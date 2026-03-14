@@ -24,6 +24,9 @@
 package fr.loudo.narrativecraft.playback;
 
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.recording.RecordingData;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -32,36 +35,48 @@ public class Playback {
     private final UUID id = UUID.randomUUID();
     private final Animation animation;
     private final ServerPlayer requester;
-    private final PlaybackContext context;
+    private final List<PlaybackContext> contexts = new ArrayList<>();
     private int tick = 0;
+    private int totalTicks = 0;
     private boolean isPlaying;
 
     public Playback(Animation animation, ServerPlayer requester) {
         this.animation = animation;
         this.requester = requester;
-        context = new PlaybackContext(this, requester.level());
     }
 
     public void start() {
+        for (RecordingData recordingData : animation.getRecordingDataList()) {
+            totalTicks += recordingData.getActions().size();
+            contexts.add(new PlaybackContext(this, recordingData, requester.level()));
+        }
+
         isPlaying = true;
-        context.start();
+        for (PlaybackContext context : contexts) {
+            context.start();
+        }
     }
 
     public void stop() {
         isPlaying = false;
-        context.stop();
+        for (PlaybackContext context : contexts) {
+            context.stop();
+        }
     }
 
     public void tick() {
         if (!isPlaying) return;
 
-        if (tick == animation.getActions().size()) {
+        if (tick == totalTicks) {
             stop();
+            return;
         }
 
-        context.tick();
-        tick++;
+        for (PlaybackContext context : contexts) {
+            context.tick();
+        }
 
+        tick++;
     }
 
     public UUID getId() {

@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.recording;
 
 import fr.loudo.narrativecraft.recording.actions.AbstractAction;
 import fr.loudo.narrativecraft.recording.actions.Action;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.UUID;
@@ -40,13 +41,18 @@ public class RecordingWriter implements Action.Writer {
         this.outputStream = outputStream;
     }
 
-    public void writeHeader(UUID recordingId, UUID playerUUID, String name, int actionCount) throws IOException {
+    public void writeHeader(UUID recordingId, String name, int entityCount) throws IOException {
         outputStream.writeByte('N');
         outputStream.writeByte('C');
         outputStream.writeByte(VERSION);
         addUUID(recordingId);
-        addUUID(playerUUID);
         outputStream.writeUTF(name);
+        outputStream.writeInt(entityCount);
+    }
+
+    public void writeEntityHeader(RecordingEntityData recordingEntityData, int actionCount) throws IOException {
+        outputStream.writeInt(recordingEntityData.getRecordingId());
+        outputStream.writeUTF(Utils.getEntityTypeString(recordingEntityData.getEntity()));
         outputStream.writeInt(actionCount);
     }
 

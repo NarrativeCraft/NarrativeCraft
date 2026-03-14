@@ -24,36 +24,73 @@
 package fr.loudo.narrativecraft.playback;
 
 import com.mojang.authlib.GameProfile;
+import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.recording.actions.AbstractAction;
 import fr.loudo.narrativecraft.recording.actions.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
-import java.util.List;
-import java.util.UUID;
-
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 
 public class PlaybackContext {
 
     private final Playback playback;
+    private final RecordingData recordingData;
     private final ServerLevel level;
-    private LivingEntity entity;
+    private Entity entity;
+    private int tick = 0;
+    private boolean isPlaying = false;
 
-    public PlaybackContext(Playback playback, ServerLevel level) {
+    public PlaybackContext(Playback playback, RecordingData recordingData, ServerLevel level) {
         this.playback = playback;
+        this.recordingData = recordingData;
         this.level = level;
     }
 
     public void start() {
-        entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "fakeP"), true);
-        if (entity instanceof FakePlayer fakePlayer) {
-            UtilsServer.broadcastPacket(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-            level.addFreshEntity(fakePlayer);
+        tick = 0;
+        isPlaying = true;
+        spawnEntity();
+    }
+
+    private void spawnEntity() {
+        if (recordingData.getEntityId().equals("minecraft:player")) {
+            entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "fakeP"), true);
+            if (entity instanceof FakePlayer fakePlayer) {
+                UtilsServer.broadcastPacket(new ClientboundPlayerInfoUpdatePacket(
+                        ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+                level.addFreshEntity(fakePlayer);
+            }
+        } else {
+            Optional<EntityType<?>> entityType = EntityType.byString(recordingData.getEntityId());
+            EntityType<?> type = entityType.orElse(null);
+            if (type == null) {
+                Utils.sendError(
+                        Translation.message("error.playback_entity_type", recordingData.getEntityId()),
+                        playback.getRequester());
+                playback.stop();
+                return;
+            } else {
+                entity = type.create(level, EntitySpawnReason.MOB_SUMMONED);
+            }
+
+            if (entity == null) {
+                Utils.sendError(
+                        Translation.message("error.playback_entity_null", recordingData.getEntityId()),
+                        playback.getRequester());
+                playback.stop();
+                return;
+            }
+
+            level.addFreshEntity(entity);
         }
     }
 
@@ -62,10 +99,16 @@ public class PlaybackContext {
 
         entity.remove(Entity.RemovalReason.KILLED);
         entity = null;
+        isPlaying = false;
     }
 
     public void tick() {
-        List<AbstractAction> actionsToPlay = playback.getAnimation().getActions().get(playback.getTick());
+        if (tick >= recordingData.getActions().size()) {
+            if (isPlaying) stop();
+            return;
+        }
+
+        List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
         if (actionsToPlay == null) return;
 
         for (AbstractAction action : actionsToPlay) {
@@ -75,17 +118,21 @@ public class PlaybackContext {
                 sendError(action);
             }
         }
+        tick++;
     }
 
     private void sendError(AbstractAction action) {
-        Utils.sendError(Translation.message("error.playback", playback.getAnimation().getName(), playback.getTick(), action.getType()), playback.getRequester());
+        Utils.sendError(
+                Translation.message(
+                        "error.playback", playback.getAnimation().getName(), playback.getTick(), action.getType()),
+                playback.getRequester());
     }
 
     public ServerLevel getLevel() {
         return level;
     }
 
-    public LivingEntity getEntity() {
+    public Entity getEntity() {
         return entity;
     }
 }

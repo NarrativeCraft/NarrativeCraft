@@ -37,7 +37,8 @@ public class OnServerTickEvent {
             recording.tick();
         }
 
-        for (Playback playback : NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
+        for (Playback playback :
+                NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
             playback.tick();
         }
     }

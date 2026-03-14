@@ -21,30 +21,46 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.utils;
+package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
+import fr.loudo.narrativecraft.recording.actions.AbstractAction;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 
-public class Utils {
+public class RecordingEntityData {
 
-    public static final String ONLY_NUMBERS = "^[0-9]*$";
-    public static final String NO_SPECIAL_CHARACTERS = "^[a-zA-Z0-9_ ]*$";
+    private final RecordingData recordingData;
+    private final int recordingId;
+    private final Entity entity;
+    private boolean isTracked;
 
-    public static void sendError(Component message, Player player) {
-        if (player == null) return;
-        Component errorMsg = Component.empty()
-                .append("[" + NarrativeCraftMod.MOD_NAME + "] ")
-                .append(message)
-                .withStyle(ChatFormatting.RED);
-        player.displayClientMessage(errorMsg, false);
+    public RecordingEntityData(int recordingId, Entity entity, boolean isTracked) {
+        recordingData = new RecordingData(entity);
+        this.recordingId = recordingId;
+        this.entity = entity;
+        this.isTracked = isTracked;
     }
 
-    public static String getEntityTypeString(Entity entity) {
-        return EntityType.getKey(entity.getType()).toString();
+    public void addAction(AbstractAction action) {
+        recordingData.addAction(action);
+    }
+
+    public RecordingData getRecordingData() {
+        return recordingData;
+    }
+
+    public int getRecordingId() {
+        return recordingId;
+    }
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public boolean isTracked() {
+        return isTracked;
+    }
+
+    public void setTracked(boolean tracked) {
+        isTracked = tracked;
     }
 }
