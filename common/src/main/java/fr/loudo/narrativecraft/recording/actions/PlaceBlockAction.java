@@ -26,7 +26,11 @@ package fr.loudo.narrativecraft.recording.actions;
 import fr.loudo.narrativecraft.playback.PlaybackContext;
 import fr.loudo.narrativecraft.recording.RecordingActionType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -51,20 +55,40 @@ public class PlaceBlockAction extends DataBlockAction {
     public ActionResult execute(PlaybackContext context) {
 
         ServerLevel level = context.getLevel();
-
-        level.setBlock(blockPos, blockState, 3);
-        if (blockState.is(Blocks.AIR)) {
-            return ActionResult.OK;
-        }
-
         SoundType soundType = blockState.getSoundType();
-        level.playSound(
-                context.getEntity(),
-                blockPos,
-                blockState.getSoundType().getPlaceSound(),
-                SoundSource.BLOCKS,
-                (soundType.getVolume() + 1.0f) / 2.0f,
-                soundType.getPitch() * 0.8f);
+
+        if (context.forSpecificPlayers()) {
+            for (ServerPlayer player : context.getTargetedPlayers()) {
+                player.connection.send(new ClientboundBlockUpdatePacket(blockPos, blockState));
+                if (blockState.is(Blocks.AIR)) {
+                    return ActionResult.OK;
+                }
+
+                player.connection.send(new ClientboundSoundPacket(
+                        Holder.direct(soundType.getPlaceSound()),
+                        SoundSource.BLOCKS,
+                        blockPos.getX(),
+                        blockPos.getY(),
+                        blockPos.getZ(),
+                        (soundType.getVolume() + 1.0f) / 2.0f,
+                        soundType.getPitch() * 0.8f,
+                        level.getRandom().nextLong()
+                ));
+            }
+        } else {
+            level.setBlock(blockPos, blockState, 3);
+            if (blockState.is(Blocks.AIR)) {
+                return ActionResult.OK;
+            }
+
+            level.playSound(
+                    context.getEntity(),
+                    blockPos,
+                    soundType.getPlaceSound(),
+                    SoundSource.BLOCKS,
+                    (soundType.getVolume() + 1.0f) / 2.0f,
+                    soundType.getPitch() * 0.8f);
+        }
 
         return ActionResult.OK;
     }

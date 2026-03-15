@@ -26,6 +26,11 @@ package fr.loudo.narrativecraft.recording.actions;
 import fr.loudo.narrativecraft.playback.PlaybackContext;
 import fr.loudo.narrativecraft.recording.RecordingActionType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BreakBlockAction extends DataBlockAction {
@@ -46,7 +51,21 @@ public class BreakBlockAction extends DataBlockAction {
     @Override
     public ActionResult execute(PlaybackContext context) {
 
-        context.getLevel().destroyBlock(blockPos, false);
+        if (context.forSpecificPlayers()) {
+            for (ServerPlayer player : context.getTargetedPlayers()) {
+                player.connection.send(new ClientboundBlockUpdatePacket(blockPos, Blocks.AIR.defaultBlockState()));
+                if (context.getLevel().getBlockState(blockPos).getBlock() != Blocks.AIR) {
+                    player.connection.send(new ClientboundLevelEventPacket(
+                            2001, // Block break + block break sound
+                            blockPos,
+                            Block.getId(blockState),
+                            false
+                    ));
+                }
+            }
+        } else {
+            context.getLevel().destroyBlock(blockPos, false);
+        }
 
         return ActionResult.OK;
     }
