@@ -29,16 +29,14 @@ import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
-import fr.loudo.narrativecraft.recording.actions.MovementAction;
-import fr.loudo.narrativecraft.recording.actions.PoseAction;
+import fr.loudo.narrativecraft.recording.actions.*;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 public class Recording {
 
@@ -64,6 +62,10 @@ public class Recording {
             recordingEntityData.addAction(new PoseAction(tick, entity.getPose()));
             recordingEntityData.addAction(
                     new EntityByteAction(tick, entity.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID())));
+
+            if (recordingEntityData.getEntity() instanceof LivingEntity livingEntity) {
+                recordingEntityData.addAction(new SwingAction(tick, livingEntity));
+            }
         }
         tick++;
     }

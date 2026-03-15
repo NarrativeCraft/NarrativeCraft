@@ -32,7 +32,7 @@ public enum RecordingActionType {
     ENTITY_BYTE(3, EntityByteAction::new),
     PLACE_BLOCK(4, PlaceBlockAction::new),
     BREAK_BLOCK(5, BreakBlockAction::new),
-    ;
+    SWING(6, SwingAction::new);
 
     private final int id;
     private final IntFunction<AbstractAction> factory;
