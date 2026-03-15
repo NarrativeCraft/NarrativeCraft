@@ -21,39 +21,26 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.recording.actions.*;
-import java.util.function.IntFunction;
+import fr.loudo.narrativecraft.events.server.OnServerPlaceBlockEventFabric;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-public enum RecordingActionType {
-    MOVEMENT(1, MovementAction::new),
-    POSE(2, PoseAction::new),
-    ENTITY_BYTE(3, EntityByteAction::new),
-    PLACE_BLOCK(4, PlaceBlockAction::new),
-    BREAK_BLOCK(5, BreakBlockAction::new),
-    ;
+@Mixin(BlockItem.class)
+public class BlockItemMixinFabric {
 
-    private final int id;
-    private final IntFunction<AbstractAction> factory;
-
-    RecordingActionType(int id, IntFunction<AbstractAction> factory) {
-        this.id = id;
-        this.factory = factory;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public AbstractAction createAction(int tick) {
-        return factory.apply(tick);
-    }
-
-    public static RecordingActionType getById(int id) {
-        for (RecordingActionType type : values()) {
-            if (type.id == id) return type;
+    @Inject(method = "placeBlock", at = @At(value = "HEAD"))
+    private void atPlaceBlock(BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+        if (!context.getLevel().isClientSide()) {
+            OnServerPlaceBlockEventFabric.placeBlock(
+                    state, context.getClickedPos(), (ServerPlayer) context.getPlayer());
         }
-        throw new IllegalArgumentException("Unknown action type id: " + id);
     }
 }

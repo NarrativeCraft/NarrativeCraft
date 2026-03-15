@@ -24,56 +24,48 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.playback.PlaybackContext;
-import java.io.IOException;
-import java.util.UUID;
+import fr.loudo.narrativecraft.recording.RecordingActionType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 
-public interface Action {
+public class PlaceBlockAction extends DataBlockAction {
 
-    ActionResult execute(PlaybackContext context);
-
-    interface Writer {
-        void addByte(byte value) throws IOException;
-
-        void addInt(int value) throws IOException;
-
-        void addLong(long value) throws IOException;
-
-        void addDouble(double value) throws IOException;
-
-        void addFloat(float value) throws IOException;
-
-        void addString(String value) throws IOException;
-
-        void addBoolean(boolean value) throws IOException;
-
-        void addUUID(UUID uuid) throws IOException;
-
-        void addVec3(Vec3 pos) throws IOException;
-
-        void addBlockPos(BlockPos blockPos) throws IOException;
+    public PlaceBlockAction(int tick, BlockPos blockPos, BlockState blockState) {
+        super(tick, blockPos, blockState);
     }
 
-    interface Reader {
-        byte readByte() throws IOException;
+    public PlaceBlockAction(int tick) {
+        super(tick);
+    }
 
-        long readLong() throws IOException;
+    @Override
+    public RecordingActionType getType() {
+        return RecordingActionType.PLACE_BLOCK;
+    }
 
-        int readInt() throws IOException;
+    @Override
+    public ActionResult execute(PlaybackContext context) {
 
-        double readDouble() throws IOException;
+        ServerLevel level = context.getLevel();
 
-        float readFloat() throws IOException;
+        level.setBlock(blockPos, blockState, 3);
+        if (blockState.is(Blocks.AIR)) {
+            return ActionResult.OK;
+        }
 
-        boolean readBoolean() throws IOException;
+        SoundType soundType = blockState.getSoundType();
+        level.playSound(
+                context.getEntity(),
+                blockPos,
+                blockState.getSoundType().getPlaceSound(),
+                SoundSource.BLOCKS,
+                (soundType.getVolume() + 1.0f) / 2.0f,
+                soundType.getPitch() * 0.8f);
 
-        String readString() throws IOException;
-
-        UUID readUUID() throws IOException;
-
-        Vec3 readVec3() throws IOException;
-
-        BlockPos readBlockPos() throws IOException;
+        return ActionResult.OK;
     }
 }

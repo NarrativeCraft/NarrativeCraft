@@ -21,39 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.recording.actions.*;
-import java.util.function.IntFunction;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.actions.BreakBlockAction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.state.BlockState;
 
-public enum RecordingActionType {
-    MOVEMENT(1, MovementAction::new),
-    POSE(2, PoseAction::new),
-    ENTITY_BYTE(3, EntityByteAction::new),
-    PLACE_BLOCK(4, PlaceBlockAction::new),
-    BREAK_BLOCK(5, BreakBlockAction::new),
-    ;
+public class OnServerBreakBlockEvent {
 
-    private final int id;
-    private final IntFunction<AbstractAction> factory;
+    public static void onBreakEvent(BlockState blockState, BlockPos blockPos, ServerPlayer player) {
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
+        if (recording == null) return;
 
-    RecordingActionType(int id, IntFunction<AbstractAction> factory) {
-        this.id = id;
-        this.factory = factory;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public AbstractAction createAction(int tick) {
-        return factory.apply(tick);
-    }
-
-    public static RecordingActionType getById(int id) {
-        for (RecordingActionType type : values()) {
-            if (type.id == id) return type;
-        }
-        throw new IllegalArgumentException("Unknown action type id: " + id);
+        recording.addAction(new BreakBlockAction(recording.getTick(), blockPos, blockState), player);
     }
 }

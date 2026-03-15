@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.utils.Utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 
 public class RecordingWriter implements Action.Writer {
@@ -88,6 +89,16 @@ public class RecordingWriter implements Action.Writer {
     }
 
     @Override
+    public void addString(String value) throws IOException {
+        outputStream.writeUTF(value);
+    }
+
+    @Override
+    public void addBoolean(boolean value) throws IOException {
+        outputStream.writeBoolean(value);
+    }
+
+    @Override
     public void addUUID(UUID uuid) throws IOException {
         outputStream.writeLong(uuid.getMostSignificantBits());
         outputStream.writeLong(uuid.getLeastSignificantBits());
@@ -98,5 +109,12 @@ public class RecordingWriter implements Action.Writer {
         outputStream.writeDouble(pos.x);
         outputStream.writeDouble(pos.y);
         outputStream.writeDouble(pos.z);
+    }
+
+    @Override
+    public void addBlockPos(BlockPos blockPos) throws IOException {
+        outputStream.writeInt(blockPos.getX());
+        outputStream.writeInt(blockPos.getY());
+        outputStream.writeInt(blockPos.getZ());
     }
 }

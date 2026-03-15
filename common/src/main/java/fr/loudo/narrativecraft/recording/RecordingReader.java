@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 
 public class RecordingReader implements Action.Reader {
@@ -66,6 +67,16 @@ public class RecordingReader implements Action.Reader {
     }
 
     @Override
+    public boolean readBoolean() throws IOException {
+        return inputStream.readBoolean();
+    }
+
+    @Override
+    public String readString() throws IOException {
+        return inputStream.readUTF();
+    }
+
+    @Override
     public UUID readUUID() throws IOException {
         return new UUID(inputStream.readLong(), inputStream.readLong());
     }
@@ -73,6 +84,11 @@ public class RecordingReader implements Action.Reader {
     @Override
     public Vec3 readVec3() throws IOException {
         return new Vec3(inputStream.readDouble(), inputStream.readDouble(), inputStream.readDouble());
+    }
+
+    @Override
+    public BlockPos readBlockPos() throws IOException {
+        return new BlockPos(inputStream.readInt(), inputStream.readInt(), inputStream.readInt());
     }
 
     public record RecordingHeader(UUID recordingId, String name, int entityCount) {}

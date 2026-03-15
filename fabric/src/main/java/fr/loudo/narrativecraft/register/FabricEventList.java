@@ -38,6 +38,7 @@ public class FabricEventList {
         events.add(new OnPlayerLeaveEventFabric());
         events.add(new OnServerTickEventFabric());
         events.add(new OnCommandRegisterEventFabric());
+        events.add(new OnServerBreakBlockEventFabric());
     }
 
     public void register() {

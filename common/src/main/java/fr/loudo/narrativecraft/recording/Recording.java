@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.recording.actions.AbstractAction;
 import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.recording.actions.PoseAction;
@@ -67,6 +68,12 @@ public class Recording {
         tick++;
     }
 
+    public void addAction(AbstractAction action, Entity entity) {
+        RecordingEntityData recordingEntityData = getRecordingEntityData(entity);
+        if (entity == null) return;
+        recordingEntityData.addAction(action);
+    }
+
     public void start() {
         isRecording = true;
     }
@@ -79,6 +86,15 @@ public class Recording {
         for (RecordingEntityData recordingEntityData : recordingEntityData) {
             if (recordingEntityData.getEntity().getUUID().equals(entity.getUUID())) {
                 return recordingEntityData.getEntity();
+            }
+        }
+        return null;
+    }
+
+    public RecordingEntityData getRecordingEntityData(Entity entity) {
+        for (RecordingEntityData recordingEntityData : recordingEntityData) {
+            if (recordingEntityData.getEntity().getUUID().equals(entity.getUUID())) {
+                return recordingEntityData;
             }
         }
         return null;

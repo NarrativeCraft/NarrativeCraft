@@ -21,39 +21,33 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.recording.actions.*;
-import java.util.function.IntFunction;
+import fr.loudo.narrativecraft.playback.PlaybackContext;
+import fr.loudo.narrativecraft.recording.RecordingActionType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
-public enum RecordingActionType {
-    MOVEMENT(1, MovementAction::new),
-    POSE(2, PoseAction::new),
-    ENTITY_BYTE(3, EntityByteAction::new),
-    PLACE_BLOCK(4, PlaceBlockAction::new),
-    BREAK_BLOCK(5, BreakBlockAction::new),
-    ;
+public class BreakBlockAction extends DataBlockAction {
 
-    private final int id;
-    private final IntFunction<AbstractAction> factory;
-
-    RecordingActionType(int id, IntFunction<AbstractAction> factory) {
-        this.id = id;
-        this.factory = factory;
+    public BreakBlockAction(int tick, BlockPos blockPos, BlockState blockState) {
+        super(tick, blockPos, blockState);
     }
 
-    public int getId() {
-        return id;
+    public BreakBlockAction(int tick) {
+        super(tick);
     }
 
-    public AbstractAction createAction(int tick) {
-        return factory.apply(tick);
+    @Override
+    public RecordingActionType getType() {
+        return RecordingActionType.BREAK_BLOCK;
     }
 
-    public static RecordingActionType getById(int id) {
-        for (RecordingActionType type : values()) {
-            if (type.id == id) return type;
-        }
-        throw new IllegalArgumentException("Unknown action type id: " + id);
+    @Override
+    public ActionResult execute(PlaybackContext context) {
+
+        context.getLevel().destroyBlock(blockPos, false);
+
+        return ActionResult.OK;
     }
 }
