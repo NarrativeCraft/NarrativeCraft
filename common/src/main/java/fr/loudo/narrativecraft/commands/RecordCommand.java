@@ -76,7 +76,7 @@ public class RecordCommand {
         RECORDING_MANAGER.add(recording);
         recording.start();
 
-        context.getSource().sendSuccess(() -> Translation.message("record.start"), true);
+        context.getSource().sendSuccess(() -> Translation.message("record.start"), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -99,7 +99,7 @@ public class RecordCommand {
         }
 
         recording.stop();
-        context.getSource().sendSuccess(() -> Translation.message("record.stop"), true);
+        context.getSource().sendSuccess(() -> Translation.message("record.stop"), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -116,7 +116,7 @@ public class RecordCommand {
         recording.stop();
         RECORDING_MANAGER.remove(recording);
 
-        context.getSource().sendSuccess(() -> Translation.message("record.discarded"), true);
+        context.getSource().sendSuccess(() -> Translation.message("record.discarded"), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -145,7 +145,7 @@ public class RecordCommand {
         }
 
         if (recording.save(recordName)) {
-            context.getSource().sendSuccess(() -> Translation.message("record.saved"), true);
+            context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);
         } else {
             context.getSource().sendFailure(Translation.message("error.record.save"));
         }

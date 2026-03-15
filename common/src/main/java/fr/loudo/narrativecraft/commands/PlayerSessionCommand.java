@@ -68,7 +68,7 @@ public class PlayerSessionCommand {
                 UtilsServer.getPlayerSessionByPlayer(context.getSource().getPlayer());
         playerSession.clear();
 
-        context.getSource().sendSuccess(() -> Translation.message("session.clear"), true);
+        context.getSource().sendSuccess(() -> Translation.message("session.clear"), false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -100,7 +100,7 @@ public class PlayerSessionCommand {
 
         context.getSource()
                 .sendSuccess(
-                        () -> Translation.message("session.set", chapter.getChapterIndex(), scene.getName()), true);
+                        () -> Translation.message("session.set", chapter.getChapterIndex(), scene.getName()), false);
 
         return Command.SINGLE_SUCCESS;
     }

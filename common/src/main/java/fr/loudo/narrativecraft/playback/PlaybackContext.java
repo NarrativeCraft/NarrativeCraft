@@ -34,8 +34,11 @@ import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -65,8 +68,15 @@ public class PlaybackContext {
         if (recordingData.getEntityId().equals("minecraft:player")) {
             entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "fakeP"), true);
             if (entity instanceof FakePlayer fakePlayer) {
-                UtilsServer.broadcastPacket(new ClientboundPlayerInfoUpdatePacket(
-                        ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+                if (playback.forSpecificPlayers()) {
+                    for (ServerPlayer player : playback.getTargetedPlayers()) {
+                        player.connection.send(new ClientboundPlayerInfoUpdatePacket(
+                                ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+                    }
+                } else {
+                    UtilsServer.broadcastPacket(new ClientboundPlayerInfoUpdatePacket(
+                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+                }
                 level.addFreshEntity(fakePlayer);
             }
         } else {
@@ -90,7 +100,13 @@ public class PlaybackContext {
                 return;
             }
 
-            level.addFreshEntity(entity);
+            if (playback.forSpecificPlayers()) {
+                for (ServerPlayer player : playback.getTargetedPlayers()) {
+                    player.connection.send(new ClientboundAddEntityPacket(entity, 0, new BlockPos(0, 0, 0)));
+                }
+            } else {
+                level.addFreshEntity(entity);
+            }
         }
     }
 

@@ -52,6 +52,9 @@
   "narrativecraft.record.recording": "Please stop your recording before saving.",
   "narrativecraft.record.": "Please stop your recording before saving.",
 
+  "narrativecraft.playback.start": "Animation %s playing back...",
+  "narrativecraft.playback.start_for_players": "Animation %s playing back to targeted players...",
+
   "narrativecraft.session.set": "Your session is now set to §lchapter§r %s and §lscene§r %s.",
   "narrativecraft.session.clear": "Session cleared.",
   "narrativecraft.session.no_session": "You need to set you a session."

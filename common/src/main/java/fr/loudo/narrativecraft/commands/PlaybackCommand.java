@@ -27,6 +27,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -35,9 +36,11 @@ import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 
@@ -50,18 +53,19 @@ public class PlaybackCommand {
                         .then(Commands.literal("start")
                                 .then(Commands.argument("animation_name", StringArgumentType.string())
                                         .suggests(PlaybackCommand::suggestAnimations)
+                                        .then(Commands.argument("targets", EntityArgument.players())
+                                                .executes(PlaybackCommand::startPlaybackToPlayers))
                                         .executes(context -> startPlayback(
                                                 context, StringArgumentType.getString(context, "animation_name")))))));
     }
 
-    private static int startPlayback(CommandContext<CommandSourceStack> context, String animationName) {
-
+    private static Animation getAnimation(CommandContext<CommandSourceStack> context, String animationName) {
         ServerPlayer player = context.getSource().getPlayer();
 
         PlayerSession session = UtilsServer.getPlayerSessionByPlayer(player);
         if (!session.sessionSet()) {
             context.getSource().sendFailure(Translation.message("session.no_session"));
-            return 0;
+            return null;
         }
 
         Animation animation = session.getScene().getAnimationManager().getByName(animationName);
@@ -69,18 +73,56 @@ public class PlaybackCommand {
             context.getSource()
                     .sendFailure(Translation.message(
                             "error.not_exists", Translation.message("animation").getString(), animationName));
-            return 0;
+            return null;
         }
         if (!animation.initialize()) {
             context.getSource().sendFailure(Translation.message("error.animation.initialize", animation.getName()));
+            return null;
+        }
+        return animation;
+    }
+
+    private static int startPlayback(CommandContext<CommandSourceStack> context, String animationName) {
+
+        Animation animation = getAnimation(context, animationName);
+        if (animation == null) {
             return 0;
         }
 
+        ServerPlayer player = context.getSource().getPlayer();
         Playback playback = new Playback(animation, player);
         NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
         playback.start();
 
-        context.getSource().sendSuccess(() -> Translation.message("playback.start", animationName), true);
+        context.getSource().sendSuccess(() -> Translation.message("playback.start", animationName), false);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int startPlaybackToPlayers(CommandContext<CommandSourceStack> context) {
+
+        try {
+            String animationName = StringArgumentType.getString(context, "animation_name");
+            Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "targets");
+
+            Animation animation = getAnimation(context, animationName);
+            if (animation == null) {
+                return 0;
+            }
+
+            ServerPlayer player = context.getSource().getPlayer();
+
+            Playback playback = new Playback(animation, player);
+            NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
+            playback.start(players);
+
+            context.getSource()
+                    .sendSuccess(() -> Translation.message("playback.start_for_players", animationName), false);
+
+        } catch (CommandSyntaxException e) {
+            NarrativeCraftMod.LOGGER.error("Failed to start playback", e);
+            return 0;
+        }
 
         return Command.SINGLE_SUCCESS;
     }

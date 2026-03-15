@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.playback;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,6 +37,7 @@ public class Playback {
     private final Animation animation;
     private final ServerPlayer requester;
     private final List<PlaybackContext> contexts = new ArrayList<>();
+    private final Collection<ServerPlayer> targetedPlayers = new ArrayList<>();
     private int tick = 0;
     private int totalTicks = 0;
     private boolean isPlaying;
@@ -56,6 +58,11 @@ public class Playback {
         for (PlaybackContext context : contexts) {
             context.start();
         }
+    }
+
+    public void start(Collection<ServerPlayer> targetedPlayers) {
+        this.targetedPlayers.addAll(targetedPlayers);
+        start();
     }
 
     public void stop() {
@@ -99,6 +106,14 @@ public class Playback {
 
     public int getTick() {
         return tick;
+    }
+
+    public Collection<ServerPlayer> getTargetedPlayers() {
+        return targetedPlayers;
+    }
+
+    public boolean forSpecificPlayers() {
+        return !targetedPlayers.isEmpty();
     }
 
     public boolean isPlaying() {
