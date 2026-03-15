@@ -78,6 +78,11 @@ public class Recording {
 
     public void start() {
         isRecording = true;
+
+        // Pre-last actions added here to prevent un-wanted behaviors.
+        for (RecordingEntityData recordingEntityData : recordingEntityData) {
+            recordingEntityData.seedLastAction(RecordingActionType.SWING, new SwingAction(0));
+        }
     }
 
     public void stop() {

@@ -72,8 +72,7 @@ public class PlaceBlockAction extends DataBlockAction {
                         blockPos.getZ(),
                         (soundType.getVolume() + 1.0f) / 2.0f,
                         soundType.getPitch() * 0.8f,
-                        level.getRandom().nextLong()
-                ));
+                        level.getRandom().nextLong()));
             }
         } else {
             level.setBlock(blockPos, blockState, 3);

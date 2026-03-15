@@ -65,14 +65,12 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
             for (RecordingEntityData recordingEntityData : recording.getRecordingEntityData()) {
 
                 List<AbstractAction> sortedActions =
-                    recordingEntityData.getRecordingData().getActions().entrySet().stream()
-                        .sorted(Map.Entry.comparingByKey())
-                        .flatMap(e -> e.getValue().stream())
-                        .toList();
+                        recordingEntityData.getRecordingData().getActions().entrySet().stream()
+                                .sorted(Map.Entry.comparingByKey())
+                                .flatMap(e -> e.getValue().stream())
+                                .toList();
 
-                writer.writeEntityHeader(
-                        recordingEntityData,
-                    sortedActions.size());
+                writer.writeEntityHeader(recordingEntityData, sortedActions.size());
 
                 for (AbstractAction action : sortedActions) {
                     writer.writeActionRecord(action);

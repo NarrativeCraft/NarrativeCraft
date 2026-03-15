@@ -59,8 +59,7 @@ public class BreakBlockAction extends DataBlockAction {
                             2001, // Block break + block break sound
                             blockPos,
                             Block.getId(blockState),
-                            false
-                    ));
+                            false));
                 }
             }
         } else {

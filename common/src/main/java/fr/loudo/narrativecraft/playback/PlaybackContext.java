@@ -31,7 +31,6 @@ import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

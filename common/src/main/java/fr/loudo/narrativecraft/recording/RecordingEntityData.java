@@ -51,6 +51,10 @@ public class RecordingEntityData {
         }
     }
 
+    public void seedLastAction(RecordingActionType type, AbstractAction action) {
+        lastActions.put(type, action);
+    }
+
     public RecordingData getRecordingData() {
         return recordingData;
     }
