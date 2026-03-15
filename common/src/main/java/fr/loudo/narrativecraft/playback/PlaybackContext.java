@@ -31,6 +31,8 @@ import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,7 +51,6 @@ public class PlaybackContext {
     private final RecordingData recordingData;
     private final ServerLevel level;
     private Entity entity;
-    private int tick = 0;
     private boolean isPlaying = false;
 
     public PlaybackContext(Playback playback, RecordingData recordingData, ServerLevel level) {
@@ -59,7 +60,6 @@ public class PlaybackContext {
     }
 
     public void start() {
-        tick = 0;
         isPlaying = true;
         spawnEntity();
     }
@@ -110,6 +110,14 @@ public class PlaybackContext {
         }
     }
 
+    public boolean forSpecificPlayers() {
+        return playback.forSpecificPlayers();
+    }
+
+    public Collection<ServerPlayer> getTargetedPlayers() {
+        return playback.getTargetedPlayers();
+    }
+
     public void stop() {
         if (entity == null) return;
 
@@ -119,22 +127,20 @@ public class PlaybackContext {
     }
 
     public void tick() {
-        if (tick >= recordingData.getActions().size()) {
-            if (isPlaying) stop();
-            return;
-        }
+        if (!isPlaying) return;
 
-        List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
-        if (actionsToPlay == null) return;
-
-        for (AbstractAction action : actionsToPlay) {
-            ActionResult result = action.execute(this);
-            if (result == ActionResult.ERROR) {
-                playback.stop();
-                sendError(action);
+        int currentTick = playback.getTick();
+        List<AbstractAction> actionsToPlay = recordingData.getActions().get(currentTick);
+        if (actionsToPlay != null) {
+            for (AbstractAction action : actionsToPlay) {
+                ActionResult result = action.execute(this);
+                if (result == ActionResult.ERROR) {
+                    playback.stop();
+                    sendError(action);
+                    return;
+                }
             }
         }
-        tick++;
     }
 
     private void sendError(AbstractAction action) {

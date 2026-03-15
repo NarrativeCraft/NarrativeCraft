@@ -49,9 +49,19 @@ public class Playback {
     }
 
     public void start() {
+        tick = 0;
+        totalTicks = 0;
+        ended = false;
+        contexts.clear();
+
         for (RecordingData recordingData : animation.getRecordingDataList()) {
-            totalTicks += recordingData.getActions().size();
             contexts.add(new PlaybackContext(this, recordingData, requester.level()));
+
+            int entityMaxTick = recordingData.getActions().keySet().stream()
+                    .mapToInt(Integer::intValue)
+                    .max()
+                    .orElse(-1);
+            totalTicks = Math.max(totalTicks, entityMaxTick + 1);
         }
 
         isPlaying = true;
@@ -75,7 +85,7 @@ public class Playback {
     public void tick() {
         if (!isPlaying) return;
 
-        if (tick == totalTicks) {
+        if (tick >= totalTicks) {
             stop();
             ended = true;
             return;
