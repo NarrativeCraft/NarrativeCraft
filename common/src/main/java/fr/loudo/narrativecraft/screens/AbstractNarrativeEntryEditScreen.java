@@ -52,8 +52,6 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
     protected Button sendButton;
     protected Button closeButton;
 
-    protected boolean payloadSent = false;
-
     public AbstractNarrativeEntryEditScreen(Screen lastScreen) {
         super(Component.literal("Narrative Entry Editor"));
         this.lastScreen = lastScreen;
@@ -83,6 +81,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
                     if (!validated) return;
 
                     T instance = createInstance();
+
                     if (entry == null) {
                         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
                                 instance.getId(), instance.toPayload(), NarrativeEntryAction.ADD));
@@ -90,8 +89,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
                         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
                                 entry.getId(), instance.toPayload(), NarrativeEntryAction.EDIT));
                     }
-                    b.active = false;
-                    payloadSent = true;
+                    minecraft.setScreen(lastScreen);
                 })
                 .size(GLOBAL_WIDTH, 20)
                 .build();
@@ -179,10 +177,6 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
     protected String getDescription() {
         return descriptionBox.getValue();
-    }
-
-    public boolean payloadSent() {
-        return payloadSent;
     }
 
     protected abstract T createInstance();

@@ -37,10 +37,10 @@ import net.minecraft.network.chat.Component;
 
 public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends PaginationsItemsScreen<E> {
 
+    private final String breadCrumb;
     private Screen lastScreen;
     private Class<? extends NarrativeEntry<?>> entryClass;
     private NarrativeEntry<?> parentEntry;
-    private String breadCrumb;
 
     public NarrativeEntryListScreen(Component title, List<E> entries, Class<E> entryClass, String breadCrumb) {
         super(title, entries);

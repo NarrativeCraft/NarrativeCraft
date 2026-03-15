@@ -73,14 +73,21 @@ public class SceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Scene
             return false;
         }
 
-        if (chapter != null) {
-            int maxSize = chapter.getSceneManager().size();
-            if (sceneRank > maxSize + (entry == null ? 1 : 0)) { // Allow +1 for new scene
-                sendToastError(
-                        Translation.message("error"),
-                        Translation.message("error.scene_rank_greather_than_size", sceneRank, maxSize));
-                return false;
-            }
+        Scene scene = chapter.getSceneManager().getByName(getName());
+        if (scene != null) {
+            sendToastError(
+                    Translation.message("error"),
+                    Translation.message(
+                            "error.already_exists", Translation.message("scene").getString(), scene.getName()));
+            return false;
+        }
+
+        int maxSize = chapter.getSceneManager().size();
+        if (sceneRank > maxSize + (entry == null ? 1 : 0)) { // Allow +1 for new scene
+            sendToastError(
+                    Translation.message("error"),
+                    Translation.message("error.scene_rank_greather_than_size", sceneRank, maxSize));
+            return false;
         }
 
         return true;

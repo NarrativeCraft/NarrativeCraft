@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.managers.RecordingManager;
+import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -35,8 +37,11 @@ public class OnPlayerLeaveEvent {
         PlayerSessionManager playerSessionManager =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession playerSession = playerSessionManager.getByPlayer(player);
-        if (playerSession != null) {
-            playerSessionManager.remove(playerSession);
-        }
+        playerSessionManager.remove(playerSession);
+
+        RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
+        recordingManager.remove(recording);
     }
 }

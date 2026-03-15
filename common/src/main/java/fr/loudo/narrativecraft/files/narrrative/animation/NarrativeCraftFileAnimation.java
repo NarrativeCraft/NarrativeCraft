@@ -138,12 +138,12 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
 
         if (!fileRecord.exists()) {
             NarrativeCraftMod.LOGGER.error(
-                    "Failed to rename animation {} because the file doesn't exists", entry.getName());
+                    "Failed to delete animation {} because the file doesn't exists", entry.getName());
             return NarrativeCraftFileEditor.OPERATION_FAILED;
         }
 
         if (!fileRecord.delete()) {
-            NarrativeCraftMod.LOGGER.error("Failed to rename animation {}", entry.getName());
+            NarrativeCraftMod.LOGGER.error("Failed to delete animation {}", entry.getName());
             return NarrativeCraftFileEditor.OPERATION_FAILED;
         }
 
