@@ -51,6 +51,8 @@ public class RecordCommand {
                 .then(Commands.literal("record").then(Commands.literal("start").executes(RecordCommand::startRecord)))
                 .then(Commands.literal("record").then(Commands.literal("stop").executes(RecordCommand::stopRecord)))
                 .then(Commands.literal("record")
+                        .then(Commands.literal("discard").executes(RecordCommand::discardRecord)))
+                .then(Commands.literal("record")
                         .then(Commands.literal("save")
                                 .then(Commands.argument("record_name", StringArgumentType.string())
                                         .executes(RecordCommand::saveRecord)))));
@@ -98,6 +100,23 @@ public class RecordCommand {
 
         recording.stop();
         context.getSource().sendSuccess(() -> Translation.message("record.stop"), true);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int discardRecord(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
+
+        Recording recording = RECORDING_MANAGER.getRecording(player);
+        if (recording == null) {
+            context.getSource().sendFailure(Translation.message("record.not_recording"));
+            return 0;
+        }
+
+        recording.stop();
+        RECORDING_MANAGER.remove(recording);
+
+        context.getSource().sendSuccess(() -> Translation.message("record.discarded"), true);
 
         return Command.SINGLE_SUCCESS;
     }
