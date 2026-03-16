@@ -23,51 +23,17 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
-import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import java.io.IOException;
-import net.minecraft.world.entity.Pose;
+import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 
-public class PoseAction extends AbstractAction {
+public class ActionRegister {
 
-    private Pose pose;
+    public static void register(IActionRegistry registry) {
 
-    public PoseAction(int tick) {
-        super(tick);
-    }
-
-    public PoseAction(int tick, Pose pose) {
-        super(tick);
-        this.pose = pose;
-    }
-
-    @Override
-    public boolean differs(AbstractAction other) {
-        if (!(other instanceof PoseAction otherPose)) {
-            return false;
-        }
-        return this.pose != otherPose.pose;
-    }
-
-    @Override
-    public void write(Writer writer) throws IOException {
-        writer.addInt(pose.id());
-    }
-
-    @Override
-    public void read(Reader reader) throws IOException {
-        pose = Pose.BY_ID.apply(reader.readInt());
-    }
-
-    @Override
-    public ActionResult execute(IPlaybackContext context) {
-        if (pose == null) {
-            return ActionResult.ERROR;
-        }
-
-        context.getEntity().setPose(pose);
-
-        return ActionResult.OK;
+        registry.register(MovementAction.class, MovementAction::new);
+        registry.register(PoseAction.class, PoseAction::new);
+        registry.register(EntityByteAction.class, EntityByteAction::new);
+        registry.register(PlaceBlockAction.class, PlaceBlockAction::new);
+        registry.register(BreakBlockAction.class, BreakBlockAction::new);
+        registry.register(SwingAction.class, SwingAction::new);
     }
 }

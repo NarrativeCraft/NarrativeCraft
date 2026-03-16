@@ -23,6 +23,10 @@
 
 package fr.loudo.narrativecraft.recording;
 
+import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.api.recording.IRecording;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
@@ -38,10 +42,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
-public class Recording {
+public class Recording implements IRecording {
 
     public static final String RECORDING_EXTENSION = ".ncr";
 
+    private final IActionRegistry actionRegistry =
+            NarrativeCraftAPI.getInstance().getRegistry();
     private final UUID id = UUID.randomUUID();
     private final PlayerSession playerSession;
     private final List<RecordingEntityData> recordingEntityData = new ArrayList<>();
@@ -81,7 +87,7 @@ public class Recording {
 
         // Pre-last actions added here to prevent un-wanted behaviors.
         for (RecordingEntityData recordingEntityData : recordingEntityData) {
-            recordingEntityData.seedLastAction(RecordingActionType.SWING, new SwingAction(0));
+            recordingEntityData.seedLastAction(actionRegistry.getId(SwingAction.class), new SwingAction(0));
         }
     }
 

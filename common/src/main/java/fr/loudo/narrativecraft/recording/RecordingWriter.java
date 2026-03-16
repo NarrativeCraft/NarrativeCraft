@@ -23,8 +23,9 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import fr.loudo.narrativecraft.recording.actions.Action;
+import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.Action;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -59,7 +60,8 @@ public class RecordingWriter implements Action.Writer {
 
     public void writeActionRecord(AbstractAction action) throws IOException {
         outputStream.writeInt(action.getTick());
-        outputStream.writeByte(action.getType().getId());
+        int id = NarrativeCraftAPI.getInstance().getRegistry().getId(action.getClass());
+        outputStream.writeByte(id);
         action.write(this);
     }
 

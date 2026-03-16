@@ -21,53 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.api.recording;
 
-import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import java.io.IOException;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.Entity;
 
-public class PoseAction extends AbstractAction {
-
-    private Pose pose;
-
-    public PoseAction(int tick) {
-        super(tick);
-    }
-
-    public PoseAction(int tick, Pose pose) {
-        super(tick);
-        this.pose = pose;
-    }
-
-    @Override
-    public boolean differs(AbstractAction other) {
-        if (!(other instanceof PoseAction otherPose)) {
-            return false;
-        }
-        return this.pose != otherPose.pose;
-    }
-
-    @Override
-    public void write(Writer writer) throws IOException {
-        writer.addInt(pose.id());
-    }
-
-    @Override
-    public void read(Reader reader) throws IOException {
-        pose = Pose.BY_ID.apply(reader.readInt());
-    }
-
-    @Override
-    public ActionResult execute(IPlaybackContext context) {
-        if (pose == null) {
-            return ActionResult.ERROR;
-        }
-
-        context.getEntity().setPose(pose);
-
-        return ActionResult.OK;
-    }
+public interface IRecording {
+    void addAction(AbstractAction action, Entity entity);
 }

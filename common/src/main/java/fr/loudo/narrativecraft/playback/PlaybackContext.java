@@ -24,9 +24,10 @@
 package fr.loudo.narrativecraft.playback;
 
 import com.mojang.authlib.GameProfile;
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.recording.RecordingData;
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import fr.loudo.narrativecraft.recording.actions.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
@@ -44,7 +45,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 
-public class PlaybackContext {
+public class PlaybackContext implements IPlaybackContext {
 
     private final Playback playback;
     private final RecordingData recordingData;
@@ -145,7 +146,10 @@ public class PlaybackContext {
     private void sendError(AbstractAction action) {
         Utils.sendError(
                 Translation.message(
-                        "error.playback", playback.getAnimation().getName(), playback.getTick(), action.getType()),
+                        "error.playback",
+                        playback.getAnimation().getName(),
+                        playback.getTick(),
+                        action.getClass().getName()),
                 playback.getRequester());
     }
 

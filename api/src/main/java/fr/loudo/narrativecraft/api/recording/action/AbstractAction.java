@@ -21,53 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.api.recording.action;
 
-import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
-import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
-import net.minecraft.world.entity.Pose;
 
-public class PoseAction extends AbstractAction {
+public abstract class AbstractAction implements Action {
 
-    private Pose pose;
+    private int tick;
 
-    public PoseAction(int tick) {
-        super(tick);
+    public AbstractAction(int tick) {
+        this.tick = tick;
     }
 
-    public PoseAction(int tick, Pose pose) {
-        super(tick);
-        this.pose = pose;
-    }
+    public abstract void write(Writer writer) throws IOException;
 
-    @Override
+    public abstract void read(Reader reader) throws IOException;
+
     public boolean differs(AbstractAction other) {
-        if (!(other instanceof PoseAction otherPose)) {
-            return false;
-        }
-        return this.pose != otherPose.pose;
+        return false;
     }
 
-    @Override
-    public void write(Writer writer) throws IOException {
-        writer.addInt(pose.id());
+    public int getTick() {
+        return tick;
     }
 
-    @Override
-    public void read(Reader reader) throws IOException {
-        pose = Pose.BY_ID.apply(reader.readInt());
-    }
-
-    @Override
-    public ActionResult execute(IPlaybackContext context) {
-        if (pose == null) {
-            return ActionResult.ERROR;
-        }
-
-        context.getEntity().setPose(pose);
-
-        return ActionResult.OK;
+    public void setTick(int tick) {
+        this.tick = tick;
     }
 }

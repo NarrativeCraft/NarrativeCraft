@@ -21,38 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.api.recording.action;
 
-import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-
-public class RecordingData {
-
-    private final Map<Integer, List<AbstractAction>> actions = new HashMap<>();
-    private final String entityId;
-
-    public RecordingData(Entity entity) {
-        this.entityId = EntityType.getKey(entity.getType()).toString();
-    }
-
-    public RecordingData(String entityId) {
-        this.entityId = entityId;
-    }
-
-    public void addAction(AbstractAction action) {
-        actions.computeIfAbsent(action.getTick(), k -> new ArrayList<>()).add(action);
-    }
-
-    public Map<Integer, List<AbstractAction>> getActions() {
-        return actions;
-    }
-
-    public String getEntityId() {
-        return entityId;
-    }
+public enum ActionResult {
+    OK,
+    ERROR,
+    IGNORED,
 }

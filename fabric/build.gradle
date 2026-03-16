@@ -19,16 +19,8 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
-    compileOnly("io.github.kosmx.emotes:emotesServer:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
-    compileOnly("io.github.kosmx.emotes:emotesMc:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
     include(implementation "com.bladecoder.ink:blade-ink:1.3.2")
+    implementation project(':api')
 }
 
 loom {

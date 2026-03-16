@@ -21,7 +21,8 @@ spotless {
 		endWithNewline()
 	}
 	java {
-		target 'common/src/main/java/**/*.java',
+		target 'api/src/main/java/**/*.java',
+				'common/src/main/java/**/*.java',
 				'common/src/test/java/**/*.java',
 				'fabric/src/main/java/**/*.java',
 				'neoforge/src/main/java/**/*.java'

@@ -23,18 +23,21 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
+import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.world.entity.Entity;
 
 public class RecordingEntityData {
 
+    private final IActionRegistry registry = NarrativeCraftAPI.getInstance().getRegistry();
     private final RecordingData recordingData;
     private final int recordingId;
     private final Entity entity;
     private boolean isTracked;
-    private final Map<RecordingActionType, AbstractAction> lastActions = new HashMap<>();
+    private final Map<Integer, AbstractAction> lastActions = new HashMap<>();
 
     public RecordingEntityData(int recordingId, Entity entity, boolean isTracked) {
         recordingData = new RecordingData(entity);
@@ -44,15 +47,15 @@ public class RecordingEntityData {
     }
 
     public void addAction(AbstractAction action) {
-        AbstractAction lastAction = lastActions.get(action.getType());
+        AbstractAction lastAction = lastActions.get(registry.getId(action.getClass()));
         if (lastAction == null || action.differs(lastAction)) {
             recordingData.addAction(action);
-            lastActions.put(action.getType(), action);
+            lastActions.put(registry.getId(action.getClass()), action);
         }
     }
 
-    public void seedLastAction(RecordingActionType type, AbstractAction action) {
-        lastActions.put(type, action);
+    public void seedLastAction(int id, AbstractAction action) {
+        lastActions.put(id, action);
     }
 
     public RecordingData getRecordingData() {

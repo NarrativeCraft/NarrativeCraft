@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.files.narrrative.animation;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
@@ -32,7 +33,6 @@ import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.recording.*;
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;

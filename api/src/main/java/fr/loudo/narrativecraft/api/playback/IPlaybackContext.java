@@ -21,39 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording;
+package fr.loudo.narrativecraft.api.playback;
 
-import fr.loudo.narrativecraft.recording.actions.*;
-import java.util.function.IntFunction;
+import java.util.Collection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
-public enum RecordingActionType {
-    MOVEMENT(1, MovementAction::new),
-    POSE(2, PoseAction::new),
-    ENTITY_BYTE(3, EntityByteAction::new),
-    PLACE_BLOCK(4, PlaceBlockAction::new),
-    BREAK_BLOCK(5, BreakBlockAction::new),
-    SWING(6, SwingAction::new);
+public interface IPlaybackContext {
 
-    private final int id;
-    private final IntFunction<AbstractAction> factory;
+    /**
+     * Determine if the action applies to everyone including the world, or if it's only for a group of players.
+     * If it's for everyone, the action will be seen by everyone in the server and the world will be also affected.
+     * However, if it only applies to a small group, the action will be only rendered client-side only to the group.
+     * @return if it's for everyone or only a small group of players
+     */
+    boolean forSpecificPlayers();
 
-    RecordingActionType(int id, IntFunction<AbstractAction> factory) {
-        this.id = id;
-        this.factory = factory;
-    }
+    /**
+     * If it returns an empty collection, it means the action applies to everyone. Else, the action only applies to the group returned.
+     * You can check if the action can be played to everyone or a small group using {@link #forSpecificPlayers()}
+     * @return The group of player to play the action
+     */
+    Collection<ServerPlayer> getTargetedPlayers();
 
-    public int getId() {
-        return id;
-    }
+    ServerLevel getLevel();
 
-    public AbstractAction createAction(int tick) {
-        return factory.apply(tick);
-    }
-
-    public static RecordingActionType getById(int id) {
-        for (RecordingActionType type : values()) {
-            if (type.id == id) return type;
-        }
-        throw new IllegalArgumentException("Unknown action type id: " + id);
-    }
+    Entity getEntity();
 }

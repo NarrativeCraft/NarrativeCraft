@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.playback.PlaybackContext;
-import fr.loudo.narrativecraft.recording.RecordingActionType;
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
@@ -47,12 +47,7 @@ public class PlaceBlockAction extends DataBlockAction {
     }
 
     @Override
-    public RecordingActionType getType() {
-        return RecordingActionType.PLACE_BLOCK;
-    }
-
-    @Override
-    public ActionResult execute(PlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context) {
 
         ServerLevel level = context.getLevel();
         SoundType soundType = blockState.getSoundType();

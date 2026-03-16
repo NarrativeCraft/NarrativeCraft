@@ -23,8 +23,9 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.recording.actions.AbstractAction;
-import fr.loudo.narrativecraft.recording.actions.Action;
+import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.Action;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -120,7 +121,8 @@ public class RecordingReader implements Action.Reader {
         for (int i = 0; i < count; i++) {
             int tick = inputStream.readInt();
             int id = inputStream.readByte() & 0xFF;
-            AbstractAction action = RecordingActionType.getById(id).createAction(tick);
+            AbstractAction action =
+                    NarrativeCraftAPI.getInstance().getRegistry().createAction(id, tick);
             action.read(this);
             result.add(action);
         }

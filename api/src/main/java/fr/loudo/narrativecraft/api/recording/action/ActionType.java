@@ -21,10 +21,8 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.api.recording.action;
 
-public enum ActionResult {
-    OK,
-    ERROR,
-    IGNORED,
-}
+import java.util.function.IntFunction;
+
+public record ActionType(int id, Class<? extends AbstractAction> actionClass, IntFunction<AbstractAction> factory) {}

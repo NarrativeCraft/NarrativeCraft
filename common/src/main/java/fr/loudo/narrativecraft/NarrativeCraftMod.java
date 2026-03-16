@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditorsRegister;
@@ -32,6 +33,8 @@ import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
 import fr.loudo.narrativecraft.playback.PlaybackManager;
+import fr.loudo.narrativecraft.recording.actions.ActionRegister;
+import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -58,6 +61,13 @@ public class NarrativeCraftMod {
     public static void commonInit() {
         NarrativeCraftFileEditorsRegister.register();
         NarrativeEditorsRegister.register();
+
+        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
+        ActionRegistry actionRegistry = new ActionRegistry();
+        api.setRegistry(actionRegistry);
+        ActionRegister.register(actionRegistry);
+
+        api.setRecordingManager(new RecordingManager());
     }
 
     public ChapterManager getChapterManager() {

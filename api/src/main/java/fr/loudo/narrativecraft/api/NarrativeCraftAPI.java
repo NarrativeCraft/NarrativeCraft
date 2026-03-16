@@ -21,34 +21,35 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.api;
 
-import fr.loudo.narrativecraft.recording.RecordingActionType;
-import java.io.IOException;
+import fr.loudo.narrativecraft.api.managers.IRecordingManager;
+import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 
-public abstract class AbstractAction implements Action {
+public class NarrativeCraftAPI {
 
-    private int tick;
+    private static final NarrativeCraftAPI INSTANCE = new NarrativeCraftAPI();
 
-    public AbstractAction(int tick) {
-        this.tick = tick;
+    private IActionRegistry registry;
+    private IRecordingManager recordingManager;
+
+    public IActionRegistry getRegistry() {
+        return registry;
     }
 
-    public abstract RecordingActionType getType();
-
-    public abstract void write(Writer writer) throws IOException;
-
-    public abstract void read(Reader reader) throws IOException;
-
-    public boolean differs(AbstractAction other) {
-        return true;
+    public void setRegistry(IActionRegistry registry) {
+        this.registry = registry;
     }
 
-    public int getTick() {
-        return tick;
+    public IRecordingManager getRecordingManager() {
+        return recordingManager;
     }
 
-    public void setTick(int tick) {
-        this.tick = tick;
+    public void setRecordingManager(IRecordingManager recordingManager) {
+        this.recordingManager = recordingManager;
+    }
+
+    public static NarrativeCraftAPI getInstance() {
+        return INSTANCE;
     }
 }

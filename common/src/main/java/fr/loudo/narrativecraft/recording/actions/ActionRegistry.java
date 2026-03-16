@@ -23,49 +23,51 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
-import java.io.IOException;
-import net.minecraft.network.syncher.SynchedEntityData;
+import fr.loudo.narrativecraft.api.recording.action.ActionType;
+import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.IntFunction;
 
-public class EntityByteAction extends AbstractAction {
+public class ActionRegistry implements IActionRegistry {
 
-    private byte entityByte;
+    private static final int MAX_ACTIONS = 254;
 
-    public EntityByteAction(int tick, byte entityByte) {
-        super(tick);
-        this.entityByte = entityByte;
-    }
+    private final Map<Integer, ActionType> registry = new HashMap<>();
 
-    public EntityByteAction(int tick) {
-        super(tick);
-    }
+    public ActionType register(Class<? extends AbstractAction> actionClass, IntFunction<AbstractAction> factory) {
+        int newId = registry.size();
 
-    @Override
-    public boolean differs(AbstractAction other) {
-        if (!(other instanceof EntityByteAction otherEntityByteAction)) {
-            return false;
+        if (newId > MAX_ACTIONS) {
+            throw new IllegalStateException("Cannot register more than " + MAX_ACTIONS + " actions");
         }
-        return this.entityByte != otherEntityByteAction.entityByte;
+
+        ActionType action = new ActionType(newId, actionClass, factory);
+        registry.put(newId, action);
+        return action;
+    }
+
+    public ActionType get(int id) {
+        return registry.get(id);
     }
 
     @Override
-    public void write(Writer writer) throws IOException {
-        writer.addByte(entityByte);
+    public AbstractAction createAction(int id, int tick) {
+        ActionType action = registry.get(id);
+        if (action == null) return null;
+
+        return action.factory().apply(tick);
     }
 
     @Override
-    public void read(Reader reader) throws IOException {
-        entityByte = reader.readByte();
-    }
+    public int getId(Class<? extends AbstractAction> actionClass) {
+        for (ActionType action : registry.values()) {
+            if (action.actionClass().equals(actionClass)) {
+                return action.id();
+            }
+        }
 
-    @Override
-    public ActionResult execute(IPlaybackContext context) {
-        SynchedEntityData entityData = context.getEntity().getEntityData();
-        entityData.set(EntityAccessor.getDATA_SHARED_FLAGS_ID(), entityByte);
-
-        return ActionResult.OK;
+        return -1;
     }
 }

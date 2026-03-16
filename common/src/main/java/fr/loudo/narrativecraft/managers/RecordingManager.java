@@ -23,11 +23,12 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.api.managers.IRecordingManager;
 import fr.loudo.narrativecraft.recording.Recording;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 
-public class RecordingManager extends Manager<Recording> {
+public class RecordingManager extends Manager<Recording> implements IRecordingManager {
 
     public Recording getById(UUID id) {
         for (Recording recording : list) {

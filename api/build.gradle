@@ -30,22 +30,21 @@ dependencies {
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
     implementation "com.bladecoder.ink:blade-ink:1.3.2"
-    implementation project(':api')
 }
 
 configurations {
-    commonJava {
+    apiJava {
         canBeResolved = false
         canBeConsumed = true
     }
-    commonResources {
+    apiResources {
         canBeResolved = false
         canBeConsumed = true
     }
 }
 
 artifacts {
-    commonJava sourceSets.main.java.sourceDirectories.singleFile
-    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+    apiJava sourceSets.main.java.sourceDirectories.singleFile
+    apiResources sourceSets.main.resources.sourceDirectories.singleFile
 }
 

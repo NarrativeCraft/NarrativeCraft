@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import java.io.IOException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;

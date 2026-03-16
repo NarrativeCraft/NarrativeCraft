@@ -23,8 +23,9 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.playback.PlaybackContext;
-import fr.loudo.narrativecraft.recording.RecordingActionType;
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -49,14 +50,9 @@ public class SwingAction extends AbstractAction {
     @Override
     public boolean differs(AbstractAction other) {
         if (!(other instanceof SwingAction otherSwingAction)) {
-            return true;
+            return false;
         }
         return swinging && (!otherSwingAction.swinging || swingTime <= otherSwingAction.swingTime);
-    }
-
-    @Override
-    public RecordingActionType getType() {
-        return RecordingActionType.SWING;
     }
 
     @Override
@@ -70,7 +66,7 @@ public class SwingAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(PlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context) {
         if (!(context.getEntity() instanceof LivingEntity livingEntity)) {
             return ActionResult.IGNORED;
         }

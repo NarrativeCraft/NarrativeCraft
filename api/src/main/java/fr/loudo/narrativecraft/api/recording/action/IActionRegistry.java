@@ -1,0 +1,59 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.api.recording.action;
+
+import java.util.function.IntFunction;
+
+public interface IActionRegistry {
+
+    /**
+     * Register your action
+     * @param actionClass The class of your implemented {@link AbstractAction}
+     * @param factory Factory class of your implemented {@link AbstractAction}
+     * @return New instance of {@link ActionType}
+     */
+    ActionType register(Class<? extends AbstractAction> actionClass, IntFunction<AbstractAction> factory);
+
+    /**
+     * Get the {@link ActionType} instance from its id.
+     * @param id ID of the action you want to retrieve.
+     * @return Instance of ActionType
+     */
+    ActionType get(int id);
+
+    /**
+     * Dynamically create an instance of {@link AbstractAction} by his factory.
+     * @param id ID of the action
+     * @param tick Current tick
+     * @return instance of @link {@link AbstractAction}}
+     */
+    AbstractAction createAction(int id, int tick);
+
+    /**
+     * Get the id from your implemented {@link AbstractAction}
+     * @param actionClass Action class you want to get the id from.
+     * @return The id of your implemented {@link AbstractAction}
+     */
+    int getId(Class<? extends AbstractAction> actionClass);
+}
