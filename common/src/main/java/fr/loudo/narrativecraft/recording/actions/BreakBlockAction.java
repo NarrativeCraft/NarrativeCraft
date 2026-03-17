@@ -51,13 +51,11 @@ public class BreakBlockAction extends DataBlockAction {
         if (context.forSpecificPlayers()) {
             for (ServerPlayer player : context.getTargetedPlayers()) {
                 player.connection.send(new ClientboundBlockUpdatePacket(blockPos, Blocks.AIR.defaultBlockState()));
-                if (context.getLevel().getBlockState(blockPos).getBlock() != Blocks.AIR) {
-                    player.connection.send(new ClientboundLevelEventPacket(
-                            2001, // Block break + block break sound
-                            blockPos,
-                            Block.getId(blockState),
-                            false));
-                }
+                player.connection.send(new ClientboundLevelEventPacket(
+                        2001, // Block break + block break sound
+                        blockPos,
+                        Block.getId(blockState),
+                        false));
             }
         } else {
             context.getLevel().destroyBlock(blockPos, false);
