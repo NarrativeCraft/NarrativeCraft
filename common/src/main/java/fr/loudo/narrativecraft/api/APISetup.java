@@ -23,33 +23,19 @@
 
 package fr.loudo.narrativecraft.api;
 
-import fr.loudo.narrativecraft.api.managers.IRecordingManager;
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.actions.ActionRegister;
+import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
 
-public class NarrativeCraftAPI {
+public class APISetup {
 
-    private static final NarrativeCraftAPI INSTANCE = new NarrativeCraftAPI();
+    public static void init(NarrativeCraftMod mod) {
+        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
 
-    private IActionRegistry registry;
-    private IRecordingManager recordingManager;
+        ActionRegistry actionRegistry = new ActionRegistry();
+        api.setRegistry(actionRegistry);
+        ActionRegister.register(actionRegistry);
 
-    public IActionRegistry getRegistry() {
-        return registry;
-    }
-
-    void setRegistry(IActionRegistry registry) {
-        this.registry = registry;
-    }
-
-    public IRecordingManager getRecordingManager() {
-        return recordingManager;
-    }
-
-    void setRecordingManager(IRecordingManager recordingManager) {
-        this.recordingManager = recordingManager;
-    }
-
-    public static NarrativeCraftAPI getInstance() {
-        return INSTANCE;
+        api.setRecordingManager(mod.getRecordingManager());
     }
 }
