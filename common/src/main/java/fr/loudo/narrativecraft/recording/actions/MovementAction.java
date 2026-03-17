@@ -32,6 +32,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class MovementAction extends AbstractAction {
 
+    public static final String ID = "movement";
+
     private Vec3 pos;
     private float pitch, yaw, headYaw;
 
@@ -72,5 +74,10 @@ public class MovementAction extends AbstractAction {
         pitch = reader.readFloat();
         yaw = reader.readFloat();
         headYaw = reader.readFloat();
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 }

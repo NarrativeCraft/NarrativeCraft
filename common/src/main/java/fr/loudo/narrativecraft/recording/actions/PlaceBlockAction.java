@@ -38,6 +38,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class PlaceBlockAction extends DataBlockAction {
 
+    public static final String ID = "place_block";
+
     public PlaceBlockAction(int tick, BlockPos blockPos, BlockState blockState) {
         super(tick, blockPos, blockState);
     }
@@ -85,5 +87,10 @@ public class PlaceBlockAction extends DataBlockAction {
         }
 
         return ActionResult.OK;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 }

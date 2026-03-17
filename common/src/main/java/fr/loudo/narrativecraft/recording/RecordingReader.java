@@ -28,68 +28,72 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.Action;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 
 public class RecordingReader implements Action.Reader {
 
-    private final DataInputStream inputStream;
+    private final Map<Byte, String> localActionsIds = new HashMap<>();
+    private final DataInputStream input;
 
-    public RecordingReader(DataInputStream inputStream) {
-        this.inputStream = inputStream;
+    public RecordingReader(DataInputStream input) {
+        this.input = input;
     }
 
     @Override
     public byte readByte() throws IOException {
-        return inputStream.readByte();
+        return input.readByte();
+    }
+
+    @Override
+    public short readShort() throws IOException {
+        return input.readShort();
     }
 
     @Override
     public long readLong() throws IOException {
-        return inputStream.readLong();
+        return input.readLong();
     }
 
     @Override
     public int readInt() throws IOException {
-        return inputStream.readInt();
+        return input.readInt();
     }
 
     @Override
     public double readDouble() throws IOException {
-        return inputStream.readDouble();
+        return input.readDouble();
     }
 
     @Override
     public float readFloat() throws IOException {
-        return inputStream.readFloat();
+        return input.readFloat();
     }
 
     @Override
     public boolean readBoolean() throws IOException {
-        return inputStream.readBoolean();
+        return input.readBoolean();
     }
 
     @Override
     public String readString() throws IOException {
-        return inputStream.readUTF();
+        return input.readUTF();
     }
 
     @Override
     public UUID readUUID() throws IOException {
-        return new UUID(inputStream.readLong(), inputStream.readLong());
+        return new UUID(input.readLong(), input.readLong());
     }
 
     @Override
     public Vec3 readVec3() throws IOException {
-        return new Vec3(inputStream.readDouble(), inputStream.readDouble(), inputStream.readDouble());
+        return new Vec3(input.readDouble(), input.readDouble(), input.readDouble());
     }
 
     @Override
     public BlockPos readBlockPos() throws IOException {
-        return new BlockPos(inputStream.readInt(), inputStream.readInt(), inputStream.readInt());
+        return new BlockPos(input.readInt(), input.readInt(), input.readInt());
     }
 
     public record RecordingHeader(UUID recordingId, String name, int entityCount) {}
@@ -97,32 +101,46 @@ public class RecordingReader implements Action.Reader {
     public record EntityHeader(int entityRecordingId, String entityType, int actionCount) {}
 
     public RecordingHeader readHeader() throws IOException {
-        byte magic0 = inputStream.readByte();
-        byte magic1 = inputStream.readByte();
+        byte magic0 = input.readByte();
+        byte magic1 = input.readByte();
         if (magic0 != 'N' || magic1 != 'C') {
             throw new IOException("Invalid .ncr file: bad magic bytes");
         }
-        inputStream.readByte(); // version, reserved for future format migrations
+        input.readByte(); // version, reserved for future format migrations
         UUID recordingId = readUUID();
-        String name = inputStream.readUTF();
-        int entityCount = inputStream.readInt();
+        String name = input.readUTF();
+        int entityCount = input.readInt();
         return new RecordingHeader(recordingId, name, entityCount);
     }
 
+    public Map<Byte, String> readLocalActionsId() throws IOException {
+        byte actionsCount = input.readByte();
+        for (int i = 0; i < actionsCount; i++) {
+            byte id = input.readByte();
+            String actionId = input.readUTF();
+            localActionsIds.put(id, actionId);
+        }
+        return localActionsIds;
+    }
+
     public EntityHeader readEntityHeader() throws IOException {
-        int entityRecordingId = inputStream.readInt();
-        String entityType = inputStream.readUTF();
-        int actionCount = inputStream.readInt();
+        int entityRecordingId = input.readInt();
+        String entityType = input.readUTF();
+        int actionCount = input.readInt();
         return new EntityHeader(entityRecordingId, entityType, actionCount);
     }
 
     public List<AbstractAction> readAllActions(int count) throws IOException {
         List<AbstractAction> result = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            int tick = inputStream.readInt();
-            int id = inputStream.readByte() & 0xFF;
+            int tick = input.readInt();
+            byte id = input.readByte();
+            String actionId = localActionsIds.get(id);
             AbstractAction action =
-                    NarrativeCraftAPI.getInstance().getRegistry().createAction(id, tick);
+                    NarrativeCraftAPI.getInstance().getRegistry().createAction(actionId, tick);
+            if (action == null) {
+                throw new IOException(String.format("Action with id %s not found", actionId));
+            }
             action.read(this);
             result.add(action);
         }

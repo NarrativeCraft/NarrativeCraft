@@ -25,4 +25,4 @@ package fr.loudo.narrativecraft.api.recording.action;
 
 import java.util.function.IntFunction;
 
-public record ActionType(int id, Class<? extends AbstractAction> actionClass, IntFunction<AbstractAction> factory) {}
+public record ActionType(String id, IntFunction<AbstractAction> factory) {}

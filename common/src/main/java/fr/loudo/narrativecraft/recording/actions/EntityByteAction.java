@@ -32,6 +32,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 
 public class EntityByteAction extends AbstractAction {
 
+    public static final String ID = "entity_byte";
+
     private byte entityByte;
 
     public EntityByteAction(int tick, byte entityByte) {
@@ -67,5 +69,10 @@ public class EntityByteAction extends AbstractAction {
         entityData.set(EntityAccessor.getDATA_SHARED_FLAGS_ID(), entityByte);
 
         return ActionResult.OK;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 }

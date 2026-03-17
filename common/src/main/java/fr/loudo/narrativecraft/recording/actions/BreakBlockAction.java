@@ -35,6 +35,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BreakBlockAction extends DataBlockAction {
 
+    public static final String ID = "break_block";
+
     public BreakBlockAction(int tick, BlockPos blockPos, BlockState blockState) {
         super(tick, blockPos, blockState);
     }
@@ -62,5 +64,10 @@ public class BreakBlockAction extends DataBlockAction {
         }
 
         return ActionResult.OK;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 }

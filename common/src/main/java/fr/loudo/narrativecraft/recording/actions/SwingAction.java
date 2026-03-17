@@ -32,6 +32,8 @@ import net.minecraft.world.entity.LivingEntity;
 
 public class SwingAction extends AbstractAction {
 
+    public static final String ID = "swing";
+
     private InteractionHand hand;
     private int swingTime;
     private boolean swinging;
@@ -72,5 +74,10 @@ public class SwingAction extends AbstractAction {
         }
         livingEntity.swing(hand);
         return ActionResult.OK;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 }

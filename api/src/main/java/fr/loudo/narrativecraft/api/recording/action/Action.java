@@ -36,6 +36,8 @@ public interface Action {
     interface Writer {
         void addByte(byte value) throws IOException;
 
+        void addShort(short value) throws IOException;
+
         void addInt(int value) throws IOException;
 
         void addLong(long value) throws IOException;
@@ -58,11 +60,13 @@ public interface Action {
     interface Reader {
         byte readByte() throws IOException;
 
-        long readLong() throws IOException;
+        short readShort() throws IOException;
 
         int readInt() throws IOException;
 
         double readDouble() throws IOException;
+
+        long readLong() throws IOException;
 
         float readFloat() throws IOException;
 

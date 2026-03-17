@@ -31,6 +31,8 @@ import net.minecraft.world.entity.Pose;
 
 public class PoseAction extends AbstractAction {
 
+    public static final String ID = "pose";
+
     private Pose pose;
 
     public PoseAction(int tick) {
@@ -69,5 +71,10 @@ public class PoseAction extends AbstractAction {
         context.getEntity().setPose(pose);
 
         return ActionResult.OK;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 }

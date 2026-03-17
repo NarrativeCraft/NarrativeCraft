@@ -26,9 +26,13 @@ package fr.loudo.narrativecraft.recording;
 import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.Action;
+import fr.loudo.narrativecraft.api.recording.action.ActionType;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
@@ -37,86 +41,113 @@ public class RecordingWriter implements Action.Writer {
 
     public static final byte VERSION = 1;
 
-    private final DataOutputStream outputStream;
+    private final Map<String, Byte> localActionsIds = new HashMap<>();
+    private final DataOutputStream output;
 
-    public RecordingWriter(DataOutputStream outputStream) {
-        this.outputStream = outputStream;
+    public RecordingWriter(DataOutputStream output) {
+        this.output = output;
     }
 
     public void writeHeader(UUID recordingId, String name, int entityCount) throws IOException {
-        outputStream.writeByte('N');
-        outputStream.writeByte('C');
-        outputStream.writeByte(VERSION);
+        output.writeByte('N');
+        output.writeByte('C');
+        output.writeByte(VERSION);
         addUUID(recordingId);
-        outputStream.writeUTF(name);
-        outputStream.writeInt(entityCount);
+        output.writeUTF(name);
+        output.writeInt(entityCount);
+    }
+
+    public void writeLocalActionsId() throws IOException {
+        Collection<ActionType> actionTypes =
+                NarrativeCraftAPI.getInstance().getRegistry().getActionsType();
+        writeActionSize((byte) actionTypes.size());
+        byte id = 0;
+        for (ActionType action : NarrativeCraftAPI.getInstance().getRegistry().getActionsType()) {
+            writeActionId(id, action.id());
+            id++;
+        }
+    }
+
+    public void writeActionSize(byte size) throws IOException {
+        output.writeByte(size);
+    }
+
+    public void writeActionId(byte id, String actionId) throws IOException {
+        output.writeByte(id);
+        output.writeUTF(actionId);
+        localActionsIds.put(actionId, id);
     }
 
     public void writeEntityHeader(RecordingEntityData recordingEntityData, int actionCount) throws IOException {
-        outputStream.writeInt(recordingEntityData.getRecordingId());
-        outputStream.writeUTF(Utils.getEntityTypeString(recordingEntityData.getEntity()));
-        outputStream.writeInt(actionCount);
+        output.writeInt(recordingEntityData.getRecordingId());
+        output.writeUTF(Utils.getEntityTypeString(recordingEntityData.getEntity()));
+        output.writeInt(actionCount);
     }
 
     public void writeActionRecord(AbstractAction action) throws IOException {
-        outputStream.writeInt(action.getTick());
-        int id = NarrativeCraftAPI.getInstance().getRegistry().getId(action.getClass());
-        outputStream.writeByte(id);
+        output.writeInt(action.getTick());
+        byte id = localActionsIds.get(action.getId());
+        output.writeByte(id);
         action.write(this);
     }
 
     @Override
     public void addByte(byte value) throws IOException {
-        outputStream.writeByte(value);
+        output.writeByte(value);
+    }
+
+    @Override
+    public void addShort(short value) throws IOException {
+        output.writeShort(value);
     }
 
     @Override
     public void addInt(int value) throws IOException {
-        outputStream.writeInt(value);
+        output.writeInt(value);
     }
 
     @Override
     public void addLong(long value) throws IOException {
-        outputStream.writeLong(value);
+        output.writeLong(value);
     }
 
     @Override
     public void addDouble(double value) throws IOException {
-        outputStream.writeDouble(value);
+        output.writeDouble(value);
     }
 
     @Override
     public void addFloat(float value) throws IOException {
-        outputStream.writeFloat(value);
+        output.writeFloat(value);
     }
 
     @Override
     public void addString(String value) throws IOException {
-        outputStream.writeUTF(value);
+        output.writeUTF(value);
     }
 
     @Override
     public void addBoolean(boolean value) throws IOException {
-        outputStream.writeBoolean(value);
+        output.writeBoolean(value);
     }
 
     @Override
     public void addUUID(UUID uuid) throws IOException {
-        outputStream.writeLong(uuid.getMostSignificantBits());
-        outputStream.writeLong(uuid.getLeastSignificantBits());
+        output.writeLong(uuid.getMostSignificantBits());
+        output.writeLong(uuid.getLeastSignificantBits());
     }
 
     @Override
     public void addVec3(Vec3 pos) throws IOException {
-        outputStream.writeDouble(pos.x);
-        outputStream.writeDouble(pos.y);
-        outputStream.writeDouble(pos.z);
+        output.writeDouble(pos.x);
+        output.writeDouble(pos.y);
+        output.writeDouble(pos.z);
     }
 
     @Override
     public void addBlockPos(BlockPos blockPos) throws IOException {
-        outputStream.writeInt(blockPos.getX());
-        outputStream.writeInt(blockPos.getY());
-        outputStream.writeInt(blockPos.getZ());
+        output.writeInt(blockPos.getX());
+        output.writeInt(blockPos.getY());
+        output.writeInt(blockPos.getZ());
     }
 }

@@ -87,7 +87,7 @@ public class Recording implements IRecording {
 
         // Pre-last actions added here to prevent un-wanted behaviors.
         for (RecordingEntityData recordingEntityData : recordingEntityData) {
-            recordingEntityData.seedLastAction(actionRegistry.getId(SwingAction.class), new SwingAction(0));
+            recordingEntityData.seedLastAction(SwingAction.ID, new SwingAction(0));
         }
     }
 

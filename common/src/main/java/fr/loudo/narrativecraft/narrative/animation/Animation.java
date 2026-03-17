@@ -82,7 +82,7 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
         try (DataInputStream stream = new DataInputStream(new FileInputStream(animationFile))) {
             RecordingReader reader = new RecordingReader(stream);
             RecordingReader.RecordingHeader header = reader.readHeader();
-
+            reader.readLocalActionsId();
             for (int i = 0; i < header.entityCount(); i++) {
                 RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();
                 RecordingData recordingData = new RecordingData(entityHeader.entityType());

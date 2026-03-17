@@ -62,6 +62,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                     recording.getId(),
                     entry.getName(),
                     recording.getRecordingEntityData().size());
+            writer.writeLocalActionsId();
             for (RecordingEntityData recordingEntityData : recording.getRecordingEntityData()) {
 
                 List<AbstractAction> sortedActions =
@@ -97,10 +98,18 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
         try (DataInputStream inStream = new DataInputStream(new FileInputStream(oldFileRecord))) {
             RecordingReader reader = new RecordingReader(inStream);
             RecordingReader.RecordingHeader header = reader.readHeader();
+            Map<Byte, String> actionsDict = reader.readLocalActionsId();
 
             try (DataOutputStream outStream = new DataOutputStream(new FileOutputStream(newFileRecord))) {
                 RecordingWriter writer = new RecordingWriter(outStream);
                 writer.writeHeader(header.recordingId(), entry.getName(), header.entityCount());
+                writer.writeActionSize((byte) actionsDict.size());
+
+                for (Map.Entry<Byte, String> actionTypeEntry : actionsDict.entrySet()) {
+                    byte id = actionTypeEntry.getKey();
+                    String actionId = actionTypeEntry.getValue();
+                    writer.writeActionId(id, actionId);
+                }
 
                 for (int i = 0; i < header.entityCount(); i++) {
                     RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();

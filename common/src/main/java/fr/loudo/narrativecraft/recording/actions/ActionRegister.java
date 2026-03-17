@@ -28,12 +28,11 @@ import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 public class ActionRegister {
 
     public static void register(IActionRegistry registry) {
-
-        registry.register(MovementAction.class, MovementAction::new);
-        registry.register(PoseAction.class, PoseAction::new);
-        registry.register(EntityByteAction.class, EntityByteAction::new);
-        registry.register(PlaceBlockAction.class, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.class, BreakBlockAction::new);
-        registry.register(SwingAction.class, SwingAction::new);
+        registry.register(MovementAction.ID, MovementAction::new);
+        registry.register(PoseAction.ID, PoseAction::new);
+        registry.register(EntityByteAction.ID, EntityByteAction::new);
+        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
+        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
+        registry.register(SwingAction.ID, SwingAction::new);
     }
 }

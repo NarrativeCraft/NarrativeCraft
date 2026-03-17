@@ -37,7 +37,7 @@ public class RecordingEntityData {
     private final int recordingId;
     private final Entity entity;
     private boolean isTracked;
-    private final Map<Integer, AbstractAction> lastActions = new HashMap<>();
+    private final Map<String, AbstractAction> lastActions = new HashMap<>();
 
     public RecordingEntityData(int recordingId, Entity entity, boolean isTracked) {
         recordingData = new RecordingData(entity);
@@ -47,14 +47,14 @@ public class RecordingEntityData {
     }
 
     public void addAction(AbstractAction action) {
-        AbstractAction lastAction = lastActions.get(registry.getId(action.getClass()));
+        AbstractAction lastAction = lastActions.get(action.getId());
         if (lastAction == null || action.differs(lastAction)) {
             recordingData.addAction(action);
-            lastActions.put(registry.getId(action.getClass()), action);
+            lastActions.put(action.getId(), action);
         }
     }
 
-    public void seedLastAction(int id, AbstractAction action) {
+    public void seedLastAction(String id, AbstractAction action) {
         lastActions.put(id, action);
     }
 

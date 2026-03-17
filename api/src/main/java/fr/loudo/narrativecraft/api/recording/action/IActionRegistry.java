@@ -23,37 +23,35 @@
 
 package fr.loudo.narrativecraft.api.recording.action;
 
+import java.util.Collection;
 import java.util.function.IntFunction;
 
 public interface IActionRegistry {
 
     /**
      * Register your action
-     * @param actionClass The class of your implemented {@link AbstractAction}
+     *
      * @param factory Factory class of your implemented {@link AbstractAction}
      * @return New instance of {@link ActionType}
      */
-    ActionType register(Class<? extends AbstractAction> actionClass, IntFunction<AbstractAction> factory);
+    ActionType register(String id, IntFunction<AbstractAction> factory);
 
     /**
      * Get the {@link ActionType} instance from its id.
+     *
      * @param id ID of the action you want to retrieve.
      * @return Instance of ActionType
      */
-    ActionType get(int id);
+    ActionType get(String id);
 
     /**
      * Dynamically create an instance of {@link AbstractAction} by his factory.
-     * @param id ID of the action
+     *
+     * @param id   ID of the action
      * @param tick Current tick
-     * @return instance of @link {@link AbstractAction}}
+     * @return instance of {@link AbstractAction}
      */
-    AbstractAction createAction(int id, int tick);
+    AbstractAction createAction(String id, int tick);
 
-    /**
-     * Get the id from your implemented {@link AbstractAction}
-     * @param actionClass Action class you want to get the id from.
-     * @return The id of your implemented {@link AbstractAction}
-     */
-    int getId(Class<? extends AbstractAction> actionClass);
+    Collection<ActionType> getActionsType();
 }

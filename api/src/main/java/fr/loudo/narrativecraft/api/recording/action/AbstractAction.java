@@ -37,8 +37,10 @@ public abstract class AbstractAction implements Action {
 
     public abstract void read(Reader reader) throws IOException;
 
+    public abstract String getId();
+
     public boolean differs(AbstractAction other) {
-        return false;
+        return true;
     }
 
     public int getTick() {
