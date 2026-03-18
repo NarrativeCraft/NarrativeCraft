@@ -23,8 +23,11 @@
 
 package fr.loudo.narrativecraft.utils;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -46,5 +49,9 @@ public class Utils {
 
     public static String getEntityTypeString(Entity entity) {
         return EntityType.getKey(entity.getType()).toString();
+    }
+
+    public static CompoundTag nbtFromString(String nbtString) throws CommandSyntaxException {
+        return TagParser.parseCompoundFully(nbtString);
     }
 }

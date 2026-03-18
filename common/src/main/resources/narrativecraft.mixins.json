@@ -5,7 +5,8 @@
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_18",
   "mixins": [
-    "accessor.EntityAccessor"
+    "accessor.EntityAccessor",
+    "accessor.LivingEntityAccessor"
   ],
   "client": [],
   "server": [],
