@@ -23,50 +23,37 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableBiMap;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.world.entity.Pose;
 
 public class PoseAction extends AbstractAction {
 
     public static final String ID = "pose";
 
-    private static final BiMap<Integer, Pose> poseMap;
-    private static final BiMap<Pose, Integer> poseIdMap;
-    static
-    {
-        EnumMap<Pose, Integer> enumMap = new EnumMap<>(Pose.class);
-        enumMap.put(Pose.STANDING, 1);
-        enumMap.put(Pose.FALL_FLYING, 2);
-        enumMap.put(Pose.SLEEPING, 3);
-        enumMap.put(Pose.SWIMMING, 4);
-        enumMap.put(Pose.SPIN_ATTACK, 5);
-        enumMap.put(Pose.CROUCHING, 6);
-        enumMap.put(Pose.DYING, 7);
-        enumMap.put(Pose.LONG_JUMPING, 8);
-        enumMap.put(Pose.CROAKING, 9);
-        enumMap.put(Pose.USING_TONGUE, 10);
-        enumMap.put(Pose.SITTING, 11);
-        enumMap.put(Pose.ROARING, 12);
-        enumMap.put(Pose.SNIFFING, 13);
-        enumMap.put(Pose.EMERGING, 14);
-        enumMap.put(Pose.DIGGING, 15);
-        enumMap.put(Pose.SLIDING, 16);
-        enumMap.put(Pose.SHOOTING, 17);
-        enumMap.put(Pose.INHALING, 18);
-
-        poseIdMap = HashBiMap.create(enumMap);
-        poseMap = poseIdMap.inverse();
-    }
-
+    private static final ImmutableBiMap<Pose, Integer> POSE_IDS = ImmutableBiMap.<Pose, Integer>builder()
+            .put(Pose.STANDING, 1)
+            .put(Pose.FALL_FLYING, 2)
+            .put(Pose.SLEEPING, 3)
+            .put(Pose.SWIMMING, 4)
+            .put(Pose.SPIN_ATTACK, 5)
+            .put(Pose.CROUCHING, 6)
+            .put(Pose.DYING, 7)
+            .put(Pose.LONG_JUMPING, 8)
+            .put(Pose.CROAKING, 9)
+            .put(Pose.USING_TONGUE, 10)
+            .put(Pose.SITTING, 11)
+            .put(Pose.ROARING, 12)
+            .put(Pose.SNIFFING, 13)
+            .put(Pose.EMERGING, 14)
+            .put(Pose.DIGGING, 15)
+            .put(Pose.SLIDING, 16)
+            .put(Pose.SHOOTING, 17)
+            .put(Pose.INHALING, 18)
+            .build();
 
     private Pose pose;
 
@@ -81,30 +68,30 @@ public class PoseAction extends AbstractAction {
 
     @Override
     public boolean differs(AbstractAction other) {
-        if (!(other instanceof PoseAction otherPose)) {
-            return false;
-        }
-        return this.pose != otherPose.pose;
+        return other instanceof PoseAction that && this.pose != that.pose;
     }
 
     @Override
     public void write(Writer writer) throws IOException {
-        writer.addInt(poseIdMap.get(pose));
+        Integer id = POSE_IDS.get(pose);
+        if (id == null) {
+            throw new IOException("Unknown pose: " + pose);
+        }
+        writer.addInt(id);
     }
 
     @Override
     public void read(Reader reader) throws IOException {
-        pose = poseMap.get(reader.readInt());
+        int id = reader.readInt();
+        this.pose = POSE_IDS.inverse().get(id);
+        if (this.pose == null) {
+            throw new IOException("Unknown pose ID: " + id);
+        }
     }
 
     @Override
     public ActionResult execute(IPlaybackContext context) {
-        if (pose == null) {
-            return ActionResult.ERROR;
-        }
-
         context.getEntity().setPose(pose);
-
         return ActionResult.OK;
     }
 
