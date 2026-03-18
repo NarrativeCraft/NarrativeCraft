@@ -59,7 +59,9 @@ public class ChangeItemAction extends AbstractAction {
 
     private EquipmentSlot slot;
     private ItemStack itemStack;
+    private Item item;
     private DynamicOps<Tag> ops;
+    private String data;
 
     public ChangeItemAction(int tick) {
         super(tick);
@@ -69,7 +71,18 @@ public class ChangeItemAction extends AbstractAction {
         super(tick);
         this.slot = slot;
         this.itemStack = entity.getItemBySlot(slot).copy();
+        this.item = itemStack.getItem();
         this.ops = entity.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        initItemData();
+    }
+
+    private void initItemData() {
+        DataResult<Tag> result = ItemStack.CODEC.encodeStart(ops, itemStack);
+        Tag tag = result.resultOrPartial(error -> {}).orElse(null);
+
+        if (tag instanceof CompoundTag compound && compound.contains("components")) {
+            data = tag.toString();
+        }
     }
 
     @Override
@@ -83,40 +96,26 @@ public class ChangeItemAction extends AbstractAction {
     public void write(Writer writer) throws IOException {
         writer.addInt(SLOT_IDS.get(slot));
 
-        DataResult<Tag> result = ItemStack.CODEC.encodeStart(ops, itemStack);
-        Tag tag = result.resultOrPartial(error -> {}).orElse(null);
-
-        if (tag instanceof CompoundTag compound && compound.contains("components")) {
+        writer.addString(BuiltInRegistries.ITEM.getKey(item).toString());
+        if (data != null) {
             writer.addInt(DataType.ID_AND_COMPONENTS.id);
-            writer.addString(compound.toString());
+            writer.addString(data);
         } else {
             writer.addInt(DataType.ID_ONLY.id);
-            writer.addString(BuiltInRegistries.ITEM.getKey(itemStack.getItem()).toString());
         }
     }
 
     @Override
     public void read(Reader reader) throws IOException {
-        this.slot = SLOT_IDS.inverse().get(reader.readInt());
-        int typeId = reader.readInt();
-        String data = reader.readString();
+        slot = SLOT_IDS.inverse().get(reader.readInt());
+        Identifier key = Identifier.parse(reader.readString());
 
+        int typeId = reader.readInt();
         if (typeId == DataType.ID_AND_COMPONENTS.id) {
-            try {
-                CompoundTag nbt = Utils.nbtFromString(data);
-                this.itemStack = ItemStack.CODEC
-                        .parse(NbtOps.INSTANCE, nbt)
-                        .resultOrPartial(e -> {})
-                        .orElse(ItemStack.EMPTY);
-            } catch (CommandSyntaxException e) {
-                throw new IOException("Invalid NBT data", e);
-            }
-        } else {
-            Identifier id = Identifier.parse(data);
-            Item item =
-                    BuiltInRegistries.ITEM.getOptional(id).orElseThrow(() -> new IOException("Unknown item: " + id));
-            this.itemStack = new ItemStack(item);
+            data = reader.readString();
         }
+
+        item = BuiltInRegistries.ITEM.getOptional(key).orElseThrow(() -> new IOException("Unknown item: " + key));
     }
 
     @Override
@@ -125,10 +124,39 @@ public class ChangeItemAction extends AbstractAction {
             return ActionResult.IGNORED;
         }
 
-        entity.setItemSlot(slot, itemStack.copy());
+        ops = context.getEntity().registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        entity.setItemSlot(slot, generateItemStack().copy());
         ((LivingEntityAccessor) entity).callDetectEquipmentUpdates(); // Update for other players.
 
         return ActionResult.OK;
+    }
+
+    private ItemStack generateItemStack() {
+        if (data == null) {
+            return new ItemStack(item);
+        } else {
+            CompoundTag tag = tagFromIdAndComponents();
+            if (tag == null) return ItemStack.EMPTY;
+            try {
+                return ItemStack.CODEC.parse(ops, tag).getOrThrow();
+            } catch (Exception e) {
+                return ItemStack.EMPTY;
+            }
+        }
+    }
+
+    private CompoundTag tagFromIdAndComponents() {
+        CompoundTag tag = new CompoundTag();
+
+        try {
+            tag.put("components", Utils.nbtFromString(data));
+        } catch (CommandSyntaxException e) {
+            return null;
+        }
+
+        tag.put("id", StringTag.valueOf(BuiltInRegistries.ITEM.getKey(item).toString()));
+        tag.put("count", IntTag.valueOf(1));
+        return tag;
     }
 
     @Override
