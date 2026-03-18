@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 
 public class Recording implements IRecording {
@@ -71,9 +70,7 @@ public class Recording implements IRecording {
                     new EntityByteAction(tick, entity.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID())));
 
             if (recordingEntityData.getEntity() instanceof LivingEntity livingEntity) {
-                for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
-                    recordingEntityData.addAction(new ChangeItemAction(tick, equipmentSlot, livingEntity));
-                }
+                recordingEntityData.addAction(new ChangeItemAction(tick, livingEntity));
                 recordingEntityData.addAction(new SwingAction(tick, livingEntity));
             }
         }
