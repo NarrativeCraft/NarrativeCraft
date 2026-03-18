@@ -144,6 +144,7 @@ public class RecordCommand {
             context.getSource().sendFailure(Translation.message("record.recording"));
         }
 
+        context.getSource().sendSuccess(() -> Translation.message("record.saving"), false);
         if (recording.save(recordName)) {
             context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);
         } else {

@@ -51,10 +51,8 @@ public class SwingAction extends AbstractAction {
 
     @Override
     public boolean differs(AbstractAction other) {
-        if (!(other instanceof SwingAction otherSwingAction)) {
-            return false;
-        }
-        return swinging && (!otherSwingAction.swinging || swingTime <= otherSwingAction.swingTime);
+        if (!(other instanceof SwingAction that)) return false;
+        return swinging && (!that.swinging || swingTime <= that.swingTime);
     }
 
     @Override
@@ -69,9 +67,8 @@ public class SwingAction extends AbstractAction {
 
     @Override
     public ActionResult execute(IPlaybackContext context) {
-        if (!(context.getEntity() instanceof LivingEntity livingEntity)) {
-            return ActionResult.IGNORED;
-        }
+        if (!(context.getEntity() instanceof LivingEntity livingEntity)) return ActionResult.IGNORED;
+
         livingEntity.swing(hand);
         return ActionResult.OK;
     }

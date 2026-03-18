@@ -44,13 +44,13 @@
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",
+  "narrativecraft.record.saving": "Saving...",
   "narrativecraft.record.saved": "Recording saved!",
   "narrativecraft.record.discarded": "Recording discarded.",
   "narrativecraft.record.already_recording": "You are already recording!",
   "narrativecraft.record.not_recording": "You are not recording.",
   "narrativecraft.record.recorded_nothing": "You recorded nothing!",
   "narrativecraft.record.recording": "Please stop your recording before saving.",
-  "narrativecraft.record.": "Please stop your recording before saving.",
 
   "narrativecraft.playback.start": "Animation %s playing back...",
   "narrativecraft.playback.start_for_players": "Animation %s playing back to targeted players...",
