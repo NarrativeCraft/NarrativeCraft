@@ -24,18 +24,13 @@
 package fr.loudo.narrativecraft.api;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.actions.ActionRegister;
-import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
 
 public class APISetup {
 
     public static void init(NarrativeCraftMod mod) {
         NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
 
-        ActionRegistry actionRegistry = new ActionRegistry();
-        api.setRegistry(actionRegistry);
-        ActionRegister.register(actionRegistry);
-
         api.setRecordingManager(mod.getRecordingManager());
+        api.setActionRegistry(mod.getActionRegistry());
     }
 }

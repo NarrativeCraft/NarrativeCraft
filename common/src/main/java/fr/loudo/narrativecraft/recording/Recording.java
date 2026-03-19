@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.recording.IRecording;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
@@ -47,7 +47,7 @@ public class Recording implements IRecording {
     public static final String RECORDING_EXTENSION = ".ncr";
 
     private final IActionRegistry actionRegistry =
-            NarrativeCraftAPI.getInstance().getRegistry();
+            NarrativeCraftMod.getInstance().getActionRegistry();
     private final UUID id = UUID.randomUUID();
     private final PlayerSession playerSession;
     private final List<RecordingEntityData> recordingEntityData = new ArrayList<>();

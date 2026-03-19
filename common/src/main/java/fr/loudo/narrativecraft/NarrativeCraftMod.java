@@ -33,6 +33,8 @@ import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
 import fr.loudo.narrativecraft.playback.PlaybackManager;
+import fr.loudo.narrativecraft.recording.actions.ActionRegister;
+import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -50,6 +52,7 @@ public class NarrativeCraftMod {
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
+    private final ActionRegistry actionRegistry = new ActionRegistry();
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
@@ -60,6 +63,8 @@ public class NarrativeCraftMod {
         NarrativeCraftFileEditorsRegister.register();
         NarrativeEditorsRegister.register();
         APISetup.init(getInstance());
+
+        ActionRegister.register(getInstance().actionRegistry);
     }
 
     public ChapterManager getChapterManager() {
@@ -80,6 +85,10 @@ public class NarrativeCraftMod {
 
     public PlayerSessionManager getPlayerSessionManager() {
         return playerSessionManager;
+    }
+
+    public ActionRegistry getActionRegistry() {
+        return actionRegistry;
     }
 
     public NarrativeCraftFile getFile() {

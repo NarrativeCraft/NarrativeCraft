@@ -30,15 +30,15 @@ public class NarrativeCraftAPI {
 
     private static final NarrativeCraftAPI INSTANCE = new NarrativeCraftAPI();
 
-    private IActionRegistry registry;
+    private IActionRegistry actionRegistry;
     private IRecordingManager recordingManager;
 
-    public IActionRegistry getRegistry() {
-        return registry;
+    public IActionRegistry getActionRegistry() {
+        return actionRegistry;
     }
 
-    void setRegistry(IActionRegistry registry) {
-        this.registry = registry;
+    void setActionRegistry(IActionRegistry actionRegistry) {
+        this.actionRegistry = actionRegistry;
     }
 
     public IRecordingManager getRecordingManager() {

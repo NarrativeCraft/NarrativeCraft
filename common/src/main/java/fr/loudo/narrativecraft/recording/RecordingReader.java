@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.Action;
 import java.io.DataInputStream;
@@ -137,7 +137,7 @@ public class RecordingReader implements Action.Reader {
             byte id = input.readByte();
             String actionId = localActionsIds.get(id);
             AbstractAction action =
-                    NarrativeCraftAPI.getInstance().getRegistry().createAction(actionId, tick);
+                    NarrativeCraftMod.getInstance().getActionRegistry().createAction(actionId, tick);
             if (action == null) {
                 throw new IOException(String.format("Action with id %s not found", actionId));
             }

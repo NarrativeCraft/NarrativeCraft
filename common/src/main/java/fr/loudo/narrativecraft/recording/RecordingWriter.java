@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.Action;
 import fr.loudo.narrativecraft.api.recording.action.ActionType;
@@ -59,10 +59,11 @@ public class RecordingWriter implements Action.Writer {
 
     public void writeLocalActionsId() throws IOException {
         Collection<ActionType> actionTypes =
-                NarrativeCraftAPI.getInstance().getRegistry().getActionsType();
+                NarrativeCraftMod.getInstance().getActionRegistry().getActionsType();
         writeActionSize((byte) actionTypes.size());
         byte id = 0;
-        for (ActionType action : NarrativeCraftAPI.getInstance().getRegistry().getActionsType()) {
+        for (ActionType action :
+                NarrativeCraftMod.getInstance().getActionRegistry().getActionsType()) {
             writeActionId(id, action.id());
             id++;
         }
