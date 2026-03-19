@@ -21,17 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api;
+package fr.loudo.narrativecraft.api.events;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.recording.IRecording;
+import net.minecraft.server.level.ServerPlayer;
 
-public class APISetup {
-
-    public static void init(NarrativeCraftMod mod) {
-        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
-
-        api.setRecordingManager(mod.getRecordingManager());
-        api.setActionRegistry(mod.getActionRegistry());
-        api.setEventBus(mod.getEventBus());
-    }
-}
+public record RecordingStartEvent(ServerPlayer player, IRecording recording) implements Event {}

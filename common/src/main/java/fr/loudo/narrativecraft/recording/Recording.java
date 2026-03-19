@@ -24,13 +24,16 @@
 package fr.loudo.narrativecraft.recording;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.RecordingSaveEvent;
+import fr.loudo.narrativecraft.api.events.RecordingStartEvent;
+import fr.loudo.narrativecraft.api.events.RecordingStopEvent;
 import fr.loudo.narrativecraft.api.recording.IRecording;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.events.EventBus;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.actions.*;
@@ -45,9 +48,9 @@ import net.minecraft.world.entity.LivingEntity;
 public class Recording implements IRecording {
 
     public static final String RECORDING_EXTENSION = ".ncr";
+    private static final EventBus EVENT_BUS =
+            NarrativeCraftMod.getInstance().getEventBus();
 
-    private final IActionRegistry actionRegistry =
-            NarrativeCraftMod.getInstance().getActionRegistry();
     private final UUID id = UUID.randomUUID();
     private final PlayerSession playerSession;
     private final List<RecordingEntityData> recordingEntityData = new ArrayList<>();
@@ -90,10 +93,13 @@ public class Recording implements IRecording {
         for (RecordingEntityData recordingEntityData : recordingEntityData) {
             recordingEntityData.seedLastAction(SwingAction.ID, new SwingAction(0));
         }
+
+        EVENT_BUS.post(new RecordingStartEvent(getPlayer(), this));
     }
 
     public void stop() {
         isRecording = false;
+        EVENT_BUS.post(new RecordingStopEvent(getPlayer(), this));
     }
 
     public Entity getEntityByRecordingId(Entity entity) {
@@ -131,6 +137,7 @@ public class Recording implements IRecording {
         Services.PACKET.sendToPlayer(
                 getPlayer(), BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
 
+        EVENT_BUS.post(new RecordingSaveEvent(getPlayer(), this));
         return true;
     }
 

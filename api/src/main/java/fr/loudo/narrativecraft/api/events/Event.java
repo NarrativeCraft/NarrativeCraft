@@ -21,17 +21,6 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api;
+package fr.loudo.narrativecraft.api.events;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-
-public class APISetup {
-
-    public static void init(NarrativeCraftMod mod) {
-        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
-
-        api.setRecordingManager(mod.getRecordingManager());
-        api.setActionRegistry(mod.getActionRegistry());
-        api.setEventBus(mod.getEventBus());
-    }
-}
+public interface Event {}

@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.api;
 
+import fr.loudo.narrativecraft.api.events.IEventBus;
 import fr.loudo.narrativecraft.api.managers.IRecordingManager;
 import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 
@@ -31,6 +32,7 @@ public class NarrativeCraftAPI {
     private static final NarrativeCraftAPI INSTANCE = new NarrativeCraftAPI();
 
     private IActionRegistry actionRegistry;
+    private IEventBus eventBus;
     private IRecordingManager recordingManager;
 
     public IActionRegistry getActionRegistry() {
@@ -39,6 +41,14 @@ public class NarrativeCraftAPI {
 
     void setActionRegistry(IActionRegistry actionRegistry) {
         this.actionRegistry = actionRegistry;
+    }
+
+    public IEventBus getEventBus() {
+        return eventBus;
+    }
+
+    void setEventBus(IEventBus eventBus) {
+        this.eventBus = eventBus;
     }
 
     public IRecordingManager getRecordingManager() {
