@@ -25,8 +25,10 @@ package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.api.managers.IRecordingManager;
 import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
 public class RecordingManager extends Manager<Recording> implements IRecordingManager {
 
@@ -52,6 +54,18 @@ public class RecordingManager extends Manager<Recording> implements IRecordingMa
         for (Recording recording : list) {
             if (recording.getPlayer().getUUID().equals(player.getUUID())) {
                 return recording;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Recording getRecording(Entity entity) {
+        for (Recording recording : list) {
+            for (RecordingEntityData recordingEntityData : recording.getRecordingEntityData()) {
+                if (recordingEntityData.getEntity().getUUID().equals(entity.getUUID())) {
+                    return recording;
+                }
             }
         }
         return null;

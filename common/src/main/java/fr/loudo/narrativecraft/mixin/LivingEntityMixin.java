@@ -21,20 +21,28 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.actions.SleepAction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class ActionRegister {
+@Mixin(LivingEntity.class)
+public class LivingEntityMixin {
 
-    public static void register(IActionRegistry registry) {
-        registry.register(MovementAction.ID, MovementAction::new);
-        registry.register(PoseAction.ID, PoseAction::new);
-        registry.register(EntityByteAction.ID, EntityByteAction::new);
-        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
-        registry.register(SwingAction.ID, SwingAction::new);
-        registry.register(ChangeItemAction.ID, ChangeItemAction::new);
-        registry.register(SleepAction.ID, SleepAction::new);
+    @Inject(method = "startSleeping", at = @At("HEAD"))
+    private void narrativecraft$startSleeping(BlockPos pos, CallbackInfo ci) {
+        LivingEntity livingEntity = (LivingEntity) (Object) this;
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(livingEntity);
+        if (recording == null) return;
+
+        recording.addAction(new SleepAction(recording.getTick(), pos), livingEntity);
     }
 }

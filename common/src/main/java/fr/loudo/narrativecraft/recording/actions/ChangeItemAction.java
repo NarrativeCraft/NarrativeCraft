@@ -185,55 +185,54 @@ public class ChangeItemAction extends AbstractAction {
     private record StoredItem(Item item, String data) {
 
         public static StoredItem fromStack(ItemStack itemStack, DynamicOps<Tag> ops) {
-                Item item = itemStack.getItem();
-                String data = null;
+            Item item = itemStack.getItem();
+            String data = null;
 
-                DataResult<Tag> result = ItemStack.CODEC.encodeStart(ops, itemStack);
-                Tag tag = result.resultOrPartial(error -> {
-                }).orElse(null);
+            DataResult<Tag> result = ItemStack.CODEC.encodeStart(ops, itemStack);
+            Tag tag = result.resultOrPartial(error -> {}).orElse(null);
 
-                if (tag instanceof CompoundTag compound && compound.contains("components")) {
-                    data = compound.get("components").toString();
-                }
-
-                return new StoredItem(item, data);
+            if (tag instanceof CompoundTag compound && compound.contains("components")) {
+                data = compound.get("components").toString();
             }
 
-            public ItemStack toItemStack(DynamicOps<Tag> ops) {
-                if (item == Items.AIR && data == null) {
-                    return ItemStack.EMPTY;
-                }
+            return new StoredItem(item, data);
+        }
 
-                if (data == null) {
-                    return new ItemStack(item);
-                }
-
-                CompoundTag tag = createTag();
-                if (tag == null) {
-                    return ItemStack.EMPTY;
-                }
-
-                try {
-                    return ItemStack.CODEC.parse(ops, tag).getOrThrow();
-                } catch (Exception e) {
-                    return ItemStack.EMPTY;
-                }
+        public ItemStack toItemStack(DynamicOps<Tag> ops) {
+            if (item == Items.AIR && data == null) {
+                return ItemStack.EMPTY;
             }
 
-            private CompoundTag createTag() {
-                CompoundTag tag = new CompoundTag();
+            if (data == null) {
+                return new ItemStack(item);
+            }
 
-                try {
-                    tag.put("components", Utils.nbtFromString(data));
-                } catch (CommandSyntaxException e) {
-                    return null;
-                }
+            CompoundTag tag = createTag();
+            if (tag == null) {
+                return ItemStack.EMPTY;
+            }
 
-                tag.put("id", StringTag.valueOf(BuiltInRegistries.ITEM.getKey(item).toString()));
-                tag.put("count", IntTag.valueOf(1));
-                return tag;
+            try {
+                return ItemStack.CODEC.parse(ops, tag).getOrThrow();
+            } catch (Exception e) {
+                return ItemStack.EMPTY;
             }
         }
+
+        private CompoundTag createTag() {
+            CompoundTag tag = new CompoundTag();
+
+            try {
+                tag.put("components", Utils.nbtFromString(data));
+            } catch (CommandSyntaxException e) {
+                return null;
+            }
+
+            tag.put("id", StringTag.valueOf(BuiltInRegistries.ITEM.getKey(item).toString()));
+            tag.put("count", IntTag.valueOf(1));
+            return tag;
+        }
+    }
 
     enum DataType {
         ID_ONLY(1),

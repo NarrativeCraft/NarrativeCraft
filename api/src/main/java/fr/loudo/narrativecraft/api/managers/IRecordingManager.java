@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.api.managers;
 import fr.loudo.narrativecraft.api.recording.IRecording;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
 public interface IRecordingManager {
 
@@ -34,4 +35,6 @@ public interface IRecordingManager {
     boolean isRecording(ServerPlayer player);
 
     IRecording getRecording(ServerPlayer player);
+
+    IRecording getRecording(Entity entity);
 }

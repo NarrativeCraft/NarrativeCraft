@@ -23,18 +23,48 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import java.io.IOException;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
 
-public class ActionRegister {
+public class SleepAction extends AbstractAction {
 
-    public static void register(IActionRegistry registry) {
-        registry.register(MovementAction.ID, MovementAction::new);
-        registry.register(PoseAction.ID, PoseAction::new);
-        registry.register(EntityByteAction.ID, EntityByteAction::new);
-        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
-        registry.register(SwingAction.ID, SwingAction::new);
-        registry.register(ChangeItemAction.ID, ChangeItemAction::new);
-        registry.register(SleepAction.ID, SleepAction::new);
+    public static final String ID = "sleep";
+
+    private BlockPos blockPos;
+
+    public SleepAction(int tick, BlockPos blockPos) {
+        super(tick);
+        this.blockPos = blockPos;
+    }
+
+    public SleepAction(int tick) {
+        super(tick);
+    }
+
+    @Override
+    public void write(Writer writer) throws IOException {
+        writer.addBlockPos(blockPos);
+    }
+
+    @Override
+    public void read(Reader reader) throws IOException {
+        blockPos = reader.readBlockPos();
+    }
+
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public ActionResult execute(IPlaybackContext context) {
+        if (!(context.getEntity() instanceof LivingEntity entity)) return ActionResult.IGNORED;
+
+        entity.setSleepingPos(blockPos);
+        return ActionResult.OK;
     }
 }
