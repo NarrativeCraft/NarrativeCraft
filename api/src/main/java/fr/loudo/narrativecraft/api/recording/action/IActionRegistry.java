@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.api.recording.action;
 
-import java.util.Collection;
 import java.util.function.IntFunction;
 
 public interface IActionRegistry {
@@ -35,23 +34,4 @@ public interface IActionRegistry {
      * @return New instance of {@link ActionType}
      */
     ActionType register(String id, IntFunction<AbstractAction> factory);
-
-    /**
-     * Get the {@link ActionType} instance from its id.
-     *
-     * @param id ID of the action you want to retrieve.
-     * @return Instance of ActionType
-     */
-    ActionType get(String id);
-
-    /**
-     * Dynamically create an instance of {@link AbstractAction} by his factory.
-     *
-     * @param id   ID of the action
-     * @param tick Current tick
-     * @return instance of {@link AbstractAction}
-     */
-    AbstractAction createAction(String id, int tick);
-
-    Collection<ActionType> getActionsType();
 }

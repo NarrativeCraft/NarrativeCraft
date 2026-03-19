@@ -32,6 +32,6 @@ public class APISetup {
 
         api.setRecordingManager(mod.getRecordingManager());
         api.setActionRegistry(mod.getActionRegistry());
-        api.setEventBus(mod.getEventBus());
+        api.setEventBus(NarrativeCraftMod.EVENT_BUS);
     }
 }

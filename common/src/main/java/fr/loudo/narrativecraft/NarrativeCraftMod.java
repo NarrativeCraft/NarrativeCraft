@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.api.APISetup;
-import fr.loudo.narrativecraft.api.events.RecordingStartEvent;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditorsRegister;
@@ -47,6 +46,7 @@ public class NarrativeCraftMod {
     public static final String MOD_ID = "narrativecraft";
     public static final String MOD_NAME = "NarrativeCraft";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
+    public static final EventBus EVENT_BUS = new EventBus();
     private static final NarrativeCraftMod instance = new NarrativeCraftMod();
 
     private final ChapterManager chapterManager = new ChapterManager();
@@ -55,7 +55,6 @@ public class NarrativeCraftMod {
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
     private final ActionRegistry actionRegistry = new ActionRegistry();
-    private final EventBus eventBus = new EventBus();
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
@@ -92,10 +91,6 @@ public class NarrativeCraftMod {
 
     public ActionRegistry getActionRegistry() {
         return actionRegistry;
-    }
-
-    public EventBus getEventBus() {
-        return eventBus;
     }
 
     public NarrativeCraftFile getFile() {

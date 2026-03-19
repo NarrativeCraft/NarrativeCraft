@@ -37,6 +37,7 @@ public class ActionRegistry implements IActionRegistry {
 
     private final Map<String, ActionType> registry = new HashMap<>();
 
+    @Override
     public ActionType register(String id, IntFunction<AbstractAction> factory) {
         id = id.toLowerCase();
         ActionType action = new ActionType(id, factory);
@@ -51,7 +52,6 @@ public class ActionRegistry implements IActionRegistry {
         return registry.get(id.toLowerCase());
     }
 
-    @Override
     public AbstractAction createAction(String id, int tick) {
         ActionType action = registry.get(id.toLowerCase());
         if (action == null) return null;
