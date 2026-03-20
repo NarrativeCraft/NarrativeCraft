@@ -23,16 +23,13 @@
 
 package fr.loudo.narrativecraft.recording;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.world.entity.Entity;
 
 public class RecordingEntityData {
 
-    private final IActionRegistry registry = NarrativeCraftMod.getInstance().getActionRegistry();
     private final RecordingData recordingData;
     private final int recordingId;
     private final Entity entity;
@@ -40,7 +37,7 @@ public class RecordingEntityData {
     private final Map<String, AbstractAction> lastActions = new HashMap<>();
 
     public RecordingEntityData(int recordingId, Entity entity, boolean isTracked) {
-        recordingData = new RecordingData(entity);
+        recordingData = new RecordingData(recordingId, entity);
         this.recordingId = recordingId;
         this.entity = entity;
         this.isTracked = isTracked;

@@ -85,7 +85,9 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
             reader.readLocalActionsId();
             for (int i = 0; i < header.entityCount(); i++) {
                 RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();
-                RecordingData recordingData = new RecordingData(entityHeader.entityType());
+                RecordingData recordingData =
+                        new RecordingData(entityHeader.entityRecordingId(), entityHeader.entityType());
+                recordingData.setInitialNbt(entityHeader.initialNbt());
                 for (AbstractAction action : reader.readAllActions(entityHeader.actionCount())) {
                     recordingData.addAction(action);
                 }

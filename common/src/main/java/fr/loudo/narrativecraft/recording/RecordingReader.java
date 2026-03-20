@@ -28,8 +28,15 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.Action;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.phys.Vec3;
 
 public class RecordingReader implements Action.Reader {
@@ -98,7 +105,7 @@ public class RecordingReader implements Action.Reader {
 
     public record RecordingHeader(UUID recordingId, String name, int entityCount) {}
 
-    public record EntityHeader(int entityRecordingId, String entityType, int actionCount) {}
+    public record EntityHeader(int entityRecordingId, String entityType, CompoundTag initialNbt, int actionCount) {}
 
     public RecordingHeader readHeader() throws IOException {
         byte magic0 = input.readByte();
@@ -126,8 +133,14 @@ public class RecordingReader implements Action.Reader {
     public EntityHeader readEntityHeader() throws IOException {
         int entityRecordingId = input.readInt();
         String entityType = input.readUTF();
+        boolean hasInitialNbt = input.readBoolean();
+        CompoundTag initialNbt = hasInitialNbt ? readCompoundTag() : null;
         int actionCount = input.readInt();
-        return new EntityHeader(entityRecordingId, entityType, actionCount);
+        return new EntityHeader(entityRecordingId, entityType, initialNbt, actionCount);
+    }
+
+    public CompoundTag readCompoundTag() throws IOException {
+        return NbtIo.read(input, NbtAccounter.unlimitedHeap());
     }
 
     public List<AbstractAction> readAllActions(int count) throws IOException {

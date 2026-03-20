@@ -114,9 +114,11 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                 for (int i = 0; i < header.entityCount(); i++) {
                     RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();
 
-                    outStream.writeInt(entityHeader.entityRecordingId());
-                    outStream.writeUTF(entityHeader.entityType());
-                    outStream.writeInt(entityHeader.actionCount());
+                    writer.writeEntityHeader(
+                            entityHeader.entityRecordingId(),
+                            entityHeader.entityType(),
+                            entityHeader.initialNbt(),
+                            entityHeader.actionCount());
 
                     for (AbstractAction action : reader.readAllActions(entityHeader.actionCount())) {
                         writer.writeActionRecord(action);

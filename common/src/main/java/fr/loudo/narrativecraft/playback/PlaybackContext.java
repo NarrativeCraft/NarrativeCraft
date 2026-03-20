@@ -41,9 +41,9 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.level.storage.TagValueInput;
 
 public class PlaybackContext implements IPlaybackContext {
 
@@ -65,6 +65,36 @@ public class PlaybackContext implements IPlaybackContext {
     }
 
     private void spawnEntity() {
+        if (recordingData.getInitialNbt() != null) {
+            Optional<EntityType<?>> typeOpt = EntityType.byString(recordingData.getEntityId());
+            if (typeOpt.isEmpty()) {
+                Utils.sendError(
+                        Translation.message("error.playback_entity_type", recordingData.getEntityId()),
+                        playback.getRequester());
+                playback.stop();
+                return;
+            }
+            entity = typeOpt.get().create(level, EntitySpawnReason.LOAD);
+            if (entity == null) {
+                Utils.sendError(
+                        Translation.message("error.playback_entity_null", recordingData.getEntityId()),
+                        playback.getRequester());
+                playback.stop();
+                return;
+            }
+            entity.load(TagValueInput.create(
+                    ProblemReporter.DISCARDING, entity.registryAccess(), recordingData.getInitialNbt()));
+            entity.setUUID(UUID.randomUUID());
+            if (entity instanceof Mob mob) {
+                mob.setNoAi(true);
+            }
+            level.addFreshEntity(entity);
+            if (playback.forSpecificPlayers()) {
+                playback.hideEntitiesToOtherPlayers();
+            }
+            return;
+        }
+
         if (recordingData.getEntityId().equals("minecraft:player")) {
             entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "fakeP"), true);
             if (entity instanceof FakePlayer fakePlayer) {
@@ -120,10 +150,18 @@ public class PlaybackContext implements IPlaybackContext {
 
     public void stop() {
         if (entity == null) return;
-
         entity.remove(Entity.RemovalReason.KILLED);
         entity = null;
         isPlaying = false;
+    }
+
+    @Override
+    public Entity getEntityByRecordingId(int recordingId) {
+        return playback.getEntityByRecordingId(recordingId);
+    }
+
+    public int getRecordingId() {
+        return recordingData.getRecordingId();
     }
 
     public void tick() {

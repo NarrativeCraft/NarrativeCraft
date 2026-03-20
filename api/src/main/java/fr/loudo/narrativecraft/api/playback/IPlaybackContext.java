@@ -48,4 +48,10 @@ public interface IPlaybackContext {
     ServerLevel getLevel();
 
     Entity getEntity();
+
+    /**
+     * Returns the entity with the given recording ID, or null if not found.
+     * Used by actions like RideEntityAction to reference other entities recorded in the same animation.
+     */
+    Entity getEntityByRecordingId(int recordingId);
 }

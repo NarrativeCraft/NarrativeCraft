@@ -41,16 +41,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.phys.AABB;
 
 public class Recording implements IRecording {
 
     public static final String RECORDING_EXTENSION = ".ncr";
+    private static final double SCAN_RADIUS = 10.0;
 
     private final UUID id = UUID.randomUUID();
     private final PlayerSession playerSession;
     private final List<RecordingEntityData> recordingEntityData = new ArrayList<>();
+    private int nextNearbyEntityLocalId = 1;
     private boolean isRecording = false;
     private int tick = 0;
 
@@ -61,33 +67,59 @@ public class Recording implements IRecording {
 
     public void tick() {
         if (!isRecording) return;
-        for (RecordingEntityData recordingEntityData : recordingEntityData) {
-            Entity entity = recordingEntityData.getEntity();
-            recordingEntityData.addAction(new MovementAction(
+
+        scanNearbyEntities();
+
+        for (RecordingEntityData data : recordingEntityData) {
+            Entity entity = data.getEntity();
+            data.addAction(new MovementAction(
                     tick, entity.position(), entity.getXRot(), entity.getYRot(), entity.getYHeadRot()));
-            recordingEntityData.addAction(new PoseAction(tick, entity.getPose()));
-            recordingEntityData.addAction(
+            data.addAction(new PoseAction(tick, entity.getPose()));
+            data.addAction(
                     new EntityByteAction(tick, entity.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID())));
-            if (recordingEntityData.getEntity() instanceof LivingEntity livingEntity) {
-                recordingEntityData.addAction(new ChangeItemAction(tick, livingEntity));
-                recordingEntityData.addAction(new SwingAction(tick, livingEntity));
+            if (entity instanceof LivingEntity livingEntity) {
+                data.addAction(new ChangeItemAction(tick, livingEntity));
+                data.addAction(new SwingAction(tick, livingEntity));
             }
         }
         tick++;
     }
 
+    private void scanNearbyEntities() {
+        Entity player = playerSession.getPlayer();
+        AABB searchBox = player.getBoundingBox().inflate(SCAN_RADIUS);
+        List<Entity> found = player.level().getEntities(player, searchBox, e -> !(e instanceof Player));
+        for (Entity entity : found) {
+            if (getRecordingEntityData(entity) == null) {
+                recordingEntityData.add(new RecordingEntityData(nextNearbyEntityLocalId++, entity, false));
+            }
+        }
+    }
+
     public void addAction(AbstractAction action, Entity entity) {
-        RecordingEntityData recordingEntityData = getRecordingEntityData(entity);
-        if (entity == null) return;
-        recordingEntityData.addAction(action);
+        RecordingEntityData data = getRecordingEntityData(entity);
+        if (data == null) return;
+        data.addAction(action);
+    }
+
+    public int markEntityAsTracked(Entity entity) {
+        RecordingEntityData data = getRecordingEntityData(entity);
+        if (data == null) return -1;
+
+        if (!data.isTracked()) {
+            TagValueOutput nbt = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, entity.registryAccess());
+            entity.saveWithoutId(nbt);
+            data.getRecordingData().setInitialNbt(nbt.buildResult());
+            data.setTracked(true);
+        }
+        return data.getRecordingId();
     }
 
     public void start() {
         isRecording = true;
 
-        // Pre-last actions added here to prevent un-wanted behaviors.
-        for (RecordingEntityData recordingEntityData : recordingEntityData) {
-            recordingEntityData.seedLastAction(SwingAction.ID, new SwingAction(0));
+        for (RecordingEntityData data : recordingEntityData) {
+            data.seedLastAction(SwingAction.ID, new SwingAction(0));
         }
 
         NarrativeCraftMod.EVENT_BUS.post(new RecordingStartEvent(getPlayer(), this));
@@ -98,35 +130,24 @@ public class Recording implements IRecording {
         NarrativeCraftMod.EVENT_BUS.post(new RecordingStopEvent(getPlayer(), this));
     }
 
-    public Entity getEntityByRecordingId(Entity entity) {
-        for (RecordingEntityData recordingEntityData : recordingEntityData) {
-            if (recordingEntityData.getEntity().getUUID().equals(entity.getUUID())) {
-                return recordingEntityData.getEntity();
-            }
-        }
-        return null;
-    }
-
     public RecordingEntityData getRecordingEntityData(Entity entity) {
-        for (RecordingEntityData recordingEntityData : recordingEntityData) {
-            if (recordingEntityData.getEntity().getUUID().equals(entity.getUUID())) {
-                return recordingEntityData;
-            }
+        UUID uuid = entity.getUUID();
+        for (RecordingEntityData data : recordingEntityData) {
+            if (data.getEntity().getUUID().equals(uuid)) return data;
         }
         return null;
     }
 
     public boolean save(String name) {
-
         Animation animation = new Animation(id, name, playerSession.getScene());
 
         if (NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_FAILED) {
             return false;
         }
 
-        for (RecordingEntityData recordingEntityData : recordingEntityData) {
-            if (!recordingEntityData.isTracked()) continue;
-            animation.getRecordingDataList().add(recordingEntityData.getRecordingData());
+        for (RecordingEntityData data : recordingEntityData) {
+            if (!data.isTracked()) continue;
+            animation.getRecordingDataList().add(data.getRecordingData());
         }
 
         playerSession.getScene().getAnimationManager().add(animation);

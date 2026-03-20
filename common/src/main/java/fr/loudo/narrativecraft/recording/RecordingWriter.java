@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.phys.Vec3;
 
 public class RecordingWriter implements Action.Writer {
@@ -80,9 +82,26 @@ public class RecordingWriter implements Action.Writer {
     }
 
     public void writeEntityHeader(RecordingEntityData recordingEntityData, int actionCount) throws IOException {
-        output.writeInt(recordingEntityData.getRecordingId());
-        output.writeUTF(Utils.getEntityTypeString(recordingEntityData.getEntity()));
+        writeEntityHeader(
+                recordingEntityData.getRecordingId(),
+                Utils.getEntityTypeString(recordingEntityData.getEntity()),
+                recordingEntityData.getRecordingData().getInitialNbt(),
+                actionCount);
+    }
+
+    public void writeEntityHeader(int recordingId, String entityType, CompoundTag initialNbt, int actionCount)
+            throws IOException {
+        output.writeInt(recordingId);
+        output.writeUTF(entityType);
+        output.writeBoolean(initialNbt != null);
+        if (initialNbt != null) {
+            writeCompoundTag(initialNbt);
+        }
         output.writeInt(actionCount);
+    }
+
+    public void writeCompoundTag(CompoundTag tag) throws IOException {
+        NbtIo.write(tag, output);
     }
 
     public void writeActionRecord(AbstractAction action) throws IOException {

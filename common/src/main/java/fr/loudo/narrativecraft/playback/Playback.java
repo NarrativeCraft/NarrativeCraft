@@ -25,11 +25,14 @@ package fr.loudo.narrativecraft.playback;
 
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.RecordingData;
+import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
 public class Playback {
 
@@ -98,6 +101,18 @@ public class Playback {
         tick++;
     }
 
+    public void hideEntitiesToOtherPlayers() {
+        for (PlaybackContext context : contexts) {
+            if (context.getEntity() instanceof FakePlayer) continue;
+
+            for (ServerPlayer serverPlayer : context.getLevel().players()) {
+                if (targetedPlayers.contains(serverPlayer)) continue;
+                serverPlayer.connection.send(
+                        new ClientboundRemoveEntitiesPacket(context.getEntity().getId()));
+            }
+        }
+    }
+
     public boolean isEnded() {
         return ended;
     }
@@ -124,6 +139,15 @@ public class Playback {
 
     public boolean forSpecificPlayers() {
         return !targetedPlayers.isEmpty();
+    }
+
+    public Entity getEntityByRecordingId(int recordingId) {
+        for (PlaybackContext context : contexts) {
+            if (context.getRecordingId() == recordingId) {
+                return context.getEntity();
+            }
+        }
+        return null;
     }
 
     public boolean isPlaying() {

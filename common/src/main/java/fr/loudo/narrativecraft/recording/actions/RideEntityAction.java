@@ -21,20 +21,50 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.recording;
+package fr.loudo.narrativecraft.recording.actions;
 
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import java.io.IOException;
 import net.minecraft.world.entity.Entity;
 
-public interface IRecording {
-    void addAction(AbstractAction action, Entity entity);
+public class RideEntityAction extends AbstractAction {
 
-    /**
-     * Marks the given entity as tracked (interacted with during recording).
-     * Captures its current NBT state so it can be exactly recreated at playback.
-     * The entity must already be in the scan list; if not found, returns -1.
-     *
-     * @return the recording ID of the entity, used in RideEntityAction.
-     */
-    int markEntityAsTracked(Entity entity);
+    public static final String ID = "ride_entity";
+
+    private int nearbyEntityLocalId;
+
+    public RideEntityAction(int tick, int nearbyEntityLocalId) {
+        super(tick);
+        this.nearbyEntityLocalId = nearbyEntityLocalId;
+    }
+
+    public RideEntityAction(int tick) {
+        super(tick);
+    }
+
+    @Override
+    public void write(Writer writer) throws IOException {
+        writer.addInt(nearbyEntityLocalId);
+    }
+
+    @Override
+    public void read(Reader reader) throws IOException {
+        nearbyEntityLocalId = reader.readInt();
+    }
+
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public ActionResult execute(IPlaybackContext context) {
+        Entity vehicle = context.getEntityByRecordingId(nearbyEntityLocalId);
+        if (vehicle == null) return ActionResult.IGNORED;
+
+        context.getEntity().startRiding(vehicle, true, true);
+        return ActionResult.OK;
+    }
 }

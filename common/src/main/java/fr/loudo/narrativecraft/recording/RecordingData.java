@@ -28,19 +28,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
 public class RecordingData {
 
     private final Map<Integer, List<AbstractAction>> actions = new HashMap<>();
+    private final int recordingId;
     private final String entityId;
+    /** Non-null only for tracked nearby entities; used to restore their exact state at playback spawn. */
+    private CompoundTag initialNbt;
 
-    public RecordingData(Entity entity) {
+    public RecordingData(int recordingId, Entity entity) {
+        this.recordingId = recordingId;
         this.entityId = EntityType.getKey(entity.getType()).toString();
     }
 
-    public RecordingData(String entityId) {
+    public RecordingData(int recordingId, String entityId) {
+        this.recordingId = recordingId;
         this.entityId = entityId;
     }
 
@@ -52,7 +58,19 @@ public class RecordingData {
         return actions;
     }
 
+    public int getRecordingId() {
+        return recordingId;
+    }
+
     public String getEntityId() {
         return entityId;
+    }
+
+    public CompoundTag getInitialNbt() {
+        return initialNbt;
+    }
+
+    public void setInitialNbt(CompoundTag initialNbt) {
+        this.initialNbt = initialNbt;
     }
 }
