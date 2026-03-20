@@ -1,4 +1,4 @@
-### No, the mod isn't compatible with multiplayer, but it's in the work.
+# The mod is being rewritten from scratch. Track progress on https://blog.loudo.dev ([dev branch](https://github.com/LOUDO56/NarrativeCraft/tree/rerewrite))
 # NarrativeCraft
 <div align="center">
     Create your own stories, easily and freely, in Minecraft.
