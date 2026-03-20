@@ -26,4 +26,4 @@ package fr.loudo.narrativecraft.api.events;
 import fr.loudo.narrativecraft.api.recording.IRecording;
 import net.minecraft.server.level.ServerPlayer;
 
-public record RecordingSaveEvent(ServerPlayer player, IRecording recording) implements Event {}
+public record RecordingSaveEvent(ServerPlayer player, IRecording recording, String recordingName) implements Event {}

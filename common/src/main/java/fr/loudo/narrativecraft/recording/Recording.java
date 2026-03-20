@@ -161,7 +161,7 @@ public class Recording implements IRecording {
         Services.PACKET.sendToPlayer(
                 getPlayer(), BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
 
-        NarrativeCraftMod.EVENT_BUS.post(new RecordingSaveEvent(getPlayer(), this));
+        NarrativeCraftMod.EVENT_BUS.post(new RecordingSaveEvent(getPlayer(), this, animation.getName()));
         return true;
     }
 
