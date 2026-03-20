@@ -7,7 +7,7 @@
   "mixins": [
     "LivingEntityMixin",
     "ServerLevelMixin",
-    "ServerPlayerMixin",
+    "EntityMixin",
     "accessor.EntityAccessor",
     "accessor.LivingEntityAccessor"
   ],

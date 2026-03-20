@@ -122,6 +122,13 @@ public class Recording implements IRecording {
             data.seedLastAction(SwingAction.ID, new SwingAction(0));
         }
 
+        // If player is already riding an entity first tick
+        Entity vehicle = getPlayer().getVehicle();
+        if (vehicle != null) {
+            recordingEntityData.add(new RecordingEntityData(nextNearbyEntityLocalId++, vehicle, false));
+            addAction(new RideEntityAction(0, markEntityAsTracked(vehicle)), getPlayer());
+        }
+
         NarrativeCraftMod.EVENT_BUS.post(new RecordingStartEvent(getPlayer(), this));
     }
 

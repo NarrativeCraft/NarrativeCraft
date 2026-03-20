@@ -23,21 +23,33 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import java.io.IOException;
 
-public class ActionRegister {
+public class StopRideEntityAction extends AbstractAction {
 
-    public static void register(IActionRegistry registry) {
-        registry.register(MovementAction.ID, MovementAction::new);
-        registry.register(PoseAction.ID, PoseAction::new);
-        registry.register(EntityByteAction.ID, EntityByteAction::new);
-        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
-        registry.register(SwingAction.ID, SwingAction::new);
-        registry.register(ChangeItemAction.ID, ChangeItemAction::new);
-        registry.register(SleepAction.ID, SleepAction::new);
-        registry.register(DestroyBlockStageAction.ID, DestroyBlockStageAction::new);
-        registry.register(RideEntityAction.ID, RideEntityAction::new);
-        registry.register(StopRideEntityAction.ID, StopRideEntityAction::new);
+    public static final String ID = "stop_ride_entity";
+
+    public StopRideEntityAction(int tick) {
+        super(tick);
+    }
+
+    @Override
+    public void write(Writer writer) throws IOException {}
+
+    @Override
+    public void read(Reader reader) throws IOException {}
+
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public ActionResult execute(IPlaybackContext context) {
+        context.getEntity().stopRiding();
+        return ActionResult.OK;
     }
 }
