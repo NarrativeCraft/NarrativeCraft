@@ -6,6 +6,7 @@
   "compatibilityLevel": "JAVA_18",
   "mixins": [
     "LivingEntityMixin",
+    "ServerLevelMixin",
     "accessor.EntityAccessor",
     "accessor.LivingEntityAccessor"
   ],

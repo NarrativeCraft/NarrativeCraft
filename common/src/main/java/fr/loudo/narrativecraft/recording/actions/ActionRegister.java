@@ -36,5 +36,6 @@ public class ActionRegister {
         registry.register(SwingAction.ID, SwingAction::new);
         registry.register(ChangeItemAction.ID, ChangeItemAction::new);
         registry.register(SleepAction.ID, SleepAction::new);
+        registry.register(DestroyBlockStageAction.ID, DestroyBlockStageAction::new);
     }
 }

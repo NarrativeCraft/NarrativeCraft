@@ -68,7 +68,6 @@ public class Recording implements IRecording {
             recordingEntityData.addAction(new PoseAction(tick, entity.getPose()));
             recordingEntityData.addAction(
                     new EntityByteAction(tick, entity.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID())));
-
             if (recordingEntityData.getEntity() instanceof LivingEntity livingEntity) {
                 recordingEntityData.addAction(new ChangeItemAction(tick, livingEntity));
                 recordingEntityData.addAction(new SwingAction(tick, livingEntity));
