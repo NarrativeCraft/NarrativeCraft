@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
-import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
@@ -43,12 +42,5 @@ public class OnPlayerJoinEvent {
 
         PlayerSession playerSession = new PlayerSession(player);
         NarrativeCraftMod.getInstance().getPlayerSessionManager().add(playerSession);
-
-        for (Playback playback :
-                NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
-            if (playback.forSpecificPlayers()) {
-                playback.hideEntitiesToOtherPlayers();
-            }
-        }
     }
 }

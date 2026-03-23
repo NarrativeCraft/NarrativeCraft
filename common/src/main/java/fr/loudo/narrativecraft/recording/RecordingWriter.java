@@ -106,7 +106,11 @@ public class RecordingWriter implements Action.Writer {
 
     public void writeActionRecord(AbstractAction action) throws IOException {
         output.writeInt(action.getTick());
-        byte id = localActionsIds.get(action.getId());
+        byte id = localActionsIds.getOrDefault(action.getId(), (byte) -1);
+        if (id == -1) {
+            throw new IllegalArgumentException(
+                    "Unknown action id " + action.getId() + ". Seems like you forgot to register your action!");
+        }
         output.writeByte(id);
         action.write(this);
     }

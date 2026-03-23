@@ -24,6 +24,8 @@
 package fr.loudo.narrativecraft.playback;
 
 import fr.loudo.narrativecraft.managers.Manager;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PlaybackManager extends Manager<Playback> {
@@ -36,5 +38,15 @@ public class PlaybackManager extends Manager<Playback> {
         }
 
         return null;
+    }
+
+    public List<Playback> getActivePlaybacks() {
+        List<Playback> playbacks = new ArrayList<>();
+        for (Playback playback : list) {
+            if (playback.isPlaying()) {
+                playbacks.add(playback);
+            }
+        }
+        return playbacks;
     }
 }

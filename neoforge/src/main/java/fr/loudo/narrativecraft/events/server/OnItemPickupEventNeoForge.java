@@ -21,25 +21,26 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.IEventBus;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.TriState;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 
-public class ActionRegister {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnItemPickupEventNeoForge {
 
-    public static void register(IActionRegistry registry) {
-        registry.register(MovementAction.ID, MovementAction::new);
-        registry.register(PoseAction.ID, PoseAction::new);
-        registry.register(EntityByteAction.ID, EntityByteAction::new);
-        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
-        registry.register(SwingAction.ID, SwingAction::new);
-        registry.register(ChangeItemAction.ID, ChangeItemAction::new);
-        registry.register(SleepAction.ID, SleepAction::new);
-        registry.register(DestroyBlockStageAction.ID, DestroyBlockStageAction::new);
-        registry.register(RideEntityAction.ID, RideEntityAction::new);
-        registry.register(StopRideEntityAction.ID, StopRideEntityAction::new);
-        registry.register(RightClickBlockAction.ID, RightClickBlockAction::new);
-        registry.register(ItemPickupAction.ID, ItemPickupAction::new);
+    public OnItemPickupEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnItemPickupEventNeoForge::itemPickup);
+    }
+
+    private static void itemPickup(ItemEntityPickupEvent.Pre event) {
+        OnItemPickupEvent.onPickup((ServerPlayer) event.getPlayer(), event.getItemEntity());
+        boolean canPickup = OnItemPickupEvent.canPickup(event.getItemEntity());
+        event.setCanPickup(canPickup ? TriState.FALSE : TriState.TRUE);
     }
 }

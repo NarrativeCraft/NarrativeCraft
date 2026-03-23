@@ -26,36 +26,31 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.Recording;
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.server.MinecraftServer;
+import fr.loudo.narrativecraft.recording.actions.ItemPickupAction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.item.ItemEntity;
 
-public class OnServerTickEvent {
+public class OnItemPickupEvent {
 
-    public static void tick(MinecraftServer server) {
-
-        for (Recording recording :
-                NarrativeCraftMod.getInstance().getRecordingManager().getList()) {
-            recording.tick();
+    public static void onPickup(ServerPlayer player, ItemEntity itemEntity) {
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
+        if (recording != null) {
+            ItemPickupAction action = new ItemPickupAction(
+                    recording.getTick(),
+                    recording.markEntityAsTracked(itemEntity),
+                    itemEntity.getItem().getCount());
+            recording.addAction(action, player);
         }
+    }
 
+    public static boolean canPickup(ItemEntity itemEntity) {
         for (Playback playback :
-                NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
-            if (playback.forSpecificPlayers()) {
-                playback.hideEntitiesToOtherPlayers();
+                NarrativeCraftMod.getInstance().getPlaybackManager().getActivePlaybacks()) {
+            if (playback.entityFromPlayback(itemEntity)) {
+                return false;
             }
         }
-
-        List<Playback> toRemove = new ArrayList<>();
-
-        for (Playback playback :
-                NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
-            playback.tick();
-            if (playback.isEnded()) {
-                toRemove.add(playback);
-            }
-        }
-
-        NarrativeCraftMod.getInstance().getPlaybackManager().getList().removeAll(toRemove);
+        return true;
     }
 }

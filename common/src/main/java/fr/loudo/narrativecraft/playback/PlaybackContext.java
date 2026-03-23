@@ -89,9 +89,6 @@ public class PlaybackContext implements IPlaybackContext {
                 mob.setNoAi(true);
             }
             level.addFreshEntity(entity);
-            if (playback.forSpecificPlayers()) {
-                playback.hideEntitiesToOtherPlayers();
-            }
             return;
         }
 

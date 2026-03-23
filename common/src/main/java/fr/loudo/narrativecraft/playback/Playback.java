@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.playback;
 
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.RecordingData;
-import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -71,6 +70,9 @@ public class Playback {
         for (PlaybackContext context : contexts) {
             context.start();
         }
+        if (forSpecificPlayers()) {
+            hideEntitiesToOtherPlayers();
+        }
     }
 
     public void start(Collection<ServerPlayer> targetedPlayers) {
@@ -102,15 +104,29 @@ public class Playback {
     }
 
     public void hideEntitiesToOtherPlayers() {
-        for (PlaybackContext context : contexts) {
-            if (context.getEntity() instanceof FakePlayer) continue;
-
-            for (ServerPlayer serverPlayer : context.getLevel().players()) {
-                if (targetedPlayers.contains(serverPlayer)) continue;
+        for (ServerPlayer serverPlayer : requester.level().players()) {
+            if (targetedPlayers.contains(serverPlayer)) continue;
+            for (PlaybackContext context : contexts) {
                 serverPlayer.connection.send(
                         new ClientboundRemoveEntitiesPacket(context.getEntity().getId()));
             }
         }
+    }
+
+    public void hideEntitiesToPlayer(ServerPlayer player) {
+        for (PlaybackContext context : contexts) {
+            player.connection.send(
+                    new ClientboundRemoveEntitiesPacket(context.getEntity().getId()));
+        }
+    }
+
+    public boolean entityFromPlayback(Entity entity) {
+        for (PlaybackContext context : contexts) {
+            if (context.getEntity().getUUID().equals(entity.getUUID())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isEnded() {
