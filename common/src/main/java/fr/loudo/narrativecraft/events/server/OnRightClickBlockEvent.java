@@ -21,24 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.actions.RightClickBlockAction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class ActionRegister {
+public class OnRightClickBlockEvent {
 
-    public static void register(IActionRegistry registry) {
-        registry.register(MovementAction.ID, MovementAction::new);
-        registry.register(PoseAction.ID, PoseAction::new);
-        registry.register(EntityByteAction.ID, EntityByteAction::new);
-        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
-        registry.register(SwingAction.ID, SwingAction::new);
-        registry.register(ChangeItemAction.ID, ChangeItemAction::new);
-        registry.register(SleepAction.ID, SleepAction::new);
-        registry.register(DestroyBlockStageAction.ID, DestroyBlockStageAction::new);
-        registry.register(RideEntityAction.ID, RideEntityAction::new);
-        registry.register(StopRideEntityAction.ID, StopRideEntityAction::new);
-        registry.register(RightClickBlockAction.ID, RightClickBlockAction::new);
+    public static void rightClickBlock(ServerPlayer entity, InteractionHand hand, BlockHitResult blockHitResult) {
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
+        if (recording == null) return;
+
+        recording.addAction(new RightClickBlockAction(recording.getTick(), blockHitResult, hand), entity);
     }
 }

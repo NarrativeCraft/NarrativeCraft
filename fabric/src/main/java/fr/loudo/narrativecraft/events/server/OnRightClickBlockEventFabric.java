@@ -21,24 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.events.IFabricEventRegister;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
 
-public class ActionRegister {
-
-    public static void register(IActionRegistry registry) {
-        registry.register(MovementAction.ID, MovementAction::new);
-        registry.register(PoseAction.ID, PoseAction::new);
-        registry.register(EntityByteAction.ID, EntityByteAction::new);
-        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
-        registry.register(SwingAction.ID, SwingAction::new);
-        registry.register(ChangeItemAction.ID, ChangeItemAction::new);
-        registry.register(SleepAction.ID, SleepAction::new);
-        registry.register(DestroyBlockStageAction.ID, DestroyBlockStageAction::new);
-        registry.register(RideEntityAction.ID, RideEntityAction::new);
-        registry.register(StopRideEntityAction.ID, StopRideEntityAction::new);
-        registry.register(RightClickBlockAction.ID, RightClickBlockAction::new);
+public class OnRightClickBlockEventFabric implements IFabricEventRegister {
+    @Override
+    public void register() {
+        UseBlockCallback.EVENT.register((player, world, hand, blockHitResult) -> {
+            if (world.isClientSide()) return InteractionResult.PASS;
+            OnRightClickBlockEvent.rightClickBlock((ServerPlayer) player, hand, blockHitResult);
+            return InteractionResult.PASS;
+        });
     }
 }

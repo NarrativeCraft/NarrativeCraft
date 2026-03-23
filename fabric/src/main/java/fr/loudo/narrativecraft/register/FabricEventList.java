@@ -39,6 +39,7 @@ public class FabricEventList {
         events.add(new OnServerTickEventFabric());
         events.add(new OnCommandRegisterEventFabric());
         events.add(new OnServerBreakBlockEventFabric());
+        events.add(new OnRightClickBlockEventFabric());
     }
 
     public void register() {
