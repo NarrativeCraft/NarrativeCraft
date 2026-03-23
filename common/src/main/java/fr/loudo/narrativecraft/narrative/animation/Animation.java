@@ -88,6 +88,7 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
                 RecordingData recordingData =
                         new RecordingData(entityHeader.entityRecordingId(), entityHeader.entityType());
                 recordingData.setInitialNbt(entityHeader.initialNbt());
+                recordingData.setSpawnTick(entityHeader.spawnTick());
                 for (AbstractAction action : reader.readAllActions(entityHeader.actionCount())) {
                     recordingData.addAction(action);
                 }

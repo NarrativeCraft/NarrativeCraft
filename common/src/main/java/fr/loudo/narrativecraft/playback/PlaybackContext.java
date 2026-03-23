@@ -52,6 +52,7 @@ public class PlaybackContext implements IPlaybackContext {
     private final ServerLevel level;
     private Entity entity;
     private boolean isPlaying = false;
+    private boolean spawned = false;
 
     public PlaybackContext(Playback playback, RecordingData recordingData, ServerLevel level) {
         this.playback = playback;
@@ -61,10 +62,15 @@ public class PlaybackContext implements IPlaybackContext {
 
     public void start() {
         isPlaying = true;
-        spawnEntity();
+        spawned = false;
+        createEntity();
+        if (entity != null && recordingData.getSpawnTick() == 0) {
+            addEntityToWorld();
+            spawned = true;
+        }
     }
 
-    private void spawnEntity() {
+    private void createEntity() {
         if (recordingData.getInitialNbt() != null) {
             Optional<EntityType<?>> typeOpt = EntityType.byString(recordingData.getEntityId());
             if (typeOpt.isEmpty()) {
@@ -88,53 +94,49 @@ public class PlaybackContext implements IPlaybackContext {
             if (entity instanceof Mob mob) {
                 mob.setNoAi(true);
             }
-            level.addFreshEntity(entity);
             return;
         }
 
         if (recordingData.getEntityId().equals("minecraft:player")) {
             entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "fakeP"), true);
-            if (entity instanceof FakePlayer fakePlayer) {
-                if (playback.forSpecificPlayers()) {
-                    for (ServerPlayer player : playback.getTargetedPlayers()) {
-                        player.connection.send(new ClientboundPlayerInfoUpdatePacket(
-                                ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-                    }
-                } else {
-                    UtilsServer.broadcastPacket(new ClientboundPlayerInfoUpdatePacket(
-                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-                }
-                level.addFreshEntity(fakePlayer);
-            }
-        } else {
-            Optional<EntityType<?>> entityType = EntityType.byString(recordingData.getEntityId());
-            EntityType<?> type = entityType.orElse(null);
-            if (type == null) {
-                Utils.sendError(
-                        Translation.message("error.playback_entity_type", recordingData.getEntityId()),
-                        playback.getRequester());
-                playback.stop();
-                return;
-            } else {
-                entity = type.create(level, EntitySpawnReason.MOB_SUMMONED);
-            }
+            return;
+        }
 
-            if (entity == null) {
-                Utils.sendError(
-                        Translation.message("error.playback_entity_null", recordingData.getEntityId()),
-                        playback.getRequester());
-                playback.stop();
-                return;
-            }
+        Optional<EntityType<?>> entityType = EntityType.byString(recordingData.getEntityId());
+        EntityType<?> type = entityType.orElse(null);
+        if (type == null) {
+            Utils.sendError(
+                    Translation.message("error.playback_entity_type", recordingData.getEntityId()),
+                    playback.getRequester());
+            playback.stop();
+            return;
+        }
+        entity = type.create(level, EntitySpawnReason.MOB_SUMMONED);
+        if (entity == null) {
+            Utils.sendError(
+                    Translation.message("error.playback_entity_null", recordingData.getEntityId()),
+                    playback.getRequester());
+            playback.stop();
+        }
+    }
 
+    private void addEntityToWorld() {
+
+        if (entity instanceof FakePlayer fakePlayer) {
             if (playback.forSpecificPlayers()) {
                 for (ServerPlayer player : playback.getTargetedPlayers()) {
-                    player.connection.send(new ClientboundAddEntityPacket(entity, 0, new BlockPos(0, 0, 0)));
+                    player.connection.send(new ClientboundPlayerInfoUpdatePacket(
+                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
                 }
             } else {
-                level.addFreshEntity(entity);
+                UtilsServer.broadcastPacket(new ClientboundPlayerInfoUpdatePacket(
+                        ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
             }
+            level.addNewPlayer(fakePlayer);
+            return;
         }
+
+        level.addFreshEntity(entity);
     }
 
     public boolean forSpecificPlayers() {
@@ -165,6 +167,14 @@ public class PlaybackContext implements IPlaybackContext {
         if (!isPlaying) return;
 
         int currentTick = playback.getTick();
+
+        if (!spawned && entity != null && currentTick >= recordingData.getSpawnTick()) {
+            addEntityToWorld();
+            spawned = true;
+        }
+
+        if (!spawned) return;
+
         List<AbstractAction> actionsToPlay = recordingData.getActions().get(currentTick);
         if (actionsToPlay != null) {
             for (AbstractAction action : actionsToPlay) {

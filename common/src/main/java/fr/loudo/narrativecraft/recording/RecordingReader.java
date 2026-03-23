@@ -105,7 +105,7 @@ public class RecordingReader implements Action.Reader {
 
     public record RecordingHeader(UUID recordingId, String name, int entityCount) {}
 
-    public record EntityHeader(int entityRecordingId, String entityType, CompoundTag initialNbt, int actionCount) {}
+    public record EntityHeader(int entityRecordingId, String entityType, CompoundTag initialNbt, int spawnTick, int actionCount) {}
 
     public RecordingHeader readHeader() throws IOException {
         byte magic0 = input.readByte();
@@ -135,8 +135,9 @@ public class RecordingReader implements Action.Reader {
         String entityType = input.readUTF();
         boolean hasInitialNbt = input.readBoolean();
         CompoundTag initialNbt = hasInitialNbt ? readCompoundTag() : null;
+        int spawnTick = input.readInt();
         int actionCount = input.readInt();
-        return new EntityHeader(entityRecordingId, entityType, initialNbt, actionCount);
+        return new EntityHeader(entityRecordingId, entityType, initialNbt, spawnTick, actionCount);
     }
 
     public CompoundTag readCompoundTag() throws IOException {

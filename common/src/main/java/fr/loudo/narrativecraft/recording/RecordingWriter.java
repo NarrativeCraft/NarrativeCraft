@@ -86,10 +86,11 @@ public class RecordingWriter implements Action.Writer {
                 recordingEntityData.getRecordingId(),
                 Utils.getEntityTypeString(recordingEntityData.getEntity()),
                 recordingEntityData.getRecordingData().getInitialNbt(),
+                recordingEntityData.getRecordingData().getSpawnTick(),
                 actionCount);
     }
 
-    public void writeEntityHeader(int recordingId, String entityType, CompoundTag initialNbt, int actionCount)
+    public void writeEntityHeader(int recordingId, String entityType, CompoundTag initialNbt, int spawnTick, int actionCount)
             throws IOException {
         output.writeInt(recordingId);
         output.writeUTF(entityType);
@@ -97,6 +98,7 @@ public class RecordingWriter implements Action.Writer {
         if (initialNbt != null) {
             writeCompoundTag(initialNbt);
         }
+        output.writeInt(spawnTick);
         output.writeInt(actionCount);
     }
 

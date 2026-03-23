@@ -118,6 +118,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                             entityHeader.entityRecordingId(),
                             entityHeader.entityType(),
                             entityHeader.initialNbt(),
+                            entityHeader.spawnTick(),
                             entityHeader.actionCount());
 
                     for (AbstractAction action : reader.readAllActions(entityHeader.actionCount())) {

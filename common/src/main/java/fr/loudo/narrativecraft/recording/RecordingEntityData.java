@@ -34,13 +34,15 @@ public class RecordingEntityData {
     private final int recordingId;
     private final Entity entity;
     private boolean isTracked;
+    private final int firstSeenTick;
     private final Map<String, AbstractAction> lastActions = new HashMap<>();
 
-    public RecordingEntityData(int recordingId, Entity entity, boolean isTracked) {
+    public RecordingEntityData(int recordingId, Entity entity, boolean isTracked, int firstSeenTick) {
         recordingData = new RecordingData(recordingId, entity);
         this.recordingId = recordingId;
         this.entity = entity;
         this.isTracked = isTracked;
+        this.firstSeenTick = firstSeenTick;
     }
 
     public void addAction(AbstractAction action) {
@@ -73,5 +75,9 @@ public class RecordingEntityData {
 
     public void setTracked(boolean tracked) {
         isTracked = tracked;
+    }
+
+    public int getFirstSeenTick() {
+        return firstSeenTick;
     }
 }
