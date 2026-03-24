@@ -58,10 +58,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
         try (DataOutputStream stream =
                 new DataOutputStream(new FileOutputStream(new File(animationsFolder, entry.toFileName())))) {
             RecordingWriter writer = new RecordingWriter(stream);
-            writer.writeHeader(
-                    recording.getId(),
-                    entry.getName(),
-                    recording.getEntityTrackedSize());
+            writer.writeHeader(recording.getId(), entry.getName(), recording.getEntityTrackedSize());
             writer.writeLocalActionsId();
             for (RecordingEntityData recordingEntityData : recording.getRecordingEntityData()) {
                 if (!recordingEntityData.isTracked()) continue;

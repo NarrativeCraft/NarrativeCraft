@@ -31,6 +31,7 @@ public class ActionRegister {
         registry.register(MovementAction.ID, MovementAction::new);
         registry.register(PoseAction.ID, PoseAction::new);
         registry.register(EntityByteAction.ID, EntityByteAction::new);
+        registry.register(LivingEntityByteAction.ID, LivingEntityByteAction::new);
         registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
         registry.register(BreakBlockAction.ID, BreakBlockAction::new);
         registry.register(SwingAction.ID, SwingAction::new);
