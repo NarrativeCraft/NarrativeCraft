@@ -41,8 +41,7 @@ public class ItemEntityMixinFabric {
                     @At(
                             value = "INVOKE",
                             target =
-                                    "Lnet/minecraft/world/entity/player/Player;onItemPickup(Lnet/minecraft/world/entity/item/ItemEntity;)V")
-    )
+                                    "Lnet/minecraft/world/entity/player/Player;onItemPickup(Lnet/minecraft/world/entity/item/ItemEntity;)V"))
     private void narrativecraft$itemPickup(Player player, CallbackInfo ci) {
         ItemEntity itemEntity = (ItemEntity) (Object) this;
         OnItemPickupEvent.onPickup((ServerPlayer) player, itemEntity);

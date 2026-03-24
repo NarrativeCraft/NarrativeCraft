@@ -21,26 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.actions.CloseContainerAction;
+import net.minecraft.server.level.ServerPlayer;
 
-public class ActionRegister {
+public class OnPlayerCloseContainerEvent {
 
-    public static void register(IActionRegistry registry) {
-        registry.register(MovementAction.ID, MovementAction::new);
-        registry.register(PoseAction.ID, PoseAction::new);
-        registry.register(EntityByteAction.ID, EntityByteAction::new);
-        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
-        registry.register(SwingAction.ID, SwingAction::new);
-        registry.register(ChangeItemAction.ID, ChangeItemAction::new);
-        registry.register(SleepAction.ID, SleepAction::new);
-        registry.register(DestroyBlockStageAction.ID, DestroyBlockStageAction::new);
-        registry.register(RideEntityAction.ID, RideEntityAction::new);
-        registry.register(StopRideEntityAction.ID, StopRideEntityAction::new);
-        registry.register(RightClickBlockAction.ID, RightClickBlockAction::new);
-        registry.register(ItemPickupAction.ID, ItemPickupAction::new);
-        registry.register(CloseContainerAction.ID, CloseContainerAction::new);
+    public static void onCloseContainer(ServerPlayer player) {
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
+        if (recording == null) return;
+
+        recording.addAction(new CloseContainerAction(recording.getTick()), player);
     }
 }

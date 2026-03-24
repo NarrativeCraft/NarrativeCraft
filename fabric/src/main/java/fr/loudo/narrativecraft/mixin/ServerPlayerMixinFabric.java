@@ -21,26 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.events.server.OnPlayerCloseContainerEvent;
+import net.minecraft.server.level.ServerPlayer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class ActionRegister {
+@Mixin(ServerPlayer.class)
+public class ServerPlayerMixinFabric {
 
-    public static void register(IActionRegistry registry) {
-        registry.register(MovementAction.ID, MovementAction::new);
-        registry.register(PoseAction.ID, PoseAction::new);
-        registry.register(EntityByteAction.ID, EntityByteAction::new);
-        registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
-        registry.register(BreakBlockAction.ID, BreakBlockAction::new);
-        registry.register(SwingAction.ID, SwingAction::new);
-        registry.register(ChangeItemAction.ID, ChangeItemAction::new);
-        registry.register(SleepAction.ID, SleepAction::new);
-        registry.register(DestroyBlockStageAction.ID, DestroyBlockStageAction::new);
-        registry.register(RideEntityAction.ID, RideEntityAction::new);
-        registry.register(StopRideEntityAction.ID, StopRideEntityAction::new);
-        registry.register(RightClickBlockAction.ID, RightClickBlockAction::new);
-        registry.register(ItemPickupAction.ID, ItemPickupAction::new);
-        registry.register(CloseContainerAction.ID, CloseContainerAction::new);
+    @Inject(method = "doCloseContainer", at = @At("HEAD"))
+    private void narrativecraft$doCloseContainer(CallbackInfo ci) {
+        ServerPlayer serverPlayer = (ServerPlayer) (Object) this;
+        OnPlayerCloseContainerEvent.onCloseContainer(serverPlayer);
     }
 }

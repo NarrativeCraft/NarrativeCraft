@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.recording.actions;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -62,7 +62,7 @@ public class PlaceBlockAction extends DataBlockAction {
                 }
 
                 player.connection.send(new ClientboundSoundPacket(
-                        Holder.direct(soundType.getPlaceSound()),
+                        BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundType.getPlaceSound()),
                         SoundSource.BLOCKS,
                         blockPos.getX(),
                         blockPos.getY(),

@@ -105,7 +105,8 @@ public class RecordingReader implements Action.Reader {
 
     public record RecordingHeader(UUID recordingId, String name, int entityCount) {}
 
-    public record EntityHeader(int entityRecordingId, String entityType, CompoundTag initialNbt, int spawnTick, int actionCount) {}
+    public record EntityHeader(
+            int entityRecordingId, String entityType, CompoundTag initialNbt, int spawnTick, int actionCount) {}
 
     public RecordingHeader readHeader() throws IOException {
         byte magic0 = input.readByte();

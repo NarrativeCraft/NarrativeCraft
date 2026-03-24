@@ -39,6 +39,7 @@ public class RecordingData {
     private final String entityId;
     /** Non-null only for tracked nearby entities; used to restore their exact state at playback spawn. */
     private CompoundTag initialNbt;
+
     private int spawnTick = 0;
 
     public RecordingData(int recordingId, Entity entity) {

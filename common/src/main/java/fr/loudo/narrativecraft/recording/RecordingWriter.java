@@ -90,7 +90,8 @@ public class RecordingWriter implements Action.Writer {
                 actionCount);
     }
 
-    public void writeEntityHeader(int recordingId, String entityType, CompoundTag initialNbt, int spawnTick, int actionCount)
+    public void writeEntityHeader(
+            int recordingId, String entityType, CompoundTag initialNbt, int spawnTick, int actionCount)
             throws IOException {
         output.writeInt(recordingId);
         output.writeUTF(entityType);
