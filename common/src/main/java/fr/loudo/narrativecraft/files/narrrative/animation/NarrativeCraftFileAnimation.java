@@ -61,10 +61,10 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
             writer.writeHeader(
                     recording.getId(),
                     entry.getName(),
-                    recording.getRecordingEntityData().size());
+                    recording.getEntityTrackedSize());
             writer.writeLocalActionsId();
             for (RecordingEntityData recordingEntityData : recording.getRecordingEntityData()) {
-
+                if (!recordingEntityData.isTracked()) continue;
                 List<AbstractAction> sortedActions =
                         recordingEntityData.getRecordingData().getActions().entrySet().stream()
                                 .sorted(Map.Entry.comparingByKey())

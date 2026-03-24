@@ -166,6 +166,10 @@ public class Recording implements IRecording {
         return true;
     }
 
+    public int getEntityTrackedSize() {
+        return recordingEntityData.stream().filter(RecordingEntityData::isTracked).toList().size();
+    }
+
     public UUID getId() {
         return id;
     }
