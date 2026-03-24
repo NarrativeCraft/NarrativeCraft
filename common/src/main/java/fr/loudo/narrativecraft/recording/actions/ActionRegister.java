@@ -42,5 +42,6 @@ public class ActionRegister {
         registry.register(RightClickBlockAction.ID, RightClickBlockAction::new);
         registry.register(ItemPickupAction.ID, ItemPickupAction::new);
         registry.register(CloseContainerAction.ID, CloseContainerAction::new);
+        registry.register(CommandAction.ID, CommandAction::new);
     }
 }
