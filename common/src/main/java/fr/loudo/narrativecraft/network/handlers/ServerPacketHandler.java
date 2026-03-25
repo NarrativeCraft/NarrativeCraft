@@ -23,8 +23,16 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.editors.cutscene.CutsceneEditor;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import fr.loudo.narrativecraft.session.PlayerSession;
 import net.minecraft.world.entity.player.Player;
 
 public class ServerPacketHandler {
@@ -37,6 +45,32 @@ public class ServerPacketHandler {
                 NarrativeEntryEditorRegistry.getInstance().edit(packet.entryId(), packet.entry(), player.getUUID());
             case DELETE ->
                 NarrativeEntryEditorRegistry.getInstance().delete(packet.entryId(), packet.entry(), player.getUUID());
+        }
+    }
+
+    public static void cutsceneState(C2SCutsceneState packet, Player player) {
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession session = sessionManager.getByPlayer(player);
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
+        if (scene == null) return;
+        Cutscene cutscene = scene.getCutsceneManager().getById(packet.getCutsceneId());
+        if (cutscene == null) return;
+
+        switch (packet.getState()) {
+            case ENTER -> {
+                CutsceneEditor editor = new CutsceneEditor(cutscene, session);
+                session.setEditor(editor);
+                editor.init();
+            }
+            case QUIT -> {
+                CutsceneEditor editor = sessionManager.getEditor(player, CutsceneEditor.class);
+                if (editor != null) {
+                    editor.stop();
+                    session.setEditor(null);
+                }
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.register;
 
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
 import fr.loudo.narrativecraft.events.client.OnClientTickEventFabric;
+import fr.loudo.narrativecraft.events.client.OnHudRenderEventFabric;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class ClientFabricEventList {
 
     public ClientFabricEventList() {
         events.add(new OnClientTickEventFabric());
+        events.add(new OnHudRenderEventFabric());
     }
 
     public void register() {

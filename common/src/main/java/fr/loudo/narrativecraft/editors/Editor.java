@@ -21,58 +21,6 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.session;
+package fr.loudo.narrativecraft.editors;
 
-import fr.loudo.narrativecraft.editors.Editor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-
-public class AbstractPlayerSession {
-
-    private Chapter chapter;
-    private Scene scene;
-    private Editor editor;
-
-    public AbstractPlayerSession(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
-    }
-
-    public void apply(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
-    }
-
-    public void clear() {
-        chapter = null;
-        scene = null;
-    }
-
-    public boolean sessionSet() {
-        return chapter != null && scene != null;
-    }
-
-    public Chapter getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    public Editor getEditor() {
-        return editor;
-    }
-
-    public void setEditor(Editor editor) {
-        this.editor = editor;
-    }
-}
+public interface Editor {}

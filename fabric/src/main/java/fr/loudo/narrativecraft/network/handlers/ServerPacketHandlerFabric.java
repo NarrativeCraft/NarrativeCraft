@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 public class ServerPacketHandlerFabric {
@@ -31,6 +32,9 @@ public class ServerPacketHandlerFabric {
     public static void handle() {
         ServerPlayNetworking.registerGlobalReceiver(BiSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
             ServerPacketHandler.narrativeEntry(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SCutsceneState.TYPE, (packet, context) -> {
+            ServerPacketHandler.cutsceneState(packet, context.player());
         });
     }
 }

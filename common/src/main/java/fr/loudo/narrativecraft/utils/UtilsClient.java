@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.utils;
 
+import com.mojang.blaze3d.platform.Window;
 import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
 import net.minecraft.client.Minecraft;
 
@@ -35,5 +36,12 @@ public class UtilsClient {
         if (minecraft.screen instanceof NarrativeEntryListScreen<?> screen) {
             screen.reload();
         }
+    }
+
+    public static int[] getScaledMousePos() {
+        Window window = Minecraft.getInstance().getWindow();
+        int mouseX = (int) Minecraft.getInstance().mouseHandler.getScaledXPos(window);
+        int mouseY = (int) Minecraft.getInstance().mouseHandler.getScaledYPos(window);
+        return new int[] {mouseX, mouseY};
     }
 }

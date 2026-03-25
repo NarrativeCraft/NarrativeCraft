@@ -21,58 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.session;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.editors.Editor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-public class AbstractPlayerSession {
+@Mixin(MouseHandler.class)
+public class MouseHandlerMixinFabric {
 
-    private Chapter chapter;
-    private Scene scene;
-    private Editor editor;
-
-    public AbstractPlayerSession(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
-    }
-
-    public void apply(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
-    }
-
-    public void clear() {
-        chapter = null;
-        scene = null;
-    }
-
-    public boolean sessionSet() {
-        return chapter != null && scene != null;
-    }
-
-    public Chapter getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    public Editor getEditor() {
-        return editor;
-    }
-
-    public void setEditor(Editor editor) {
-        this.editor = editor;
+    @Redirect(
+            method = "onButton",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"))
+    private boolean narrativecraft$onScreenMouseClick(
+            Screen instance, MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
+        OnScreenMouseClickEvent.cutsceneHudClick(mouseButtonEvent, isDoubleClick);
+        return instance.mouseClicked(mouseButtonEvent, isDoubleClick);
     }
 }

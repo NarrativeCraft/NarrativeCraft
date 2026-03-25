@@ -23,15 +23,28 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public class PlayerSessionManager extends Manager<PlayerSession> {
 
-    public PlayerSession getByPlayer(ServerPlayer player) {
+    public PlayerSession getByPlayer(Player player) {
         for (PlayerSession playerSession : list) {
             if (playerSession.getPlayer().getUUID().equals(player.getUUID())) {
                 return playerSession;
+            }
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Editor> T getEditor(Player player, Class<T> clazz) {
+        for (PlayerSession playerSession : list) {
+            if (playerSession.getPlayer().getUUID().equals(player.getUUID())
+                    && playerSession.getEditor() != null
+                    && playerSession.getEditor().getClass().equals(clazz)) {
+                return (T) playerSession.getEditor();
             }
         }
         return null;

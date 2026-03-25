@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ServerPacketHandlerNeoForge {
@@ -31,6 +32,12 @@ public class ServerPacketHandlerNeoForge {
     public static void syncNarrativeEntry(BiSyncNarrativeEntryPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ServerPacketHandler.narrativeEntry(packet, context.player());
+        });
+    }
+
+    public static void cutsceneState(C2SCutsceneState packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ServerPacketHandler.cutsceneState(packet, context.player());
         });
     }
 }

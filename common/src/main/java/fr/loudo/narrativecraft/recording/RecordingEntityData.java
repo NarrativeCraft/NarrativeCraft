@@ -27,7 +27,6 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 
 public class RecordingEntityData {
 
@@ -71,7 +70,7 @@ public class RecordingEntityData {
     }
 
     public boolean isTracked() {
-        return isTracked && !(entity instanceof Player);
+        return isTracked;
     }
 
     public void setTracked(boolean tracked) {

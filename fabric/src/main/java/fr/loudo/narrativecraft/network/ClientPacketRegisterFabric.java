@@ -23,7 +23,12 @@
 
 package fr.loudo.narrativecraft.network;
 
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+
 public class ClientPacketRegisterFabric {
 
-    public static void register() {}
+    public static void register() {
+        PayloadTypeRegistry.playC2S().register(C2SCutsceneState.TYPE, C2SCutsceneState.STREAM_CODEC);
+    }
 }

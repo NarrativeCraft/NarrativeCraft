@@ -21,58 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.session;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.editors.Editor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.IEventBus;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
-public class AbstractPlayerSession {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnHudRenderEventNeoForge {
 
-    private Chapter chapter;
-    private Scene scene;
-    private Editor editor;
-
-    public AbstractPlayerSession(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
+    public OnHudRenderEventNeoForge(IEventBus eventBus) {
+        NeoForge.EVENT_BUS.addListener(OnHudRenderEventNeoForge::onHudRender);
     }
 
-    public void apply(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
-    }
+    private static void onHudRender(RenderGuiEvent.Post event) {
+        GuiGraphics guiGraphics = event.getGuiGraphics();
+        DeltaTracker deltaTracker = event.getPartialTick();
 
-    public void clear() {
-        chapter = null;
-        scene = null;
-    }
-
-    public boolean sessionSet() {
-        return chapter != null && scene != null;
-    }
-
-    public Chapter getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    public Editor getEditor() {
-        return editor;
-    }
-
-    public void setEditor(Editor editor) {
-        this.editor = editor;
+        OnHudRender.cutsceneHudRender(guiGraphics, deltaTracker);
     }
 }

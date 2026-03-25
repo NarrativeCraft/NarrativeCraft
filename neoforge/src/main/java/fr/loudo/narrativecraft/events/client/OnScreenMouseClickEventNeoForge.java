@@ -21,58 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.session;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.editors.Editor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
-public class AbstractPlayerSession {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnScreenMouseClickEventNeoForge {
 
-    private Chapter chapter;
-    private Scene scene;
-    private Editor editor;
-
-    public AbstractPlayerSession(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
+    public OnScreenMouseClickEventNeoForge(IEventBus bus) {
+        NeoForge.EVENT_BUS.addListener(OnScreenMouseClickEventNeoForge::onMouseClick);
     }
 
-    public void apply(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
-    }
-
-    public void clear() {
-        chapter = null;
-        scene = null;
-    }
-
-    public boolean sessionSet() {
-        return chapter != null && scene != null;
-    }
-
-    public Chapter getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    public Editor getEditor() {
-        return editor;
-    }
-
-    public void setEditor(Editor editor) {
-        this.editor = editor;
+    private static void onMouseClick(ScreenEvent.MouseButtonPressed event) {
+        OnScreenMouseClickEvent.cutsceneHudClick(event.getMouseButtonEvent(), event.isDoubleClick());
     }
 }

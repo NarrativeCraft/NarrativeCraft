@@ -21,58 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.session;
+package fr.loudo.narrativecraft.events.client;
 
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneEditor;
 import fr.loudo.narrativecraft.editors.Editor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
 
-public class AbstractPlayerSession {
+public class OnHudRender {
 
-    private Chapter chapter;
-    private Scene scene;
-    private Editor editor;
+    public static void cutsceneHudRender(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (!(editor instanceof ClientCutsceneEditor cutsceneEditor)) return;
 
-    public AbstractPlayerSession(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
-    }
-
-    public void apply(Chapter chapter, Scene scene) {
-        this.chapter = chapter;
-        this.scene = scene;
-    }
-
-    public void clear() {
-        chapter = null;
-        scene = null;
-    }
-
-    public boolean sessionSet() {
-        return chapter != null && scene != null;
-    }
-
-    public Chapter getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    public Editor getEditor() {
-        return editor;
-    }
-
-    public void setEditor(Editor editor) {
-        this.editor = editor;
+        cutsceneEditor.render(guiGraphics, deltaTracker);
     }
 }

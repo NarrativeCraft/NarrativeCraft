@@ -23,12 +23,18 @@
 
 package fr.loudo.narrativecraft.client.narrative.cutscene;
 
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneEditor;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.screens.narrative.cutscene.CutsceneEntryEditScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 
 public class ClientCutsceneNarrativeUIAction implements ClientNarrativeUIAction<Cutscene> {
@@ -45,7 +51,12 @@ public class ClientCutsceneNarrativeUIAction implements ClientNarrativeUIAction<
 
     @Override
     public void customClickAction(Cutscene entry) {
-        // TODO: enter cutscene
+        Services.PACKET.sendToServer(new C2SCutsceneState(C2SCutsceneState.State.ENTER, entry));
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        ClientCutsceneEditor cutsceneEditor = new ClientCutsceneEditor(entry);
+        cutsceneEditor.init();
+        session.setEditor(cutsceneEditor);
+        Minecraft.getInstance().setScreen(null);
     }
 
     @Override
