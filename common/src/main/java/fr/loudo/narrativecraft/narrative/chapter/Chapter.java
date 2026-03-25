@@ -54,13 +54,6 @@ public class Chapter extends NarrativeEntry<ChapterPayload> {
         return sceneManager;
     }
 
-    @Override
-    public String toRawJson() {
-        return String.format(
-                "{\"id\": \"%s\",\"name\":\"%s\",\"description\":\"%s\",\"chapterIndex\": %s}",
-                id.toString(), name, description, chapterIndex);
-    }
-
     public String formattedName() {
         return chapterIndex + " - " + name;
     }

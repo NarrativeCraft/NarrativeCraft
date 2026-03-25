@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -131,8 +132,11 @@ public class NarrativeCraftFileCutscene extends NarrativeCraftFileDefault
     }
 
     private int writeJson(Cutscene entry, File file) {
+        Gson gson = gsonBuilder
+                .registerTypeAdapter(Cutscene.class, new CutsceneSerializer())
+                .create();
         try (Writer writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write(entry.toRawJson());
+            gson.toJson(entry, writer);
             return OPERATION_SUCCESS;
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to write cutscene data {}", entry.getName(), e);

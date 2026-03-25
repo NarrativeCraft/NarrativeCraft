@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.managers.SceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.scene.SceneDeserializer;
+import fr.loudo.narrativecraft.narrative.scene.SceneSerializer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -127,8 +128,11 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
 
             File dataFile = createFile(sceneFile, DATA_FILE_NAME);
 
+            Gson gson = gsonBuilder
+                    .registerTypeAdapter(Scene.class, new SceneSerializer())
+                    .create();
             try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
-                writer.write(entry.toRawJson());
+                gson.toJson(entry, writer);
             }
 
         } catch (Exception e) {

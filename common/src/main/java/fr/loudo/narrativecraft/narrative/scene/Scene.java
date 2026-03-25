@@ -95,13 +95,6 @@ public class Scene extends NarrativeEntry<ScenePayload> {
     }
 
     @Override
-    public String toRawJson() {
-        return String.format(
-                "{\"id\": \"%s\",\"name\":\"%s\",\"description\":\"%s\", \"chapterId\":\"%s\",\"rank\":\"%s\"}",
-                id.toString(), name, description, chapter.getId(), rank);
-    }
-
-    @Override
     public ScenePayload toPayload() {
         return new ScenePayload(name, description, chapter.getId(), rank);
     }

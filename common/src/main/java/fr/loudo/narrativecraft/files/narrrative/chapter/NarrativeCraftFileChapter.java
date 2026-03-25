@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterDeserializer;
+import fr.loudo.narrativecraft.narrative.chapter.ChapterSerializer;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -114,8 +115,11 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
 
             File dataFile = createFile(chapterDirectory, DATA_FILE_NAME);
 
+            Gson gson = gsonBuilder
+                    .registerTypeAdapter(Chapter.class, new ChapterSerializer())
+                    .create();
             try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
-                writer.write(entry.toRawJson());
+                gson.toJson(entry, writer);
             }
 
         } catch (Exception e) {

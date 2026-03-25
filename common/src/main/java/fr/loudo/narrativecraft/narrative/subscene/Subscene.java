@@ -76,24 +76,6 @@ public class Subscene extends NarrativeEntry<SubscenePayload> {
     }
 
     @Override
-    public String toRawJson() {
-        StringBuilder idsJson = new StringBuilder("[");
-        for (int i = 0; i < animations.size(); i++) {
-            if (i > 0) idsJson.append(",");
-            idsJson.append("\"").append(animations.get(i).getId()).append("\"");
-        }
-        idsJson.append("]");
-        return String.format(
-                "{\"id\":\"%s\",\"name\":\"%s\",\"description\":\"%s\",\"sceneId\":\"%s\",\"chapterId\":\"%s\",\"animationIds\":%s}",
-                id.toString(),
-                name,
-                description,
-                scene.getId().toString(),
-                scene.getChapter().getId().toString(),
-                idsJson);
-    }
-
-    @Override
     public SubscenePayload toPayload() {
         List<UUID> animationIds = animations.stream().map(Animation::getId).toList();
         return new SubscenePayload(

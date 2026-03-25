@@ -95,33 +95,6 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> {
     }
 
     @Override
-    public String toRawJson() {
-        StringBuilder animIds = new StringBuilder("[");
-        for (int i = 0; i < animations.size(); i++) {
-            if (i > 0) animIds.append(",");
-            animIds.append("\"").append(animations.get(i).getId()).append("\"");
-        }
-        animIds.append("]");
-
-        StringBuilder subIds = new StringBuilder("[");
-        for (int i = 0; i < subscenes.size(); i++) {
-            if (i > 0) subIds.append(",");
-            subIds.append("\"").append(subscenes.get(i).getId()).append("\"");
-        }
-        subIds.append("]");
-
-        return String.format(
-                "{\"id\":\"%s\",\"name\":\"%s\",\"description\":\"%s\",\"sceneId\":\"%s\",\"chapterId\":\"%s\",\"animationIds\":%s,\"subsceneIds\":%s}",
-                id.toString(),
-                name,
-                description,
-                scene.getId().toString(),
-                scene.getChapter().getId().toString(),
-                animIds,
-                subIds);
-    }
-
-    @Override
     public CutscenePayload toPayload() {
         List<UUID> animationIds = animations.stream().map(Animation::getId).toList();
         List<UUID> subsceneIds = subscenes.stream().map(Subscene::getId).toList();

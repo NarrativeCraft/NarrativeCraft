@@ -21,54 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative;
+package fr.loudo.narrativecraft.narrative.chapter;
 
-import java.util.UUID;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import java.lang.reflect.Type;
 
-public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
-    protected final UUID id;
-    protected String name;
-    protected String description;
+public class ChapterSerializer implements JsonSerializer<Chapter> {
 
-    public NarrativeEntry(UUID id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
+    @Override
+    public JsonElement serialize(Chapter src, Type typeOfSrc, JsonSerializationContext context) {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", src.getId().toString());
+        json.addProperty("name", src.getName());
+        json.addProperty("description", src.getDescription());
+        json.addProperty("chapterIndex", src.getChapterIndex());
+        return json;
     }
-
-    public NarrativeEntry(String name, String description) {
-        this.id = UUID.randomUUID();
-        this.name = name;
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public abstract T toPayload();
-
-    /**
-     * If your entry needs extra info in the name, otherwise juste return the current name
-     * @return formatted name
-     */
-    public abstract String formattedName();
-
-    public abstract String toFileName();
 }
