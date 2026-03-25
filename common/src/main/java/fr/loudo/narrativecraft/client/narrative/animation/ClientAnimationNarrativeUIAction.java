@@ -37,9 +37,12 @@ public class ClientAnimationNarrativeUIAction implements ClientNarrativeUIAction
     }
 
     @Override
-    public boolean hasSubScreen() {
+    public boolean isClickable() {
         return false;
     }
+
+    @Override
+    public void customClickAction(Animation entry) {}
 
     @Override
     public AbstractNarrativeEntryEditScreen<Animation> showEditScreen(Animation entry, Screen lastScreen) {

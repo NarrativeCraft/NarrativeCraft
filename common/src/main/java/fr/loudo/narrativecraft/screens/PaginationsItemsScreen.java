@@ -147,6 +147,10 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
     }
 
     public void addWidgetsForItem(int x, int y, T item) {
+        addMainButton(x, y, item);
+    }
+
+    protected void addMainButton(int x, int y, T item) {
         Button button = Button.builder(Component.literal(getItemName(item)), b -> {
                     onItemClicked(item);
                 })

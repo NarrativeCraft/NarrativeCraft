@@ -21,41 +21,42 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative.cutscene;
+package fr.loudo.narrativecraft.screens.narrative.cutscene;
 
-import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.screens.narrative.cutscene.CutsceneEntryEditScreen;
+import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
+import java.util.List;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
-public class ClientCutsceneNarrativeUIAction implements ClientNarrativeUIAction<Cutscene> {
+public class CutsceneEntryListScreen extends NarrativeEntryListScreen<Cutscene> {
 
-    @Override
-    public Screen subListSubScreen(Cutscene entry, Screen parent) {
-        return null;
+    public CutsceneEntryListScreen(
+            Component title,
+            List<Cutscene> entries,
+            Screen lastScreen,
+            NarrativeEntry<?> parentEntry,
+            String breadCrumb) {
+        super(title, entries, lastScreen, Cutscene.class, parentEntry, breadCrumb);
     }
 
     @Override
-    public boolean isClickable() {
-        return true;
+    public void addWidgetsForItem(int x, int y, Cutscene item) {
+        addMainButton(x - 30, y, item);
+        Button editButton = addEditButton(x + buttonWidth - 25, y, item);
+        Button assignButton = addAssignButton(editButton.getX() + editButton.getWidth() + 5, y, item);
+        addDeleteButton(assignButton.getX() + assignButton.getWidth() + 5, y, item);
     }
 
-    @Override
-    public void customClickAction(Cutscene entry) {
-        // TODO: enter cutscene
-    }
-
-    @Override
-    public AbstractNarrativeEntryEditScreen<Cutscene> showEditScreen(Cutscene entry, Screen lastScreen) {
-        return new CutsceneEntryEditScreen(entry, lastScreen);
-    }
-
-    @Override
-    public AbstractNarrativeEntryEditScreen<Cutscene> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
-        if (!(parent instanceof Scene scene)) return null;
-        return new CutsceneEntryEditScreen(scene, lastScreen);
+    protected Button addAssignButton(int x, int y, Cutscene item) {
+        Button assignButton = Button.builder(Component.literal("⚙"), b -> {
+                    minecraft.setScreen(new CutsceneSubscenesAssignScreen(item, this));
+                })
+                .bounds(x, y, 20, 20)
+                .build();
+        addRenderableWidget(assignButton);
+        return assignButton;
     }
 }

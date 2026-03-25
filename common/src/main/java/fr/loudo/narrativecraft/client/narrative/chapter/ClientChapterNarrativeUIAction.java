@@ -46,9 +46,12 @@ public class ClientChapterNarrativeUIAction implements ClientNarrativeUIAction<C
     }
 
     @Override
-    public boolean hasSubScreen() {
+    public boolean isClickable() {
         return true;
     }
+
+    @Override
+    public void customClickAction(Chapter entry) {}
 
     @Override
     public AbstractNarrativeEntryEditScreen<Chapter> showEditScreen(Chapter entry, Screen lastScreen) {

@@ -39,9 +39,12 @@ public class ClientSceneNarrativeUIAction implements ClientNarrativeUIAction<Sce
     }
 
     @Override
-    public boolean hasSubScreen() {
+    public boolean isClickable() {
         return true;
     }
+
+    @Override
+    public void customClickAction(Scene entry) {}
 
     @Override
     public AbstractNarrativeEntryEditScreen<Scene> showEditScreen(Scene entry, Screen lastScreen) {

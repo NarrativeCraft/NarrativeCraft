@@ -108,15 +108,23 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
 
     @Override
     public void addWidgetsForItem(int x, int y, E item) {
-        super.addWidgetsForItem(x - 20, y, item);
+        addMainButton(x - 20, y, item);
+        Button editButton = addEditButton(x + buttonWidth - 15, y, item);
+        addDeleteButton(editButton.getX() + editButton.getWidth() + 5, y, item);
+    }
+
+    protected Button addEditButton(int x, int y, E item) {
         Button editButton = Button.builder(Component.literal("✎"), b -> {
                     minecraft.setScreen(
                             ClientNarrativeUIActionRegistry.getInstance().showEditScreen(item, this));
                 })
-                .bounds(x + buttonWidth - 15, y, 20, 20)
+                .bounds(x, y, 20, 20)
                 .build();
         this.addRenderableWidget(editButton);
+        return editButton;
+    }
 
+    protected Button addDeleteButton(int x, int y, E item) {
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 b -> {
                     if (b) {
@@ -128,9 +136,10 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                 Translation.message("screen.confirm.message", item.getName()));
 
         Button deleteButton = Button.builder(Component.literal("✖"), b -> minecraft.setScreen(confirmScreen))
-                .bounds(editButton.getX() + editButton.getWidth() + 5, y, 20, 20)
+                .bounds(x, y, 20, 20)
                 .build();
         this.addRenderableWidget(deleteButton);
+        return deleteButton;
     }
 
     @Override
@@ -140,11 +149,16 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
 
     @Override
     protected void onItemClicked(E item) {
-        minecraft.setScreen(ClientNarrativeUIActionRegistry.getInstance().showListSubScreen(item, this));
+        Screen subScreen = ClientNarrativeUIActionRegistry.getInstance().showListSubScreen(item, this);
+        if (subScreen != null) {
+            minecraft.setScreen(subScreen);
+        } else {
+            ClientNarrativeUIActionRegistry.getInstance().customClickAction(item);
+        }
     }
 
     @Override
     protected boolean isItemClickable(E item) {
-        return ClientNarrativeUIActionRegistry.getInstance().hasSubScreen(item);
+        return ClientNarrativeUIActionRegistry.getInstance().isClickable(item);
     }
 }

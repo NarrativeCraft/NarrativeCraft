@@ -57,10 +57,15 @@ public class ClientNarrativeUIActionRegistry {
         return null;
     }
 
-    public <T extends NarrativeEntry<?>> boolean hasSubScreen(T entry) {
+    public <T extends NarrativeEntry<?>> boolean isClickable(T entry) {
         ClientNarrativeUIAction<T> editor = getClientEditor(entry);
-        if (editor != null) return editor.hasSubScreen();
+        if (editor != null) return editor.isClickable();
         return false;
+    }
+
+    public <T extends NarrativeEntry<?>> void customClickAction(T entry) {
+        ClientNarrativeUIAction<T> editor = getClientEditor(entry);
+        if (editor != null) editor.customClickAction(entry);
     }
 
     @SuppressWarnings("unchecked")

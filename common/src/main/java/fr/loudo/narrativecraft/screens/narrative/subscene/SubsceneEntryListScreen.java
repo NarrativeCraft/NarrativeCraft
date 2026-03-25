@@ -21,39 +21,42 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative.subscene;
+package fr.loudo.narrativecraft.screens.narrative.subscene;
 
-import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.screens.narrative.subscene.SubsceneEntryEditScreen;
+import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
+import java.util.List;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
-public class ClientSubsceneNarrativeUIAction implements ClientNarrativeUIAction<Subscene> {
+public class SubsceneEntryListScreen extends NarrativeEntryListScreen<Subscene> {
 
-    @Override
-    public Screen subListSubScreen(Subscene entry, Screen parent) {
-        return null;
+    public SubsceneEntryListScreen(
+            Component title,
+            List<Subscene> entries,
+            Screen lastScreen,
+            NarrativeEntry<?> parentEntry,
+            String breadCrumb) {
+        super(title, entries, lastScreen, Subscene.class, parentEntry, breadCrumb);
     }
 
     @Override
-    public boolean isClickable() {
-        return false;
+    public void addWidgetsForItem(int x, int y, Subscene item) {
+        addMainButton(x - 30, y, item);
+        Button editButton = addEditButton(x + buttonWidth - 25, y, item);
+        Button assignButton = addAssignButton(editButton.getX() + editButton.getWidth() + 5, y, item);
+        addDeleteButton(assignButton.getX() + assignButton.getWidth() + 5, y, item);
     }
 
-    @Override
-    public void customClickAction(Subscene entry) {}
-
-    @Override
-    public AbstractNarrativeEntryEditScreen<Subscene> showEditScreen(Subscene entry, Screen lastScreen) {
-        return new SubsceneEntryEditScreen(entry, lastScreen);
-    }
-
-    @Override
-    public AbstractNarrativeEntryEditScreen<Subscene> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
-        if (!(parent instanceof Scene scene)) return null;
-        return new SubsceneEntryEditScreen(scene, lastScreen);
+    protected Button addAssignButton(int x, int y, Subscene item) {
+        Button assignButton = Button.builder(Component.literal("⚙"), b -> {
+                    minecraft.setScreen(new SubsceneAnimationsAssignScreen(item, this));
+                })
+                .bounds(x, y, 20, 20)
+                .build();
+        addRenderableWidget(assignButton);
+        return assignButton;
     }
 }
