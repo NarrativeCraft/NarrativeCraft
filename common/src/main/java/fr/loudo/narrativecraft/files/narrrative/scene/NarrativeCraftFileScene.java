@@ -59,6 +59,12 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             return OPERATION_FAILED;
         }
 
+        File subsceneFolder = createDirectory(sceneFile, SUBSCENES_FOLDER_NAME);
+        if (subsceneFolder == null) {
+            NarrativeCraftMod.LOGGER.error("Failed to create subscenes directory of scene {}", entry.getName());
+            return OPERATION_FAILED;
+        }
+
         return edit(entry);
     }
 

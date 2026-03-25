@@ -21,23 +21,8 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative;
+package fr.loudo.narrativecraft.narrative.subscene;
 
-import fr.loudo.narrativecraft.client.narrative.animation.ClientAnimationEditor;
-import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
-import fr.loudo.narrativecraft.client.narrative.scene.ClientSceneEditor;
-import fr.loudo.narrativecraft.client.narrative.subscene.ClientSubsceneEditor;
-import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
-import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
-import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
-import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 
-public class ClientNarrativeEditorsRegister {
-
-    public static void register() {
-        ClientNarrativeEntryEditorRegistry.getInstance().register(ChapterPayload.class, new ClientChapterEditor());
-        ClientNarrativeEntryEditorRegistry.getInstance().register(ScenePayload.class, new ClientSceneEditor());
-        ClientNarrativeEntryEditorRegistry.getInstance().register(AnimationPayload.class, new ClientAnimationEditor());
-        ClientNarrativeEntryEditorRegistry.getInstance().register(SubscenePayload.class, new ClientSubsceneEditor());
-    }
-}
+public class SubsceneManager extends NarrativeManager<Subscene> {}

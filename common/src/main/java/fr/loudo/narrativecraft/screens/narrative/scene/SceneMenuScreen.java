@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.screens.narrative.scene;
 
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -71,7 +72,19 @@ public class SceneMenuScreen extends Screen {
         labels.put(Translation.message("screen.scene_menu.cutscenes"), () -> {});
         labels.put(Translation.message("screen.scene_menu.interactions"), () -> {});
         labels.put(Translation.message("screen.scene_menu.npc"), () -> {});
-        labels.put(Translation.message("screen.scene_menu.subscenes"), () -> {});
+        labels.put(Translation.message("screen.scene_menu.subscenes"), () -> {
+            minecraft.setScreen(new NarrativeEntryListScreen<>(
+                    Translation.message("subscene"),
+                    scene.getSubsceneManager().getList(),
+                    this,
+                    Subscene.class,
+                    scene,
+                    String.format(
+                            "%s;%s;%s",
+                            scene.getChapter().getName(),
+                            scene.getName(),
+                            Translation.message("subscene").getString())));
+        });
 
         int totalHeight = labels.size() * BUTTON_HEIGHT + (labels.size() - 1) * BUTTON_GAP;
         int startY = (this.height - totalHeight) / 2;

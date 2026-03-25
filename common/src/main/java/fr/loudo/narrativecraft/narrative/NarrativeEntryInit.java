@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.platform.Services;
@@ -47,6 +48,7 @@ public class NarrativeEntryInit {
         chapters();
         scenes();
         animations();
+        subscenes();
     }
 
     private static void chapters() {
@@ -90,6 +92,19 @@ public class NarrativeEntryInit {
         }
     }
 
+    private static void subscenes() {
+        List<DeserializationResult<Subscene>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Subscene.class);
+        for (DeserializationResult<Subscene> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Subscene subscene = deserializationResult.entry();
+            subscene.getScene().getSubsceneManager().add(subscene);
+        }
+    }
+
     public static void sendDataToPlayer(ServerPlayer player) {
         Services.PACKET.sendToPlayer(player, S2CNarrativeDataClear.INSTANCE);
         for (Chapter chapter :
@@ -100,6 +115,10 @@ public class NarrativeEntryInit {
                 for (Animation animation : scene.getAnimationManager().getList()) {
                     Services.PACKET.sendToPlayer(
                             player, BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
+                }
+                for (Subscene subscene : scene.getSubsceneManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(subscene.getId(), subscene.toPayload()));
                 }
             }
         }

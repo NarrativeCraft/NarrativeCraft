@@ -21,23 +21,37 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.client.narrative.subscene;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.files.narrrative.subscene.NarrativeCraftFileSubscene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.screens.narrative.subscene.SubsceneAnimationsAssignScreen;
+import fr.loudo.narrativecraft.screens.narrative.subscene.SubsceneEntryEditScreen;
+import net.minecraft.client.gui.screens.Screen;
 
-public class NarrativeCraftFileEditorsRegister {
+public class ClientSubsceneNarrativeUIAction implements ClientNarrativeUIAction<Subscene> {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
-        NarrativeCraftFileRegistry.getInstance().register(Subscene.class, new NarrativeCraftFileSubscene());
+    @Override
+    public Screen subListSubScreen(Subscene entry, Screen parent) {
+        return new SubsceneAnimationsAssignScreen(entry, parent);
+    }
+
+    @Override
+    public boolean hasSubScreen() {
+        return true;
+    }
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Subscene> showEditScreen(Subscene entry, Screen lastScreen) {
+        return new SubsceneEntryEditScreen(entry, lastScreen);
+    }
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Subscene> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
+        if (!(parent instanceof Scene scene)) return null;
+        return new SubsceneEntryEditScreen(scene, lastScreen);
     }
 }

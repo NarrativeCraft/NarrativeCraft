@@ -26,9 +26,11 @@ package fr.loudo.narrativecraft.client.narrative.ui;
 import fr.loudo.narrativecraft.client.narrative.animation.ClientAnimationNarrativeUIAction;
 import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterNarrativeUIAction;
 import fr.loudo.narrativecraft.client.narrative.scene.ClientSceneNarrativeUIAction;
+import fr.loudo.narrativecraft.client.narrative.subscene.ClientSubsceneNarrativeUIAction;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 
 public class ClientNarrativeUIActionRegister {
 
@@ -36,5 +38,6 @@ public class ClientNarrativeUIActionRegister {
         ClientNarrativeUIActionRegistry.getInstance().register(Chapter.class, new ClientChapterNarrativeUIAction());
         ClientNarrativeUIActionRegistry.getInstance().register(Scene.class, new ClientSceneNarrativeUIAction());
         ClientNarrativeUIActionRegistry.getInstance().register(Animation.class, new ClientAnimationNarrativeUIAction());
+        ClientNarrativeUIActionRegistry.getInstance().register(Subscene.class, new ClientSubsceneNarrativeUIAction());
     }
 }

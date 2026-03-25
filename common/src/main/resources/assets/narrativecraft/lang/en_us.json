@@ -3,6 +3,7 @@
   "narrativecraft.chapter_index": "Chapter Index",
   "narrativecraft.scene": "Scene",
   "narrativecraft.animation": "Animation",
+  "narrativecraft.subscene": "Subscene",
   "narrativecraft.name": "Name",
   "narrativecraft.description": "Description",
   "narrativecraft.send": "Send",
@@ -16,6 +17,9 @@
   "narrativecraft.screen.scene_menu.interactions": "Interactions",
   "narrativecraft.screen.scene_menu.npc": "Npc",
   "narrativecraft.screen.scene_menu.subscenes": "Subscenes",
+
+  "narrativecraft.screen.subscene_assign.available": "Available",
+  "narrativecraft.screen.subscene_assign.assigned": "Assigned",
 
   "narrativecraft.screen.pagination.page": "Page %d",
   "narrativecraft.screen.pagination.page_out_of": "Page %d out of %d",

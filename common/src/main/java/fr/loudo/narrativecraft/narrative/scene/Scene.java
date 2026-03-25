@@ -26,12 +26,14 @@ package fr.loudo.narrativecraft.narrative.scene;
 import fr.loudo.narrativecraft.managers.AnimationManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.subscene.SubsceneManager;
 import java.util.UUID;
 
 public class Scene extends NarrativeEntry<ScenePayload> {
 
     private final Chapter chapter;
     private final AnimationManager animationManager = new AnimationManager();
+    private final SubsceneManager subsceneManager = new SubsceneManager();
 
     private int rank;
 
@@ -62,6 +64,10 @@ public class Scene extends NarrativeEntry<ScenePayload> {
 
     public AnimationManager getAnimationManager() {
         return animationManager;
+    }
+
+    public SubsceneManager getSubsceneManager() {
+        return subsceneManager;
     }
 
     @Override
