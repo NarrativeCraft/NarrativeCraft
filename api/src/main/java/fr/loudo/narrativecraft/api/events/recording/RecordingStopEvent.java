@@ -21,8 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.events;
+package fr.loudo.narrativecraft.api.events.recording;
 
+import fr.loudo.narrativecraft.api.events.Event;
 import fr.loudo.narrativecraft.api.recording.IRecording;
 import net.minecraft.server.level.ServerPlayer;
 

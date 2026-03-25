@@ -64,6 +64,7 @@ public class EntityByteAction extends AbstractAction {
     }
 
     @Override
+    @SuppressWarnings("DataFlowIssue")
     public ActionResult execute(IPlaybackContext context) {
         SynchedEntityData entityData = context.getEntity().getEntityData();
         entityData.set(EntityAccessor.getDATA_SHARED_FLAGS_ID(), entityByte);

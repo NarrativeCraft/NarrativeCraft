@@ -24,9 +24,9 @@
 package fr.loudo.narrativecraft.recording;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.events.RecordingSaveEvent;
-import fr.loudo.narrativecraft.api.events.RecordingStartEvent;
-import fr.loudo.narrativecraft.api.events.RecordingStopEvent;
+import fr.loudo.narrativecraft.api.events.recording.RecordingSaveEvent;
+import fr.loudo.narrativecraft.api.events.recording.RecordingStartEvent;
+import fr.loudo.narrativecraft.api.events.recording.RecordingStopEvent;
 import fr.loudo.narrativecraft.api.recording.IRecording;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;

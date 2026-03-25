@@ -64,6 +64,7 @@ public class LivingEntityByteAction extends AbstractAction {
     }
 
     @Override
+    @SuppressWarnings("DataFlowIssue")
     public ActionResult execute(IPlaybackContext context) {
         SynchedEntityData entityData = context.getEntity().getEntityData();
         entityData.set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), livingEntityByte);
