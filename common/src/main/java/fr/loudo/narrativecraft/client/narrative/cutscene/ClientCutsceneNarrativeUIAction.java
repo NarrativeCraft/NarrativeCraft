@@ -21,26 +21,37 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files;
+package fr.loudo.narrativecraft.client.narrative.cutscene;
 
-import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
-import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
-import fr.loudo.narrativecraft.files.narrrative.cutscene.NarrativeCraftFileCutscene;
-import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
-import fr.loudo.narrativecraft.files.narrrative.subscene.NarrativeCraftFileSubscene;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.screens.narrative.cutscene.CutsceneEntryEditScreen;
+import fr.loudo.narrativecraft.screens.narrative.cutscene.CutsceneSubscenesAssignScreen;
+import net.minecraft.client.gui.screens.Screen;
 
-public class NarrativeCraftFileEditorsRegister {
+public class ClientCutsceneNarrativeUIAction implements ClientNarrativeUIAction<Cutscene> {
 
-    public static void register() {
-        NarrativeCraftFileRegistry.getInstance().register(Chapter.class, new NarrativeCraftFileChapter());
-        NarrativeCraftFileRegistry.getInstance().register(Scene.class, new NarrativeCraftFileScene());
-        NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
-        NarrativeCraftFileRegistry.getInstance().register(Subscene.class, new NarrativeCraftFileSubscene());
-        NarrativeCraftFileRegistry.getInstance().register(Cutscene.class, new NarrativeCraftFileCutscene());
+    @Override
+    public Screen subListSubScreen(Cutscene entry, Screen parent) {
+        return new CutsceneSubscenesAssignScreen(entry, parent);
+    }
+
+    @Override
+    public boolean hasSubScreen() {
+        return true;
+    }
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Cutscene> showEditScreen(Cutscene entry, Screen lastScreen) {
+        return new CutsceneEntryEditScreen(entry, lastScreen);
+    }
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Cutscene> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
+        if (!(parent instanceof Scene scene)) return null;
+        return new CutsceneEntryEditScreen(scene, lastScreen);
     }
 }

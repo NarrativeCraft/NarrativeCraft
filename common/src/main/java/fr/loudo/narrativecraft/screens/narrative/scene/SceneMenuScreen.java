@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.narrative.scene;
 
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
@@ -69,7 +70,19 @@ public class SceneMenuScreen extends Screen {
         });
 
         labels.put(Translation.message("screen.scene_menu.camera_angles"), () -> {});
-        labels.put(Translation.message("screen.scene_menu.cutscenes"), () -> {});
+        labels.put(Translation.message("screen.scene_menu.cutscenes"), () -> {
+            minecraft.setScreen(new NarrativeEntryListScreen<>(
+                    Translation.message("cutscene"),
+                    scene.getCutsceneManager().getList(),
+                    this,
+                    Cutscene.class,
+                    scene,
+                    String.format(
+                            "%s;%s;%s",
+                            scene.getChapter().getName(),
+                            scene.getName(),
+                            Translation.message("cutscene").getString())));
+        });
         labels.put(Translation.message("screen.scene_menu.interactions"), () -> {});
         labels.put(Translation.message("screen.scene_menu.npc"), () -> {});
         labels.put(Translation.message("screen.scene_menu.subscenes"), () -> {

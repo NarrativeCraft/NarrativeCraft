@@ -21,11 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.narrative.subscene;
+package fr.loudo.narrativecraft.screens.narrative.cutscene;
 
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.platform.Services;
@@ -39,64 +40,67 @@ import java.util.UUID;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class SubsceneAnimationsAssignScreen extends AbstractAssignScreen<Animation> {
+public class CutsceneSubscenesAssignScreen extends AbstractAssignScreen<Subscene> {
 
-    private final Subscene subscene;
+    private final Cutscene cutscene;
 
-    public SubsceneAnimationsAssignScreen(Subscene subscene, Screen lastScreen) {
-        super(Component.literal("Assign Animations"), lastScreen);
-        this.subscene = subscene;
+    public CutsceneSubscenesAssignScreen(Cutscene cutscene, Screen lastScreen) {
+        super(Component.literal("Assign Subscenes"), lastScreen);
+        this.cutscene = cutscene;
     }
 
     @Override
-    protected List<Animation> buildAvailableList() {
+    protected List<Subscene> buildAvailableList() {
         Set<UUID> assignedIds = new HashSet<>();
-        for (Animation anim : subscene.getAnimations()) assignedIds.add(anim.getId());
-        List<Animation> result = new ArrayList<>();
-        for (Animation anim : subscene.getScene().getAnimationManager().getList()) {
-            if (!assignedIds.contains(anim.getId())) result.add(anim);
+        for (Subscene subscene : cutscene.getSubscenes()) assignedIds.add(subscene.getId());
+        List<Subscene> result = new ArrayList<>();
+        for (Subscene subscene : cutscene.getScene().getSubsceneManager().getList()) {
+            if (!assignedIds.contains(subscene.getId())) result.add(subscene);
         }
         return result;
     }
 
     @Override
-    protected List<Animation> buildAssignedList() {
-        return new ArrayList<>(subscene.getAnimations());
+    protected List<Subscene> buildAssignedList() {
+        return new ArrayList<>(cutscene.getSubscenes());
     }
 
     @Override
-    protected String getItemName(Animation item) {
+    protected String getItemName(Subscene item) {
         return item.getName();
     }
 
     @Override
     protected String getBreadcrumb() {
-        return subscene.getScene().getChapter().getName()
-                + ";" + subscene.getScene().getName()
-                + ";" + subscene.getName();
+        return cutscene.getScene().getChapter().getName()
+                + ";" + cutscene.getScene().getName()
+                + ";" + cutscene.getName();
     }
 
     @Override
     protected Component getAvailableColumnLabel() {
-        return Translation.message("screen.subscene_assign.available");
+        return Translation.message("screen.cutscene_assign.available");
     }
 
     @Override
     protected Component getAssignedColumnLabel() {
-        return Translation.message("screen.subscene_assign.assigned");
+        return Translation.message("screen.cutscene_assign.assigned");
     }
 
     @Override
-    protected void onSave(List<Animation> assigned) {
-        List<UUID> newAnimationIds = assigned.stream().map(Animation::getId).toList();
+    protected void onSave(List<Subscene> assigned) {
+        List<UUID> animationIds =
+                cutscene.getAnimations().stream().map(Animation::getId).toList();
+        List<UUID> subsceneIds = assigned.stream().map(Subscene::getId).toList();
         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
-                subscene.getId(),
-                new SubscenePayload(
-                        subscene.getName(),
-                        subscene.getDescription(),
-                        subscene.getScene().getId(),
-                        subscene.getScene().getChapter().getId(),
-                        newAnimationIds),
+                cutscene.getId(),
+                new CutscenePayload(
+                        cutscene.getName(),
+                        cutscene.getDescription(),
+                        cutscene.getScene().getId(),
+                        cutscene.getScene().getChapter().getId(),
+                        animationIds,
+                        subsceneIds),
                 NarrativeEntryAction.EDIT));
         minecraft.setScreen(lastScreen);
     }

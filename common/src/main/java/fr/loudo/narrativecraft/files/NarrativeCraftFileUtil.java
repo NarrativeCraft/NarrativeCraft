@@ -54,4 +54,9 @@ public class NarrativeCraftFileUtil {
         File sceneFolder = getSceneFolder(scene);
         return new File(sceneFolder, NarrativeCraftFileDefault.SUBSCENES_FOLDER_NAME);
     }
+
+    public static File getCutscenesFolder(Scene scene) {
+        File sceneFolder = getSceneFolder(scene);
+        return new File(sceneFolder, NarrativeCraftFileDefault.CUTSCENES_FOLDER_NAME);
+    }
 }

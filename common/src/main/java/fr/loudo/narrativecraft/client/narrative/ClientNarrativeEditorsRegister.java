@@ -25,10 +25,12 @@ package fr.loudo.narrativecraft.client.narrative;
 
 import fr.loudo.narrativecraft.client.narrative.animation.ClientAnimationEditor;
 import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
+import fr.loudo.narrativecraft.client.narrative.cutscene.ClientCutsceneEditor;
 import fr.loudo.narrativecraft.client.narrative.scene.ClientSceneEditor;
 import fr.loudo.narrativecraft.client.narrative.subscene.ClientSubsceneEditor;
 import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
+import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
 import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
 
@@ -39,5 +41,6 @@ public class ClientNarrativeEditorsRegister {
         ClientNarrativeEntryEditorRegistry.getInstance().register(ScenePayload.class, new ClientSceneEditor());
         ClientNarrativeEntryEditorRegistry.getInstance().register(AnimationPayload.class, new ClientAnimationEditor());
         ClientNarrativeEntryEditorRegistry.getInstance().register(SubscenePayload.class, new ClientSubsceneEditor());
+        ClientNarrativeEntryEditorRegistry.getInstance().register(CutscenePayload.class, new ClientCutsceneEditor());
     }
 }

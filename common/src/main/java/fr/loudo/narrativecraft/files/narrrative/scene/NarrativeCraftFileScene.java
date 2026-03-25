@@ -65,6 +65,12 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             return OPERATION_FAILED;
         }
 
+        File cutsceneFolder = createDirectory(sceneFile, CUTSCENES_FOLDER_NAME);
+        if (cutsceneFolder == null) {
+            NarrativeCraftMod.LOGGER.error("Failed to create cutscenes directory of scene {}", entry.getName());
+            return OPERATION_FAILED;
+        }
+
         return edit(entry);
     }
 
