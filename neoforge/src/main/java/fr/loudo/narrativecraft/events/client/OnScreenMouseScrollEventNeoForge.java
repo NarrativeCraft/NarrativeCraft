@@ -21,18 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api;
+package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
-public class APISetup {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnScreenMouseScrollEventNeoForge {
 
-    public static void init(NarrativeCraftMod mod) {
-        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
+    public OnScreenMouseScrollEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnScreenMouseScrollEventNeoForge::onMouseScroll);
+    }
 
-        api.setRecordingManager(mod.getRecordingManager());
-        api.setActionRegistry(mod.getActionRegistry());
-        api.setCutsceneLayerRegistry(mod.getCutsceneLayerRegistry());
-        api.setEventBus(NarrativeCraftMod.EVENT_BUS);
+    private static void onMouseScroll(ScreenEvent.MouseScrolled.Post event) {
+        OnScreenMouseScrollEvent.onCutsceneLayerMouseScroll(event.getScrollDeltaY());
     }
 }

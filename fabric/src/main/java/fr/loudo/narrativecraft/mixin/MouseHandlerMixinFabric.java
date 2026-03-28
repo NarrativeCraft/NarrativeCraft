@@ -24,15 +24,25 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
+import fr.loudo.narrativecraft.events.client.OnScreenMouseScrollEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MouseHandler.class)
-public class MouseHandlerMixinFabric {
+public abstract class MouseHandlerMixinFabric {
+
+    @Shadow
+    @Final
+    private Minecraft minecraft;
 
     @Redirect(
             method = "onButton",
@@ -45,5 +55,17 @@ public class MouseHandlerMixinFabric {
             Screen instance, MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
         OnScreenMouseClickEvent.cutsceneHudClick(mouseButtonEvent, isDoubleClick);
         return instance.mouseClicked(mouseButtonEvent, isDoubleClick);
+    }
+
+    @Inject(
+            method = "onScroll",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseScrolled(DDDD)Z"))
+    private void narrativecraft$onMouseScroll(long windowPointer, double xOffset, double yOffset, CallbackInfo ci) {
+        boolean flag = this.minecraft.options.discreteMouseScroll().get();
+        double d0 = this.minecraft.options.mouseWheelSensitivity().get();
+        double deltaX = (flag ? Math.signum(xOffset) : xOffset) * d0;
+        double deltaY = (flag ? Math.signum(yOffset) : yOffset) * d0;
+
+        OnScreenMouseScrollEvent.onCutsceneLayerMouseScroll(deltaX, deltaY);
     }
 }

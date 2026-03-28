@@ -21,18 +21,19 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneEditor;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 
-public class APISetup {
+public class OnScreenMouseScrollEvent {
 
-    public static void init(NarrativeCraftMod mod) {
-        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
+    public static void onCutsceneLayerMouseScroll(double deltaX, double deltaY) {
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (!(playerSession.getEditor() instanceof ClientCutsceneEditor cutsceneEditor)) return;
 
-        api.setRecordingManager(mod.getRecordingManager());
-        api.setActionRegistry(mod.getActionRegistry());
-        api.setCutsceneLayerRegistry(mod.getCutsceneLayerRegistry());
-        api.setEventBus(NarrativeCraftMod.EVENT_BUS);
+        cutsceneEditor.mouseScrolled(deltaX, deltaY);
     }
 }

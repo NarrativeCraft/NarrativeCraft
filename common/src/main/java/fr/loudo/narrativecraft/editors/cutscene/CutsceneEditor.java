@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.editors.cutscene;
 
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
@@ -31,11 +32,13 @@ import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.level.GameType;
 
 public class CutsceneEditor implements Editor {
 
     private final Cutscene cutscene;
     private final List<Playback> playbacks = new ArrayList<>();
+    private final List<ICutsceneLayer> layersAdded = new ArrayList<>();
     private final PlayerSession playerSession;
     private int totalTick;
     private int currentTick;
@@ -65,15 +68,25 @@ public class CutsceneEditor implements Editor {
             animation.initialize();
             playbacks.add(new Playback(animation, playerSession.getPlayer()));
         }
-        for (Playback playback : playbacks) {
-            playback.start();
-        }
+        playerSession.changeGameMode(GameType.SPECTATOR);
+        //        for (Playback playback : playbacks) {
+        //            playback.start();
+        //        }
     }
 
     public void stop() {
         for (Playback playback : playbacks) {
             playback.stop();
         }
+        playerSession.changeGameMode(playerSession.getLastGameType());
+    }
+
+    public void addLayer(ICutsceneLayer layer) {
+        layersAdded.add(layer);
+    }
+
+    public void removeLayer(ICutsceneLayer layer) {
+        layersAdded.remove(layer);
     }
 
     public void play() {
@@ -86,6 +99,10 @@ public class CutsceneEditor implements Editor {
 
     public Cutscene getCutscene() {
         return cutscene;
+    }
+
+    public List<ICutsceneLayer> getLayersAdded() {
+        return layersAdded;
     }
 
     public PlayerSession getPlayerSession() {

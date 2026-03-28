@@ -39,9 +39,9 @@ public class UtilsClient {
     }
 
     public static int[] getScaledMousePos() {
-        Window window = Minecraft.getInstance().getWindow();
-        int mouseX = (int) Minecraft.getInstance().mouseHandler.getScaledXPos(window);
-        int mouseY = (int) Minecraft.getInstance().mouseHandler.getScaledYPos(window);
+        Window window = minecraft.getWindow();
+        int mouseX = (int) minecraft.mouseHandler.getScaledXPos(window);
+        int mouseY = (int) minecraft.mouseHandler.getScaledYPos(window);
         return new int[] {mouseX, mouseY};
     }
 }

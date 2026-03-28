@@ -26,10 +26,12 @@ package fr.loudo.narrativecraft.session;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 
 public class PlayerSession extends AbstractPlayerSession {
 
     private final ServerPlayer player;
+    private GameType lastGameType;
 
     public PlayerSession(ServerPlayer player, Chapter chapter, Scene scene) {
         super(chapter, scene);
@@ -41,7 +43,20 @@ public class PlayerSession extends AbstractPlayerSession {
         this.player = player;
     }
 
+    public void changeGameMode(GameType gameType) {
+        lastGameType = player.gameMode();
+        player.setGameMode(gameType);
+    }
+
     public ServerPlayer getPlayer() {
         return player;
+    }
+
+    public GameType getLastGameType() {
+        return lastGameType;
+    }
+
+    public void setLastGameType(GameType lastGameType) {
+        this.lastGameType = lastGameType;
     }
 }

@@ -21,18 +21,43 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api;
+package fr.loudo.narrativecraft.editors.cutscene;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.editors.ICutsceneLayerRegistry;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class APISetup {
+public class CutsceneLayerRegistry implements ICutsceneLayerRegistry {
 
-    public static void init(NarrativeCraftMod mod) {
-        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
+    private final Map<String, ICutsceneLayer> layers = new HashMap<>();
 
-        api.setRecordingManager(mod.getRecordingManager());
-        api.setActionRegistry(mod.getActionRegistry());
-        api.setCutsceneLayerRegistry(mod.getCutsceneLayerRegistry());
-        api.setEventBus(NarrativeCraftMod.EVENT_BUS);
+    public void register(String id, ICutsceneLayer cutsceneLayer) {
+        id = id.toLowerCase();
+        ICutsceneLayer existing = layers.get(id);
+        if (existing != null) {
+            throw new IllegalStateException("CutsceneLayer " + id + " already exists");
+        }
+
+        layers.put(id, cutsceneLayer);
+    }
+
+    public void unregister(String id) {
+        id = id.toLowerCase();
+        ICutsceneLayer layer = layers.get(id);
+        if (layer != null) {
+            layers.remove(id);
+        }
+    }
+
+    public ICutsceneLayer getLayer(String id) {
+        id = id.toLowerCase();
+        return layers.get(id);
+    }
+
+    public List<ICutsceneLayer> getLayers() {
+        return new ArrayList<>(layers.values());
     }
 }

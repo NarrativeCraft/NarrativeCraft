@@ -21,18 +21,19 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api;
+package fr.loudo.narrativecraft.editors.cutscene.layers;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 
-public class APISetup {
+public abstract class CutsceneLayer implements ICutsceneLayer {
 
-    public static void init(NarrativeCraftMod mod) {
-        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
+    private final String name;
 
-        api.setRecordingManager(mod.getRecordingManager());
-        api.setActionRegistry(mod.getActionRegistry());
-        api.setCutsceneLayerRegistry(mod.getCutsceneLayerRegistry());
-        api.setEventBus(NarrativeCraftMod.EVENT_BUS);
+    public CutsceneLayer(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 }

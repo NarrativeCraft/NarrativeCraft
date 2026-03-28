@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.api;
 
+import fr.loudo.narrativecraft.api.editors.ICutsceneLayerRegistry;
 import fr.loudo.narrativecraft.api.events.IEventBus;
 import fr.loudo.narrativecraft.api.managers.IRecordingManager;
 import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
@@ -32,11 +33,20 @@ public class NarrativeCraftAPI {
     private static final NarrativeCraftAPI INSTANCE = new NarrativeCraftAPI();
 
     private IActionRegistry actionRegistry;
+    private ICutsceneLayerRegistry cutsceneLayerRegistry;
     private IEventBus eventBus;
     private IRecordingManager recordingManager;
 
     public IActionRegistry getActionRegistry() {
         return actionRegistry;
+    }
+
+    public ICutsceneLayerRegistry getCutsceneLayerRegistry() {
+        return cutsceneLayerRegistry;
+    }
+
+    void setCutsceneLayerRegistry(ICutsceneLayerRegistry cutsceneLayerRegistry) {
+        this.cutsceneLayerRegistry = cutsceneLayerRegistry;
     }
 
     void setActionRegistry(IActionRegistry actionRegistry) {
