@@ -29,6 +29,6 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 public class ClientPacketRegisterFabric {
 
     public static void register() {
-        PayloadTypeRegistry.playC2S().register(C2SCutsceneState.TYPE, C2SCutsceneState.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneState.TYPE, C2SCutsceneState.STREAM_CODEC);
     }
 }

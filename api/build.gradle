@@ -3,25 +3,8 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-repositories {
-    mavenLocal()
-    maven {
-        url 'https://maven.kosmx.dev/'
-    }
-    maven { url = "https://repo.redlance.org/public" }
-}
-
 neoForge {
     neoFormVersion = neo_form_version
-    // Automatically enable AccessTransformers if the file exists
-    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
-    if (at.exists()) {
-        accessTransformers.from(at.absolutePath)
-    }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
 }
 
 dependencies {

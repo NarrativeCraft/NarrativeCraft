@@ -30,7 +30,7 @@ import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
@@ -64,28 +64,28 @@ public class CutsceneEditorLayerSelector {
         }
     }
 
-    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         if (!visible) return;
 
         int visibleHeight = Math.min(layerButtons.size() * 20, maxHeight);
-        guiGraphics.fill(x, y - visibleHeight, x + width, y, color);
+        graphics.fill(x, y - visibleHeight, x + width, y, color);
 
         int[] mousePos = UtilsClient.getScaledMousePos();
-        guiGraphics.enableScissor(x, y - visibleHeight, x + width, y);
+        graphics.enableScissor(x, y - visibleHeight, x + width, y);
         int currentY = y - visibleHeight - scrollOffset;
         for (LayerSelectionButton button : layerButtons) {
             button.setPosition(x, currentY);
             currentY += button.getHeight();
-            button.render(guiGraphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            button.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
         }
-        guiGraphics.disableScissor();
+        graphics.disableScissor();
 
         int totalHeight = layerButtons.size() * 20;
         int maxScroll = totalHeight - maxHeight;
         if (maxScroll > 0) {
             int indicatorHeight = maxHeight * maxHeight / totalHeight;
             int indicatorTop = (int) ((float) scrollOffset / maxScroll * (maxHeight - indicatorHeight));
-            guiGraphics.fill(
+            graphics.fill(
                     x + width - 1,
                     y - maxHeight + indicatorTop,
                     x + width,

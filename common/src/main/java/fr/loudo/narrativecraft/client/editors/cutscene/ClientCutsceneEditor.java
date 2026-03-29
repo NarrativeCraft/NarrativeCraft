@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -86,27 +86,26 @@ public class ClientCutsceneEditor implements Editor {
         layersAdded.remove(layer);
     }
 
-    private void renderLayers(GuiGraphics guiGraphics) {
+    private void renderLayers(GuiGraphicsExtractor graphics) {
         int screenHeight = mc.getWindow().getGuiScaledHeight();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int layerStartY = getStartLayerY();
         int currentY = layerStartY - scrollOffset;
 
         // Layers background
-        guiGraphics.fill(0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, ARGB.color(0.8f, 0));
+        graphics.fill(0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, ARGB.color(0.8f, 0));
 
         // Separator
-        guiGraphics.fill(LAYER_GAP, layerStartY, LAYER_GAP + 1, screenHeight, 0xFFFFFFFF);
+        graphics.fill(LAYER_GAP, layerStartY, LAYER_GAP + 1, screenHeight, 0xFFFFFFFF);
 
         for (ICutsceneLayer layer : layersAdded) {
             int totalHeight = (currentY + LAYER_HEIGHT);
             if (currentY >= layerStartY && currentY < screenHeight) {
                 // Bottom line of the layer
-                guiGraphics.fill(0, totalHeight - 1, screenWidth, totalHeight, 0xFFFFFFFF);
+                graphics.fill(0, totalHeight - 1, screenWidth, totalHeight, 0xFFFFFFFF);
 
                 // Layer name
-                guiGraphics.drawString(
-                        mc.font, layer.getName(), 5, currentY + (mc.font.lineHeight / 2) + 1, 0xFFFFFFFF);
+                graphics.text(mc.font, layer.getName(), 5, currentY + (mc.font.lineHeight / 2) + 1, 0xFFFFFFFF);
 
                 // TODO: draw layers button to add n stuff
             }
@@ -119,8 +118,7 @@ public class ClientCutsceneEditor implements Editor {
         if (maxScroll > 0) {
             int indicatorHeight = LAYERS_START_Y_OFFSET * LAYERS_START_Y_OFFSET / totalLayerHeight;
             int indicatorTop = (int) ((float) scrollOffset / maxScroll * (LAYERS_START_Y_OFFSET - indicatorHeight));
-            guiGraphics.fill(
-                    0, layerStartY + indicatorTop, 1, layerStartY + indicatorTop + indicatorHeight, 0xFFFFFFFF);
+            graphics.fill(0, layerStartY + indicatorTop, 1, layerStartY + indicatorTop + indicatorHeight, 0xFFFFFFFF);
         }
     }
 
@@ -136,7 +134,7 @@ public class ClientCutsceneEditor implements Editor {
         scrollOffset = (int) Math.clamp(scrollOffset - deltaY * LAYER_HEIGHT, 0, maxScroll);
     }
 
-    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         int[] mousePos = UtilsClient.getScaledMousePos();
         int addLayerX = LAYER_GAP - addLayerButton.getWidth() / 2;
         int addLayerY = getStartLayerY() - ADD_NEW_LAYER_BUTTON_OFFSET;
@@ -144,12 +142,12 @@ public class ClientCutsceneEditor implements Editor {
         addLayerButton.setPosition(addLayerX, addLayerY);
         layerSelector.setPosition(addLayerX + 2, addLayerY);
 
-        renderLayers(guiGraphics);
+        renderLayers(graphics);
 
         for (Button button : buttons) {
-            button.render(guiGraphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            button.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
         }
-        layerSelector.render(guiGraphics, deltaTracker);
+        layerSelector.render(graphics, deltaTracker);
     }
 
     public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {

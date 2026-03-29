@@ -37,6 +37,8 @@
   "narrativecraft.error.add": "Failed to add %s %s.",
   "narrativecraft.error.already_exists": "%s %s already exists.",
   "narrativecraft.error.must_have_name": "Must have a name!",
+  "narrativecraft.error.no_special_characters": "Special characters are not allowed.",
+  "narrativecraft.error.only_numbers": "Only numbers are allowed.",
   "narrativecraft.error.must_have_chapter_index": "Must have a chapter index!",
   "narrativecraft.error.chapter_index_greather_than_size": "Chapter index %s is higher than the last chapter index %s",
   "narrativecraft.error.corrupted_entry": "Entry %s failed to deserialize. Something went wrong when decoding data.",

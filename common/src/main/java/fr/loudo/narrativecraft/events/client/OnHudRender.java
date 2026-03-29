@@ -27,14 +27,14 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneEditor;
 import fr.loudo.narrativecraft.editors.Editor;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class OnHudRender {
 
-    public static void cutsceneHudRender(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static void cutsceneHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (!(editor instanceof ClientCutsceneEditor cutsceneEditor)) return;
 
-        cutsceneEditor.render(guiGraphics, deltaTracker);
+        cutsceneEditor.render(graphics, deltaTracker);
     }
 }

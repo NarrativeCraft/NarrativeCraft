@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.screens;
 
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
+import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -124,13 +125,16 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
         this.addRenderableWidget(pageIndicator);
 
         EditBox skipToPageBox = new EditBox(this.font, 20, 20, Component.empty());
-        skipToPageBox.setFilter(s -> s.matches(Utils.ONLY_NUMBERS));
         skipToPageBox.setTooltip(Tooltip.create(Translation.message("screen.pagination.skip_to_page_tootip")));
         skipToPageBox.setPosition(this.width / 2 - 25, navigationPageY + 25);
         this.addRenderableWidget(skipToPageBox);
 
         Button skipToPageButton = Button.builder(Component.literal("Go"), b -> {
                     String value = skipToPageBox.getValue();
+                    if (!value.matches(Utils.ONLY_NUMBERS)) {
+                        UtilsClient.sendToast(Translation.message("error"), Translation.message("error.only_numbers"));
+                        return;
+                    }
                     if (value.isEmpty()) return;
                     changePage(Integer.parseInt(skipToPageBox.getValue()));
                 })

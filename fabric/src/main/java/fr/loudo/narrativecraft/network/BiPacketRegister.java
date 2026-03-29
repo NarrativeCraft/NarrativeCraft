@@ -28,9 +28,9 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 public class BiPacketRegister {
 
     public static void register() {
-        PayloadTypeRegistry.playS2C()
+        PayloadTypeRegistry.clientboundPlay()
                 .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S()
+        PayloadTypeRegistry.serverboundPlay()
                 .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
     }
 }

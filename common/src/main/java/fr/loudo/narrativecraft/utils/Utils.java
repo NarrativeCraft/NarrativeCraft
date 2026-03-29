@@ -44,7 +44,7 @@ public class Utils {
                 .append("[" + NarrativeCraftMod.MOD_NAME + "] ")
                 .append(message)
                 .withStyle(ChatFormatting.RED);
-        player.displayClientMessage(errorMsg, false);
+        player.sendSystemMessage(errorMsg);
     }
 
     public static String getEntityTypeString(Entity entity) {

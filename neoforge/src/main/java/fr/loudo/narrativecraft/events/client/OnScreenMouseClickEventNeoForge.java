@@ -24,19 +24,18 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.events.IEventBus;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(NarrativeCraftMod.MOD_ID)
 public class OnScreenMouseClickEventNeoForge {
-
     public OnScreenMouseClickEventNeoForge(IEventBus bus) {
         NeoForge.EVENT_BUS.addListener(OnScreenMouseClickEventNeoForge::onMouseClick);
     }
 
-    private static void onMouseClick(ScreenEvent.MouseButtonPressed event) {
+    private static void onMouseClick(ScreenEvent.MouseButtonPressed.Pre event) {
         OnScreenMouseClickEvent.cutsceneHudClick(event.getMouseButtonEvent(), event.isDoubleClick());
     }
 }

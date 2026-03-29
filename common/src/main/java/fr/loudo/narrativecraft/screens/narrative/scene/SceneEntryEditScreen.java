@@ -54,7 +54,6 @@ public class SceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Scene
         if (entry == null) return; // If we're creating a new scene, don't show the rank field
 
         sceneRankField = new EditBox(this.font, 20, 20, Translation.message("scene_rank"));
-        sceneRankField.setFilter(s -> s.matches(Utils.ONLY_NUMBERS));
         sceneRankField.setValue(String.valueOf(entry.getRank()));
         widgets.add(sceneRankField);
 
@@ -109,6 +108,7 @@ public class SceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Scene
         }
         if (sceneRankField == null) return -1;
         if (sceneRankField.getValue().isEmpty()) return -1;
+        if (!sceneRankField.getValue().matches(Utils.ONLY_NUMBERS)) return -1;
         return Integer.parseInt(sceneRankField.getValue());
     }
 

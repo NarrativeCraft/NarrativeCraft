@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.components;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.InputWithModifiers;
@@ -44,14 +44,14 @@ public class LayerSelectionButton extends AbstractButton {
     }
 
     @Override
-    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
+    protected void extractContents(GuiGraphicsExtractor graphics, int i, int i1, float v) {
+        this.extractDefaultLabel(graphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
         if (isHovered) {
             int x = getX(), y = getY(), r = x + getWidth(), b = y + getHeight();
-            guiGraphics.fill(x, y, r, y + 1, 0xFFFFFFFF); // top
-            guiGraphics.fill(x, b - 1, r, b, 0xFFFFFFFF); // bottom
-            guiGraphics.fill(x, y, x + 1, b, 0xFFFFFFFF); // left
-            guiGraphics.fill(r - 1, y, r, b, 0xFFFFFFFF); // right
+            graphics.fill(x, y, r, y + 1, 0xFFFFFFFF); // top
+            graphics.fill(x, b - 1, r, b, 0xFFFFFFFF); // bottom
+            graphics.fill(x, y, x + 1, b, 0xFFFFFFFF); // left
+            graphics.fill(r - 1, y, r, b, 0xFFFFFFFF); // right
         }
     }
 

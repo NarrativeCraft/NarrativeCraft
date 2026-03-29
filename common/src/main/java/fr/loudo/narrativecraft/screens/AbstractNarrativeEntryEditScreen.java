@@ -68,7 +68,6 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
         nameText = new StringWidget(Translation.message("name"), this.font);
         nameBox = new EditBox(this.font, GLOBAL_WIDTH, 20, Translation.message("name"));
-        nameBox.setFilter(s -> s.matches(Utils.NO_SPECIAL_CHARACTERS));
         nameBox.setValue(entry != null ? entry.getName() : "");
 
         descriptionText = new StringWidget(Translation.message("description"), this.font);
@@ -129,6 +128,10 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
         String name = getName();
         if (name.isEmpty()) {
             sendToastError(Translation.message("error"), Translation.message("error.must_have_name"));
+            return false;
+        }
+        if (!name.matches(Utils.NO_SPECIAL_CHARACTERS)) {
+            sendToastError(Translation.message("error"), Translation.message("error.no_special_characters"));
             return false;
         }
         return true;

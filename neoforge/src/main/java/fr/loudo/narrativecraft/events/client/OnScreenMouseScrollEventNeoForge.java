@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.events.IEventBus;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -37,6 +37,6 @@ public class OnScreenMouseScrollEventNeoForge {
     }
 
     private static void onMouseScroll(ScreenEvent.MouseScrolled.Post event) {
-        OnScreenMouseScrollEvent.onCutsceneLayerMouseScroll(event.getScrollDeltaY());
+        OnScreenMouseScrollEvent.onCutsceneLayerMouseScroll(event.getScrollDeltaX(), event.getScrollDeltaY());
     }
 }

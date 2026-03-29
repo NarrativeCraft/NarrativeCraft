@@ -2,9 +2,6 @@ pluginManagement {
 	repositories {
 		gradlePluginPortal()
 		mavenCentral()
-		maven {
-			url "https://maven.firstdark.dev/releases"
-		}
 		exclusiveContent {
 			forRepository {
 				maven {
@@ -13,9 +10,7 @@ pluginManagement {
 				}
 			}
 			filter {
-				includeGroup('net.fabricmc')
-				includeGroup('fabric-loom')
-				includeGroup('net.fabricmc.unpick')
+				includeGroupAndSubgroups('net.fabricmc')
 			}
 		}
 		exclusiveContent {
@@ -29,24 +24,12 @@ pluginManagement {
 				includeGroupAndSubgroups("org.spongepowered")
 			}
 		}
-		exclusiveContent {
-			forRepository {
-				maven {
-					name = 'Forge'
-					url = uri('https://maven.minecraftforge.net')
-				}
-			}
-			filter {
-				includeGroupAndSubgroups('net.minecraftforge')
-			}
-		}
 	}
 }
 
 plugins {
 	id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
 }
-
 // This should match the folder name of the project, or else IDEA may complain (see https://youtrack.jetbrains.com/issue/IDEA-317606)
 rootProject.name = 'NarrativeCraft'
 include('common')

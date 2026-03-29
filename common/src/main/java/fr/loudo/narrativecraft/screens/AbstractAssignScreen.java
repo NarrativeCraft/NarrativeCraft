@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.utils.Translation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
@@ -119,8 +119,7 @@ public abstract class AbstractAssignScreen<T> extends Screen {
                         assigned.add(selectedLeft);
                         available.remove(selectedLeft);
                         selectedLeft = null;
-                        leftPage = Math.min(
-                                leftPage, Math.max(1, (int) Math.ceil((double) available.size() / MAX_PER_PAGE)));
+                        leftPage = Math.clamp((int) Math.ceil((double) available.size() / MAX_PER_PAGE), 1, leftPage);
                         rebuildWidgets();
                     }
                 })
@@ -134,8 +133,7 @@ public abstract class AbstractAssignScreen<T> extends Screen {
                         available.add(selectedRight);
                         assigned.remove(selectedRight);
                         selectedRight = null;
-                        rightPage = Math.min(
-                                rightPage, Math.max(1, (int) Math.ceil((double) assigned.size() / MAX_PER_PAGE)));
+                        rightPage = Math.clamp((int) Math.ceil((double) assigned.size() / MAX_PER_PAGE), 1, rightPage);
                         rebuildWidgets();
                     }
                 })
@@ -216,25 +214,25 @@ public abstract class AbstractAssignScreen<T> extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         int leftListX = this.width / 4 - LIST_WIDTH / 2;
         int rightListX = 3 * this.width / 4 - LIST_WIDTH / 2;
         int totalListHeight = MAX_PER_PAGE * (ITEM_HEIGHT + ITEM_GAP);
 
-        guiGraphics.fill(
+        graphics.fill(
                 leftListX - 3,
                 LIST_START_Y - 17,
                 leftListX + LIST_WIDTH + 3,
                 LIST_START_Y + totalListHeight + 2,
                 ARGB.color(70, 31, 30, 30));
-        guiGraphics.fill(
+        graphics.fill(
                 rightListX - 3,
                 LIST_START_Y - 17,
                 rightListX + LIST_WIDTH + 3,
                 LIST_START_Y + totalListHeight + 2,
                 ARGB.color(70, 31, 30, 30));
 
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        super.extractBackground(graphics, mouseX, mouseY, a);
     }
 
     @Override

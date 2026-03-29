@@ -50,7 +50,6 @@ public class ChapterEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cha
     protected void addCustomFields() {
         if (entry == null) return; // If we're creating a new chapter, don't show chapter index field
         chapterIndexField = new EditBox(this.font, 20, 20, Translation.message("chapter_index"));
-        chapterIndexField.setFilter(s -> s.matches(Utils.ONLY_NUMBERS));
         chapterIndexField.setValue(entry != null ? String.valueOf(entry.getChapterIndex()) : "");
         widgets.add(chapterIndexField);
 
@@ -96,6 +95,7 @@ public class ChapterEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cha
             return ClientNarrativeCraftMod.getInstance().getChapterManager().size() + 1;
         }
         if (chapterIndexField.getValue().isEmpty()) return -1;
+        if (!chapterIndexField.getValue().matches(Utils.ONLY_NUMBERS)) return -1;
         return Integer.parseInt(chapterIndexField.getValue());
     }
 

@@ -24,9 +24,9 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.events.IEventBus;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -39,9 +39,9 @@ public class OnHudRenderEventNeoForge {
     }
 
     private static void onHudRender(RenderGuiEvent.Post event) {
-        GuiGraphics guiGraphics = event.getGuiGraphics();
+        GuiGraphicsExtractor graphics = event.getGuiGraphics();
         DeltaTracker deltaTracker = event.getPartialTick();
 
-        OnHudRender.cutsceneHudRender(guiGraphics, deltaTracker);
+        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
     }
 }

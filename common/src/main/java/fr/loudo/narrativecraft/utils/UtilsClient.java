@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.utils;
 import com.mojang.blaze3d.platform.Window;
 import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.network.chat.Component;
 
 public class UtilsClient {
 
@@ -43,5 +45,9 @@ public class UtilsClient {
         int mouseX = (int) minecraft.mouseHandler.getScaledXPos(window);
         int mouseY = (int) minecraft.mouseHandler.getScaledYPos(window);
         return new int[] {mouseX, mouseY};
+    }
+
+    public static void sendToast(Component title, Component message) {
+        minecraft.getToastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
     }
 }
