@@ -34,6 +34,9 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
+/**
+ * The selection menu to add layers on the timeline
+ */
 public class CutsceneEditorLayerSelector {
 
     private static final List<ICutsceneLayer> CUTSCENE_LAYERS =

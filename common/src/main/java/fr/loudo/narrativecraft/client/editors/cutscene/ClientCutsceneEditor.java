@@ -41,6 +41,9 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 
+/**
+ * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
+ */
 public class ClientCutsceneEditor implements Editor {
 
     private static final int LAYER_HEIGHT = 20;
@@ -56,6 +59,7 @@ public class ClientCutsceneEditor implements Editor {
     private final List<Button> buttons = new ArrayList<>();
     private final CutsceneEditorLayerSelector layerSelector =
             new CutsceneEditorLayerSelector(this, 90, 120, ARGB.color(190, 0, 0, 0));
+    private final PlayHead playHead = new PlayHead(11, 90);
 
     private Button addLayerButton;
     private int scrollOffset = 0;
@@ -126,6 +130,10 @@ public class ClientCutsceneEditor implements Editor {
         return mc.getWindow().getGuiScaledHeight() - LAYERS_START_Y_OFFSET;
     }
 
+    private int getTimelineWidth() {
+        return mc.getWindow().getGuiScaledWidth() - LAYER_GAP;
+    }
+
     public void mouseScrolled(double deltaX, double deltaY) {
         layerSelector.mouseScrolled(deltaY);
         int[] mousePos = UtilsClient.getScaledMousePos();
@@ -136,11 +144,10 @@ public class ClientCutsceneEditor implements Editor {
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         int[] mousePos = UtilsClient.getScaledMousePos();
-        int addLayerX = LAYER_GAP - addLayerButton.getWidth() / 2;
         int addLayerY = getStartLayerY() - ADD_NEW_LAYER_BUTTON_OFFSET;
 
-        addLayerButton.setPosition(addLayerX, addLayerY);
-        layerSelector.setPosition(addLayerX + 2, addLayerY);
+        addLayerButton.setPosition(2, addLayerY);
+        layerSelector.setPosition(2, addLayerY - 3);
 
         renderLayers(graphics);
 
@@ -148,6 +155,9 @@ public class ClientCutsceneEditor implements Editor {
             button.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
         }
         layerSelector.render(graphics, deltaTracker);
+
+        playHead.setY(getStartLayerY() - 5);
+        playHead.render(graphics, LAYER_GAP, getTimelineWidth());
     }
 
     public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
@@ -159,6 +169,7 @@ public class ClientCutsceneEditor implements Editor {
         if (!onAddLayerButton) {
             layerSelector.mouseClicked(mouseButtonEvent, isDoubleClick);
         }
+        playHead.onClick(mouseButtonEvent, LAYER_GAP, getTimelineWidth());
     }
 
     public Cutscene getCutscene() {
