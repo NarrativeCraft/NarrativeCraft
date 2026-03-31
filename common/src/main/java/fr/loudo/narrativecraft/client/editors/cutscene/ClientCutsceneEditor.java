@@ -157,7 +157,7 @@ public class ClientCutsceneEditor implements Editor {
         layerSelector.render(graphics, deltaTracker);
 
         playHead.setY(getStartLayerY() - 5);
-        playHead.render(graphics, LAYER_GAP, getTimelineWidth());
+        playHead.render(graphics, mousePos[0], mousePos[1], LAYER_GAP, getTimelineWidth());
     }
 
     public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
@@ -169,7 +169,21 @@ public class ClientCutsceneEditor implements Editor {
         if (!onAddLayerButton) {
             layerSelector.mouseClicked(mouseButtonEvent, isDoubleClick);
         }
-        playHead.onClick(mouseButtonEvent, LAYER_GAP, getTimelineWidth());
+
+        int timelineWidth = getTimelineWidth();
+        if (playHead.isHovered()) {
+            playHead.setDragging(true);
+        } else {
+            playHead.onClick(mouseButtonEvent, LAYER_GAP, timelineWidth, getStartLayerY());
+        }
+    }
+
+    public void mouseReleased(MouseButtonEvent mouseButtonEvent) {
+        playHead.setDragging(false);
+    }
+
+    public void mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
+        playHead.onMouseDrag(mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth());
     }
 
     public Cutscene getCutscene() {

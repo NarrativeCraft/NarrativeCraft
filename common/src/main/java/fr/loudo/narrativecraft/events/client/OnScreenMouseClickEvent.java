@@ -36,4 +36,11 @@ public class OnScreenMouseClickEvent {
 
         cutsceneEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
     }
+
+    public static void cutsceneHudRelease(MouseButtonEvent mouseButtonEvent) {
+        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (!(editor instanceof ClientCutsceneEditor cutsceneEditor)) return;
+
+        cutsceneEditor.mouseReleased(mouseButtonEvent);
+    }
 }

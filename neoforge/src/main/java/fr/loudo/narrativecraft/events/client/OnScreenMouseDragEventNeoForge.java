@@ -30,17 +30,14 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(NarrativeCraftMod.MOD_ID)
-public class OnScreenMouseClickEventNeoForge {
-    public OnScreenMouseClickEventNeoForge(IEventBus bus) {
-        NeoForge.EVENT_BUS.addListener(OnScreenMouseClickEventNeoForge::onMouseClick);
-        NeoForge.EVENT_BUS.addListener(OnScreenMouseClickEventNeoForge::onMouseRelease);
+public class OnScreenMouseDragEventNeoForge {
+
+    public OnScreenMouseDragEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnScreenMouseDragEventNeoForge::onDragMouse);
     }
 
-    private static void onMouseClick(ScreenEvent.MouseButtonPressed.Pre event) {
-        OnScreenMouseClickEvent.cutsceneHudClick(event.getMouseButtonEvent(), event.isDoubleClick());
-    }
-
-    private static void onMouseRelease(ScreenEvent.MouseButtonReleased.Post event) {
-        OnScreenMouseClickEvent.cutsceneHudRelease(event.getMouseButtonEvent());
+    private static void onDragMouse(ScreenEvent.MouseDragged.Post event) {
+        OnScreenMouseScrollEvent.onCutsceneTimelineDrag(
+                event.getMouseButtonEvent(), event.getDragX(), event.getDragY());
     }
 }

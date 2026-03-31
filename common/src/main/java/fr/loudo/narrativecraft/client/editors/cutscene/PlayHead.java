@@ -34,6 +34,8 @@ public class PlayHead {
     public static final Identifier playHeadLocation =
             Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "playhead");
     private int y, width, height;
+    private boolean isHovered;
+    private boolean isDragging;
     private float ratio = 0f;
 
     public PlayHead(int width, int height) {
@@ -41,13 +43,24 @@ public class PlayHead {
         this.height = height;
     }
 
-    public void render(GuiGraphicsExtractor graphics, int timelineStartX, int timelineWidth) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int timelineStartX, int timelineWidth) {
         int x = timelineStartX + (int) (ratio * timelineWidth) - width / 2;
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, playHeadLocation, x, y, width, height);
+        isHovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
-    public void onClick(MouseButtonEvent event, int timelineStartX, int timelineWidth) {
+    public void onMouseDrag(double mouseX, int timelineStartX, int timelineWidth) {
+        if (!isDragging || timelineWidth <= 0) return;
+        ratio = (float) Math.clamp((mouseX - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
+    }
+
+    public void onClick(MouseButtonEvent event, int timelineStartX, int timelineWidth, int timelineY) {
         if (timelineWidth <= 0) return;
+        if (timelineY >= event.y() + 5) return;
+        if (event.x() <= timelineStartX) {
+            ratio = 0.0f;
+            return;
+        }
         ratio = (float) Math.clamp((event.x() - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
     }
 
@@ -73,5 +86,17 @@ public class PlayHead {
 
     public int getHeight() {
         return height;
+    }
+
+    public boolean isHovered() {
+        return isHovered;
+    }
+
+    public boolean isDragging() {
+        return isDragging;
+    }
+
+    public void setDragging(boolean dragging) {
+        isDragging = dragging;
     }
 }

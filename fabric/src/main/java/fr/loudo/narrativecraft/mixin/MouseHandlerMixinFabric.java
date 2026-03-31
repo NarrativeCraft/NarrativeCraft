@@ -57,6 +57,18 @@ public abstract class MouseHandlerMixinFabric {
         return instance.mouseClicked(mouseButtonEvent, isDoubleClick);
     }
 
+    @Redirect(
+            method = "onButton",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/gui/screens/Screen;mouseReleased(Lnet/minecraft/client/input/MouseButtonEvent;)Z"))
+    private boolean narrativecraft$onScreenMouseRelease(Screen instance, MouseButtonEvent mouseButtonEvent) {
+        OnScreenMouseClickEvent.cutsceneHudRelease(mouseButtonEvent);
+        return instance.mouseReleased(mouseButtonEvent);
+    }
+
     @Inject(
             method = "onScroll",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseScrolled(DDDD)Z"))
