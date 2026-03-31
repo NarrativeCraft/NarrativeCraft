@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
+import fr.loudo.narrativecraft.events.client.OnScreenMouseDragEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseScrollEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -79,5 +80,17 @@ public abstract class MouseHandlerMixinFabric {
         double deltaY = (flag ? Math.signum(yOffset) : yOffset) * d0;
 
         OnScreenMouseScrollEvent.onCutsceneLayerMouseScroll(deltaX, deltaY);
+    }
+
+    @Redirect(
+            method = "handleAccumulatedMovement",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/gui/screens/Screen;mouseDragged(Lnet/minecraft/client/input/MouseButtonEvent;DD)Z"))
+    private boolean narrativecraft$onMouseDragged(Screen instance, MouseButtonEvent event, double dragX, double dragY) {
+        OnScreenMouseDragEvent.onCutsceneTimelineDrag(event, dragX, dragY);
+        return instance.mouseDragged(event, dragX, dragY);
     }
 }

@@ -59,13 +59,15 @@ public class ClientCutsceneEditor implements Editor {
     private final List<Button> buttons = new ArrayList<>();
     private final CutsceneEditorLayerSelector layerSelector =
             new CutsceneEditorLayerSelector(this, 90, 120, ARGB.color(190, 0, 0, 0));
-    private final PlayHead playHead = new PlayHead(11, 90);
+    private final PlayHead playHead = new PlayHead(11, 90, 5);
+    private final CutsceneEditorControl control;
 
     private Button addLayerButton;
     private int scrollOffset = 0;
 
     public ClientCutsceneEditor(Cutscene cutscene) {
         this.cutscene = cutscene;
+        this.control = new CutsceneEditorControl(cutscene, 15, 15);
     }
 
     public void init() {
@@ -156,6 +158,9 @@ public class ClientCutsceneEditor implements Editor {
         }
         layerSelector.render(graphics, deltaTracker);
 
+        control.setPosition(LAYER_GAP / 2 - control.getWidth() / 2, getStartLayerY() - control.getHeight() - 2);
+        control.render(graphics, deltaTracker, mousePos[0], mousePos[1]);
+
         playHead.setY(getStartLayerY() - 5);
         playHead.render(graphics, mousePos[0], mousePos[1], LAYER_GAP, getTimelineWidth());
     }
@@ -169,6 +174,7 @@ public class ClientCutsceneEditor implements Editor {
         if (!onAddLayerButton) {
             layerSelector.mouseClicked(mouseButtonEvent, isDoubleClick);
         }
+        control.mouseClicked(mouseButtonEvent, isDoubleClick);
 
         int timelineWidth = getTimelineWidth();
         if (playHead.isHovered()) {

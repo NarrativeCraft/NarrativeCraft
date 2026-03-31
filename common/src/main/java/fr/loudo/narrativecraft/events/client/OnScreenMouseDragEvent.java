@@ -23,20 +23,18 @@
 
 package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneEditor;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import net.minecraft.client.input.MouseButtonEvent;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnScreenMouseDragEventNeoForge {
+public class OnScreenMouseDragEvent {
 
-    public OnScreenMouseDragEventNeoForge(IEventBus modBus) {
-        NeoForge.EVENT_BUS.addListener(OnScreenMouseDragEventNeoForge::onDragMouse);
-    }
+    public static void onCutsceneTimelineDrag(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (!(playerSession.getEditor() instanceof ClientCutsceneEditor cutsceneEditor)) return;
 
-    private static void onDragMouse(ScreenEvent.MouseDragged.Post event) {
-        OnScreenMouseDragEvent.onCutsceneTimelineDrag(event.getMouseButtonEvent(), event.getDragX(), event.getDragY());
+        cutsceneEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
     }
 }

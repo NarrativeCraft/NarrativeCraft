@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -34,19 +35,27 @@ public class PlayHead {
     public static final Identifier playHeadLocation =
             Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "playhead");
     private int y, width, height;
+    private int space;
     private boolean isHovered;
     private boolean isDragging;
     private float ratio = 0f;
 
-    public PlayHead(int width, int height) {
+    public PlayHead(int width, int height, int space) {
         this.width = width;
         this.height = height;
+        this.space = space;
     }
 
     public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int timelineStartX, int timelineWidth) {
         int x = timelineStartX + (int) (ratio * timelineWidth) - width / 2;
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, playHeadLocation, x, y, width, height);
-        isHovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+        isHovered = mouseX >= x - space && mouseX <= x + space + width && mouseY >= y && mouseY <= y + height;
+
+        if (isDragging) {
+            graphics.requestCursor(CursorTypes.RESIZE_EW);
+        } else if (isHovered) {
+            graphics.requestCursor(CursorTypes.POINTING_HAND);
+        }
     }
 
     public void onMouseDrag(double mouseX, int timelineStartX, int timelineWidth) {
@@ -58,9 +67,9 @@ public class PlayHead {
         if (timelineWidth <= 0) return;
         if (timelineY >= event.y() + 5) return;
         if (event.x() <= timelineStartX) {
-            ratio = 0.0f;
             return;
         }
+        isDragging = true;
         ratio = (float) Math.clamp((event.x() - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
     }
 
@@ -86,6 +95,14 @@ public class PlayHead {
 
     public int getHeight() {
         return height;
+    }
+
+    public int getSpace() {
+        return space;
+    }
+
+    public void setSpace(int space) {
+        this.space = space;
     }
 
     public boolean isHovered() {
