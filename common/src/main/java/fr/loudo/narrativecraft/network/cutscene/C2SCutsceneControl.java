@@ -21,26 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.network.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.managers.PlayerSessionManager;
-import fr.loudo.narrativecraft.managers.RecordingManager;
-import fr.loudo.narrativecraft.recording.Recording;
-import fr.loudo.narrativecraft.session.PlayerSession;
-import net.minecraft.server.level.ServerPlayer;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class OnPlayerLeaveEvent {
+public record C2SCutsceneControl(State state) implements CustomPacketPayload {
 
-    public static void onPlayerLeave(ServerPlayer player) {
-        PlayerSessionManager playerSessionManager =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager();
-        PlayerSession playerSession = playerSessionManager.getByPlayer(player);
-        playerSessionManager.remove(playerSession);
+    public static final Type<C2SCutsceneControl> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_control"));
 
-        RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        recordingManager.remove(recording);
+    public static final StreamCodec<ByteBuf, C2SCutsceneControl> STREAM_CODEC =
+            ByteBufCodecs.BYTE.map(b -> new C2SCutsceneControl(State.values()[b]), p -> (byte) p.state.ordinal());
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
+    public enum State {
+        PLAY,
+        PAUSE,
+        QUIT;
     }
 }

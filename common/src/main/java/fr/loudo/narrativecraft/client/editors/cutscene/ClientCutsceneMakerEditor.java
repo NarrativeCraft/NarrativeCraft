@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
@@ -67,12 +67,12 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public ClientCutsceneMakerEditor(Cutscene cutscene) {
         this.cutscene = cutscene;
-        this.control = new CutsceneMakerEditorControl(cutscene, 15, 15);
+        this.control = new CutsceneMakerEditorControl(15, 15);
     }
 
     public void init() {
         buttons.add(Button.builder(Component.literal("✖"), button -> {
-                    Services.PACKET.sendToServer(new C2SCutsceneState(C2SCutsceneState.State.QUIT, cutscene));
+                    Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.QUIT));
                     playerSession.setEditor(null);
                 })
                 .bounds(5, 5, 20, 20)
@@ -194,5 +194,17 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public Cutscene getCutscene() {
         return cutscene;
+    }
+
+    public CutsceneMakerEditorLayerSelector getLayerSelector() {
+        return layerSelector;
+    }
+
+    public CutsceneMakerEditorPlayHead getPlayHead() {
+        return playHead;
+    }
+
+    public CutsceneMakerEditorControl getControl() {
+        return control;
     }
 }

@@ -28,49 +28,39 @@ import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public class C2SCutsceneState implements CustomPacketPayload {
+public class C2SCutsceneEnter implements CustomPacketPayload {
 
-    private final State state;
     private final UUID chapterId;
     private final UUID sceneId;
     private final UUID cutsceneId;
 
-    public C2SCutsceneState(State state, Cutscene cutscene) {
-        this.state = state;
+    public C2SCutsceneEnter(Cutscene cutscene) {
         this.chapterId = cutscene.getScene().getChapter().getId();
         this.sceneId = cutscene.getScene().getId();
         this.cutsceneId = cutscene.getId();
     }
 
-    public C2SCutsceneState(State state, UUID chapterId, UUID sceneId, UUID cutsceneId) {
-        this.state = state;
+    public C2SCutsceneEnter(UUID chapterId, UUID sceneId, UUID cutsceneId) {
         this.chapterId = chapterId;
         this.sceneId = sceneId;
         this.cutsceneId = cutsceneId;
     }
 
-    public static final Type<C2SCutsceneState> TYPE =
+    public static final Type<C2SCutsceneEnter> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_state"));
 
-    public static final StreamCodec<ByteBuf, C2SCutsceneState> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.BYTE.map(b -> State.values()[b], s -> (byte) s.ordinal()),
-            C2SCutsceneState::getState,
+    public static final StreamCodec<ByteBuf, C2SCutsceneEnter> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            C2SCutsceneState::getChapterId,
+            C2SCutsceneEnter::getChapterId,
             UUIDUtil.STREAM_CODEC,
-            C2SCutsceneState::getSceneId,
+            C2SCutsceneEnter::getSceneId,
             UUIDUtil.STREAM_CODEC,
-            C2SCutsceneState::getCutsceneId,
-            C2SCutsceneState::new);
-
-    public State getState() {
-        return state;
-    }
+            C2SCutsceneEnter::getCutsceneId,
+            C2SCutsceneEnter::new);
 
     public UUID getChapterId() {
         return chapterId;
@@ -87,12 +77,5 @@ public class C2SCutsceneState implements CustomPacketPayload {
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
-    }
-
-    public enum State {
-        ENTER,
-        PLAY,
-        PAUSE,
-        QUIT;
     }
 }

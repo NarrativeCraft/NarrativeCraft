@@ -28,6 +28,8 @@ import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
@@ -55,6 +57,11 @@ public class CutsceneMakerEditor implements Editor {
         for (Playback playback : playbacks) {
             playback.tick();
         }
+
+        float ratio = (float) currentTick / (float) totalTick;
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(ratio, false));
+
+        currentTick++;
     }
 
     public void init() {
@@ -69,6 +76,10 @@ public class CutsceneMakerEditor implements Editor {
             playbacks.add(new Playback(animation, playerSession.getPlayer()));
         }
         playerSession.changeGameMode(GameType.SPECTATOR);
+        totalTick = cutscene.getMaxTick();
+    }
+
+    public void start() {
         for (Playback playback : playbacks) {
             playback.start();
         }
@@ -76,9 +87,16 @@ public class CutsceneMakerEditor implements Editor {
 
     public void stop() {
         for (Playback playback : playbacks) {
-            playback.stop();
+            playback.stopAndKill();
         }
         playerSession.changeGameMode(playerSession.getLastGameType());
+    }
+
+    public void moveTo(int tick, boolean smooth) {
+        currentTick = tick;
+        for (Playback playback : playbacks) {
+            playback.moveTo(tick, smooth);
+        }
     }
 
     public void addLayer(ICutsceneLayer layer) {
@@ -90,11 +108,21 @@ public class CutsceneMakerEditor implements Editor {
     }
 
     public void play() {
+        if (currentTick >= totalTick) {
+            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(1.0f, true));
+            return;
+        }
         playing = true;
+        for (Playback playback : playbacks) {
+            playback.play();
+        }
     }
 
     public void pause() {
         playing = false;
+        for (Playback playback : playbacks) {
+            playback.pause();
+        }
     }
 
     public Cutscene getCutscene() {

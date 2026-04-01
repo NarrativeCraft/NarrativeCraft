@@ -30,7 +30,7 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.screens.narrative.cutscene.CutsceneEntryEditScreen;
@@ -51,7 +51,7 @@ public class ClientCutsceneNarrativeUIAction implements ClientNarrativeUIAction<
 
     @Override
     public void customClickAction(Cutscene entry) {
-        Services.PACKET.sendToServer(new C2SCutsceneState(C2SCutsceneState.State.ENTER, entry));
+        Services.PACKET.sendToServer(new C2SCutsceneEnter(entry));
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         ClientCutsceneMakerEditor cutsceneEditor = new ClientCutsceneMakerEditor(entry);
         cutsceneEditor.init();

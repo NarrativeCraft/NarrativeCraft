@@ -42,7 +42,7 @@ public class Playback {
     private final Collection<ServerPlayer> targetedPlayers = new ArrayList<>();
     private int tick = 0;
     private int maxTick = 0;
-    private boolean isPlaying;
+    private boolean isPlaying, killOnEnd;
     private boolean ended = false;
 
     public Playback(Animation animation, ServerPlayer requester) {
@@ -75,11 +75,35 @@ public class Playback {
         start();
     }
 
+    public void play() {
+        isPlaying = true;
+        ended = false;
+        for (PlaybackContext context : contexts) {
+            context.play();
+        }
+    }
+
+    public void pause() {
+        isPlaying = false;
+        for (PlaybackContext context : contexts) {
+            context.pause();
+        }
+    }
+
     public void stop() {
         isPlaying = false;
         for (PlaybackContext context : contexts) {
-            context.stop();
+            if (killOnEnd) {
+                context.stop();
+            } else {
+                context.pause();
+            }
         }
+    }
+
+    public void stopAndKill() {
+        killOnEnd = true;
+        stop();
     }
 
     public void tick() {
@@ -124,6 +148,13 @@ public class Playback {
         return false;
     }
 
+    public void moveTo(int tick, boolean smooth) {
+        this.tick = tick;
+        for (PlaybackContext context : contexts) {
+            context.moveTo(tick, smooth);
+        }
+    }
+
     public boolean isEnded() {
         return ended;
     }
@@ -152,6 +183,14 @@ public class Playback {
         return !targetedPlayers.isEmpty();
     }
 
+    public boolean isKillOnEnd() {
+        return killOnEnd;
+    }
+
+    public void setKillOnEnd(boolean killOnEnd) {
+        this.killOnEnd = killOnEnd;
+    }
+
     public Entity getEntityByRecordingId(int recordingId) {
         for (PlaybackContext context : contexts) {
             if (context.getRecordingId() == recordingId) {
@@ -163,9 +202,5 @@ public class Playback {
 
     public boolean isPlaying() {
         return isPlaying;
-    }
-
-    public void setPlaying(boolean playing) {
-        isPlaying = playing;
     }
 }

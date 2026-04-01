@@ -23,12 +23,16 @@
 
 package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class ClientPacketRegisterFabric {
 
     public static void register() {
-        PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneState.TYPE, C2SCutsceneState.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay()
+                .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
     }
 }

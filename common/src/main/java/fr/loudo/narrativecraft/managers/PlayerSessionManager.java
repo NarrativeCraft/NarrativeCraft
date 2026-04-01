@@ -25,9 +25,17 @@ package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.FakePlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class PlayerSessionManager extends Manager<PlayerSession> {
+
+    @Override
+    public void add(PlayerSession item) {
+        // Fake player trying to fit in loool
+        if (item.getPlayer() instanceof FakePlayer) return;
+        super.add(item);
+    }
 
     public PlayerSession getByPlayer(Player player) {
         for (PlayerSession playerSession : list) {

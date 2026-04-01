@@ -64,6 +64,19 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> {
         this.subscenes = new ArrayList<>();
     }
 
+    public int getMaxTick() {
+        int maxTick = 0;
+        for (Subscene subscene : subscenes) {
+            for (Animation animation : subscene.getAnimations()) {
+                maxTick = Math.max(maxTick, animation.getMaxTick());
+            }
+        }
+        for (Animation animation : animations) {
+            maxTick = Math.max(maxTick, animation.getMaxTick());
+        }
+        return maxTick;
+    }
+
     public Scene getScene() {
         return scene;
     }

@@ -23,8 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
-import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -37,15 +36,13 @@ public class CutsceneMakerEditorControl {
     private static final Component PLAY_LABEL = Component.literal("▶");
     private static final Component PAUSE_LABEL = Component.literal("⏸");
 
-    private final Cutscene cutscene;
     private final Button button;
     private final int width;
     private final int height;
     private int x, y;
     private boolean playing = false;
 
-    public CutsceneMakerEditorControl(Cutscene cutscene, int width, int height) {
-        this.cutscene = cutscene;
+    public CutsceneMakerEditorControl(int width, int height) {
         this.width = width;
         this.height = height;
         this.button = Button.builder(PLAY_LABEL, b -> toggle())
@@ -57,7 +54,19 @@ public class CutsceneMakerEditorControl {
         playing = !playing;
         button.setMessage(playing ? PAUSE_LABEL : PLAY_LABEL);
         Services.PACKET.sendToServer(
-                new C2SCutsceneState(playing ? C2SCutsceneState.State.PLAY : C2SCutsceneState.State.PAUSE, cutscene));
+                new C2SCutsceneControl(playing ? C2SCutsceneControl.State.PLAY : C2SCutsceneControl.State.PAUSE));
+    }
+
+    public void play() {
+        playing = true;
+        button.setMessage(PAUSE_LABEL);
+        Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.PLAY));
+    }
+
+    public void pause() {
+        playing = false;
+        button.setMessage(PLAY_LABEL);
+        Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.PAUSE));
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, int mouseX, int mouseY) {
@@ -76,10 +85,6 @@ public class CutsceneMakerEditorControl {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
-    }
-
-    public Cutscene getCutscene() {
-        return cutscene;
     }
 
     public Button getButton() {

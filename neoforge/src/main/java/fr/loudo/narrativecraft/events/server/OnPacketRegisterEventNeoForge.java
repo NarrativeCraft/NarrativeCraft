@@ -28,7 +28,9 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
 import net.neoforged.bus.api.IEventBus;
@@ -46,6 +48,7 @@ public class OnPacketRegisterEventNeoForge {
     private static void onPacketRegister(RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("1");
         registerS2CPackets(registrar);
+        registerC2SPackets(registrar);
     }
 
     private static void registerS2CPackets(PayloadRegistrar registrar) {
@@ -61,7 +64,17 @@ public class OnPacketRegisterEventNeoForge {
                 S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC, ClientPacketHandlerNeoForge::clearScreen);
         registrar.playToClient(
                 S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC, ClientPacketHandlerNeoForge::setSession);
+    }
+
+    private static void registerC2SPackets(PayloadRegistrar registrar) {
         registrar.playToServer(
-                C2SCutsceneState.TYPE, C2SCutsceneState.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneState);
+                C2SCutsceneEnter.TYPE, C2SCutsceneEnter.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneState);
+        registrar.playToServer(
+                C2SCutsceneControl.TYPE, C2SCutsceneControl.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneControl);
+        registrar.playBidirectional(
+                BiCutscenePlayHeadPacket.TYPE,
+                BiCutscenePlayHeadPacket.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::playHeadUpdate,
+                ClientPacketHandlerNeoForge::updatePlayHeadCutscene);
     }
 }

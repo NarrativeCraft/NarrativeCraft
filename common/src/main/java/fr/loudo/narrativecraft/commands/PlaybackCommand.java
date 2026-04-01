@@ -92,6 +92,7 @@ public class PlaybackCommand {
 
         ServerPlayer player = context.getSource().getPlayer();
         Playback playback = new Playback(animation, player);
+        playback.setKillOnEnd(true);
         NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
         playback.start();
 
@@ -114,6 +115,7 @@ public class PlaybackCommand {
             ServerPlayer player = context.getSource().getPlayer();
 
             Playback playback = new Playback(animation, player);
+            playback.setKillOnEnd(true);
             NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
             playback.start(players);
 

@@ -24,12 +24,16 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
+import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import net.minecraft.client.Minecraft;
 
 public class ClientPacketHandler {
@@ -62,5 +66,17 @@ public class ClientPacketHandler {
         if (scene == null) return;
 
         ClientNarrativeCraftMod.getInstance().getPlayerSession().apply(chapter, scene);
+    }
+
+    public static void updatePlayHeadCutscene(BiCutscenePlayHeadPacket packet) {
+
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (!(session.getEditor() instanceof ClientCutsceneMakerEditor editor)) return;
+
+        CutsceneMakerEditorPlayHead playHead = editor.getPlayHead();
+        playHead.setRatio(packet.ratio());
+        if (packet.ratio() == 1.0f) {
+            editor.getControl().pause();
+        }
     }
 }

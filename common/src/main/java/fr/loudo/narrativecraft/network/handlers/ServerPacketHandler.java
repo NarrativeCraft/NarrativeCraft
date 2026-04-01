@@ -31,7 +31,9 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneState;
+import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import net.minecraft.world.entity.player.Player;
 
@@ -48,7 +50,7 @@ public class ServerPacketHandler {
         }
     }
 
-    public static void cutsceneState(C2SCutsceneState packet, Player player) {
+    public static void cutsceneState(C2SCutsceneEnter packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
@@ -58,19 +60,34 @@ public class ServerPacketHandler {
         Cutscene cutscene = scene.getCutsceneManager().getById(packet.getCutsceneId());
         if (cutscene == null) return;
 
-        switch (packet.getState()) {
-            case ENTER -> {
-                CutsceneMakerEditor editor = new CutsceneMakerEditor(cutscene, session);
-                session.setEditor(editor);
-                editor.init();
-            }
+        CutsceneMakerEditor editor = new CutsceneMakerEditor(cutscene, session);
+        session.setEditor(editor);
+        editor.init();
+        editor.start();
+    }
+
+    public static void cutsceneControl(C2SCutsceneControl packet, Player player) {
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession session = sessionManager.getByPlayer(player);
+        CutsceneMakerEditor editor = sessionManager.getEditor(player, CutsceneMakerEditor.class);
+        if (editor == null) return;
+
+        switch (packet.state()) {
+            case PLAY -> editor.play();
+            case PAUSE -> editor.pause();
             case QUIT -> {
-                CutsceneMakerEditor editor = sessionManager.getEditor(player, CutsceneMakerEditor.class);
-                if (editor != null) {
-                    editor.stop();
-                    session.setEditor(null);
-                }
+                editor.stop();
+                session.setEditor(null);
             }
         }
+    }
+
+    public static void playHeadUpdate(BiCutscenePlayHeadPacket packet, Player player) {
+        CutsceneMakerEditor editor =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getEditor(player, CutsceneMakerEditor.class);
+        if (editor == null) return;
+
+        int tick = Math.round(packet.ratio() * editor.getTotalTick());
+        editor.moveTo(tick, packet.smooth());
     }
 }

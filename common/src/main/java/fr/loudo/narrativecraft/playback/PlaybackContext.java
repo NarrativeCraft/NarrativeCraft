@@ -155,6 +155,14 @@ public class PlaybackContext implements IPlaybackContext {
         if (entity == null) return;
         entity.remove(Entity.RemovalReason.KILLED);
         entity = null;
+        pause();
+    }
+
+    public void play() {
+        isPlaying = true;
+    }
+
+    public void pause() {
         isPlaying = false;
     }
 
@@ -179,7 +187,29 @@ public class PlaybackContext implements IPlaybackContext {
 
         if (!spawned) return;
 
-        List<AbstractAction> actionsToPlay = recordingData.getActions().get(currentTick);
+        executeActionsFromTick(currentTick);
+    }
+
+    public void moveTo(int tick, boolean smooth) {
+        List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
+        if (actionsToPlay == null) return;
+
+        if (!smooth) {
+            killEntity();
+            createEntity();
+            addEntityToWorld();
+        }
+        executeActionsFromTick(tick);
+    }
+
+    private void killEntity() {
+        if (entity == null) return;
+        entity.remove(Entity.RemovalReason.KILLED);
+        entity = null;
+    }
+
+    private void executeActionsFromTick(int tick) {
+        List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
         if (actionsToPlay != null) {
             for (AbstractAction action : actionsToPlay) {
                 ActionResult result = action.execute(this);
