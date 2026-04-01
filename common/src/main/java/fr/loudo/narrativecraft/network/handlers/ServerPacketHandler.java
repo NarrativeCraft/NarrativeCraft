@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.editors.cutscene.CutsceneEditor;
+import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditor;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -60,12 +60,12 @@ public class ServerPacketHandler {
 
         switch (packet.getState()) {
             case ENTER -> {
-                CutsceneEditor editor = new CutsceneEditor(cutscene, session);
+                CutsceneMakerEditor editor = new CutsceneMakerEditor(cutscene, session);
                 session.setEditor(editor);
                 editor.init();
             }
             case QUIT -> {
-                CutsceneEditor editor = sessionManager.getEditor(player, CutsceneEditor.class);
+                CutsceneMakerEditor editor = sessionManager.getEditor(player, CutsceneMakerEditor.class);
                 if (editor != null) {
                     editor.stop();
                     session.setEditor(null);

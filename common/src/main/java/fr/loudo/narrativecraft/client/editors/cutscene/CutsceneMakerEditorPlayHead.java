@@ -30,7 +30,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
-public class PlayHead {
+public class CutsceneMakerEditorPlayHead {
 
     public static final Identifier playHeadLocation =
             Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "playhead");
@@ -40,7 +40,7 @@ public class PlayHead {
     private boolean isDragging;
     private float ratio = 0f;
 
-    public PlayHead(int width, int height, int space) {
+    public CutsceneMakerEditorPlayHead(int width, int height, int space) {
         this.width = width;
         this.height = height;
         this.space = space;

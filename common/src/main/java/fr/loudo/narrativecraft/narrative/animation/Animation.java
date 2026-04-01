@@ -103,6 +103,20 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
         return true;
     }
 
+    public int getMaxTick() {
+        int maxTick = 0;
+        for (RecordingData recordingData : recordingDataList) {
+
+            int entityMaxTick = recordingData.getActions().keySet().stream()
+                    .mapToInt(Integer::intValue)
+                    .max()
+                    .orElse(-1);
+            maxTick = Math.max(maxTick, entityMaxTick + 1);
+        }
+
+        return maxTick;
+    }
+
     @Override
     public AnimationPayload toPayload() {
         return new AnimationPayload(

@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.world.level.GameType;
 
-public class CutsceneEditor implements Editor {
+public class CutsceneMakerEditor implements Editor {
 
     private final Cutscene cutscene;
     private final List<Playback> playbacks = new ArrayList<>();
@@ -44,7 +44,7 @@ public class CutsceneEditor implements Editor {
     private int currentTick;
     private boolean playing;
 
-    public CutsceneEditor(Cutscene cutscene, PlayerSession playerSession) {
+    public CutsceneMakerEditor(Cutscene cutscene, PlayerSession playerSession) {
         this.cutscene = cutscene;
         this.playerSession = playerSession;
     }
@@ -69,9 +69,9 @@ public class CutsceneEditor implements Editor {
             playbacks.add(new Playback(animation, playerSession.getPlayer()));
         }
         playerSession.changeGameMode(GameType.SPECTATOR);
-        //        for (Playback playback : playbacks) {
-        //            playback.start();
-        //        }
+        for (Playback playback : playbacks) {
+            playback.start();
+        }
     }
 
     public void stop() {

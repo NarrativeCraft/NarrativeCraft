@@ -32,10 +32,7 @@ import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -64,7 +61,16 @@ public class PlaybackContext implements IPlaybackContext {
         createEntity();
         if (entity != null && recordingData.getSpawnTick() == 0) {
             addEntityToWorld();
+            executeFirstActions();
             spawned = true;
+        }
+    }
+
+    private void executeFirstActions() {
+        List<AbstractAction> actions = recordingData.getActions().get(recordingData.getSpawnTick());
+        if (actions == null || actions.isEmpty()) return;
+        for (AbstractAction action : actions) {
+            action.execute(this);
         }
     }
 

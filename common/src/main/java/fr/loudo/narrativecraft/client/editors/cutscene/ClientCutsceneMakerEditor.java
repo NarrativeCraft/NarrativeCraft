@@ -44,7 +44,7 @@ import net.minecraft.util.ARGB;
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
  */
-public class ClientCutsceneEditor implements Editor {
+public class ClientCutsceneMakerEditor implements Editor {
 
     private static final int LAYER_HEIGHT = 20;
     private static final int LAYER_GAP = 85;
@@ -57,17 +57,17 @@ public class ClientCutsceneEditor implements Editor {
     private final ClientPlayerSession playerSession =
             ClientNarrativeCraftMod.getInstance().getPlayerSession();
     private final List<Button> buttons = new ArrayList<>();
-    private final CutsceneEditorLayerSelector layerSelector =
-            new CutsceneEditorLayerSelector(this, 90, 120, ARGB.color(190, 0, 0, 0));
-    private final PlayHead playHead = new PlayHead(11, 90, 5);
-    private final CutsceneEditorControl control;
+    private final CutsceneMakerEditorLayerSelector layerSelector =
+            new CutsceneMakerEditorLayerSelector(this, 90, 120, ARGB.color(190, 0, 0, 0));
+    private final CutsceneMakerEditorPlayHead playHead = new CutsceneMakerEditorPlayHead(11, 90, 5);
+    private final CutsceneMakerEditorControl control;
 
     private Button addLayerButton;
     private int scrollOffset = 0;
 
-    public ClientCutsceneEditor(Cutscene cutscene) {
+    public ClientCutsceneMakerEditor(Cutscene cutscene) {
         this.cutscene = cutscene;
-        this.control = new CutsceneEditorControl(cutscene, 15, 15);
+        this.control = new CutsceneMakerEditorControl(cutscene, 15, 15);
     }
 
     public void init() {

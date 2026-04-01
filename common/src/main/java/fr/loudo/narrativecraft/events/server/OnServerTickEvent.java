@@ -24,38 +24,44 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditor;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 
 public class OnServerTickEvent {
 
+    private static final NarrativeCraftMod instance = NarrativeCraftMod.getInstance();
+
     public static void tick(MinecraftServer server) {
 
-        for (Recording recording :
-                NarrativeCraftMod.getInstance().getRecordingManager().getList()) {
+        for (Recording recording : instance.getRecordingManager().getList()) {
             recording.tick();
-        }
-
-        for (Playback playback :
-                NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
-            if (playback.forSpecificPlayers()) {
-                playback.hideEntitiesToOtherPlayers();
-            }
         }
 
         List<Playback> toRemove = new ArrayList<>();
 
-        for (Playback playback :
-                NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
+        for (Playback playback : instance.getPlaybackManager().getList()) {
+            if (playback.forSpecificPlayers()) {
+                playback.hideEntitiesToOtherPlayers();
+            }
             playback.tick();
             if (playback.isEnded()) {
                 toRemove.add(playback);
             }
         }
 
-        NarrativeCraftMod.getInstance().getPlaybackManager().getList().removeAll(toRemove);
+        instance.getPlaybackManager().getList().removeAll(toRemove);
+
+        for (PlayerSession playerSession : instance.getPlayerSessionManager().getList()) {
+            Editor editor = playerSession.getEditor();
+            if (editor instanceof CutsceneMakerEditor cutsceneMakerEditor) {
+                cutsceneMakerEditor.tick();
+            }
+        }
     }
 }

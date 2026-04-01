@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneEditor;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.editors.Editor;
 import net.minecraft.client.input.MouseButtonEvent;
 
@@ -32,14 +32,14 @@ public class OnScreenMouseClickEvent {
 
     public static void cutsceneHudClick(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
         Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCutsceneEditor cutsceneEditor)) return;
+        if (!(editor instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
 
         cutsceneEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
     }
 
     public static void cutsceneHudRelease(MouseButtonEvent mouseButtonEvent) {
         Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCutsceneEditor cutsceneEditor)) return;
+        if (!(editor instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
 
         cutsceneEditor.mouseReleased(mouseButtonEvent);
     }

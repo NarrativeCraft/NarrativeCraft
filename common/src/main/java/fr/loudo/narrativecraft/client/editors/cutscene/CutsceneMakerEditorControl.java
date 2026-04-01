@@ -32,9 +32,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
-public class CutsceneEditorControl {
+public class CutsceneMakerEditorControl {
 
-    private static final int LAYER_GAP = ClientCutsceneEditor.LAYER_GAP;
     private static final Component PLAY_LABEL = Component.literal("▶");
     private static final Component PAUSE_LABEL = Component.literal("⏸");
 
@@ -45,7 +44,7 @@ public class CutsceneEditorControl {
     private int x, y;
     private boolean playing = false;
 
-    public CutsceneEditorControl(Cutscene cutscene, int width, int height) {
+    public CutsceneMakerEditorControl(Cutscene cutscene, int width, int height) {
         this.cutscene = cutscene;
         this.width = width;
         this.height = height;

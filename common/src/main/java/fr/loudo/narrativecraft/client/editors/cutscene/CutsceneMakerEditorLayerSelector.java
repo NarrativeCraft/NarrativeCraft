@@ -37,12 +37,12 @@ import net.minecraft.network.chat.Component;
 /**
  * The selection menu to add layers on the timeline
  */
-public class CutsceneEditorLayerSelector {
+public class CutsceneMakerEditorLayerSelector {
 
     private static final List<ICutsceneLayer> CUTSCENE_LAYERS =
             NarrativeCraftMod.getInstance().getCutsceneLayerRegistry().getLayers();
 
-    private final ClientCutsceneEditor cutsceneEditor;
+    private final ClientCutsceneMakerEditor cutsceneEditor;
     private final List<LayerSelectionButton> layerButtons = new ArrayList<>();
     private final int width;
     private final int maxHeight;
@@ -53,7 +53,8 @@ public class CutsceneEditorLayerSelector {
     private int scrollOffset = 0;
     private boolean visible;
 
-    public CutsceneEditorLayerSelector(ClientCutsceneEditor cutsceneEditor, int width, int maxHeight, int color) {
+    public CutsceneMakerEditorLayerSelector(
+            ClientCutsceneMakerEditor cutsceneEditor, int width, int maxHeight, int color) {
         this.cutsceneEditor = cutsceneEditor;
         this.width = width;
         this.maxHeight = maxHeight;
@@ -144,7 +145,7 @@ public class CutsceneEditorLayerSelector {
         this.y = y;
     }
 
-    public ClientCutsceneEditor getCutsceneEditor() {
+    public ClientCutsceneMakerEditor getCutsceneEditor() {
         return cutsceneEditor;
     }
 

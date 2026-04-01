@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneEditor;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.editors.Editor;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -33,7 +33,7 @@ public class OnHudRender {
 
     public static void cutsceneHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCutsceneEditor cutsceneEditor)) return;
+        if (!(editor instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
 
         cutsceneEditor.render(graphics, deltaTracker);
     }

@@ -41,7 +41,7 @@ public class Playback {
     private final List<PlaybackContext> contexts = new ArrayList<>();
     private final Collection<ServerPlayer> targetedPlayers = new ArrayList<>();
     private int tick = 0;
-    private int totalTicks = 0;
+    private int maxTick = 0;
     private boolean isPlaying;
     private boolean ended = false;
 
@@ -52,20 +52,15 @@ public class Playback {
 
     public void start() {
         tick = 0;
-        totalTicks = 0;
+        maxTick = 0;
         ended = false;
         contexts.clear();
 
         for (RecordingData recordingData : animation.getRecordingDataList()) {
             contexts.add(new PlaybackContext(this, recordingData, requester.level()));
-
-            int entityMaxTick = recordingData.getActions().keySet().stream()
-                    .mapToInt(Integer::intValue)
-                    .max()
-                    .orElse(-1);
-            totalTicks = Math.max(totalTicks, entityMaxTick + 1);
         }
 
+        maxTick = animation.getMaxTick();
         isPlaying = true;
         for (PlaybackContext context : contexts) {
             context.start();
@@ -90,7 +85,7 @@ public class Playback {
     public void tick() {
         if (!isPlaying) return;
 
-        if (tick >= totalTicks) {
+        if (tick >= maxTick) {
             stop();
             ended = true;
             return;

@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneEditor;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 
 public class OnScreenMouseScrollEvent {
@@ -32,7 +32,7 @@ public class OnScreenMouseScrollEvent {
     public static void onCutsceneLayerMouseScroll(double deltaX, double deltaY) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (!(playerSession.getEditor() instanceof ClientCutsceneEditor cutsceneEditor)) return;
+        if (!(playerSession.getEditor() instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
 
         cutsceneEditor.mouseScrolled(deltaX, deltaY);
     }
