@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.api.recording.action;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
@@ -32,6 +33,10 @@ import net.minecraft.world.phys.Vec3;
 public interface Action {
 
     ActionResult execute(IPlaybackContext context);
+
+    default Optional<Runnable> createRewindSnapshot(IPlaybackContext context) {
+        return Optional.empty();
+    }
 
     interface Writer {
         void addByte(byte value) throws IOException;

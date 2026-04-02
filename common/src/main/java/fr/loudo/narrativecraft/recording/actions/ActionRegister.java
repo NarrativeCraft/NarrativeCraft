@@ -33,6 +33,7 @@ public class ActionRegister {
         registry.register(EntityByteAction.ID, EntityByteAction::new);
         registry.register(LivingEntityByteAction.ID, LivingEntityByteAction::new);
         registry.register(PlaceBlockAction.ID, PlaceBlockAction::new);
+        registry.register(SilentPlaceBlockAction.ID, SilentPlaceBlockAction::new);
         registry.register(BreakBlockAction.ID, BreakBlockAction::new);
         registry.register(SwingAction.ID, SwingAction::new);
         registry.register(ChangeItemAction.ID, ChangeItemAction::new);
