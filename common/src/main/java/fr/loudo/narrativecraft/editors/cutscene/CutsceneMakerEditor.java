@@ -95,7 +95,11 @@ public class CutsceneMakerEditor implements Editor {
     public void moveTo(int tick, boolean smooth) {
         currentTick = tick;
         for (Playback playback : playbacks) {
-            playback.moveTo(tick, smooth);
+            if (tick < currentTick) {
+                playback.rewindTo(tick, smooth);
+            } else {
+                playback.moveTo(tick, smooth);
+            }
         }
     }
 

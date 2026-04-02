@@ -34,7 +34,7 @@ public interface Action {
 
     ActionResult execute(IPlaybackContext context);
 
-    default Optional<Runnable> createRewindSnapshot(IPlaybackContext context) {
+    default Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
         return Optional.empty();
     }
 

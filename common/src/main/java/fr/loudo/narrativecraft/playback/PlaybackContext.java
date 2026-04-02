@@ -46,6 +46,7 @@ public class PlaybackContext implements IPlaybackContext {
     private final RecordingData recordingData;
     private final ServerLevel level;
     private Entity entity;
+    private final List<Playback.RewindEntry> rewindLog = new ArrayList<>();
     private boolean isPlaying = false;
     private boolean spawned = false;
 
@@ -202,6 +203,19 @@ public class PlaybackContext implements IPlaybackContext {
         executeActionsFromTick(tick);
     }
 
+    public void rewindTo(int tick, boolean smooth) {
+        List<Playback.RewindEntry> toUndo = rewindLog.stream()
+                .filter(e -> e.tick() > tick)
+                .sorted(Comparator.comparingInt(Playback.RewindEntry::tick).reversed())
+                .toList();
+
+        for (Playback.RewindEntry entry : toUndo) {
+            entry.snapshot().execute(this);
+        }
+        rewindLog.removeIf(e -> e.tick() > tick);
+        moveTo(tick, smooth);
+    }
+
     private void killEntity() {
         if (entity == null) return;
         entity.remove(Entity.RemovalReason.KILLED);
@@ -212,6 +226,8 @@ public class PlaybackContext implements IPlaybackContext {
         List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
         if (actionsToPlay != null) {
             for (AbstractAction action : actionsToPlay) {
+                action.createRewindSnapshot(this)
+                        .ifPresent(snapshot -> rewindLog.add(new Playback.RewindEntry(tick, snapshot)));
                 ActionResult result = action.execute(this);
                 if (result == ActionResult.ERROR) {
                     playback.stop();

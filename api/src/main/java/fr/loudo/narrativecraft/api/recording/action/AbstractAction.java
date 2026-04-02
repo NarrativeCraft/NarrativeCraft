@@ -27,7 +27,7 @@ import java.io.IOException;
 
 public abstract class AbstractAction implements Action {
 
-    private int tick;
+    protected int tick;
 
     public AbstractAction(int tick) {
         this.tick = tick;

@@ -24,7 +24,9 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
@@ -87,6 +89,12 @@ public class PlaceBlockAction extends DataBlockAction {
         }
 
         return ActionResult.OK;
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        BlockState previous = context.getLevel().getBlockState(blockPos);
+        return Optional.of(new PlaceBlockAction(tick, blockPos, blockState));
     }
 
     @Override
