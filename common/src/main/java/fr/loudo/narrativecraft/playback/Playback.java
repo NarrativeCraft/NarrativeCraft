@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.playback;
 
-import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import java.util.ArrayList;
@@ -149,10 +148,11 @@ public class Playback {
         return false;
     }
 
-    public void moveTo(int tick, boolean smooth) {
-        this.tick = tick;
+    public void moveTo(int toTick, boolean smooth) {
+        int fromTick = this.tick;
+        this.tick = toTick;
         for (PlaybackContext context : contexts) {
-            context.moveTo(tick, smooth);
+            context.moveTo(fromTick, toTick, smooth);
         }
     }
 
@@ -212,5 +212,4 @@ public class Playback {
         return isPlaying;
     }
 
-    public record RewindEntry(int tick, AbstractAction snapshot) {}
 }

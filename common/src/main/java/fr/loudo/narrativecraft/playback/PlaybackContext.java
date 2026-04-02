@@ -32,7 +32,14 @@ import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.NavigableMap;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.UUID;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +53,7 @@ public class PlaybackContext implements IPlaybackContext {
     private final RecordingData recordingData;
     private final ServerLevel level;
     private Entity entity;
-    private final List<Playback.RewindEntry> rewindLog = new ArrayList<>();
+    private final NavigableMap<Integer, List<AbstractAction>> rewindLog = new TreeMap<>();
     private boolean isPlaying = false;
     private boolean spawned = false;
 
@@ -191,29 +198,33 @@ public class PlaybackContext implements IPlaybackContext {
         executeActionsFromTick(currentTick);
     }
 
-    public void moveTo(int tick, boolean smooth) {
-        List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
-        if (actionsToPlay == null) return;
-
+    public void moveTo(int fromTick, int toTick, boolean smooth) {
         if (!smooth) {
+            rewindLog.clear();
             killEntity();
             createEntity();
             addEntityToWorld();
+            spawned = true;
+            for (int t = recordingData.getSpawnTick(); t <= toTick; t++) {
+                executeActionsFromTick(t);
+            }
+            return;
         }
-        executeActionsFromTick(tick);
+        for (int t = fromTick + 1; t <= toTick; t++) {
+            executeActionsFromTick(t);
+        }
     }
 
     public void rewindTo(int tick, boolean smooth) {
-        List<Playback.RewindEntry> toUndo = rewindLog.stream()
-                .filter(e -> e.tick() > tick)
-                .sorted(Comparator.comparingInt(Playback.RewindEntry::tick).reversed())
-                .toList();
-
-        for (Playback.RewindEntry entry : toUndo) {
-            entry.snapshot().execute(this);
+        List<Integer> keysToUndo = new ArrayList<>(rewindLog.tailMap(tick + 1).keySet());
+        Collections.reverse(keysToUndo);
+        for (int t : keysToUndo) {
+            for (AbstractAction snapshot : rewindLog.get(t)) {
+                snapshot.execute(this);
+            }
         }
-        rewindLog.removeIf(e -> e.tick() > tick);
-        moveTo(tick, smooth);
+        rewindLog.tailMap(tick, true).clear();
+        executeActionsFromTick(tick);
     }
 
     private void killEntity() {
@@ -227,7 +238,8 @@ public class PlaybackContext implements IPlaybackContext {
         if (actionsToPlay != null) {
             for (AbstractAction action : actionsToPlay) {
                 action.createRewindSnapshot(this)
-                        .ifPresent(snapshot -> rewindLog.add(new Playback.RewindEntry(tick, snapshot)));
+                        .ifPresent(snapshot ->
+                                rewindLog.computeIfAbsent(tick, k -> new ArrayList<>()).add(snapshot));
                 ActionResult result = action.execute(this);
                 if (result == ActionResult.ERROR) {
                     playback.stop();

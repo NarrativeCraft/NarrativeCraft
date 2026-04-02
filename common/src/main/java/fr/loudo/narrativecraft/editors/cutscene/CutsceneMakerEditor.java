@@ -93,7 +93,6 @@ public class CutsceneMakerEditor implements Editor {
     }
 
     public void moveTo(int tick, boolean smooth) {
-        currentTick = tick;
         for (Playback playback : playbacks) {
             if (tick < currentTick) {
                 playback.rewindTo(tick, smooth);
@@ -101,6 +100,7 @@ public class CutsceneMakerEditor implements Editor {
                 playback.moveTo(tick, smooth);
             }
         }
+        currentTick = tick;
     }
 
     public void addLayer(ICutsceneLayer layer) {

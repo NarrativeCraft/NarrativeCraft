@@ -93,8 +93,7 @@ public class PlaceBlockAction extends DataBlockAction {
 
     @Override
     public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
-        BlockState previous = context.getLevel().getBlockState(blockPos);
-        return Optional.of(new PlaceBlockAction(tick, blockPos, blockState));
+        return Optional.of(new SilentPlaceBlockAction(tick, blockPos, Blocks.AIR.defaultBlockState()));
     }
 
     @Override
