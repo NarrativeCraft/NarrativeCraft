@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -63,6 +64,11 @@ public class DestroyBlockStageAction extends AbstractAction {
     @Override
     public String getId() {
         return ID;
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        return Optional.of(new DestroyBlockStageAction(tick, blockPos, progress - 1));
     }
 
     @Override

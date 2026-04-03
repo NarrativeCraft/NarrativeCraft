@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
+import java.util.Optional;
 import net.minecraft.world.entity.Pose;
 
 public class PoseAction extends AbstractAction {
@@ -64,6 +65,11 @@ public class PoseAction extends AbstractAction {
     public PoseAction(int tick, Pose pose) {
         super(tick);
         this.pose = pose;
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        return Optional.of(new PoseAction(tick, context.getEntity().getPose()));
     }
 
     @Override

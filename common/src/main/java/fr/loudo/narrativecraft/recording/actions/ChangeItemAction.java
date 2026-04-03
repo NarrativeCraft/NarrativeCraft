@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.utils.Utils;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.Identifier;
@@ -165,6 +166,14 @@ public class ChangeItemAction extends AbstractAction {
         ((LivingEntityAccessor) entity).callDetectEquipmentUpdates();
 
         return ActionResult.OK;
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        if (!(context.getEntity() instanceof LivingEntity entity)) {
+            return Optional.empty();
+        }
+        return Optional.of(new ChangeItemAction(tick, entity));
     }
 
     @Override

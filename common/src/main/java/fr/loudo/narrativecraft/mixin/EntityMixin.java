@@ -57,6 +57,10 @@ public class EntityMixin {
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
         if (recording == null) return;
 
-        recording.addAction(new StopRideEntityAction(recording.getTick()), entity);
+        recording.addAction(
+                new StopRideEntityAction(
+                        recording.getTick(),
+                        recording.getRecordingEntityData(entity).getRecordingId()),
+                entity);
     }
 }

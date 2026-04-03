@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -46,13 +47,23 @@ public class SleepAction extends AbstractAction {
     }
 
     @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        if (!(context.getEntity() instanceof LivingEntity entity)) return Optional.empty();
+        BlockPos currentPos = entity.getSleepingPos().orElse(null);
+        return Optional.of(new SleepAction(tick, currentPos));
+    }
+
+    @Override
     public void write(Writer writer) throws IOException {
-        writer.addBlockPos(blockPos);
+        writer.addBoolean(blockPos != null);
+        if (blockPos != null) {
+            writer.addBlockPos(blockPos);
+        }
     }
 
     @Override
     public void read(Reader reader) throws IOException {
-        blockPos = reader.readBlockPos();
+        blockPos = reader.readBoolean() ? reader.readBlockPos() : null;
     }
 
     @Override
@@ -64,7 +75,11 @@ public class SleepAction extends AbstractAction {
     public ActionResult execute(IPlaybackContext context) {
         if (!(context.getEntity() instanceof LivingEntity entity)) return ActionResult.IGNORED;
 
-        entity.setSleepingPos(blockPos);
+        if (blockPos == null) {
+            entity.clearSleepingPos();
+        } else {
+            entity.setSleepingPos(blockPos);
+        }
         return ActionResult.OK;
     }
 }

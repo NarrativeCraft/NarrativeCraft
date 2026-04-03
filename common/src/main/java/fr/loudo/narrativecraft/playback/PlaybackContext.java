@@ -199,7 +199,7 @@ public class PlaybackContext implements IPlaybackContext {
     }
 
     public void rewindTo(int tick) {
-        List<Integer> keysToUndo = new ArrayList<>(rewindLog.tailMap(tick + 1).keySet());
+        List<Integer> keysToUndo = new ArrayList<>(rewindLog.tailMap(tick).keySet());
         Collections.reverse(keysToUndo);
         for (int t : keysToUndo) {
             for (AbstractAction snapshot : rewindLog.get(t)) {

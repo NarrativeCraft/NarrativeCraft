@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
+import java.util.Optional;
 import net.minecraft.world.entity.Entity;
 
 public class RideEntityAction extends AbstractAction {
@@ -52,6 +53,11 @@ public class RideEntityAction extends AbstractAction {
     @Override
     public void read(Reader reader) throws IOException {
         nearbyEntityLocalId = reader.readInt();
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        return Optional.of(new StopRideEntityAction(tick));
     }
 
     @Override

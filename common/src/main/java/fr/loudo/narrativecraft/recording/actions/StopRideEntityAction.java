@@ -27,13 +27,26 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
+import java.util.Optional;
 
 public class StopRideEntityAction extends AbstractAction {
 
     public static final String ID = "stop_ride_entity";
 
+    private int entityRecordingId;
+
+    public StopRideEntityAction(int tick, int entityRecordingId) {
+        super(tick);
+        this.entityRecordingId = entityRecordingId;
+    }
+
     public StopRideEntityAction(int tick) {
         super(tick);
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        return Optional.of(new RideEntityAction(tick, entityRecordingId));
     }
 
     @Override
