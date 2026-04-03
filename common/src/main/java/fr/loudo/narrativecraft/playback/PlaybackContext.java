@@ -31,7 +31,6 @@ import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
-import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -135,13 +134,8 @@ public class PlaybackContext implements IPlaybackContext {
     private void addEntityToWorld() {
 
         if (entity instanceof FakePlayer fakePlayer) {
-            if (playback.forSpecificPlayers()) {
-                for (ServerPlayer player : playback.getTargetedPlayers()) {
-                    player.connection.send(new ClientboundPlayerInfoUpdatePacket(
-                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-                }
-            } else {
-                UtilsServer.broadcastPacket(new ClientboundPlayerInfoUpdatePacket(
+            for (ServerPlayer player : playback.getTargetedPlayers()) {
+                player.connection.send(new ClientboundPlayerInfoUpdatePacket(
                         ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
             }
             level.addNewPlayer(fakePlayer);
@@ -198,24 +192,13 @@ public class PlaybackContext implements IPlaybackContext {
         executeActionsFromTick(currentTick);
     }
 
-    public void moveTo(int fromTick, int toTick, boolean smooth) {
-        if (!smooth) {
-            rewindLog.clear();
-            killEntity();
-            createEntity();
-            addEntityToWorld();
-            spawned = true;
-            for (int t = recordingData.getSpawnTick(); t <= toTick; t++) {
-                executeActionsFromTick(t);
-            }
-            return;
-        }
+    public void moveTo(int fromTick, int toTick) {
         for (int t = fromTick + 1; t <= toTick; t++) {
             executeActionsFromTick(t);
         }
     }
 
-    public void rewindTo(int tick, boolean smooth) {
+    public void rewindTo(int tick) {
         List<Integer> keysToUndo = new ArrayList<>(rewindLog.tailMap(tick + 1).keySet());
         Collections.reverse(keysToUndo);
         for (int t : keysToUndo) {
@@ -237,9 +220,9 @@ public class PlaybackContext implements IPlaybackContext {
         List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
         if (actionsToPlay != null) {
             for (AbstractAction action : actionsToPlay) {
-                action.createRewindSnapshot(this)
-                        .ifPresent(snapshot ->
-                                rewindLog.computeIfAbsent(tick, k -> new ArrayList<>()).add(snapshot));
+                action.createRewindSnapshot(this).ifPresent(snapshot -> rewindLog
+                        .computeIfAbsent(tick, k -> new ArrayList<>())
+                        .add(snapshot));
                 ActionResult result = action.execute(this);
                 if (result == ActionResult.ERROR) {
                     playback.stop();

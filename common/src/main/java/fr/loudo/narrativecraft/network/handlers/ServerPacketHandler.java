@@ -88,6 +88,6 @@ public class ServerPacketHandler {
         if (editor == null) return;
 
         int tick = Math.round(packet.ratio() * editor.getTotalTick());
-        editor.moveTo(tick, packet.smooth());
+        editor.moveTo(tick);
     }
 }

@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.minecraft.world.level.GameType;
 
@@ -59,7 +60,7 @@ public class CutsceneMakerEditor implements Editor {
         }
 
         float ratio = (float) currentTick / (float) totalTick;
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(ratio, false));
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(ratio));
 
         currentTick++;
     }
@@ -81,7 +82,7 @@ public class CutsceneMakerEditor implements Editor {
 
     public void start() {
         for (Playback playback : playbacks) {
-            playback.start();
+            playback.start(Collections.singletonList(playerSession.getPlayer()));
         }
     }
 
@@ -92,12 +93,12 @@ public class CutsceneMakerEditor implements Editor {
         playerSession.changeGameMode(playerSession.getLastGameType());
     }
 
-    public void moveTo(int tick, boolean smooth) {
+    public void moveTo(int tick) {
         for (Playback playback : playbacks) {
             if (tick < currentTick) {
-                playback.rewindTo(tick, smooth);
+                playback.rewindTo(tick);
             } else {
-                playback.moveTo(tick, smooth);
+                playback.moveTo(tick);
             }
         }
         currentTick = tick;
@@ -113,7 +114,7 @@ public class CutsceneMakerEditor implements Editor {
 
     public void play() {
         if (currentTick >= totalTick) {
-            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(1.0f, true));
+            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(1.0f));
             return;
         }
         playing = true;

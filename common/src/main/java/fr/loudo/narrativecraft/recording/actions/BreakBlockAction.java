@@ -24,7 +24,9 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
@@ -62,6 +64,11 @@ public class BreakBlockAction extends DataBlockAction {
         }
 
         return ActionResult.OK;
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        return Optional.of(new SilentPlaceBlockAction(tick, blockPos, blockState));
     }
 
     @Override

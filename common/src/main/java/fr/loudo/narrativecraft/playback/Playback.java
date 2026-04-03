@@ -148,17 +148,17 @@ public class Playback {
         return false;
     }
 
-    public void moveTo(int toTick, boolean smooth) {
+    public void moveTo(int toTick) {
         int fromTick = this.tick;
         this.tick = toTick;
         for (PlaybackContext context : contexts) {
-            context.moveTo(fromTick, toTick, smooth);
+            context.moveTo(fromTick, toTick);
         }
     }
 
-    public void rewindTo(int tick, boolean smooth) {
+    public void rewindTo(int tick) {
         for (PlaybackContext context : contexts) {
-            context.rewindTo(tick, smooth);
+            context.rewindTo(tick);
         }
         this.tick = tick;
     }
@@ -211,5 +211,4 @@ public class Playback {
     public boolean isPlaying() {
         return isPlaying;
     }
-
 }

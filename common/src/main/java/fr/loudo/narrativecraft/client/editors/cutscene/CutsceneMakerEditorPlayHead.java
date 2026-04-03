@@ -63,7 +63,7 @@ public class CutsceneMakerEditorPlayHead {
     public void onMouseDrag(double mouseX, int timelineStartX, int timelineWidth) {
         if (!isDragging || timelineWidth <= 0) return;
         ratio = (float) Math.clamp((mouseX - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
-        Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(ratio, true));
+        Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(ratio));
     }
 
     public void onClick(MouseButtonEvent event, int timelineStartX, int timelineWidth, int timelineY) {
@@ -74,7 +74,7 @@ public class CutsceneMakerEditorPlayHead {
         }
         isDragging = true;
         ratio = (float) Math.clamp((event.x() - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
-        Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(ratio, false));
+        Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(ratio));
     }
 
     public void setY(int y) {
