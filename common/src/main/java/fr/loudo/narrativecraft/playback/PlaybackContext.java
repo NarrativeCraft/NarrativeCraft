@@ -67,8 +67,8 @@ public class PlaybackContext implements IPlaybackContext {
         spawned = false;
         createEntity();
         if (entity != null && recordingData.getSpawnTick() == 0) {
-            addEntityToWorld();
             executeFirstActions();
+            addEntityToWorld();
             spawned = true;
         }
     }
@@ -105,6 +105,8 @@ public class PlaybackContext implements IPlaybackContext {
             if (entity instanceof Mob mob) {
                 mob.setNoAi(true);
             }
+            entity.setInvulnerable(true);
+            entity.entityTags().add(Playback.ENTITY_TAG);
             return;
         }
 
@@ -128,7 +130,10 @@ public class PlaybackContext implements IPlaybackContext {
                     Translation.message("error.playback_entity_null", recordingData.getEntityId()),
                     playback.getRequester());
             playback.stop();
+            return;
         }
+        entity.setInvulnerable(true);
+        entity.entityTags().add(Playback.ENTITY_TAG);
     }
 
     private void addEntityToWorld() {
@@ -143,6 +148,20 @@ public class PlaybackContext implements IPlaybackContext {
         }
 
         level.addFreshEntity(entity);
+    }
+
+    public void respawnEntity() {
+        killEntity();
+        createEntity();
+        addEntityToWorld();
+    }
+
+    @Override
+    public void respawnEntityByRecordingId(int recordingId) {
+        PlaybackContext target = playback.getContextByRecordingId(recordingId);
+        if (target != null) {
+            target.respawnEntity();
+        }
     }
 
     public boolean forSpecificPlayers() {
@@ -182,9 +201,12 @@ public class PlaybackContext implements IPlaybackContext {
 
         int currentTick = playback.getTick();
 
-        if (!spawned && entity != null && currentTick >= recordingData.getSpawnTick()) {
-            addEntityToWorld();
-            spawned = true;
+        if (!spawned && currentTick >= recordingData.getSpawnTick()) {
+            if (entity == null) createEntity();
+            if (entity != null) {
+                addEntityToWorld();
+                spawned = true;
+            }
         }
 
         if (!spawned) return;
@@ -194,11 +216,19 @@ public class PlaybackContext implements IPlaybackContext {
 
     public void moveTo(int fromTick, int toTick) {
         for (int t = fromTick + 1; t <= toTick; t++) {
-            executeActionsFromTick(t);
+            if (!spawned && t >= recordingData.getSpawnTick()) {
+                if (entity == null) createEntity();
+                if (entity != null) {
+                    addEntityToWorld();
+                    spawned = true;
+                }
+            }
+            if (spawned) executeActionsFromTick(t);
         }
     }
 
     public void rewindTo(int tick) {
+        executeStateActionsFromTick(tick);
         List<Integer> keysToUndo = new ArrayList<>(rewindLog.tailMap(tick).keySet());
         Collections.reverse(keysToUndo);
         for (int t : keysToUndo) {
@@ -207,13 +237,16 @@ public class PlaybackContext implements IPlaybackContext {
             }
         }
         rewindLog.tailMap(tick, true).clear();
-        executeActionsFromTick(tick);
+        if (tick < recordingData.getSpawnTick()) {
+            killEntity();
+        }
     }
 
     private void killEntity() {
         if (entity == null) return;
         entity.remove(Entity.RemovalReason.KILLED);
         entity = null;
+        spawned = false;
     }
 
     private void executeActionsFromTick(int tick) {
@@ -229,6 +262,16 @@ public class PlaybackContext implements IPlaybackContext {
                     sendError(action);
                     return;
                 }
+            }
+        }
+    }
+
+    private void executeStateActionsFromTick(int tick) {
+        List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
+        if (actionsToPlay == null) return;
+        for (AbstractAction action : actionsToPlay) {
+            if (action.shouldExecuteOnRewind()) {
+                action.execute(this);
             }
         }
     }

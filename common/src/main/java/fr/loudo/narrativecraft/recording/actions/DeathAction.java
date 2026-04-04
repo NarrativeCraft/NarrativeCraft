@@ -23,82 +23,43 @@
 
 package fr.loudo.narrativecraft.recording.actions;
 
-import com.google.common.collect.ImmutableBiMap;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.io.IOException;
 import java.util.Optional;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
-public class PoseAction extends AbstractAction {
+public class DeathAction extends AbstractAction {
 
-    public static final String ID = "pose";
+    public static final String ID = "kill_entity";
 
-    private static final ImmutableBiMap<Pose, Integer> POSE_IDS = ImmutableBiMap.<Pose, Integer>builder()
-            .put(Pose.STANDING, 1)
-            .put(Pose.FALL_FLYING, 2)
-            .put(Pose.SLEEPING, 3)
-            .put(Pose.SWIMMING, 4)
-            .put(Pose.SPIN_ATTACK, 5)
-            .put(Pose.CROUCHING, 6)
-            .put(Pose.DYING, 7)
-            .put(Pose.LONG_JUMPING, 8)
-            .put(Pose.CROAKING, 9)
-            .put(Pose.USING_TONGUE, 10)
-            .put(Pose.SITTING, 11)
-            .put(Pose.ROARING, 12)
-            .put(Pose.SNIFFING, 13)
-            .put(Pose.EMERGING, 14)
-            .put(Pose.DIGGING, 15)
-            .put(Pose.SLIDING, 16)
-            .put(Pose.SHOOTING, 17)
-            .put(Pose.INHALING, 18)
-            .build();
+    private int entityId;
 
-    private Pose pose;
-
-    public PoseAction(int tick) {
+    public DeathAction(int tick, int entityId) {
         super(tick);
+        this.entityId = entityId;
     }
 
-    public PoseAction(int tick, Pose pose) {
+    public DeathAction(int tick) {
         super(tick);
-        this.pose = pose;
     }
 
     @Override
     public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
-        return Optional.of(new PoseAction(tick, context.getEntity().getPose()));
-    }
-
-    @Override
-    public boolean differs(AbstractAction other) {
-        return other instanceof PoseAction that && this.pose != that.pose;
+        return Optional.of(new SpawnEntityAction(tick, entityId));
     }
 
     @Override
     public void write(Writer writer) throws IOException {
-        Integer id = POSE_IDS.get(pose);
-        if (id == null) {
-            throw new IOException("Unknown pose: " + pose);
-        }
-        writer.addInt(id);
+        writer.addInt(entityId);
     }
 
     @Override
     public void read(Reader reader) throws IOException {
-        int id = reader.readInt();
-        this.pose = POSE_IDS.inverse().get(id);
-        if (this.pose == null) {
-            throw new IOException("Unknown pose ID: " + id);
-        }
-    }
-
-    @Override
-    public ActionResult execute(IPlaybackContext context) {
-        context.getEntity().setPose(pose);
-        return ActionResult.OK;
+        entityId = reader.readInt();
     }
 
     @Override
@@ -107,7 +68,16 @@ public class PoseAction extends AbstractAction {
     }
 
     @Override
-    public boolean shouldExecuteOnRewind() {
-        return true;
+    public ActionResult execute(IPlaybackContext context) {
+        if (context.getEntity() instanceof LivingEntity entity) {
+            entity.handleEntityEvent((byte) 3);
+        } else if (context.getEntity() instanceof FakePlayer player) {
+            player.level().broadcastEntityEvent(player, (byte) 60);
+            Entity entity = context.getEntity();
+            if (entity instanceof LivingEntity) {
+                context.getLevel().broadcastEntityEvent(entity, (byte) 3);
+            }
+        }
+        return ActionResult.OK;
     }
 }

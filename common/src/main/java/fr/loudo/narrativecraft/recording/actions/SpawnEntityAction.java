@@ -26,57 +26,31 @@ package fr.loudo.narrativecraft.recording.actions;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import java.io.IOException;
-import java.util.Optional;
-import net.minecraft.network.syncher.SynchedEntityData;
 
-public class LivingEntityByteAction extends AbstractAction {
+public class SpawnEntityAction extends AbstractAction {
 
-    public static final String ID = "living_entity_byte";
+    public static final String ID = "spawn_entity";
 
-    private byte livingEntityByte;
+    private int entityId;
 
-    public LivingEntityByteAction(int tick, byte entityByte) {
+    public SpawnEntityAction(int tick, int entityId) {
         super(tick);
-        this.livingEntityByte = entityByte;
+        this.entityId = entityId;
     }
 
-    public LivingEntityByteAction(int tick) {
+    public SpawnEntityAction(int tick) {
         super(tick);
-    }
-
-    @Override
-    public boolean differs(AbstractAction other) {
-        if (!(other instanceof LivingEntityByteAction that)) {
-            return false;
-        }
-        return this.livingEntityByte != that.livingEntityByte;
     }
 
     @Override
     public void write(Writer writer) throws IOException {
-        writer.addByte(livingEntityByte);
+        writer.addInt(entityId);
     }
 
     @Override
     public void read(Reader reader) throws IOException {
-        livingEntityByte = reader.readByte();
-    }
-
-    @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
-        byte current = context.getEntity().getEntityData().get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS());
-        return Optional.of(new LivingEntityByteAction(tick, current));
-    }
-
-    @Override
-    @SuppressWarnings("DataFlowIssue")
-    public ActionResult execute(IPlaybackContext context) {
-        SynchedEntityData entityData = context.getEntity().getEntityData();
-        entityData.set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), livingEntityByte);
-
-        return ActionResult.OK;
+        entityId = reader.readInt();
     }
 
     @Override
@@ -85,7 +59,8 @@ public class LivingEntityByteAction extends AbstractAction {
     }
 
     @Override
-    public boolean shouldExecuteOnRewind() {
-        return true;
+    public ActionResult execute(IPlaybackContext context) {
+        context.respawnEntityByRecordingId(entityId);
+        return ActionResult.OK;
     }
 }

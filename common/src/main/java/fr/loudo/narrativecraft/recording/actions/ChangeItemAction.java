@@ -181,6 +181,11 @@ public class ChangeItemAction extends AbstractAction {
         return ID;
     }
 
+    @Override
+    public boolean shouldExecuteOnRewind() {
+        return true;
+    }
+
     private ItemStack getItemStackForComparison(EquipmentSlot slot) {
         StoredItem storedItem = itemsBySlot.get(slot);
         if (storedItem == null) {

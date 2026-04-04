@@ -21,31 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.server.*;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
-public class FabricEventList {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnDeathEventNeoForge {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public FabricEventList() {
-        events.add(new OnServerStartEventFabric());
-        events.add(new OnPlayerJoinEventFabric());
-        events.add(new OnPlayerLeaveEventFabric());
-        events.add(new OnServerTickEventFabric());
-        events.add(new OnCommandRegisterEventFabric());
-        events.add(new OnServerBreakBlockEventFabric());
-        events.add(new OnRightClickBlockEventFabric());
-        events.add(new OnDeathEventFabric());
+    public OnDeathEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnDeathEventNeoForge::onDeath);
     }
 
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+    private static void onDeath(LivingDeathEvent event) {
+        OnDeathEvent.onDeath(event.getEntity());
     }
 }

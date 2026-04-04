@@ -134,6 +134,10 @@ public class CutsceneMakerEditor implements Editor {
         return cutscene;
     }
 
+    public List<Playback> getPlaybacks() {
+        return playbacks;
+    }
+
     public List<ICutsceneLayer> getLayersAdded() {
         return layersAdded;
     }

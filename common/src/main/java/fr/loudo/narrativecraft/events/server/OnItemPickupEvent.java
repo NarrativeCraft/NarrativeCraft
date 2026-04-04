@@ -24,9 +24,12 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditor;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.actions.ItemPickupAction;
+import fr.loudo.narrativecraft.session.PlayerSession;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 
@@ -49,6 +52,19 @@ public class OnItemPickupEvent {
                 NarrativeCraftMod.getInstance().getPlaybackManager().getActivePlaybacks()) {
             if (playback.entityFromPlayback(itemEntity)) {
                 return false;
+            }
+        }
+
+        PlayerSessionManager playerSessionManager =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        for (PlayerSession playerSession : playerSessionManager.getList()) {
+            CutsceneMakerEditor editor =
+                    playerSessionManager.getEditor(playerSession.getPlayer(), CutsceneMakerEditor.class);
+            if (editor == null) continue;
+            for (Playback playback : editor.getPlaybacks()) {
+                if (playback.entityFromPlayback(itemEntity)) {
+                    return false;
+                }
             }
         }
         return true;

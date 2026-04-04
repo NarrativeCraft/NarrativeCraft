@@ -34,6 +34,21 @@ import net.minecraft.world.entity.EntityType;
 
 public class RecordingData {
 
+    private static final List<String> TRANSIENT_NBT_KEYS = List.of(
+            "Health",
+            "HurtTime",
+            "HurtByTimestamp",
+            "DeathTime",
+            "AbsorptionAmount",
+            "ActiveEffects",
+            "FoodEffects",
+            "Fire",
+            "Air",
+            "Motion",
+            "FallDistance",
+            "AngerTime",
+            "AngryAt");
+
     private final Map<Integer, List<AbstractAction>> actions = new HashMap<>();
     private final int recordingId;
     private final String entityId;
@@ -56,6 +71,13 @@ public class RecordingData {
         actions.computeIfAbsent(action.getTick(), k -> new ArrayList<>()).add(action);
     }
 
+    private CompoundTag sanitizeEntityNbt(CompoundTag nbt) {
+        if (nbt == null) return null;
+        CompoundTag sanitized = nbt.copy();
+        TRANSIENT_NBT_KEYS.forEach(sanitized::remove);
+        return sanitized;
+    }
+
     public Map<Integer, List<AbstractAction>> getActions() {
         return actions;
     }
@@ -73,7 +95,7 @@ public class RecordingData {
     }
 
     public void setInitialNbt(CompoundTag initialNbt) {
-        this.initialNbt = initialNbt;
+        this.initialNbt = sanitizeEntityNbt(initialNbt);
     }
 
     public int getSpawnTick() {

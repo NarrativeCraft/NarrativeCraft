@@ -73,4 +73,9 @@ public class RideEntityAction extends AbstractAction {
         context.getEntity().startRiding(vehicle, true, true);
         return ActionResult.OK;
     }
+
+    @Override
+    public boolean shouldExecuteOnRewind() {
+        return true;
+    }
 }

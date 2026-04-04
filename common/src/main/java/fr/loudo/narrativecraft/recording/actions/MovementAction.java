@@ -80,4 +80,9 @@ public class MovementAction extends AbstractAction {
     public String getId() {
         return ID;
     }
+
+    @Override
+    public boolean shouldExecuteOnRewind() {
+        return true;
+    }
 }

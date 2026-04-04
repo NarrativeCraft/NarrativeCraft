@@ -45,6 +45,8 @@ public interface IPlaybackContext {
      */
     Collection<ServerPlayer> getTargetedPlayers();
 
+    void respawnEntityByRecordingId(int recordingId);
+
     ServerLevel getLevel();
 
     Entity getEntity();

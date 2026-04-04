@@ -35,6 +35,8 @@ import net.minecraft.world.entity.Entity;
 
 public class Playback {
 
+    public static final String ENTITY_TAG = "nc_playback";
+
     private final UUID id = UUID.randomUUID();
     private final Animation animation;
     private final ServerPlayer requester;
@@ -203,6 +205,15 @@ public class Playback {
         for (PlaybackContext context : contexts) {
             if (context.getRecordingId() == recordingId) {
                 return context.getEntity();
+            }
+        }
+        return null;
+    }
+
+    public PlaybackContext getContextByRecordingId(int recordingId) {
+        for (PlaybackContext context : contexts) {
+            if (context.getRecordingId() == recordingId) {
+                return context;
             }
         }
         return null;

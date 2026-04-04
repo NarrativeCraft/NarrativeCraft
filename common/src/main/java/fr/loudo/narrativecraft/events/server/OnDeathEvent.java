@@ -21,39 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.Recording;
-import fr.loudo.narrativecraft.recording.actions.SleepAction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.DamageSource;
+import fr.loudo.narrativecraft.recording.actions.DeathAction;
 import net.minecraft.world.entity.LivingEntity;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(LivingEntity.class)
-public class LivingEntityMixin {
+public class OnDeathEvent {
 
-    @Inject(method = "startSleeping", at = @At("HEAD"))
-    private void narrativecraft$startSleeping(BlockPos pos, CallbackInfo ci) {
-        LivingEntity livingEntity = (LivingEntity) (Object) this;
+    public static void onDeath(LivingEntity entity) {
         Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(livingEntity);
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
         if (recording == null) return;
 
-        recording.addAction(new SleepAction(recording.getTick(), pos), livingEntity);
-    }
-
-    @Inject(method = "dropAllDeathLoot", at = @At("HEAD"), cancellable = true)
-    private void narrativecraft$shouldDropLoot(ServerLevel level, DamageSource source, CallbackInfo ci) {
-        LivingEntity livingEntity = (LivingEntity) (Object) this;
-        if (livingEntity.entityTags().contains(Playback.ENTITY_TAG)) {
-            ci.cancel();
-        }
+        recording.addAction(new DeathAction(recording.getTick(), recording.markEntityAsTracked(entity)), entity);
     }
 }

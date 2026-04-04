@@ -23,7 +23,9 @@
 
 package fr.loudo.narrativecraft.api.recording.action;
 
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import java.io.IOException;
+import java.util.Optional;
 
 public abstract class AbstractAction implements Action {
 
@@ -41,6 +43,25 @@ public abstract class AbstractAction implements Action {
 
     public boolean differs(AbstractAction other) {
         return true;
+    }
+
+    /**
+     * Returns the inverse of this action, captured before it executes.
+     * Called by the rewind log to undo this action when the timeline scrubs backward.
+     * Must be silent (no sounds, no visual side effects).
+     * @return Empty for stateless actions or actions fully restored by {@link #shouldExecuteOnRewind()}.
+     */
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        return Optional.empty();
+    }
+
+    /**
+     * Whether this action should be re-executed at the target tick during rewind
+     * to restore entity state (position, pose, flags, etc.).
+     * @return True for pure state actions, false for event actions (sounds, block changes, etc.).
+     */
+    public boolean shouldExecuteOnRewind() {
+        return false;
     }
 
     public int getTick() {

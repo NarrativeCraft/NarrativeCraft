@@ -65,4 +65,9 @@ public class StopRideEntityAction extends AbstractAction {
         context.getEntity().stopRiding();
         return ActionResult.OK;
     }
+
+    @Override
+    public boolean shouldExecuteOnRewind() {
+        return true;
+    }
 }

@@ -82,4 +82,9 @@ public class SleepAction extends AbstractAction {
         }
         return ActionResult.OK;
     }
+
+    @Override
+    public boolean shouldExecuteOnRewind() {
+        return true;
+    }
 }

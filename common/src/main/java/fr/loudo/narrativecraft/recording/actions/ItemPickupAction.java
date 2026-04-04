@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.io.IOException;
+import java.util.Optional;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 
@@ -46,6 +47,11 @@ public class ItemPickupAction extends AbstractAction {
 
     public ItemPickupAction(int tick) {
         super(tick);
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+        return Optional.of(new SpawnEntityAction(tick, entityRecordingId));
     }
 
     @Override
@@ -73,6 +79,7 @@ public class ItemPickupAction extends AbstractAction {
         if (!(entity instanceof ItemEntity itemEntity)) return ActionResult.IGNORED;
 
         player.take(itemEntity, count);
+        itemEntity.remove(Entity.RemovalReason.DISCARDED);
 
         return ActionResult.OK;
     }
