@@ -56,4 +56,10 @@ public interface IPlaybackContext {
      * Used by actions like RideEntityAction to reference other entities recorded in the same animation.
      */
     Entity getEntityByRecordingId(int recordingId);
+
+    /**
+     * Get the recording id of the entity playback context
+     * @return recording id of the entity
+     */
+    int getRecordingId();
 }

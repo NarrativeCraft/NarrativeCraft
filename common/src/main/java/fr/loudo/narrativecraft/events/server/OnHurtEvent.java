@@ -21,32 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.server.*;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.actions.HurtAction;
+import net.minecraft.world.entity.LivingEntity;
 
-public class FabricEventList {
+public class OnHurtEvent {
+    public static void onHurt(LivingEntity entity) {
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
+        if (recording == null) return;
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public FabricEventList() {
-        events.add(new OnServerStartEventFabric());
-        events.add(new OnPlayerJoinEventFabric());
-        events.add(new OnPlayerLeaveEventFabric());
-        events.add(new OnServerTickEventFabric());
-        events.add(new OnCommandRegisterEventFabric());
-        events.add(new OnServerBreakBlockEventFabric());
-        events.add(new OnRightClickBlockEventFabric());
-        events.add(new OnDeathEventFabric());
-        events.add(new OnHurtEventFabric());
-    }
-
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+        recording.markEntityAsTracked(entity);
+        recording.addAction(new HurtAction(recording.getTick()), entity);
     }
 }

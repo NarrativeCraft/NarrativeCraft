@@ -153,8 +153,10 @@ public class Playback {
     public void moveTo(int toTick) {
         int fromTick = this.tick;
         this.tick = toTick;
-        for (PlaybackContext context : contexts) {
-            context.moveTo(fromTick, toTick);
+        for (int t = fromTick + 1; t <= toTick; t++) {
+            for (PlaybackContext context : contexts) {
+                context.moveTo(t - 1, t);
+            }
         }
     }
 

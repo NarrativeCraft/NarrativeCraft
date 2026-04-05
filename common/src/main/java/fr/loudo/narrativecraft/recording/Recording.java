@@ -52,7 +52,7 @@ import net.minecraft.world.phys.AABB;
 public class Recording implements IRecording {
 
     public static final String RECORDING_EXTENSION = ".ncr";
-    private static final double SCAN_RADIUS = 10.0;
+    private static final double SCAN_RADIUS = 40.0;
 
     private final UUID id = UUID.randomUUID();
     private final PlayerSession playerSession;

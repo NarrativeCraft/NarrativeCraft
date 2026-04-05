@@ -69,6 +69,8 @@ public class RideEntityAction extends AbstractAction {
     public ActionResult execute(IPlaybackContext context) {
         Entity vehicle = context.getEntityByRecordingId(nearbyEntityLocalId);
         if (vehicle == null) return ActionResult.IGNORED;
+        // Protection to prevent stack overflow if it tries to ride the entity itself
+        if (vehicle.getUUID().equals(context.getEntity().getUUID())) return ActionResult.IGNORED;
 
         context.getEntity().startRiding(vehicle, true, true);
         return ActionResult.OK;

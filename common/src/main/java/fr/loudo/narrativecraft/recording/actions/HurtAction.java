@@ -26,36 +26,28 @@ package fr.loudo.narrativecraft.recording.actions;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.io.IOException;
-import java.util.Optional;
+import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket;
+import net.minecraft.world.entity.LivingEntity;
 
-public class StopRideEntityAction extends AbstractAction {
+public class HurtAction extends AbstractAction {
 
-    public static final String ID = "stop_ride_entity";
+    public static final String ID = "hurt";
 
-    private int entityRecordingId;
-
-    public StopRideEntityAction(int tick, int entityRecordingId) {
-        super(tick);
-        this.entityRecordingId = entityRecordingId;
-    }
-
-    public StopRideEntityAction(int tick) {
+    public HurtAction(int tick) {
         super(tick);
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
-        int recordingIdPlayback = context.getRecordingId();
-        if (recordingIdPlayback == entityRecordingId) return Optional.empty();
-        return Optional.of(new RideEntityAction(tick, entityRecordingId));
+    public void write(Writer writer) throws IOException {
+        writer.addInt(0);
     }
 
     @Override
-    public void write(Writer writer) throws IOException {}
-
-    @Override
-    public void read(Reader reader) throws IOException {}
+    public void read(Reader reader) throws IOException {
+        reader.readInt();
+    }
 
     @Override
     public String getId() {
@@ -64,12 +56,9 @@ public class StopRideEntityAction extends AbstractAction {
 
     @Override
     public ActionResult execute(IPlaybackContext context) {
-        context.getEntity().stopRiding();
+        if (!(context.getEntity() instanceof LivingEntity entity)) return ActionResult.IGNORED;
+        UtilsServer.broadcastPacket(new ClientboundHurtAnimationPacket(entity));
+        context.getEntity().handleDamageEvent(entity.damageSources().generic());
         return ActionResult.OK;
-    }
-
-    @Override
-    public boolean shouldExecuteOnRewind() {
-        return true;
     }
 }
