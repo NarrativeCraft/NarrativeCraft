@@ -29,20 +29,39 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.io.IOException;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
 
 public class CloseContainerAction extends AbstractAction {
 
     public static final String ID = "close_container";
+
+    private BlockPos blockPos;
+
+    public CloseContainerAction(int tick, BlockPos blockPos) {
+        super(tick);
+        this.blockPos = blockPos;
+    }
 
     public CloseContainerAction(int tick) {
         super(tick);
     }
 
     @Override
-    public void write(Writer writer) throws IOException {}
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        if (blockPos == null) return Optional.empty();
+        return Optional.of(RightClickBlockAction.defaultInstance(tick, blockPos));
+    }
 
     @Override
-    public void read(Reader reader) throws IOException {}
+    public void write(Writer writer) throws IOException {
+        writer.addBlockPos(blockPos);
+    }
+
+    @Override
+    public void read(Reader reader) throws IOException {
+        blockPos = reader.readBlockPos();
+    }
 
     @Override
     public String getId() {

@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.recording;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 
 public class RecordingEntityData {
@@ -33,9 +34,10 @@ public class RecordingEntityData {
     private final RecordingData recordingData;
     private final int recordingId;
     private final Entity entity;
-    private boolean isTracked;
     private final int firstSeenTick;
     private final Map<String, AbstractAction> lastActions = new HashMap<>();
+    private boolean isTracked;
+    private BlockPos lastInteractedBlockPos;
 
     public RecordingEntityData(int recordingId, Entity entity, boolean isTracked, int firstSeenTick) {
         recordingData = new RecordingData(recordingId, entity);
@@ -79,5 +81,13 @@ public class RecordingEntityData {
 
     public int getFirstSeenTick() {
         return firstSeenTick;
+    }
+
+    public BlockPos getLastInteractedBlockPos() {
+        return lastInteractedBlockPos;
+    }
+
+    public void setLastInteractedBlockPos(BlockPos lastInteractedBlockPos) {
+        this.lastInteractedBlockPos = lastInteractedBlockPos;
     }
 }

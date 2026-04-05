@@ -30,11 +30,13 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.io.IOException;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -55,6 +57,17 @@ public class RightClickBlockAction extends AbstractAction {
     private BlockHitResult blockHitResult;
     private boolean offHand;
 
+    public static RightClickBlockAction defaultInstance(int tick, BlockPos blockPos) {
+        BlockHitResult hitResult = new BlockHitResult(Vec3.ZERO, Direction.DOWN, blockPos, false);
+        return new RightClickBlockAction(tick, hitResult, false);
+    }
+
+    public RightClickBlockAction(int tick, BlockHitResult blockHitResult, boolean offHand) {
+        super(tick);
+        this.blockHitResult = blockHitResult;
+        this.offHand = offHand;
+    }
+
     public RightClickBlockAction(int tick, BlockHitResult blockHitResult, InteractionHand hand) {
         super(tick);
         this.blockHitResult = blockHitResult;
@@ -63,6 +76,16 @@ public class RightClickBlockAction extends AbstractAction {
 
     public RightClickBlockAction(int tick) {
         super(tick);
+    }
+
+    @Override
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        BlockState blockState = session.getLevel().getBlockState(blockHitResult.getBlockPos());
+        // If the right-clicked block is a chest, then close it because it was previously opened
+        if (blockState.is(Blocks.CHEST)) {
+            return Optional.of(new CloseContainerAction(tick));
+        }
+        return Optional.of(new RightClickBlockAction(tick, blockHitResult, offHand));
     }
 
     @Override

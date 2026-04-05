@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.CloseContainerAction;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -35,6 +36,9 @@ public class OnPlayerCloseContainerEvent {
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
         if (recording == null) return;
 
-        recording.addAction(new CloseContainerAction(recording.getTick()), player);
+        RecordingEntityData entityData = recording.getRecordingEntityData(player);
+        recording.addAction(
+                new CloseContainerAction(recording.getTick(), entityData.getLastInteractedBlockPos()), player);
+        entityData.setLastInteractedBlockPos(null);
     }
 }
