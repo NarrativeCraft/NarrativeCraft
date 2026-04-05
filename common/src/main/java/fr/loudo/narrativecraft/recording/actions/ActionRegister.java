@@ -48,5 +48,6 @@ public class ActionRegister {
         registry.register(DeathAction.ID, DeathAction::new);
         registry.register(SpawnEntityAction.ID, SpawnEntityAction::new);
         registry.register(HurtAction.ID, HurtAction::new);
+        registry.register(HorseByteAction.ID, HorseByteAction::new);
     }
 }

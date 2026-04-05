@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.api.recording.IRecording;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
+import fr.loudo.narrativecraft.mixin.accessor.AbstractHorseAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
@@ -45,6 +46,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.AABB;
@@ -83,6 +85,10 @@ public class Recording implements IRecording {
                 data.addAction(new SwingAction(tick, livingEntity));
                 data.addAction(new LivingEntityByteAction(
                         tick, entity.getEntityData().get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS())));
+            }
+            if (entity instanceof AbstractHorse horse) {
+                data.addAction(
+                        new HorseByteAction(tick, horse.getEntityData().get(AbstractHorseAccessor.getDATA_ID_FLAGS())));
             }
         }
         tick++;

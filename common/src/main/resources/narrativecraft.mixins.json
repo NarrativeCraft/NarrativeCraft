@@ -8,6 +8,7 @@
     "EntityMixin",
     "LivingEntityMixin",
     "ServerLevelMixin",
+    "accessor.AbstractHorseAccessor",
     "accessor.EntityAccessor",
     "accessor.LivingEntityAccessor"
   ],
