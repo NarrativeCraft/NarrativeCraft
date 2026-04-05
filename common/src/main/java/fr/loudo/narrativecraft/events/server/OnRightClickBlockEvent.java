@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.RightClickBlockAction;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,12 +33,11 @@ import net.minecraft.world.phys.BlockHitResult;
 public class OnRightClickBlockEvent {
 
     public static void rightClickBlock(ServerPlayer entity, InteractionHand hand, BlockHitResult blockHitResult) {
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
-        if (recording == null) return;
+        RecordingEntityData data =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
+        if (data == null) return;
 
-        recording.addAction(new RightClickBlockAction(recording.getTick(), blockHitResult, hand), entity);
-        RecordingEntityData entityData = recording.getRecordingEntityData(entity);
-        entityData.setLastInteractedBlockPos(blockHitResult.getBlockPos());
+        data.addAction(new RightClickBlockAction(data.getRecordingTick(), blockHitResult, hand));
+        data.setLastInteractedBlockPos(blockHitResult.getBlockPos());
     }
 }

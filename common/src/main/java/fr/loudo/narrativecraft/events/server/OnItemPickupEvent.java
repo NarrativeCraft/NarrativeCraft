@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditor;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.playback.Playback;
-import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.ItemPickupAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,14 +36,13 @@ import net.minecraft.world.entity.item.ItemEntity;
 public class OnItemPickupEvent {
 
     public static void onPickup(ServerPlayer player, ItemEntity itemEntity) {
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        if (recording != null) {
-            ItemPickupAction action = new ItemPickupAction(
-                    recording.getTick(),
-                    recording.markEntityAsTracked(itemEntity),
-                    itemEntity.getItem().getCount());
-            recording.addAction(action, player);
+        RecordingEntityData data =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
+        if (data != null) {
+            data.addAction(new ItemPickupAction(
+                    data.getRecordingTick(),
+                    data.getRecording().markEntityAsTracked(itemEntity),
+                    itemEntity.getItem().getCount()));
         }
     }
 

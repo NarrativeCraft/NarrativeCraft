@@ -37,4 +37,14 @@ public interface IRecording {
      * @return the recording ID of the entity, used in RideEntityAction.
      */
     int markEntityAsTracked(Entity entity);
+
+    void start();
+
+    void stop();
+
+    IRecordingEntityData getRecordingEntityData(Entity entity);
+
+    int getTick();
+
+    boolean isRecording();
 }

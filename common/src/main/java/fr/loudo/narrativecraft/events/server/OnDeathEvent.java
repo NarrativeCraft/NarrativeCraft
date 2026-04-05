@@ -24,17 +24,17 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.DeathAction;
 import net.minecraft.world.entity.LivingEntity;
 
 public class OnDeathEvent {
 
     public static void onDeath(LivingEntity entity) {
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
-        if (recording == null) return;
+        RecordingEntityData data =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
+        if (data == null) return;
 
-        recording.addAction(new DeathAction(recording.getTick(), recording.markEntityAsTracked(entity)), entity);
+        data.addAction(new DeathAction(data.getRecordingTick(), data.markAsTracked()));
     }
 }

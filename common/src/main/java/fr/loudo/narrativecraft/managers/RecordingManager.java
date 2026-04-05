@@ -70,4 +70,15 @@ public class RecordingManager extends Manager<Recording> implements IRecordingMa
         }
         return null;
     }
+
+    public RecordingEntityData getRecordingEntityData(Entity entity) {
+        for (Recording recording : list) {
+            for (RecordingEntityData data : recording.getRecordingEntityData()) {
+                if (data.getEntity().getUUID().equals(entity.getUUID())) {
+                    return data;
+                }
+            }
+        }
+        return null;
+    }
 }

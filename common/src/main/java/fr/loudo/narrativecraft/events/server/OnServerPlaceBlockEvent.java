@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.PlaceBlockAction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,11 +33,10 @@ import net.minecraft.world.level.block.state.BlockState;
 public class OnServerPlaceBlockEvent {
     public static void onPlaceBlock(BlockState state, BlockPos clickedPos, ServerPlayer player) {
 
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        if (recording == null) return;
+        RecordingEntityData data =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
+        if (data == null) return;
 
-        PlaceBlockAction placeBlockAction = new PlaceBlockAction(recording.getTick(), clickedPos, state);
-        recording.addAction(placeBlockAction, player);
+        data.addAction(new PlaceBlockAction(data.getRecordingTick(), clickedPos, state));
     }
 }

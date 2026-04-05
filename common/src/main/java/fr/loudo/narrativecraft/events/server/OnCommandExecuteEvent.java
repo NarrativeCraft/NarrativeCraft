@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.CommandAction;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -32,10 +32,10 @@ public class OnCommandExecuteEvent {
 
     public static void onCommandExecute(String command, ServerPlayer player) {
 
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        if (recording == null) return;
+        RecordingEntityData data =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
+        if (data == null) return;
 
-        recording.addAction(new CommandAction(recording.getTick(), command), player);
+        data.addAction(new CommandAction(data.getRecordingTick(), command));
     }
 }

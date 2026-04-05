@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.playback.Playback;
-import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.SleepAction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -42,11 +42,11 @@ public class LivingEntityMixin {
     @Inject(method = "startSleeping", at = @At("HEAD"))
     private void narrativecraft$startSleeping(BlockPos pos, CallbackInfo ci) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(livingEntity);
-        if (recording == null) return;
+        RecordingEntityData recordingEntityData =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(livingEntity);
+        if (recordingEntityData == null) return;
 
-        recording.addAction(new SleepAction(recording.getTick(), pos), livingEntity);
+        recordingEntityData.addAction(new SleepAction(recordingEntityData.getRecordingTick(), pos));
     }
 
     @Inject(method = "dropAllDeathLoot", at = @At("HEAD"), cancellable = true)

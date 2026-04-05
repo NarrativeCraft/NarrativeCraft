@@ -63,7 +63,7 @@ public class Recording implements IRecording {
 
     public Recording(PlayerSession playerSession) {
         this.playerSession = playerSession;
-        recordingEntityData.add(new RecordingEntityData(0, playerSession.getPlayer(), true, 0));
+        recordingEntityData.add(new RecordingEntityData(0, playerSession.getPlayer(), true, 0, this));
     }
 
     public void tick() {
@@ -94,7 +94,7 @@ public class Recording implements IRecording {
         List<Entity> found = player.level().getEntities(player, searchBox, e -> !(e instanceof Player));
         for (Entity entity : found) {
             if (getRecordingEntityData(entity) == null) {
-                recordingEntityData.add(new RecordingEntityData(nextNearbyEntityLocalId++, entity, false, tick));
+                recordingEntityData.add(new RecordingEntityData(nextNearbyEntityLocalId++, entity, false, tick, this));
             }
         }
     }
@@ -129,7 +129,7 @@ public class Recording implements IRecording {
         // If player is already riding an entity first tick
         Entity vehicle = getPlayer().getVehicle();
         if (vehicle != null) {
-            recordingEntityData.add(new RecordingEntityData(nextNearbyEntityLocalId++, vehicle, false, 0));
+            recordingEntityData.add(new RecordingEntityData(nextNearbyEntityLocalId++, vehicle, false, 0, this));
             addAction(new RideEntityAction(0, markEntityAsTracked(vehicle)), getPlayer());
         }
 

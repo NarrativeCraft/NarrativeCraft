@@ -21,21 +21,33 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.api.recording;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.recording.actions.CloseContainerAction;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 
-public class OnPlayerCloseContainerEvent {
+public interface IRecordingEntityData {
 
-    public static void onCloseContainer(ServerPlayer player) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
-        if (data == null) return;
+    void addAction(AbstractAction action);
 
-        data.addAction(new CloseContainerAction(data.getRecordingTick(), data.getLastInteractedBlockPos()));
-        data.setLastInteractedBlockPos(null);
-    }
+    int markAsTracked();
+
+    IRecording getRecording();
+
+    int getRecordingId();
+
+    Entity getEntity();
+
+    int getRecordingTick();
+
+    boolean isTracked();
+
+    void setTracked(boolean tracked);
+
+    int getFirstSeenTick();
+
+    BlockPos getLastInteractedBlockPos();
+
+    void setLastInteractedBlockPos(BlockPos lastInteractedBlockPos);
 }

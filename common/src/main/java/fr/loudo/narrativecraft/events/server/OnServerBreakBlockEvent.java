@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.BreakBlockAction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,10 +33,10 @@ import net.minecraft.world.level.block.state.BlockState;
 public class OnServerBreakBlockEvent {
 
     public static void onBreakEvent(BlockState blockState, BlockPos blockPos, ServerPlayer player) {
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        if (recording == null) return;
+        RecordingEntityData data =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
+        if (data == null) return;
 
-        recording.addAction(new BreakBlockAction(recording.getTick(), blockPos, blockState), player);
+        data.addAction(new BreakBlockAction(data.getRecordingTick(), blockPos, blockState));
     }
 }

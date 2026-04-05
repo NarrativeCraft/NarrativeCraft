@@ -23,28 +23,40 @@
 
 package fr.loudo.narrativecraft.recording;
 
+import fr.loudo.narrativecraft.api.recording.IRecordingEntityData;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 
-public class RecordingEntityData {
+public class RecordingEntityData implements IRecordingEntityData {
 
     private final RecordingData recordingData;
     private final int recordingId;
     private final Entity entity;
     private final int firstSeenTick;
     private final Map<String, AbstractAction> lastActions = new HashMap<>();
+    private final Recording recording;
     private boolean isTracked;
     private BlockPos lastInteractedBlockPos;
 
-    public RecordingEntityData(int recordingId, Entity entity, boolean isTracked, int firstSeenTick) {
+    public RecordingEntityData(
+            int recordingId, Entity entity, boolean isTracked, int firstSeenTick, Recording recording) {
         recordingData = new RecordingData(recordingId, entity);
         this.recordingId = recordingId;
         this.entity = entity;
         this.isTracked = isTracked;
         this.firstSeenTick = firstSeenTick;
+        this.recording = recording;
+    }
+
+    public int markAsTracked() {
+        return recording.markEntityAsTracked(entity);
+    }
+
+    public Recording getRecording() {
+        return recording;
     }
 
     public void addAction(AbstractAction action) {
@@ -61,6 +73,10 @@ public class RecordingEntityData {
 
     public RecordingData getRecordingData() {
         return recordingData;
+    }
+
+    public int getRecordingTick() {
+        return recording.getTick();
     }
 
     public int getRecordingId() {
