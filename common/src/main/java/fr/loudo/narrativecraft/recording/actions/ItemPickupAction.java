@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
@@ -50,7 +51,7 @@ public class ItemPickupAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         return Optional.of(new SpawnEntityAction(tick, entityRecordingId));
     }
 
@@ -72,10 +73,10 @@ public class ItemPickupAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof FakePlayer player)) return ActionResult.IGNORED;
 
-        Entity entity = context.getEntityByRecordingId(entityRecordingId);
+        Entity entity = session.getEntityByRecordingId(entityRecordingId);
         if (!(entity instanceof ItemEntity itemEntity)) return ActionResult.IGNORED;
 
         player.take(itemEntity, count);

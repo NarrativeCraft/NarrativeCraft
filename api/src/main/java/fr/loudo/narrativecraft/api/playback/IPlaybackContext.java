@@ -23,42 +23,14 @@
 
 package fr.loudo.narrativecraft.api.playback;
 
-import java.util.Collection;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
 public interface IPlaybackContext {
 
-    /**
-     * Determine if the action applies to everyone including the world, or if it's only for a group of players.
-     * If it's for everyone, the action will be seen by everyone in the server and the world will be also affected.
-     * However, if it only applies to a small group, the action will be only rendered client-side only to the group.
-     * @return if it's for everyone or only a small group of players
-     */
-    boolean forSpecificPlayers();
-
-    /**
-     * If it returns an empty collection, it means the action applies to everyone. Else, the action only applies to the group returned.
-     * You can check if the action can be played to everyone or a small group using {@link #forSpecificPlayers()}
-     * @return The group of player to play the action
-     */
-    Collection<ServerPlayer> getTargetedPlayers();
-
-    void respawnEntityByRecordingId(int recordingId);
-
-    ServerLevel getLevel();
-
     Entity getEntity();
 
     /**
-     * Returns the entity with the given recording ID, or null if not found.
-     * Used by actions like RideEntityAction to reference other entities recorded in the same animation.
-     */
-    Entity getEntityByRecordingId(int recordingId);
-
-    /**
-     * Get the recording id of the entity playback context
+     * Get the recording id of the entity playback context.
      * @return recording id of the entity
      */
     int getRecordingId();

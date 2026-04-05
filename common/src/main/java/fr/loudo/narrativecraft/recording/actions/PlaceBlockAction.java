@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.util.Optional;
@@ -51,13 +52,13 @@ public class PlaceBlockAction extends DataBlockAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
 
-        ServerLevel level = context.getLevel();
+        ServerLevel level = session.getLevel();
         SoundType soundType = blockState.getSoundType();
 
-        if (context.forSpecificPlayers()) {
-            for (ServerPlayer player : context.getTargetedPlayers()) {
+        if (session.forSpecificPlayers()) {
+            for (ServerPlayer player : session.getTargetedPlayers()) {
                 player.connection.send(new ClientboundBlockUpdatePacket(blockPos, blockState));
                 if (blockState.is(Blocks.AIR)) {
                     return ActionResult.OK;
@@ -92,8 +93,8 @@ public class PlaceBlockAction extends DataBlockAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
-        BlockState previous = context.getLevel().getBlockState(blockPos);
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        BlockState previous = session.getLevel().getBlockState(blockPos);
         return Optional.of(new SilentPlaceBlockAction(tick, blockPos, previous));
     }
 

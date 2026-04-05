@@ -32,11 +32,13 @@ import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -77,7 +79,7 @@ public class PlaybackContext implements IPlaybackContext {
         List<AbstractAction> actions = recordingData.getActions().get(recordingData.getSpawnTick());
         if (actions == null || actions.isEmpty()) return;
         for (AbstractAction action : actions) {
-            action.execute(this);
+            action.execute(this, playback);
         }
     }
 
@@ -137,7 +139,6 @@ public class PlaybackContext implements IPlaybackContext {
     }
 
     private void addEntityToWorld() {
-
         if (entity instanceof FakePlayer fakePlayer) {
             for (ServerPlayer player : playback.getTargetedPlayers()) {
                 player.connection.send(new ClientboundPlayerInfoUpdatePacket(
@@ -146,7 +147,6 @@ public class PlaybackContext implements IPlaybackContext {
             level.addNewPlayer(fakePlayer);
             return;
         }
-
         level.addFreshEntity(entity);
     }
 
@@ -154,22 +154,6 @@ public class PlaybackContext implements IPlaybackContext {
         killEntity();
         createEntity();
         addEntityToWorld();
-    }
-
-    @Override
-    public void respawnEntityByRecordingId(int recordingId) {
-        PlaybackContext target = playback.getContextByRecordingId(recordingId);
-        if (target != null) {
-            target.respawnEntity();
-        }
-    }
-
-    public boolean forSpecificPlayers() {
-        return playback.forSpecificPlayers();
-    }
-
-    public Collection<ServerPlayer> getTargetedPlayers() {
-        return playback.getTargetedPlayers();
     }
 
     public void stop() {
@@ -188,10 +172,6 @@ public class PlaybackContext implements IPlaybackContext {
     }
 
     @Override
-    public Entity getEntityByRecordingId(int recordingId) {
-        return playback.getEntityByRecordingId(recordingId);
-    }
-
     public int getRecordingId() {
         return recordingData.getRecordingId();
     }
@@ -233,7 +213,7 @@ public class PlaybackContext implements IPlaybackContext {
         Collections.reverse(keysToUndo);
         for (int t : keysToUndo) {
             for (AbstractAction snapshot : rewindLog.get(t)) {
-                snapshot.execute(this);
+                snapshot.execute(this, playback);
             }
         }
         rewindLog.tailMap(tick, true).clear();
@@ -253,10 +233,10 @@ public class PlaybackContext implements IPlaybackContext {
         List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
         if (actionsToPlay != null) {
             for (AbstractAction action : actionsToPlay) {
-                action.createRewindSnapshot(this).ifPresent(snapshot -> rewindLog
+                action.createRewindSnapshot(this, playback).ifPresent(snapshot -> rewindLog
                         .computeIfAbsent(tick, k -> new ArrayList<>())
                         .add(snapshot));
-                ActionResult result = action.execute(this);
+                ActionResult result = action.execute(this, playback);
                 if (result == ActionResult.ERROR) {
                     playback.stop();
                     sendError(action);
@@ -267,11 +247,18 @@ public class PlaybackContext implements IPlaybackContext {
     }
 
     private void executeStateActionsFromTick(int tick) {
-        List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
-        if (actionsToPlay == null) return;
-        for (AbstractAction action : actionsToPlay) {
-            if (action.shouldExecuteOnRewind()) {
-                action.execute(this);
+        Set<Class<? extends AbstractAction>> covered = new HashSet<>();
+        Map<Integer, List<AbstractAction>> allActions = recordingData.getActions();
+        List<Integer> keys = new ArrayList<>(allActions.keySet());
+        keys.sort(Collections.reverseOrder());
+        for (int t : keys) {
+            if (t > tick) continue;
+            List<AbstractAction> actions = allActions.get(t);
+            for (int i = actions.size() - 1; i >= 0; i--) {
+                AbstractAction action = actions.get(i);
+                if (action.shouldExecuteOnRewind() && covered.add(action.getClass())) {
+                    action.execute(this, playback);
+                }
             }
         }
     }
@@ -286,10 +273,7 @@ public class PlaybackContext implements IPlaybackContext {
                 playback.getRequester());
     }
 
-    public ServerLevel getLevel() {
-        return level;
-    }
-
+    @Override
     public Entity getEntity() {
         return entity;
     }

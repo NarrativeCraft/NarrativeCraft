@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class SwingAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof LivingEntity livingEntity)) return ActionResult.IGNORED;
 
         livingEntity.swing(hand);

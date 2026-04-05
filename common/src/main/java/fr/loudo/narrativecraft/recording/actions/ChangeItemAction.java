@@ -29,6 +29,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
@@ -149,7 +150,7 @@ public class ChangeItemAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof LivingEntity entity)) {
             return ActionResult.IGNORED;
         }
@@ -169,7 +170,7 @@ public class ChangeItemAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof LivingEntity entity)) {
             return Optional.empty();
         }

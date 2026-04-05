@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.playback;
 
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import java.util.ArrayList;
@@ -30,10 +31,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
-public class Playback {
+public class Playback implements IPlaybackSession {
 
     public static final String ENTITY_TAG = "nc_playback";
 
@@ -167,6 +169,19 @@ public class Playback {
         this.tick = tick;
     }
 
+    @Override
+    public ServerLevel getLevel() {
+        return requester.level();
+    }
+
+    @Override
+    public void respawnEntityByRecordingId(int recordingId) {
+        PlaybackContext target = getContextByRecordingId(recordingId);
+        if (target != null) {
+            target.respawnEntity();
+        }
+    }
+
     public boolean isEnded() {
         return ended;
     }
@@ -187,10 +202,12 @@ public class Playback {
         return tick;
     }
 
+    @Override
     public Collection<ServerPlayer> getTargetedPlayers() {
         return targetedPlayers;
     }
 
+    @Override
     public boolean forSpecificPlayers() {
         return !targetedPlayers.isEmpty();
     }
@@ -203,6 +220,7 @@ public class Playback {
         this.killOnEnd = killOnEnd;
     }
 
+    @Override
     public Entity getEntityByRecordingId(int recordingId) {
         for (PlaybackContext context : contexts) {
             if (context.getRecordingId() == recordingId) {

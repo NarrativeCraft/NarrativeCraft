@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.UtilsServer;
@@ -55,7 +56,7 @@ public class HurtAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof LivingEntity entity)) return ActionResult.IGNORED;
         UtilsServer.broadcastPacket(new ClientboundHurtAnimationPacket(entity));
         context.getEntity().handleDamageEvent(entity.damageSources().generic());

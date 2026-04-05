@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.recording.actions;
 
 import com.google.common.collect.ImmutableBiMap;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
@@ -98,22 +99,22 @@ public class RightClickBlockAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof FakePlayer player)) return ActionResult.IGNORED;
 
         InteractionHand hand = offHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         ItemStack itemStack = player.getItemInHand(hand);
 
         BlockPos blockPos = blockHitResult.getBlockPos();
-        BlockState blockState = context.getLevel().getBlockState(blockPos);
+        BlockState blockState = session.getLevel().getBlockState(blockPos);
 
-        InteractionResult result = blockState.useItemOn(itemStack, context.getLevel(), player, hand, blockHitResult);
+        InteractionResult result = blockState.useItemOn(itemStack, session.getLevel(), player, hand, blockHitResult);
         if (result != InteractionResult.TRY_WITH_EMPTY_HAND) return ActionResult.OK;
 
-        // TODO: make this action also client-side for context.forSpecificPlayers(). seems to be a bit tricky,
+        // TODO: make this action also client-side for session.forSpecificPlayers(). seems to be a bit tricky,
         // unfortunately for now it can be only played
         // server-side.
-        blockState.useWithoutItem(context.getLevel(), player, blockHitResult);
+        blockState.useWithoutItem(session.getLevel(), player, blockHitResult);
 
         return ActionResult.OK;
     }

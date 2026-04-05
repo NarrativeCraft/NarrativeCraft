@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
@@ -59,8 +60,8 @@ public class SpawnEntityAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
-        context.respawnEntityByRecordingId(entityId);
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
+        session.respawnEntityByRecordingId(entityId);
         return ActionResult.OK;
     }
 }

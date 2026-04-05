@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class RideEntityAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         return Optional.of(new StopRideEntityAction(tick));
     }
 
@@ -66,8 +67,8 @@ public class RideEntityAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
-        Entity vehicle = context.getEntityByRecordingId(nearbyEntityLocalId);
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
+        Entity vehicle = session.getEntityByRecordingId(nearbyEntityLocalId);
         if (vehicle == null) return ActionResult.IGNORED;
         // Protection to prevent stack overflow if it tries to ride the entity itself
         if (vehicle.getUUID().equals(context.getEntity().getUUID())) return ActionResult.IGNORED;

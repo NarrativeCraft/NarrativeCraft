@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
@@ -65,14 +66,14 @@ public class LivingEntityByteAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         byte current = context.getEntity().getEntityData().get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS());
         return Optional.of(new LivingEntityByteAction(tick, current));
     }
 
     @Override
     @SuppressWarnings("DataFlowIssue")
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         SynchedEntityData entityData = context.getEntity().getEntityData();
         entityData.set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), livingEntityByte);
 

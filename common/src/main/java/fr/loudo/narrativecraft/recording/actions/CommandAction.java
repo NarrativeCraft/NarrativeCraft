@@ -27,6 +27,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
@@ -66,7 +67,7 @@ public class CommandAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof FakePlayer player)) return ActionResult.IGNORED;
 
         CommandSourceStack sourceStack = new CommandSourceStack(
@@ -82,7 +83,7 @@ public class CommandAction extends AbstractAction {
 
         try {
             CommandDispatcher<CommandSourceStack> dispatcher =
-                    context.getLevel().getServer().getCommands().getDispatcher();
+                    session.getLevel().getServer().getCommands().getDispatcher();
             dispatcher.execute(command, sourceStack);
         } catch (CommandSyntaxException e) {
             NarrativeCraftMod.LOGGER.error("Error while executing command", e);

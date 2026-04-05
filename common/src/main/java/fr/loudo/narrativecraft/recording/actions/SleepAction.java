@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class SleepAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof LivingEntity entity)) return Optional.empty();
         BlockPos currentPos = entity.getSleepingPos().orElse(null);
         return Optional.of(new SleepAction(tick, currentPos));
@@ -72,7 +73,7 @@ public class SleepAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof LivingEntity entity)) return ActionResult.IGNORED;
 
         if (blockPos == null) {

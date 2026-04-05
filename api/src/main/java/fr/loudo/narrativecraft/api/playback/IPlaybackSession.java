@@ -21,38 +21,33 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.recording.actions;
+package fr.loudo.narrativecraft.api.playback;
 
-import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
-import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
-import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import fr.loudo.narrativecraft.utils.FakePlayer;
-import java.io.IOException;
+import java.util.Collection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
-public class CloseContainerAction extends AbstractAction {
+public interface IPlaybackSession {
 
-    public static final String ID = "close_container";
+    ServerLevel getLevel();
 
-    public CloseContainerAction(int tick) {
-        super(tick);
-    }
+    /**
+     * Returns the entity with the given recording ID, or null if not found.
+     */
+    Entity getEntityByRecordingId(int recordingId);
 
-    @Override
-    public void write(Writer writer) throws IOException {}
+    void respawnEntityByRecordingId(int recordingId);
 
-    @Override
-    public void read(Reader reader) throws IOException {}
+    /**
+     * Whether the playback targets a specific group of players.
+     * If false, actions affect everyone and the world.
+     * If true, actions are rendered client-side only for {@link #getTargetedPlayers()}.
+     */
+    boolean forSpecificPlayers();
 
-    @Override
-    public String getId() {
-        return ID;
-    }
-
-    @Override
-    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
-        if (!(context.getEntity() instanceof FakePlayer player)) return ActionResult.IGNORED;
-        player.doCloseContainer();
-        return ActionResult.OK;
-    }
+    /**
+     * Returns the targeted players, or an empty collection if the playback affects everyone.
+     */
+    Collection<ServerPlayer> getTargetedPlayers();
 }

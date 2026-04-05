@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class DestroyBlockStageAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         return Optional.of(new DestroyBlockStageAction(tick, blockPos, progress - 1));
     }
 
@@ -78,16 +79,16 @@ public class DestroyBlockStageAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         int entityId = context.getEntity().getId();
         ClientboundBlockDestructionPacket packet = new ClientboundBlockDestructionPacket(entityId, blockPos, progress);
 
-        if (context.forSpecificPlayers()) {
-            for (ServerPlayer player : context.getTargetedPlayers()) {
+        if (session.forSpecificPlayers()) {
+            for (ServerPlayer player : session.getTargetedPlayers()) {
                 player.connection.send(packet);
             }
         } else {
-            for (ServerPlayer player : context.getLevel().players()) {
+            for (ServerPlayer player : session.getLevel().players()) {
                 player.connection.send(packet);
             }
         }

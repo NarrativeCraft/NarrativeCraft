@@ -24,9 +24,9 @@
 package fr.loudo.narrativecraft.recording.actions;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.io.IOException;
 import java.util.Optional;
 import net.minecraft.world.entity.Entity;
@@ -48,8 +48,8 @@ public class DeathAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context) {
-        return Optional.of(new SpawnEntityAction(tick, entityId));
+    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        return Optional.empty();
     }
 
     @Override
@@ -68,15 +68,10 @@ public class DeathAction extends AbstractAction {
     }
 
     @Override
-    public ActionResult execute(IPlaybackContext context) {
-        if (context.getEntity() instanceof LivingEntity entity) {
-            entity.handleEntityEvent((byte) 3);
-        } else if (context.getEntity() instanceof FakePlayer player) {
-            player.level().broadcastEntityEvent(player, (byte) 60);
-            Entity entity = context.getEntity();
-            if (entity instanceof LivingEntity) {
-                context.getLevel().broadcastEntityEvent(entity, (byte) 3);
-            }
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
+        Entity entity = context.getEntity();
+        if (entity instanceof LivingEntity) {
+            session.getLevel().broadcastEntityEvent(entity, (byte) 3);
         }
         return ActionResult.OK;
     }
