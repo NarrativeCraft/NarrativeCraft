@@ -48,6 +48,11 @@ public class HorseByteAction extends AbstractAction {
     }
 
     @Override
+    public boolean shouldExecuteOnRewind() {
+        return true;
+    }
+
+    @Override
     public void write(Writer writer) throws IOException {
         writer.addByte(horseByte);
     }

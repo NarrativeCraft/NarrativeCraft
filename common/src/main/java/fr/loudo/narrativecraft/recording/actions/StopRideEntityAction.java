@@ -53,10 +53,14 @@ public class StopRideEntityAction extends AbstractAction {
     }
 
     @Override
-    public void write(Writer writer) throws IOException {}
+    public void write(Writer writer) throws IOException {
+        writer.addInt(entityRecordingId);
+    }
 
     @Override
-    public void read(Reader reader) throws IOException {}
+    public void read(Reader reader) throws IOException {
+        entityRecordingId = reader.readInt();
+    }
 
     @Override
     public String getId() {
@@ -71,6 +75,6 @@ public class StopRideEntityAction extends AbstractAction {
 
     @Override
     public boolean shouldExecuteOnRewind() {
-        return true;
+        return false;
     }
 }

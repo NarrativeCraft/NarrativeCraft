@@ -28,7 +28,9 @@ import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.actions.RideEntityAction;
 import fr.loudo.narrativecraft.recording.actions.StopRideEntityAction;
 import net.minecraft.world.entity.Entity;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -36,6 +38,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public class EntityMixin {
+
+    @Shadow
+    private @Nullable Entity vehicle;
 
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z", at = @At("HEAD"))
     private void narrativecraft$startRiding(
@@ -52,6 +57,8 @@ public class EntityMixin {
     @Inject(method = "stopRiding", at = @At("HEAD"))
     private void narrativecraft$stopRiding(CallbackInfo ci) {
 
+        if (vehicle == null || vehicle.isRemoved()) return;
+
         Entity entity = (Entity) (Object) this;
         Recording recording =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
@@ -60,7 +67,7 @@ public class EntityMixin {
         recording.addAction(
                 new StopRideEntityAction(
                         recording.getTick(),
-                        recording.getRecordingEntityData(entity).getRecordingId()),
+                        recording.getRecordingEntityData(vehicle).getRecordingId()),
                 entity);
     }
 }
