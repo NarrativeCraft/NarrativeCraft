@@ -34,7 +34,6 @@ public class OnHurtEvent {
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
         if (data == null) return;
 
-        data.markAsTracked();
         data.addAction(new HurtAction(data.getRecordingTick()));
     }
 }

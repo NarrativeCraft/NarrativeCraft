@@ -139,15 +139,17 @@ public class PlaybackContext implements IPlaybackContext {
     }
 
     private void addEntityToWorld() {
-        if (entity instanceof FakePlayer fakePlayer) {
-            for (ServerPlayer player : playback.getTargetedPlayers()) {
-                player.connection.send(new ClientboundPlayerInfoUpdatePacket(
-                        ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+        if (!entity.isRemoved()) {
+            if (entity instanceof FakePlayer fakePlayer) {
+                for (ServerPlayer player : playback.getTargetedPlayers()) {
+                    player.connection.send(new ClientboundPlayerInfoUpdatePacket(
+                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+                }
+                level.addNewPlayer(fakePlayer);
+                return;
             }
-            level.addNewPlayer(fakePlayer);
-            return;
+            level.addFreshEntity(entity);
         }
-        level.addFreshEntity(entity);
     }
 
     public void respawnEntity() {
