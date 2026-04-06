@@ -46,6 +46,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.storage.TagValueInput;
 
 public class PlaybackContext implements IPlaybackContext {
@@ -146,6 +147,13 @@ public class PlaybackContext implements IPlaybackContext {
                             ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
                 }
                 level.addNewPlayer(fakePlayer);
+                return;
+            }
+            if (entity instanceof ItemEntity itemEntity) {
+                float f = level.getRandom().nextFloat() * 0.5F;
+                float angle = level.getRandom().nextFloat() * (float) (Math.PI * 2);
+                itemEntity.setDeltaMovement(-Math.sin(angle) * f, 0.2F, Math.cos(angle) * f);
+                level.addFreshEntity(entity);
                 return;
             }
             level.addFreshEntity(entity);
