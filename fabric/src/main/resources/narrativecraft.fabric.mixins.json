@@ -7,7 +7,6 @@
   "mixins": [
     "BedItemMixinFabric",
     "BlockItemMixinFabric",
-    "CommandsMixinFabric",
     "ItemEntityMixinFabric",
     "PlayerMixinFabric",
     "ServerPlayerMixinFabric"
