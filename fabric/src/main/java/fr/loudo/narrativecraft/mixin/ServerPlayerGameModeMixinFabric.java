@@ -21,18 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import fr.loudo.narrativecraft.events.server.OnServerBreakBlockEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerPlayerGameMode;
+import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-public class OnServerBreakBlockEventFabric implements IFabricEventRegister {
-    @Override
-    public void register() {
-        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
-            if (world.isClientSide()) return;
-            OnServerBreakBlockEvent.onBreakEvent(state, pos, (ServerPlayer) player);
-        });
+@Mixin(ServerPlayerGameMode.class)
+public class ServerPlayerGameModeMixinFabric {
+
+    @Shadow
+    protected ServerLevel level;
+
+    @Shadow
+    @Final
+    protected ServerPlayer player;
+
+    @Inject(method = "destroyBlock", at = @At("HEAD"))
+    private void narrativecraft$destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        BlockState state = this.level.getBlockState(pos);
+        OnServerBreakBlockEvent.onBreakEvent(state, pos, player);
     }
 }

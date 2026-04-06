@@ -1,0 +1,2 @@
+- play multiple subscene when recording for sync
+- fix that override action when saving same recording name

@@ -26,9 +26,16 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.BreakBlockAction;
+import fr.loudo.narrativecraft.recording.actions.SilentPlaceBlockAction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 public class OnServerBreakBlockEvent {
 
@@ -38,5 +45,22 @@ public class OnServerBreakBlockEvent {
         if (data == null) return;
 
         data.addAction(new BreakBlockAction(data.getRecordingTick(), blockPos, blockState));
+
+        BlockPos secondPos = null;
+
+        if (blockState.getBlock() instanceof DoorBlock) {
+            secondPos =
+                    blockState.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? blockPos.above() : blockPos.below();
+        } else if (blockState.getBlock() instanceof BedBlock) {
+            Direction facing = blockState.getValue(BedBlock.FACING);
+            secondPos = blockState.getValue(BedBlock.PART) == BedPart.FOOT
+                    ? blockPos.relative(facing)
+                    : blockPos.relative(facing.getOpposite());
+        }
+
+        if (secondPos != null) {
+            data.addAction(
+                    new SilentPlaceBlockAction(data.getRecordingTick(), secondPos, Blocks.AIR.defaultBlockState()));
+        }
     }
 }

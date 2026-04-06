@@ -9,6 +9,7 @@
     "BlockItemMixinFabric",
     "ItemEntityMixinFabric",
     "PlayerMixinFabric",
+    "ServerPlayerGameModeMixinFabric",
     "ServerPlayerMixinFabric"
   ],
   "client": [
