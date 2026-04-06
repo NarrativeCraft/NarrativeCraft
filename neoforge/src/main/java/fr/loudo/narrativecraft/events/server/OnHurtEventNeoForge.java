@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.events.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 
 @Mod(NarrativeCraftMod.MOD_ID)
 public class OnHurtEventNeoForge {
@@ -36,7 +36,7 @@ public class OnHurtEventNeoForge {
         NeoForge.EVENT_BUS.addListener(OnHurtEventNeoForge::onHurt);
     }
 
-    private static void onHurt(LivingDeathEvent event) {
+    private static void onHurt(LivingDamageEvent.Post event) {
         OnHurtEvent.onHurt(event.getEntity());
     }
 }

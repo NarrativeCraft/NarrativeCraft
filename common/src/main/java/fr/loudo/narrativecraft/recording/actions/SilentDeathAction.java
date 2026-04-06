@@ -29,19 +29,32 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
 import java.util.Optional;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 
-public class DeathAction extends AbstractAction {
+public class SilentDeathAction extends AbstractAction {
 
-    public static final String ID = "kill_entity";
+    public static final String ID = "silent_death";
 
-    public DeathAction(int tick) {
+    private boolean removed;
+
+    public SilentDeathAction(int tick) {
         super(tick);
+    }
+
+    public SilentDeathAction(int tick, boolean removed) {
+        super(tick);
+        this.removed = removed;
     }
 
     @Override
     public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         return Optional.of(new SpawnEntityAction(tick));
+    }
+
+    @Override
+    public boolean differs(AbstractAction other) {
+        if (!(other instanceof SilentDeathAction that)) return false;
+        return this.removed != that.removed;
     }
 
     @Override
@@ -57,9 +70,9 @@ public class DeathAction extends AbstractAction {
 
     @Override
     public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
-        if (!(context.getEntity() instanceof LivingEntity entity)) return ActionResult.IGNORED;
-        entity.setHealth(0.0f);
-        session.getLevel().broadcastEntityEvent(entity, (byte) 3);
+
+        context.getEntity().remove(Entity.RemovalReason.DISCARDED);
+
         return ActionResult.OK;
     }
 }

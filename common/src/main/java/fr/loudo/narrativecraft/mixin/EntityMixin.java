@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.RideEntityAction;
 import fr.loudo.narrativecraft.recording.actions.StopRideEntityAction;
 import net.minecraft.world.entity.Entity;
@@ -63,11 +64,10 @@ public class EntityMixin {
         Recording recording =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
         if (recording == null) return;
+        RecordingEntityData recordingEntityData = recording.getRecordingEntityData(vehicle);
+        if (recordingEntityData == null) return;
 
         recording.addAction(
-                new StopRideEntityAction(
-                        recording.getTick(),
-                        recording.getRecordingEntityData(vehicle).getRecordingId()),
-                entity);
+                new StopRideEntityAction(recording.getTick(), recordingEntityData.getRecordingId()), entity);
     }
 }

@@ -27,31 +27,50 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import fr.loudo.narrativecraft.mixin.accessor.AbstractBoatAccessor;
 import java.io.IOException;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 
-public class SpawnEntityAction extends AbstractAction {
+public class BoatDataAction extends AbstractAction {
 
-    public static final String ID = "spawn_entity";
+    public static final String ID = "boat_data";
 
-    private int entityId = -1;
+    private boolean movingLeftPaddle;
+    private boolean movingRightPaddle;
+    private int bubbleTime;
 
-    public SpawnEntityAction(int tick, int entityId) {
+    public BoatDataAction(int tick, AbstractBoat boat) {
         super(tick);
-        this.entityId = entityId;
+        this.movingLeftPaddle = boat.getEntityData().get(AbstractBoatAccessor.getDATA_ID_PADDLE_LEFT());
+        this.movingRightPaddle = boat.getEntityData().get(AbstractBoatAccessor.getDATA_ID_PADDLE_RIGHT());
+        this.bubbleTime = boat.getEntityData().get(AbstractBoatAccessor.getDATA_ID_BUBBLE_TIME());
     }
 
-    public SpawnEntityAction(int tick) {
+    public BoatDataAction(int tick) {
         super(tick);
+    }
+
+    @Override
+    public boolean differs(AbstractAction other) {
+        if (!(other instanceof BoatDataAction that)) return false;
+        return this.movingLeftPaddle != that.movingLeftPaddle
+                || this.movingRightPaddle != that.movingRightPaddle
+                || this.bubbleTime != that.bubbleTime;
     }
 
     @Override
     public void write(Writer writer) throws IOException {
-        writer.addInt(entityId);
+        writer.addBoolean(movingLeftPaddle);
+        writer.addBoolean(movingRightPaddle);
+        writer.addInt(bubbleTime);
     }
 
     @Override
     public void read(Reader reader) throws IOException {
-        entityId = reader.readInt();
+        movingLeftPaddle = reader.readBoolean();
+        movingRightPaddle = reader.readBoolean();
+        bubbleTime = reader.readInt();
     }
 
     @Override
@@ -61,11 +80,18 @@ public class SpawnEntityAction extends AbstractAction {
 
     @Override
     public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
-        if (entityId == -1) {
-            context.respawnEntity();
-        } else {
-            session.respawnEntityByRecordingId(entityId);
-        }
+        if (!(context.getEntity() instanceof AbstractBoat boat)) return ActionResult.IGNORED;
+
+        SynchedEntityData entityData = boat.getEntityData();
+        entityData.set(AbstractBoatAccessor.getDATA_ID_PADDLE_LEFT(), movingLeftPaddle);
+        entityData.set(AbstractBoatAccessor.getDATA_ID_PADDLE_RIGHT(), movingRightPaddle);
+        entityData.set(AbstractBoatAccessor.getDATA_ID_BUBBLE_TIME(), bubbleTime);
+
         return ActionResult.OK;
+    }
+
+    @Override
+    public boolean shouldExecuteOnRewind() {
+        return true;
     }
 }

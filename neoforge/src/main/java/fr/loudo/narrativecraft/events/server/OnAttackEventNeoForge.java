@@ -24,18 +24,20 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.recording.actions.DeathAction;
-import net.minecraft.world.entity.LivingEntity;
+import fr.loudo.narrativecraft.api.events.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 
-public class OnDeathEvent {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnAttackEventNeoForge {
 
-    public static void onDeath(LivingEntity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
+    public OnAttackEventNeoForge(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnAttackEventNeoForge::onHurt);
+    }
 
-        data.markAsTracked();
-        data.addAction(new DeathAction(data.getRecordingTick()));
+    private static void onHurt(AttackEntityEvent event) {
+        if (event.getEntity().level().isClientSide()) return;
+        OnAttackEvent.onAttack(event.getEntity());
     }
 }

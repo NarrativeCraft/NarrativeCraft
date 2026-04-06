@@ -34,6 +34,7 @@ public class OnPlayerCloseContainerEvent {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (data == null) return;
+        if (data.getLastInteractedBlockPos() == null) return;
 
         data.addAction(new CloseContainerAction(data.getRecordingTick(), data.getLastInteractedBlockPos()));
         data.setLastInteractedBlockPos(null);

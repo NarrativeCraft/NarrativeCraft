@@ -48,6 +48,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.AABB;
 
@@ -58,14 +59,14 @@ public class Recording implements IRecording {
 
     private final UUID id = UUID.randomUUID();
     private final PlayerSession playerSession;
-    private final List<RecordingEntityData> recordingEntityData = new ArrayList<>();
+    private final List<RecordingEntityData> recordingEntityDataList = new ArrayList<>();
     private int nextNearbyEntityLocalId = 1;
     private boolean isRecording = false;
     private int tick = 0;
 
     public Recording(PlayerSession playerSession) {
         this.playerSession = playerSession;
-        recordingEntityData.add(new RecordingEntityData(0, playerSession.getPlayer(), true, 0, this));
+        recordingEntityDataList.add(new RecordingEntityData(0, playerSession.getPlayer(), true, 0, this));
     }
 
     public void tick() {
@@ -73,13 +74,14 @@ public class Recording implements IRecording {
 
         scanNearbyEntities();
 
-        for (RecordingEntityData data : recordingEntityData) {
+        for (RecordingEntityData data : recordingEntityDataList) {
             Entity entity = data.getEntity();
             data.addAction(new MovementAction(
                     tick, entity.position(), entity.getXRot(), entity.getYRot(), entity.getYHeadRot()));
             data.addAction(new PoseAction(tick, entity.getPose()));
             data.addAction(
                     new EntityByteAction(tick, entity.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID())));
+            data.addAction(new SilentDeathAction(tick, entity.isRemoved()));
             if (entity instanceof LivingEntity livingEntity) {
                 data.addAction(new ChangeItemAction(tick, livingEntity));
                 data.addAction(new SwingAction(tick, livingEntity));
@@ -89,6 +91,9 @@ public class Recording implements IRecording {
             if (entity instanceof AbstractHorse horse) {
                 data.addAction(
                         new HorseByteAction(tick, horse.getEntityData().get(AbstractHorseAccessor.getDATA_ID_FLAGS())));
+            }
+            if (entity instanceof AbstractBoat boat) {
+                data.addAction(new BoatDataAction(tick, boat));
             }
         }
         tick++;
@@ -100,7 +105,10 @@ public class Recording implements IRecording {
         List<Entity> found = player.level().getEntities(player, searchBox, e -> !(e instanceof Player));
         for (Entity entity : found) {
             if (getRecordingEntityData(entity) == null) {
-                recordingEntityData.add(new RecordingEntityData(nextNearbyEntityLocalId++, entity, false, tick, this));
+                RecordingEntityData recordingEntityData =
+                        new RecordingEntityData(nextNearbyEntityLocalId++, entity, false, tick, this);
+                recordingEntityDataList.add(recordingEntityData);
+                seedActions(recordingEntityData);
             }
         }
     }
@@ -128,14 +136,14 @@ public class Recording implements IRecording {
     public void start() {
         isRecording = true;
 
-        for (RecordingEntityData data : recordingEntityData) {
-            data.seedLastAction(SwingAction.ID, new SwingAction(0));
+        for (RecordingEntityData data : recordingEntityDataList) {
+            seedActions(data);
         }
 
         // If player is already riding an entity first tick
         Entity vehicle = getPlayer().getVehicle();
         if (vehicle != null) {
-            recordingEntityData.add(new RecordingEntityData(nextNearbyEntityLocalId++, vehicle, false, 0, this));
+            recordingEntityDataList.add(new RecordingEntityData(nextNearbyEntityLocalId++, vehicle, false, 0, this));
             addAction(new RideEntityAction(0, markEntityAsTracked(vehicle)), getPlayer());
         }
 
@@ -147,9 +155,14 @@ public class Recording implements IRecording {
         NarrativeCraftMod.EVENT_BUS.post(new RecordingStopEvent(getPlayer(), this));
     }
 
+    private void seedActions(RecordingEntityData data) {
+        data.seedLastAction(SwingAction.ID, new SwingAction(0));
+        data.seedLastAction(SilentDeathAction.ID, new SilentDeathAction(0));
+    }
+
     public RecordingEntityData getRecordingEntityData(Entity entity) {
         UUID uuid = entity.getUUID();
-        for (RecordingEntityData data : recordingEntityData) {
+        for (RecordingEntityData data : recordingEntityDataList) {
             if (data.getEntity().getUUID().equals(uuid)) return data;
         }
         return null;
@@ -162,7 +175,7 @@ public class Recording implements IRecording {
             return false;
         }
 
-        for (RecordingEntityData data : recordingEntityData) {
+        for (RecordingEntityData data : recordingEntityDataList) {
             if (!data.isTracked()) continue;
             animation.getRecordingDataList().add(data.getRecordingData());
         }
@@ -176,7 +189,7 @@ public class Recording implements IRecording {
     }
 
     public int getEntityTrackedSize() {
-        return recordingEntityData.stream()
+        return recordingEntityDataList.stream()
                 .filter(RecordingEntityData::isTracked)
                 .toList()
                 .size();
@@ -206,7 +219,7 @@ public class Recording implements IRecording {
         return tick;
     }
 
-    public List<RecordingEntityData> getRecordingEntityData() {
-        return recordingEntityData;
+    public List<RecordingEntityData> getRecordingEntityDataList() {
+        return recordingEntityDataList;
     }
 }

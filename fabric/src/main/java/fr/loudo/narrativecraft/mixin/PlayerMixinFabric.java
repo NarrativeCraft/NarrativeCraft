@@ -21,21 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.recording.actions.DeathAction;
-import net.minecraft.world.entity.LivingEntity;
+import fr.loudo.narrativecraft.events.server.OnAttackEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class OnDeathEvent {
+@Mixin(Player.class)
+public class PlayerMixinFabric {
 
-    public static void onDeath(LivingEntity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
+    @Inject(method = "attack", at = @At("HEAD"))
+    private void narrativecraft$playerAttack(Entity entity, CallbackInfo ci) {
+        Player player = (Player) (Object) this;
+        if (player.level().isClientSide()) return;
 
-        data.markAsTracked();
-        data.addAction(new DeathAction(data.getRecordingTick()));
+        OnAttackEvent.onAttack(entity);
     }
 }

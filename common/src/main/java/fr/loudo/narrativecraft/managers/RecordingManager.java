@@ -62,7 +62,7 @@ public class RecordingManager extends Manager<Recording> implements IRecordingMa
     @Override
     public Recording getRecording(Entity entity) {
         for (Recording recording : list) {
-            for (RecordingEntityData recordingEntityData : recording.getRecordingEntityData()) {
+            for (RecordingEntityData recordingEntityData : recording.getRecordingEntityDataList()) {
                 if (recordingEntityData.getEntity().getUUID().equals(entity.getUUID())) {
                     return recording;
                 }
@@ -73,7 +73,7 @@ public class RecordingManager extends Manager<Recording> implements IRecordingMa
 
     public RecordingEntityData getRecordingEntityData(Entity entity) {
         for (Recording recording : list) {
-            for (RecordingEntityData data : recording.getRecordingEntityData()) {
+            for (RecordingEntityData data : recording.getRecordingEntityDataList()) {
                 if (data.getEntity().getUUID().equals(entity.getUUID())) {
                     return data;
                 }

@@ -21,21 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.mixin.accessor;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.recording.actions.DeathAction;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-public class OnDeathEvent {
+@Mixin(AbstractBoat.class)
+public interface AbstractBoatAccessor {
+    @Accessor
+    static EntityDataAccessor<Boolean> getDATA_ID_PADDLE_LEFT() {
+        return null;
+    }
 
-    public static void onDeath(LivingEntity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
+    @Accessor
+    static EntityDataAccessor<Boolean> getDATA_ID_PADDLE_RIGHT() {
+        return null;
+    }
 
-        data.markAsTracked();
-        data.addAction(new DeathAction(data.getRecordingTick()));
+    @Accessor
+    static EntityDataAccessor<Integer> getDATA_ID_BUBBLE_TIME() {
+        return null;
     }
 }

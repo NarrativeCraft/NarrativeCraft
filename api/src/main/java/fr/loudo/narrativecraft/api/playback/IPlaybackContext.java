@@ -34,4 +34,6 @@ public interface IPlaybackContext {
      * @return recording id of the entity
      */
     int getRecordingId();
+
+    void respawnEntity();
 }
