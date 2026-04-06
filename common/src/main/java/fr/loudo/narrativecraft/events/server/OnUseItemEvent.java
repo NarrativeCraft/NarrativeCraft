@@ -21,33 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.server.*;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
+import fr.loudo.narrativecraft.recording.actions.UseItemAction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 
-public class FabricEventList {
+public class OnUseItemEvent {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
+    public static void onUseItem(ServerPlayer player, InteractionHand hand) {
+        RecordingEntityData entityData =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
+        if (entityData == null) return;
 
-    public FabricEventList() {
-        events.add(new OnServerStartEventFabric());
-        events.add(new OnPlayerJoinEventFabric());
-        events.add(new OnPlayerLeaveEventFabric());
-        events.add(new OnServerTickEventFabric());
-        events.add(new OnCommandRegisterEventFabric());
-        events.add(new OnServerBreakBlockEventFabric());
-        events.add(new OnRightClickBlockEventFabric());
-        events.add(new OnDeathEventFabric());
-        events.add(new OnHurtEventFabric());
-        events.add(new OnUseItemEventFabric());
-    }
-
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+        entityData.addAction(new UseItemAction(entityData.getRecordingTick(), hand));
     }
 }

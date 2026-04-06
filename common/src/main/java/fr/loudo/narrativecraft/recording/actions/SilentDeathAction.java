@@ -70,9 +70,7 @@ public class SilentDeathAction extends AbstractAction {
 
     @Override
     public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
-
         context.getEntity().remove(Entity.RemovalReason.DISCARDED);
-
         return ActionResult.OK;
     }
 }

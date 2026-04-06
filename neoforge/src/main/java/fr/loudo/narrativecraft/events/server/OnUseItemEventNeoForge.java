@@ -21,33 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.server.*;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 
-public class FabricEventList {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnUseItemEventNeoForge {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public FabricEventList() {
-        events.add(new OnServerStartEventFabric());
-        events.add(new OnPlayerJoinEventFabric());
-        events.add(new OnPlayerLeaveEventFabric());
-        events.add(new OnServerTickEventFabric());
-        events.add(new OnCommandRegisterEventFabric());
-        events.add(new OnServerBreakBlockEventFabric());
-        events.add(new OnRightClickBlockEventFabric());
-        events.add(new OnDeathEventFabric());
-        events.add(new OnHurtEventFabric());
-        events.add(new OnUseItemEventFabric());
+    public OnUseItemEventNeoForge(IEventBus bus) {
+        NeoForge.EVENT_BUS.addListener(OnUseItemEventNeoForge::onUseItem);
     }
 
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+    private static void onUseItem(LivingEntityUseItemEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        OnUseItemEvent.onUseItem(player, event.getHand());
     }
 }

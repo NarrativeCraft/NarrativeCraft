@@ -26,18 +26,25 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.RightClickBlockAction;
+import fr.loudo.narrativecraft.recording.actions.UseItemOnBlockAction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class OnRightClickBlockEvent {
 
-    public static void rightClickBlock(ServerPlayer entity, InteractionHand hand, BlockHitResult blockHitResult) {
+    public static void rightClickBlock(ServerPlayer player, InteractionHand hand, BlockHitResult hitResult) {
         RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (data == null) return;
 
-        data.addAction(new RightClickBlockAction(data.getRecordingTick(), blockHitResult, hand));
-        data.setLastInteractedBlockPos(blockHitResult.getBlockPos());
+        data.addAction(new RightClickBlockAction(data.getRecordingTick(), hitResult, hand));
+
+        ItemStack itemStack = player.getItemInHand(hand);
+        if (!itemStack.isEmpty()) {
+            data.addAction(new UseItemOnBlockAction(data.getRecordingTick(), hitResult, hand));
+        }
+        data.setLastInteractedBlockPos(hitResult.getBlockPos());
     }
 }

@@ -27,32 +27,37 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import java.util.Optional;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
+import fr.loudo.narrativecraft.utils.FakePlayer;
+import java.io.IOException;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.BoatItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 
-public class SilentPlaceBlockAction extends DataBlockAction {
+public class UseItemAction extends AbstractAction {
 
-    public static final String ID = "silent_place_block";
+    public static final String ID = "use_item";
 
-    private boolean onlyServerSide;
+    private boolean offhand;
 
-    public SilentPlaceBlockAction(int tick) {
+    public UseItemAction(int tick, InteractionHand hand) {
+        super(tick);
+        this.offhand = hand == InteractionHand.OFF_HAND;
+    }
+
+    public UseItemAction(int tick) {
         super(tick);
     }
 
-    public SilentPlaceBlockAction(int tick, BlockPos blockPos, BlockState blockState) {
-        super(tick, blockPos, blockState);
+    @Override
+    public void write(Writer writer) throws IOException {
+        writer.addBoolean(offhand);
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        BlockState current = session.getLevel().getBlockState(blockPos);
-        return Optional.of(new SilentPlaceBlockAction(tick, blockPos, current));
+    public void read(Reader reader) throws IOException {
+        offhand = reader.readBoolean();
     }
 
     @Override
@@ -62,31 +67,17 @@ public class SilentPlaceBlockAction extends DataBlockAction {
 
     @Override
     public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
+        if (!(context.getEntity() instanceof FakePlayer player)) return ActionResult.IGNORED;
 
-        ServerLevel level = session.getLevel();
-
-        if (session.forSpecificPlayers() && !onlyServerSide) {
-            for (ServerPlayer player : session.getTargetedPlayers()) {
-                player.connection.send(new ClientboundBlockUpdatePacket(blockPos, blockState));
-                if (blockState.is(Blocks.AIR)) {
-                    return ActionResult.OK;
-                }
-            }
-        } else {
-            level.setBlock(blockPos, blockState, 3);
-            if (blockState.is(Blocks.AIR)) {
-                return ActionResult.OK;
-            }
+        InteractionHand hand = offhand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        ItemStack itemStack = player.getItemInHand(hand);
+        Item item = itemStack.getItem();
+        if (item instanceof SpawnEggItem || item instanceof BoatItem) {
+            return ActionResult.IGNORED;
         }
+        itemStack.setCount(2);
+        item.use(player.level(), player, hand);
 
         return ActionResult.OK;
-    }
-
-    public boolean isOnlyServerSide() {
-        return onlyServerSide;
-    }
-
-    public void setOnlyServerSide(boolean onlyServerSide) {
-        this.onlyServerSide = onlyServerSide;
     }
 }

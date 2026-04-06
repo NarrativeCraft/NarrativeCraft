@@ -50,5 +50,7 @@ public class ActionRegister {
         registry.register(HorseByteAction.ID, HorseByteAction::new);
         registry.register(BoatDataAction.ID, BoatDataAction::new);
         registry.register(SilentDeathAction.ID, SilentDeathAction::new);
+        registry.register(UseItemAction.ID, UseItemAction::new);
+        registry.register(UseItemOnBlockAction.ID, UseItemOnBlockAction::new);
     }
 }

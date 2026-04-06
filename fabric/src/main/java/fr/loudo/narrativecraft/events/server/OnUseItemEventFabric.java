@@ -21,33 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.server.*;
-import java.util.ArrayList;
-import java.util.List;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
 
-public class FabricEventList {
-
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public FabricEventList() {
-        events.add(new OnServerStartEventFabric());
-        events.add(new OnPlayerJoinEventFabric());
-        events.add(new OnPlayerLeaveEventFabric());
-        events.add(new OnServerTickEventFabric());
-        events.add(new OnCommandRegisterEventFabric());
-        events.add(new OnServerBreakBlockEventFabric());
-        events.add(new OnRightClickBlockEventFabric());
-        events.add(new OnDeathEventFabric());
-        events.add(new OnHurtEventFabric());
-        events.add(new OnUseItemEventFabric());
-    }
-
+public class OnUseItemEventFabric implements IFabricEventRegister {
+    @Override
     public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+        UseItemCallback.EVENT.register((player, level, hand) -> {
+            if (!(player instanceof ServerPlayer)) return InteractionResult.PASS;
+            OnUseItemEvent.onUseItem((ServerPlayer) player, hand);
+            return InteractionResult.PASS;
+        });
     }
 }
