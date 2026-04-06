@@ -31,16 +31,9 @@ import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
+
+import java.util.*;
+
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -142,7 +135,8 @@ public class PlaybackContext implements IPlaybackContext {
     private void addEntityToWorld() {
         if (!entity.isRemoved()) {
             if (entity instanceof FakePlayer fakePlayer) {
-                for (ServerPlayer player : playback.getTargetedPlayers()) {
+                Collection<ServerPlayer> players = playback.forSpecificPlayers() ? playback.getTargetedPlayers() : level.players();
+                for (ServerPlayer player : players) {
                     player.connection.send(new ClientboundPlayerInfoUpdatePacket(
                             ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
                 }
