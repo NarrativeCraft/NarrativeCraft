@@ -40,7 +40,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class BedItemMixinFabric {
 
     @Inject(method = "placeBlock", at = @At(value = "HEAD"))
-    private void narrativecraft$atPlaceBlockStart(BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+    private void narrativecraft$atPlaceBlockStart(
+            BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if (!context.getLevel().isClientSide()) {
             OnServerPlaceBlockEventFabric.placeBlock(
                     state, context.getClickedPos(), (ServerPlayer) context.getPlayer());
@@ -48,12 +49,12 @@ public class BedItemMixinFabric {
     }
 
     @Inject(method = "placeBlock", at = @At(value = "TAIL"))
-    private void narrativecraft$atPlaceBlockEnd(BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+    private void narrativecraft$atPlaceBlockEnd(
+            BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if (!context.getLevel().isClientSide() && Boolean.TRUE.equals(cir.getReturnValue())) {
             BlockPos headPos = context.getClickedPos().relative(state.getValue(BedBlock.FACING));
             BlockState headState = state.setValue(BedBlock.PART, BedPart.HEAD);
-            OnServerPlaceBlockEventFabric.placeBlockSilently(
-                    headState, headPos, (ServerPlayer) context.getPlayer());
+            OnServerPlaceBlockEventFabric.placeBlockSilently(headState, headPos, (ServerPlayer) context.getPlayer());
         }
     }
 }

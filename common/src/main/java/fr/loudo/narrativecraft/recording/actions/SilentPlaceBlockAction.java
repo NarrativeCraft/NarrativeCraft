@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import java.util.Optional;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -50,9 +50,9 @@ public class SilentPlaceBlockAction extends DataBlockAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        BlockState current = session.getLevel().getBlockState(blockPos);
-        return Optional.of(new SilentPlaceBlockAction(tick, blockPos, current));
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        BlockState previous = session.getBlockStateMap().getOrDefault(blockPos, Blocks.AIR.defaultBlockState());
+        return List.of(new SilentPlaceBlockAction(tick, blockPos, previous));
     }
 
     @Override
@@ -68,15 +68,15 @@ public class SilentPlaceBlockAction extends DataBlockAction {
         if (session.forSpecificPlayers() && !onlyServerSide) {
             for (ServerPlayer player : session.getTargetedPlayers()) {
                 player.connection.send(new ClientboundBlockUpdatePacket(blockPos, blockState));
-                if (blockState.is(Blocks.AIR)) {
-                    return ActionResult.OK;
-                }
             }
         } else {
             level.setBlock(blockPos, blockState, 3);
-            if (blockState.is(Blocks.AIR)) {
-                return ActionResult.OK;
-            }
+        }
+
+        if (blockState.is(Blocks.AIR)) {
+            session.getBlockStateMap().remove(blockPos);
+        } else {
+            session.getBlockStateMap().put(blockPos, blockState);
         }
 
         return ActionResult.OK;

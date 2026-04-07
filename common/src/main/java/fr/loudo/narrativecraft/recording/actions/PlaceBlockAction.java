@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import java.util.Optional;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
@@ -60,42 +60,44 @@ public class PlaceBlockAction extends DataBlockAction {
         if (session.forSpecificPlayers()) {
             for (ServerPlayer player : session.getTargetedPlayers()) {
                 player.connection.send(new ClientboundBlockUpdatePacket(blockPos, blockState));
-                if (blockState.is(Blocks.AIR)) {
-                    return ActionResult.OK;
+                if (!blockState.is(Blocks.AIR)) {
+                    player.connection.send(new ClientboundSoundPacket(
+                            BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundType.getPlaceSound()),
+                            SoundSource.BLOCKS,
+                            blockPos.getX(),
+                            blockPos.getY(),
+                            blockPos.getZ(),
+                            (soundType.getVolume() + 1.0f) / 2.0f,
+                            soundType.getPitch() * 0.8f,
+                            level.getRandom().nextLong()));
                 }
-
-                player.connection.send(new ClientboundSoundPacket(
-                        BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundType.getPlaceSound()),
-                        SoundSource.BLOCKS,
-                        blockPos.getX(),
-                        blockPos.getY(),
-                        blockPos.getZ(),
-                        (soundType.getVolume() + 1.0f) / 2.0f,
-                        soundType.getPitch() * 0.8f,
-                        level.getRandom().nextLong()));
             }
         } else {
             level.setBlock(blockPos, blockState, 3);
-            if (blockState.is(Blocks.AIR)) {
-                return ActionResult.OK;
+            if (!blockState.is(Blocks.AIR)) {
+                level.playSound(
+                        context.getEntity(),
+                        blockPos,
+                        soundType.getPlaceSound(),
+                        SoundSource.BLOCKS,
+                        (soundType.getVolume() + 1.0f) / 2.0f,
+                        soundType.getPitch() * 0.8f);
             }
+        }
 
-            level.playSound(
-                    context.getEntity(),
-                    blockPos,
-                    soundType.getPlaceSound(),
-                    SoundSource.BLOCKS,
-                    (soundType.getVolume() + 1.0f) / 2.0f,
-                    soundType.getPitch() * 0.8f);
+        if (blockState.is(Blocks.AIR)) {
+            session.getBlockStateMap().remove(blockPos);
+        } else {
+            session.getBlockStateMap().put(blockPos, blockState);
         }
 
         return ActionResult.OK;
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        BlockState previous = session.getLevel().getBlockState(blockPos);
-        return Optional.of(new SilentPlaceBlockAction(tick, blockPos, previous));
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        BlockState previous = session.getBlockStateMap().getOrDefault(blockPos, Blocks.AIR.defaultBlockState());
+        return List.of(new SilentPlaceBlockAction(tick, blockPos, previous));
     }
 
     @Override

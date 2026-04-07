@@ -31,7 +31,7 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 
@@ -63,10 +63,10 @@ public class GameModeAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        if (!(context.getEntity() instanceof FakePlayer player)) return Optional.empty();
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        if (!(context.getEntity() instanceof FakePlayer player)) return List.of();
         GameType lastGameMode = player.gameMode();
-        return Optional.of(new GameModeAction(tick, lastGameMode));
+        return List.of(new GameModeAction(tick, lastGameMode));
     }
 
     @Override

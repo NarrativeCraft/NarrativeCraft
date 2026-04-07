@@ -27,15 +27,19 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
@@ -64,29 +68,71 @@ public class BreakBlockAction extends DataBlockAction {
                         false));
             }
         } else {
-            handleDoorBreak(session.getLevel());
+            preRemoveOtherDoubleBlockPart(session.getLevel());
             session.getLevel().destroyBlock(blockPos, false, context.getEntity());
         }
+
+        session.getBlockStateMap().put(blockPos, blockState);
 
         return ActionResult.OK;
     }
 
-    /*
-    Prevent specific case of door item dropping if breaking from the top
-     */
-    private void handleDoorBreak(ServerLevel level) {
+    private BlockPos getOtherDoubleBlockPos() {
         if (blockState.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
             DoubleBlockHalf half = blockState.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF);
-            if (half == DoubleBlockHalf.UPPER) {
-                BlockPos below = blockPos.below();
-                level.setBlock(below, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-            }
+            return half == DoubleBlockHalf.UPPER ? blockPos.below() : blockPos.above();
+        }
+        if (blockState.getBlock() instanceof BedBlock) {
+            BedPart part = blockState.getValue(BedBlock.PART);
+            Direction facing = blockState.getValue(BedBlock.FACING);
+            return part == BedPart.FOOT ? blockPos.relative(facing) : blockPos.relative(facing.getOpposite());
+        }
+        return null;
+    }
+
+    private boolean isBreakFromBottom() {
+        if (blockState.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
+            DoubleBlockHalf half = blockState.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF);
+            return half == DoubleBlockHalf.LOWER;
+        }
+        if (blockState.getBlock() instanceof BedBlock) {
+            BedPart part = blockState.getValue(BedBlock.PART);
+            return part == BedPart.HEAD;
+        }
+        return false;
+    }
+
+    /**
+     * Prevent item drop from doors and bed if breaking from a specific side.
+     */
+    private void preRemoveOtherDoubleBlockPart(ServerLevel level) {
+        BlockPos otherPos = getOtherDoubleBlockPos();
+        if (otherPos != null && !isBreakFromBottom()) {
+            level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        return Optional.of(new SilentPlaceBlockAction(tick, blockPos, blockState));
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        List<AbstractAction> snapshots = new ArrayList<>();
+        snapshots.add(new SilentPlaceBlockAction(tick, blockPos, blockState));
+        BlockPos otherPos = getOtherDoubleBlockPos();
+        if (otherPos != null) {
+            BlockState otherState;
+            if (blockState.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
+                DoubleBlockHalf half = blockState.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF);
+                otherState = blockState.setValue(
+                        BlockStateProperties.DOUBLE_BLOCK_HALF,
+                        half == DoubleBlockHalf.LOWER ? DoubleBlockHalf.UPPER : DoubleBlockHalf.LOWER);
+            } else if (blockState.getBlock() instanceof BedBlock) {
+                BedPart part = blockState.getValue(BedBlock.PART);
+                otherState = blockState.setValue(BedBlock.PART, part == BedPart.FOOT ? BedPart.HEAD : BedPart.FOOT);
+            } else {
+                otherState = session.getBlockStateMap().getOrDefault(otherPos, Blocks.AIR.defaultBlockState());
+            }
+            snapshots.add(new SilentPlaceBlockAction(tick, otherPos, otherState));
+        }
+        return snapshots;
     }
 
     @Override

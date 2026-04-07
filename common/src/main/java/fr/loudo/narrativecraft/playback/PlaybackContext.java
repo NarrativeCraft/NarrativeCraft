@@ -236,8 +236,8 @@ public class PlaybackContext implements IPlaybackContext {
         List<AbstractAction> actionsToPlay = recordingData.getActions().get(tick);
         if (actionsToPlay != null) {
             for (AbstractAction action : actionsToPlay) {
-                action.createRewindSnapshot(this, playback).ifPresent(snapshot -> rewindLog
-                        .computeIfAbsent(tick, k -> new ArrayList<>())
+                action.createRewindSnapshot(this, playback).forEach(snapshot -> rewindLog
+                        .computeIfAbsent(action.getTick(), k -> new ArrayList<>())
                         .add(snapshot));
                 ActionResult result = action.execute(this, playback);
                 if (result == ActionResult.ERROR) {

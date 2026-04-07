@@ -29,7 +29,7 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 import net.minecraft.network.syncher.SynchedEntityData;
 
 public class EntityByteAction extends AbstractAction {
@@ -66,9 +66,9 @@ public class EntityByteAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         byte current = context.getEntity().getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID());
-        return Optional.of(new EntityByteAction(tick, current));
+        return List.of(new EntityByteAction(tick, current));
     }
 
     @Override

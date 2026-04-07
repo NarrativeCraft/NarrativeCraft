@@ -26,14 +26,13 @@ package fr.loudo.narrativecraft.playback;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.RecordingData;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class Playback implements IPlaybackSession {
 
@@ -44,6 +43,7 @@ public class Playback implements IPlaybackSession {
     private final ServerPlayer requester;
     private final List<PlaybackContext> contexts = new ArrayList<>();
     private final Collection<ServerPlayer> targetedPlayers = new ArrayList<>();
+    private final Map<BlockPos, BlockState> blockStateMap = new HashMap<>();
     private int tick = 0;
     private int maxTick = 0;
     private boolean isPlaying, killOnEnd;
@@ -59,6 +59,7 @@ public class Playback implements IPlaybackSession {
         maxTick = 0;
         ended = false;
         contexts.clear();
+        blockStateMap.clear();
 
         for (RecordingData recordingData : animation.getRecordingDataList()) {
             contexts.add(new PlaybackContext(this, recordingData, requester.level()));
@@ -237,6 +238,10 @@ public class Playback implements IPlaybackSession {
             }
         }
         return null;
+    }
+
+    public Map<BlockPos, BlockState> getBlockStateMap() {
+        return blockStateMap;
     }
 
     public boolean isPlaying() {

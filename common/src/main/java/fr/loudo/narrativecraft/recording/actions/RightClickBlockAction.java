@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
-import java.util.Optional;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -57,12 +57,12 @@ public class RightClickBlockAction extends DataBlockHitAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         BlockState blockState = session.getLevel().getBlockState(hitResult.getBlockPos());
         if (blockState.is(Blocks.CHEST)) {
-            return Optional.of(new CloseContainerAction(tick));
+            return List.of(new CloseContainerAction(tick));
         }
-        return Optional.of(new RightClickBlockAction(
+        return List.of(new RightClickBlockAction(
                 tick, hitResult, offhand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND));
     }
 

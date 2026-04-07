@@ -29,7 +29,7 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 
 public class CloseContainerAction extends AbstractAction {
@@ -48,9 +48,9 @@ public class CloseContainerAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        if (blockPos == null) return Optional.empty();
-        return Optional.of(RightClickBlockAction.defaultInstance(tick, blockPos));
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        if (blockPos == null) return List.of();
+        return List.of(RightClickBlockAction.defaultInstance(tick, blockPos));
     }
 
     @Override

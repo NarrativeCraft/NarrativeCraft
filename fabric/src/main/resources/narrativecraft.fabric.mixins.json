@@ -7,6 +7,7 @@
   "mixins": [
     "BedItemMixinFabric",
     "BlockItemMixinFabric",
+    "DoubleHighBlockItemFabricMixin",
     "ItemEntityMixinFabric",
     "PlayerMixinFabric",
     "ServerPlayerGameModeMixinFabric",

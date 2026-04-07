@@ -28,14 +28,8 @@ import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.PlaceBlockAction;
 import fr.loudo.narrativecraft.recording.actions.SilentPlaceBlockAction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.BedBlock;
-import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BedPart;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 public class OnServerPlaceBlockEvent {
     public static void onPlaceBlock(BlockState state, BlockPos clickedPos, ServerPlayer player) {

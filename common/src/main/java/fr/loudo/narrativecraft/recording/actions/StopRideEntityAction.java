@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
 public class StopRideEntityAction extends AbstractAction {
 
@@ -46,10 +46,10 @@ public class StopRideEntityAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         int recordingIdPlayback = context.getRecordingId();
-        if (recordingIdPlayback == entityRecordingId) return Optional.empty();
-        return Optional.of(new RideEntityAction(tick, entityRecordingId));
+        if (recordingIdPlayback == entityRecordingId) return List.of();
+        return List.of(new RideEntityAction(tick, entityRecordingId));
     }
 
     @Override

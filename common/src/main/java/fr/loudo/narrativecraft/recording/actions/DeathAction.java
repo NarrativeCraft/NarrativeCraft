@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 import net.minecraft.world.entity.LivingEntity;
 
 public class DeathAction extends AbstractAction {
@@ -40,8 +40,8 @@ public class DeathAction extends AbstractAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        return Optional.of(new SpawnEntityAction(tick));
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        return List.of(new SpawnEntityAction(tick));
     }
 
     @Override

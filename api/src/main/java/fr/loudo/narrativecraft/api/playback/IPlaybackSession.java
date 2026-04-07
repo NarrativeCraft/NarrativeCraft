@@ -24,9 +24,12 @@
 package fr.loudo.narrativecraft.api.playback;
 
 import java.util.Collection;
+import java.util.Map;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface IPlaybackSession {
 
@@ -50,4 +53,6 @@ public interface IPlaybackSession {
      * Returns the targeted players, or an empty collection if the playback affects everyone.
      */
     Collection<ServerPlayer> getTargetedPlayers();
+
+    Map<BlockPos, BlockState> getBlockStateMap();
 }

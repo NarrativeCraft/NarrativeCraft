@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.api.recording.action;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
 public abstract class AbstractAction implements Action {
 
@@ -52,8 +52,8 @@ public abstract class AbstractAction implements Action {
      * Must be silent (no sounds, no visual side effects).
      * @return Empty for stateless actions or actions fully restored by {@link #shouldExecuteOnRewind()}.
      */
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        return Optional.empty();
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        return List.of();
     }
 
     /**
