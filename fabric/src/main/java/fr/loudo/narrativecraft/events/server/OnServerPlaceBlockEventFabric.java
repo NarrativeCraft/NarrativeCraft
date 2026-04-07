@@ -31,4 +31,8 @@ public class OnServerPlaceBlockEventFabric {
     public static void placeBlock(BlockState state, BlockPos clickedPos, ServerPlayer player) {
         OnServerPlaceBlockEvent.onPlaceBlock(state, clickedPos, player);
     }
+
+    public static void placeBlockSilently(BlockState state, BlockPos clickedPos, ServerPlayer player) {
+        OnServerPlaceBlockEvent.onPlaceBlockSilently(state, clickedPos, player);
+    }
 }

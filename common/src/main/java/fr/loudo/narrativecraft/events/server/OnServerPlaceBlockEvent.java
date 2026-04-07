@@ -45,22 +45,14 @@ public class OnServerPlaceBlockEvent {
         if (data == null) return;
 
         data.addAction(new PlaceBlockAction(data.getRecordingTick(), clickedPos, state));
+    }
 
-        ServerLevel level = player.level();
-        BlockPos secondPos = null;
+    public static void onPlaceBlockSilently(BlockState state, BlockPos clickedPos, ServerPlayer player) {
 
-        if (state.getBlock() instanceof DoorBlock && state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
-            secondPos = clickedPos.above();
-        } else if (state.getBlock() instanceof BedBlock && state.getValue(BedBlock.PART) == BedPart.FOOT) {
-            Direction facing = state.getValue(BedBlock.FACING);
-            secondPos = clickedPos.relative(facing);
-        }
+        RecordingEntityData data =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
+        if (data == null) return;
 
-        if (secondPos != null) {
-            BlockState secondState = level.getBlockState(secondPos);
-            if (!secondState.isAir()) {
-                data.addAction(new SilentPlaceBlockAction(data.getRecordingTick(), secondPos, secondState));
-            }
-        }
+        data.addAction(new SilentPlaceBlockAction(data.getRecordingTick(), clickedPos, state));
     }
 }

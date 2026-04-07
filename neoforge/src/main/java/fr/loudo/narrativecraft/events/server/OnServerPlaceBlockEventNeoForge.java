@@ -35,11 +35,18 @@ public class OnServerPlaceBlockEventNeoForge {
 
     public OnServerPlaceBlockEventNeoForge(IEventBus modBus) {
         NeoForge.EVENT_BUS.addListener(OnServerPlaceBlockEventNeoForge::onPlaceBlock);
+        NeoForge.EVENT_BUS.addListener(OnServerPlaceBlockEventNeoForge::onSilentPlaceBlock);
     }
 
     private static void onPlaceBlock(BlockEvent.EntityPlaceEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             OnServerPlaceBlockEvent.onPlaceBlock(event.getPlacedBlock(), event.getPos(), player);
+        }
+    }
+
+    private static void onSilentPlaceBlock(BlockEvent.EntityMultiPlaceEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            OnServerPlaceBlockEvent.onPlaceBlockSilently(event.getPlacedBlock(), event.getPos(), player);
         }
     }
 }

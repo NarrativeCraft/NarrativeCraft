@@ -2,3 +2,4 @@
 - fix that override action when saving same recording name
 - undo all actions when leaving cutscene maker editor
 - play subscenes through playback command
+- fix all actions undo at last tick in cutscene editor

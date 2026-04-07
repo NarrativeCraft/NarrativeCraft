@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.utils.FakePlayer;
-import java.util.Optional;
+import java.util.List;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -48,11 +48,11 @@ public class UseItemOnBlockAction extends DataBlockHitAction {
     }
 
     @Override
-    public Optional<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         BlockState state = session.getLevel().getBlockState(hitResult.getBlockPos());
         SilentPlaceBlockAction action = new SilentPlaceBlockAction(tick, hitResult.getBlockPos(), state);
         action.setOnlyServerSide(true);
-        return Optional.of(action);
+        return List.of(action);
     }
 
     @Override
@@ -66,6 +66,7 @@ public class UseItemOnBlockAction extends DataBlockHitAction {
 
         InteractionHand hand = offhand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack itemStack = player.getItemInHand(hand);
+        if (!itemStack.isDamageableItem()) return ActionResult.IGNORED;
         UseOnContext useOnContext = new UseOnContext(player, hand, hitResult);
         // Same issue as RightClickBlockAction, only server-side for now
         itemStack.useOn(useOnContext);
