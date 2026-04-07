@@ -95,6 +95,9 @@ public class Recording implements IRecording {
             if (entity instanceof AbstractBoat boat) {
                 data.addAction(new BoatDataAction(tick, boat));
             }
+            if (entity instanceof ServerPlayer player) {
+                data.addAction(new GameModeAction(tick, player));
+            }
         }
         tick++;
     }

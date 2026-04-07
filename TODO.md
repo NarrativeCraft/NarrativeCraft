@@ -1,2 +1,4 @@
 - play multiple subscene when recording for sync
 - fix that override action when saving same recording name
+- undo all actions when leaving cutscene maker editor
+- play subscenes through playback command

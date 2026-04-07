@@ -52,5 +52,6 @@ public class ActionRegister {
         registry.register(SilentDeathAction.ID, SilentDeathAction::new);
         registry.register(UseItemAction.ID, UseItemAction::new);
         registry.register(UseItemOnBlockAction.ID, UseItemOnBlockAction::new);
+        registry.register(GameModeAction.ID, GameModeAction::new);
     }
 }

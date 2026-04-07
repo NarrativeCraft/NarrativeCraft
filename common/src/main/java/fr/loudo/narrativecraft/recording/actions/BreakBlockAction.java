@@ -31,10 +31,13 @@ import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 public class BreakBlockAction extends DataBlockAction {
 
@@ -61,10 +64,24 @@ public class BreakBlockAction extends DataBlockAction {
                         false));
             }
         } else {
-            session.getLevel().destroyBlock(blockPos, false);
+            handleDoorBreak(session.getLevel());
+            session.getLevel().destroyBlock(blockPos, false, context.getEntity());
         }
 
         return ActionResult.OK;
+    }
+
+    /*
+    Prevent specific case of door item dropping if breaking from the top
+     */
+    private void handleDoorBreak(ServerLevel level) {
+        if (blockState.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
+            DoubleBlockHalf half = blockState.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF);
+            if (half == DoubleBlockHalf.UPPER) {
+                BlockPos below = blockPos.below();
+                level.setBlock(below, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            }
+        }
     }
 
     @Override
