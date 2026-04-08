@@ -23,27 +23,29 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.Editor;
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.Keyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -71,6 +73,7 @@ public class ClientCutsceneMakerEditor implements Editor {
     private int scrollOffset = 0;
     private Keyframe selectedKeyframe;
     private Keyframe draggingKeyframe;
+    private KeyframeMenu<?> openMenu;
 
     public ClientCutsceneMakerEditor(Cutscene cutscene) {
         this.cutscene = cutscene;
@@ -172,10 +175,30 @@ public class ClientCutsceneMakerEditor implements Editor {
 
         playHead.setY(getStartLayerY() - 5);
         playHead.render(graphics, mousePos[0], mousePos[1], LAYER_GAP, getTimelineWidth());
+
+        if (openMenu != null && openMenu.isVisible()) {
+            openMenu.render(graphics, deltaTracker, mousePos[0], mousePos[1]);
+        }
+    }
+
+    public void charTyped(CharacterEvent event) {
+        if (openMenu != null && openMenu.isVisible()) {
+            openMenu.charTyped(event);
+        }
+    }
+
+    public void keyPressed(KeyEvent event) {
+        if (openMenu != null && openMenu.isVisible()) {
+            openMenu.keyPressed(event);
+        }
     }
 
     public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
         int[] mousePos = UtilsClient.getScaledMousePos();
+
+        if (openMenu != null && openMenu.isVisible()) {
+            if (openMenu.mouseClicked(mouseButtonEvent, isDoubleClick)) return;
+        }
         boolean onAddLayerButton = addLayerButton.isMouseOver(mousePos[0], mousePos[1]);
         for (Button button : buttons) {
             button.mouseClicked(mouseButtonEvent, isDoubleClick);
@@ -224,6 +247,10 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     public void mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
+        if (openMenu != null && openMenu.isVisible()) {
+            openMenu.mouseDragged(mouseButtonEvent, dragX, dragY);
+            return;
+        }
         if (draggingKeyframe != null) {
             draggingKeyframe.drag(mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth(), getTotalTick());
         } else {
@@ -243,6 +270,9 @@ public class ClientCutsceneMakerEditor implements Editor {
         }
         selectedKeyframe = keyframe;
         keyframe.click(event, isDoubleClick);
+
+        if (openMenu != null) openMenu.close();
+        openMenu = keyframe.createMenu();
     }
 
     public int getTick() {

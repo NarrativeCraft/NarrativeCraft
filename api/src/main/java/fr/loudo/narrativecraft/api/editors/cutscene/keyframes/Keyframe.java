@@ -21,23 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.editors.cutscene.keyframes;
+package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.IKeyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
-public abstract class Keyframe implements IKeyframe {
+public abstract class Keyframe {
 
     public static final Identifier KEYFRAME_SPRITE =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "keyframe");
+            Identifier.fromNamespaceAndPath(NarrativeCraftAPI.getInstance().getModId(), "keyframe");
     public static final Identifier KEYFRAME_SELECTED_SPRITE =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "keyframe-selected");
+            Identifier.fromNamespaceAndPath(NarrativeCraftAPI.getInstance().getModId(), "keyframe-selected");
     public static final int SIZE = 7;
 
     protected int x;
@@ -64,6 +63,8 @@ public abstract class Keyframe implements IKeyframe {
         Identifier sprite = isSelected ? KEYFRAME_SELECTED_SPRITE : KEYFRAME_SPRITE;
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, SIZE, SIZE);
     }
+
+    public abstract KeyframeMenu<?> createMenu();
 
     public boolean isHovered(int mouseX, int mouseY) {
         return mouseX >= x && mouseX <= x + SIZE && mouseY >= y && mouseY <= y + SIZE;

@@ -21,28 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.editors.Editor;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 
-public interface IKeyframe {
-    void setLayerPosition(int x, int y);
+public class OnScreenKeyEvent {
 
-    int getX();
+    public static void onCharTyped(CharacterEvent event) {
+        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (!(editor instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
+        cutsceneEditor.charTyped(event);
+    }
 
-    void setX(int x);
-
-    int getY();
-
-    void setY(int y);
-
-    int getTick();
-
-    void setTick(int tick);
-
-    boolean isSelected();
-
-    void setSelected(boolean selected);
-
-    ICutsceneLayer getLayer();
+    public static void onKeyPressed(KeyEvent event) {
+        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (!(editor instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
+        cutsceneEditor.keyPressed(event);
+    }
 }

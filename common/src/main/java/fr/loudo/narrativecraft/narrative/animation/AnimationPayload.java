@@ -25,11 +25,10 @@ package fr.loudo.narrativecraft.narrative.animation;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import io.netty.buffer.ByteBuf;
+import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-
-import java.util.UUID;
 
 public class AnimationPayload extends NarrativeEntryPayload {
 

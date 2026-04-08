@@ -39,9 +39,6 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.actions.*;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
@@ -51,6 +48,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.AABB;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class Recording implements IRecording {
 
@@ -172,7 +173,7 @@ public class Recording implements IRecording {
     }
 
     public boolean save(String name) {
-        Animation animation = new Animation(id, name, playerSession.getScene());
+        Animation animation = new Animation(id, name, playerSession.getScene(), tick);
 
         if (NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_FAILED) {
             return false;

@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.editors.cutscene.layers;
 
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import net.minecraft.client.Minecraft;

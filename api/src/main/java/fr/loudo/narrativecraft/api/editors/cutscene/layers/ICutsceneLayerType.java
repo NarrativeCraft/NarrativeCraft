@@ -24,26 +24,25 @@
 package fr.loudo.narrativecraft.api.editors.cutscene.layers;
 
 /**
- * Describes a layer type that can be registered in the {@link fr.loudo.narrativecraft.api.editors.ICutsceneLayerRegistry}.
- * <p>
- * A layer type acts as a descriptor and factory: it defines the identity of a layer kind
- * (id, display name) and is responsible for producing new layer instances when a user
- * adds this layer to the cutscene timeline.
- * <p>
+ * Describes a layer type that can be added to a cutscene timeline.
+ * Acts as a factory for creating layer instances.
  */
 public interface ICutsceneLayerType {
 
+    /**
+     * @return the unique identifier for this layer type (e.g. {@code "camera"})
+     */
     String getId();
 
+    /**
+     * @return the human-readable display name shown in the layer selector
+     */
     String getName();
 
     /**
-     * Creates and returns a new instance of the layer associated with this type.
-     * <p>
-     * This method is called each time a user adds this layer type to the cutscene timeline,
-     * so each call must return a fresh, independent instance with its own state.
+     * Creates a new instance of the layer. Called each time the user adds this layer to the timeline.
      *
-     * @return a new {@link ICutsceneLayer} instance of this type
+     * @return a fresh layer instance
      */
     ICutsceneLayer createLayer();
 }

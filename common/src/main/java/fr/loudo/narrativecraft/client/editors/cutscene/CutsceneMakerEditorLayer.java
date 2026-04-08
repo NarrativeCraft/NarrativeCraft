@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.Keyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -96,7 +96,7 @@ public class CutsceneMakerEditorLayer {
     }
 
     private int getBtnX() {
-        return layerGap - BTN_SIZE - 2;
+        return layerGap - BTN_SIZE - 5;
     }
 
     public CutsceneLayer getLayer() {

@@ -32,6 +32,7 @@ public class NarrativeCraftAPI {
 
     private static final NarrativeCraftAPI INSTANCE = new NarrativeCraftAPI();
 
+    private String modId;
     private IActionRegistry actionRegistry;
     private ICutsceneLayerRegistry cutsceneLayerRegistry;
     private IEventBus eventBus;
@@ -71,5 +72,13 @@ public class NarrativeCraftAPI {
 
     public static NarrativeCraftAPI getInstance() {
         return INSTANCE;
+    }
+
+    public String getModId() {
+        return modId;
+    }
+
+    void setModId(String modId) {
+        this.modId = modId;
     }
 }

@@ -21,20 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.editors.cutscene.layers;
+package fr.loudo.narrativecraft.api.editors.cutscene.layers;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CutsceneLayer implements ICutsceneLayer {
 
-    protected final CutsceneLayerType layerType;
+    protected final ICutsceneLayerType layerType;
     private final List<Keyframe> keyframes = new ArrayList<>();
 
-    public CutsceneLayer(CutsceneLayerType layerType) {
+    public CutsceneLayer(ICutsceneLayerType layerType) {
         this.layerType = layerType;
     }
 

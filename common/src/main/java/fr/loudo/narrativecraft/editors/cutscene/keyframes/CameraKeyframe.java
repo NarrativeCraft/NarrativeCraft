@@ -23,15 +23,22 @@
 
 package fr.loudo.narrativecraft.editors.cutscene.keyframes;
 
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.client.editors.cutscene.CameraKeyframeMenu;
 
-public class CameraKeyframe extends Keyframe {
+public class CameraKeyframe extends fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe {
 
     private final KeyframePosition position;
 
     public CameraKeyframe(CutsceneLayer layer, int tick, KeyframePosition position) {
         super(layer, tick);
         this.position = position;
+    }
+
+    @Override
+    public KeyframeMenu<CameraKeyframe> createMenu() {
+        return new CameraKeyframeMenu(this);
     }
 
     public KeyframePosition getPosition() {

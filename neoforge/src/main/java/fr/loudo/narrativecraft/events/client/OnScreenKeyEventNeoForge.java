@@ -21,19 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api;
+package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
-public class APISetup {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnScreenKeyEventNeoForge {
 
-    public static void init(NarrativeCraftMod mod) {
-        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
+    public OnScreenKeyEventNeoForge(IEventBus bus) {
+        NeoForge.EVENT_BUS.addListener(OnScreenKeyEventNeoForge::onKeyPressed);
+        NeoForge.EVENT_BUS.addListener(OnScreenKeyEventNeoForge::onCharTyped);
+    }
 
-        api.setRecordingManager(mod.getRecordingManager());
-        api.setActionRegistry(mod.getActionRegistry());
-        api.setCutsceneLayerRegistry(mod.getCutsceneLayerRegistry());
-        api.setEventBus(NarrativeCraftMod.EVENT_BUS);
-        api.setModId(NarrativeCraftMod.MOD_ID);
+    private static void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
+        OnScreenKeyEvent.onKeyPressed(event.getKeyEvent());
+    }
+
+    private static void onCharTyped(ScreenEvent.CharacterTyped.Pre event) {
+        OnScreenKeyEvent.onCharTyped(event.getCharacterEvent());
     }
 }
