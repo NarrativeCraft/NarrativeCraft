@@ -32,12 +32,13 @@ import java.util.List;
 public abstract class CutsceneLayer implements ICutsceneLayer {
 
     protected final CutsceneLayerType layerType;
+    private final List<Keyframe> keyframes = new ArrayList<>();
 
     public CutsceneLayer(CutsceneLayerType layerType) {
         this.layerType = layerType;
     }
 
-    private final List<Keyframe> keyframes = new ArrayList<>();
+    public abstract Keyframe createDefaultKeyframe(int tick);
 
     public void addKeyframe(Keyframe keyframe) {
         keyframes.add(keyframe);

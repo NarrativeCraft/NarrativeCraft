@@ -23,6 +23,11 @@
 
 package fr.loudo.narrativecraft.editors.cutscene.layers;
 
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.phys.Vec3;
+
 public class CameraLayer extends CutsceneLayer {
 
     public CameraLayer(CutsceneLayerType layerType) {
@@ -34,4 +39,12 @@ public class CameraLayer extends CutsceneLayer {
         return CameraLayerType.ID;
     }
 
+    @Override
+    public CameraKeyframe createDefaultKeyframe(int tick) {
+        Minecraft mc = Minecraft.getInstance();
+        Vec3 pos = mc.player.position();
+        Vec3 rot = new Vec3(mc.player.getXRot(), mc.player.getYRot(), 0);
+        float fov = (float) (int) mc.options.fov().get();
+        return new CameraKeyframe(this, tick, new KeyframePosition(pos, rot, fov));
+    }
 }

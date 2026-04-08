@@ -41,10 +41,17 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
 
     private final Scene scene;
     private final List<RecordingData> recordingDataList = new ArrayList<>();
+    private int totalTick;
 
     public Animation(UUID id, String name, String description, Scene scene) {
         super(id, name, description);
         this.scene = scene;
+    }
+
+    public Animation(UUID id, String name, Scene scene, int totalTick) {
+        super(id, name, "");
+        this.scene = scene;
+        this.totalTick = totalTick;
     }
 
     public Animation(String name, String description, Scene scene) {
@@ -82,6 +89,7 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
         try (DataInputStream stream = new DataInputStream(new FileInputStream(animationFile))) {
             RecordingReader reader = new RecordingReader(stream);
             RecordingReader.RecordingHeader header = reader.readHeader();
+            totalTick = header.totalTick();
             reader.readLocalActionsId();
             for (int i = 0; i < header.entityCount(); i++) {
                 RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();
@@ -103,24 +111,14 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
         return true;
     }
 
-    public int getMaxTick() {
-        int maxTick = 0;
-        for (RecordingData recordingData : recordingDataList) {
-
-            int entityMaxTick = recordingData.getActions().keySet().stream()
-                    .mapToInt(Integer::intValue)
-                    .max()
-                    .orElse(-1);
-            maxTick = Math.max(maxTick, entityMaxTick + 1);
-        }
-
-        return maxTick;
+    public int getTotalTick() {
+        return totalTick;
     }
 
     @Override
     public AnimationPayload toPayload() {
         return new AnimationPayload(
-                name, description, scene.getId(), scene.getChapter().getId());
+                name, description, scene.getId(), scene.getChapter().getId(), totalTick);
     }
 
     @Override

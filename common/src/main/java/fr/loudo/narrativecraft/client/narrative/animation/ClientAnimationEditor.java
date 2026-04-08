@@ -46,7 +46,7 @@ public class ClientAnimationEditor implements ClientNarrativeEntryEditor<Animati
         Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
         if (scene == null) return;
 
-        Animation animation = new Animation(entryId, payload.getName(), scene);
+        Animation animation = new Animation(entryId, payload.getName(), scene, payload.getTotalTick());
         scene.getAnimationManager().add(animation);
 
         UtilsClient.reloadListScreen();

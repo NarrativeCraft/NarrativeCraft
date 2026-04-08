@@ -87,7 +87,6 @@ public class ServerPacketHandler {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getEditor(player, CutsceneMakerEditor.class);
         if (editor == null) return;
 
-        int tick = Math.round(packet.ratio() * editor.getTotalTick());
-        editor.moveTo(tick);
+        editor.moveTo(packet.tick());
     }
 }

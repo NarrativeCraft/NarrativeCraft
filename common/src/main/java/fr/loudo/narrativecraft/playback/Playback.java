@@ -65,7 +65,7 @@ public class Playback implements IPlaybackSession {
             contexts.add(new PlaybackContext(this, recordingData, requester.level()));
         }
 
-        maxTick = animation.getMaxTick();
+        maxTick = animation.getTotalTick();
         isPlaying = true;
         for (PlaybackContext context : contexts) {
             context.start();

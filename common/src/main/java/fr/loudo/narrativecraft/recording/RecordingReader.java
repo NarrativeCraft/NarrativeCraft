@@ -28,11 +28,7 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.Action;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
@@ -103,7 +99,7 @@ public class RecordingReader implements Action.Reader {
         return new BlockPos(input.readInt(), input.readInt(), input.readInt());
     }
 
-    public record RecordingHeader(UUID recordingId, String name, int entityCount) {}
+    public record RecordingHeader(UUID recordingId, String name, int entityCount, int totalTick) {}
 
     public record EntityHeader(
             int entityRecordingId, String entityType, CompoundTag initialNbt, int spawnTick, int actionCount) {}
@@ -117,8 +113,9 @@ public class RecordingReader implements Action.Reader {
         input.readByte(); // version, reserved for future format migrations
         UUID recordingId = readUUID();
         String name = input.readUTF();
+        int totalTick = input.readInt();
         int entityCount = input.readInt();
-        return new RecordingHeader(recordingId, name, entityCount);
+        return new RecordingHeader(recordingId, name, entityCount, totalTick);
     }
 
     public Map<Byte, String> readLocalActionsId() throws IOException {

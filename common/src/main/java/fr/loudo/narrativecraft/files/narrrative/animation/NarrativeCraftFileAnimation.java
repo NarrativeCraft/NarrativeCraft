@@ -58,7 +58,8 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
         try (DataOutputStream stream =
                 new DataOutputStream(new FileOutputStream(new File(animationsFolder, entry.toFileName())))) {
             RecordingWriter writer = new RecordingWriter(stream);
-            writer.writeHeader(recording.getId(), entry.getName(), recording.getEntityTrackedSize());
+            writer.writeHeader(
+                    recording.getId(), entry.getName(), recording.getEntityTrackedSize(), recording.getTick());
             writer.writeLocalActionsId();
             for (RecordingEntityData recordingEntityData : recording.getRecordingEntityDataList()) {
                 if (!recordingEntityData.isTracked()) continue;
@@ -99,7 +100,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
 
             try (DataOutputStream outStream = new DataOutputStream(new FileOutputStream(newFileRecord))) {
                 RecordingWriter writer = new RecordingWriter(outStream);
-                writer.writeHeader(header.recordingId(), entry.getName(), header.entityCount());
+                writer.writeHeader(header.recordingId(), entry.getName(), header.entityCount(), header.totalTick());
                 writer.writeActionSize((byte) actionsDict.size());
 
                 for (Map.Entry<Byte, String> actionTypeEntry : actionsDict.entrySet()) {
@@ -176,7 +177,8 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                     try (DataInputStream stream = new DataInputStream(new FileInputStream(file))) {
                         RecordingReader reader = new RecordingReader(stream);
                         RecordingReader.RecordingHeader header = reader.readHeader();
-                        Animation animation = new Animation(header.recordingId(), header.name(), scene);
+                        Animation animation =
+                                new Animation(header.recordingId(), header.name(), scene, header.totalTick());
 
                         deserializationResults.add(new DeserializationResult<>(animation, false, file.getName()));
                     } catch (IOException e) {

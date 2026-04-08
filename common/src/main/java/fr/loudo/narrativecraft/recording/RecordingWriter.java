@@ -30,7 +30,10 @@ import fr.loudo.narrativecraft.api.recording.action.ActionType;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -47,12 +50,13 @@ public class RecordingWriter implements Action.Writer {
         this.output = output;
     }
 
-    public void writeHeader(UUID recordingId, String name, int entityCount) throws IOException {
+    public void writeHeader(UUID recordingId, String name, int entityCount, int totalTick) throws IOException {
         output.writeByte('N');
         output.writeByte('C');
         output.writeByte(VERSION);
         addUUID(recordingId);
         output.writeUTF(name);
+        output.writeInt(totalTick);
         output.writeInt(entityCount);
     }
 

@@ -30,13 +30,13 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record BiCutscenePlayHeadPacket(float ratio) implements CustomPacketPayload {
+public record BiCutscenePlayHeadPacket(int tick) implements CustomPacketPayload {
 
     public static final Type<BiCutscenePlayHeadPacket> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_head_update"));
 
     public static final StreamCodec<ByteBuf, BiCutscenePlayHeadPacket> STREAM_CODEC =
-            StreamCodec.composite(ByteBufCodecs.FLOAT, BiCutscenePlayHeadPacket::ratio, BiCutscenePlayHeadPacket::new);
+            StreamCodec.composite(ByteBufCodecs.INT, BiCutscenePlayHeadPacket::tick, BiCutscenePlayHeadPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

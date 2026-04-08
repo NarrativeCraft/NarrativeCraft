@@ -59,8 +59,7 @@ public class CutsceneMakerEditor implements Editor {
             playback.tick();
         }
 
-        float ratio = (float) currentTick / (float) totalTick;
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(ratio));
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(currentTick));
 
         currentTick++;
     }
@@ -114,7 +113,7 @@ public class CutsceneMakerEditor implements Editor {
 
     public void play() {
         if (currentTick >= totalTick) {
-            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(1.0f));
+            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(totalTick));
             return;
         }
         playing = true;

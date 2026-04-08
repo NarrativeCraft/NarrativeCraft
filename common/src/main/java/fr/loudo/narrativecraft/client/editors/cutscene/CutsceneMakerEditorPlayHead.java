@@ -25,8 +25,6 @@ package fr.loudo.narrativecraft.client.editors.cutscene;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -63,7 +61,6 @@ public class CutsceneMakerEditorPlayHead {
     public void onMouseDrag(double mouseX, int timelineStartX, int timelineWidth) {
         if (!isDragging || timelineWidth <= 0) return;
         ratio = (float) Math.clamp((mouseX - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
-        Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(ratio));
     }
 
     public void onClick(MouseButtonEvent event, int timelineStartX, int timelineWidth, int timelineY) {
@@ -74,7 +71,6 @@ public class CutsceneMakerEditorPlayHead {
         }
         isDragging = true;
         ratio = (float) Math.clamp((event.x() - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
-        Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(ratio));
     }
 
     public void setY(int y) {

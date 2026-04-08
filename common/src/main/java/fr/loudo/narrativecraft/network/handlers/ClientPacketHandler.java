@@ -74,8 +74,9 @@ public class ClientPacketHandler {
         if (!(session.getEditor() instanceof ClientCutsceneMakerEditor editor)) return;
 
         CutsceneMakerEditorPlayHead playHead = editor.getPlayHead();
-        playHead.setRatio(packet.ratio());
-        if (packet.ratio() == 1.0f) {
+        float ratio = (float) packet.tick() / editor.getTotalTick();
+        playHead.setRatio(ratio);
+        if (ratio == 1.0f) {
             editor.getControl().pause();
         }
     }
