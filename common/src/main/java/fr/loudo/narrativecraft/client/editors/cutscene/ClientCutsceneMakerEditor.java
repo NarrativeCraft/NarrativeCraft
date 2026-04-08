@@ -31,8 +31,6 @@ import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -40,6 +38,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -111,7 +112,7 @@ public class ClientCutsceneMakerEditor implements Editor {
                 graphics.fill(0, totalHeight - 1, screenWidth, totalHeight, 0xFFFFFFFF);
 
                 // Layer name
-                graphics.text(mc.font, layer.getName(), 5, currentY + (mc.font.lineHeight / 2) + 1, 0xFFFFFFFF);
+                graphics.text(mc.font, layer.getType().getName(), 5, currentY + (mc.font.lineHeight / 2) + 1, 0xFFFFFFFF);
 
                 // TODO: draw layers button to add n stuff
             }

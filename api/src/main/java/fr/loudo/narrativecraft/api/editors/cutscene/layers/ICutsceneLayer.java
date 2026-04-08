@@ -23,8 +23,16 @@
 
 package fr.loudo.narrativecraft.api.editors.cutscene.layers;
 
+/**
+ * Represents an active layer instance living in the cutscene timeline.
+ * <p>
+ * Unlike {@link ICutsceneLayerType} which is a singleton descriptor registered in the registry,
+ * an {@code ICutsceneLayer} is created fresh each time a user adds a layer to the timeline
+ * and holds its own state (keyframes, etc.).
+ */
 public interface ICutsceneLayer {
-    String getId();
 
-    String getName();
+    String getTypeId();
+
+    ICutsceneLayerType getType();
 }

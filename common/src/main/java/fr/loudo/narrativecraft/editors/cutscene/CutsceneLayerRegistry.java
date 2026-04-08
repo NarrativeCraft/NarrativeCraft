@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.editors.cutscene;
 
 import fr.loudo.narrativecraft.api.editors.ICutsceneLayerRegistry;
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,32 +32,29 @@ import java.util.Map;
 
 public class CutsceneLayerRegistry implements ICutsceneLayerRegistry {
 
-    private final Map<String, ICutsceneLayer> layers = new HashMap<>();
+    private final Map<String, ICutsceneLayerType> types = new HashMap<>();
 
-    public void register(String id, ICutsceneLayer cutsceneLayer) {
-        id = id.toLowerCase();
-        ICutsceneLayer existing = layers.get(id);
-        if (existing != null) {
-            throw new IllegalStateException("CutsceneLayer " + id + " already exists");
+    @Override
+    public void register(ICutsceneLayerType type) {
+        String id = type.getId().toLowerCase();
+        if (types.containsKey(id)) {
+            throw new IllegalStateException("CutsceneLayerType '" + id + "' is already registered");
         }
-
-        layers.put(id, cutsceneLayer);
+        types.put(id, type);
     }
 
-    public void unregister(String id) {
-        id = id.toLowerCase();
-        ICutsceneLayer layer = layers.get(id);
-        if (layer != null) {
-            layers.remove(id);
-        }
+    @Override
+    public void unregister(String typeId) {
+        types.remove(typeId.toLowerCase());
     }
 
-    public ICutsceneLayer getLayer(String id) {
-        id = id.toLowerCase();
-        return layers.get(id);
+    @Override
+    public ICutsceneLayerType getType(String typeId) {
+        return types.get(typeId.toLowerCase());
     }
 
-    public List<ICutsceneLayer> getLayers() {
-        return new ArrayList<>(layers.values());
+    @Override
+    public List<ICutsceneLayerType> getTypes() {
+        return new ArrayList<>(types.values());
     }
 }

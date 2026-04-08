@@ -21,18 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.editors;
+package fr.loudo.narrativecraft.editors.cutscene.keyframes;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
-import java.util.List;
+import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayer;
 
-public interface ICutsceneLayerRegistry {
+public class CameraKeyframe extends Keyframe {
 
-    void register(ICutsceneLayerType type);
+    private final KeyframePosition position;
 
-    void unregister(String typeId);
+    public CameraKeyframe(CutsceneLayer layer, int tick, KeyframePosition position) {
+        super(layer, tick);
+        this.position = position;
+    }
 
-    ICutsceneLayerType getType(String typeId);
-
-    List<ICutsceneLayerType> getTypes();
+    public KeyframePosition getPosition() {
+        return position;
+    }
 }

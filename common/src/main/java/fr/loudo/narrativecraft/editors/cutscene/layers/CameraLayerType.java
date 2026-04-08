@@ -21,18 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.editors;
+package fr.loudo.narrativecraft.editors.cutscene.layers;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
-import java.util.List;
+public class CameraLayerType extends CutsceneLayerType {
 
-public interface ICutsceneLayerRegistry {
+    public static final String ID = "camera";
 
-    void register(ICutsceneLayerType type);
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-    void unregister(String typeId);
+    @Override
+    public String getName() {
+        return "Camera";
+    }
 
-    ICutsceneLayerType getType(String typeId);
-
-    List<ICutsceneLayerType> getTypes();
+    @Override
+    public CameraLayer createLayer() {
+        return new CameraLayer(this);
+    }
 }

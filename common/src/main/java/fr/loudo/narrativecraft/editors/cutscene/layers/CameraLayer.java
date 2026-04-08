@@ -23,16 +23,15 @@
 
 package fr.loudo.narrativecraft.editors.cutscene.layers;
 
-public class CutsceneCameraLayer extends CutsceneLayer {
+public class CameraLayer extends CutsceneLayer {
 
-    public static final String ID = "camera";
-
-    public CutsceneCameraLayer() {
-        super("Camera");
+    public CameraLayer(CutsceneLayerType layerType) {
+        super(layerType);
     }
 
     @Override
-    public String getId() {
-        return ID;
+    public String getTypeId() {
+        return CameraLayerType.ID;
     }
+
 }

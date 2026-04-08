@@ -23,11 +23,11 @@
 
 package fr.loudo.narrativecraft.editors.cutscene;
 
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneCameraLayer;
+import fr.loudo.narrativecraft.editors.cutscene.layers.CameraLayerType;
 
 public class CutsceneLayerRegister {
 
     public static void register(CutsceneLayerRegistry registry) {
-        registry.register(CutsceneCameraLayer.ID, new CutsceneCameraLayer());
+        registry.register(new CameraLayerType());
     }
 }

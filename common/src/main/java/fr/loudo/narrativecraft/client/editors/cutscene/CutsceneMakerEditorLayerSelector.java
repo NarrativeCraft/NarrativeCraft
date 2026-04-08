@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.screens.components.LayerSelectionButton;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
@@ -39,8 +39,8 @@ import net.minecraft.network.chat.Component;
  */
 public class CutsceneMakerEditorLayerSelector {
 
-    private static final List<ICutsceneLayer> CUTSCENE_LAYERS =
-            NarrativeCraftMod.getInstance().getCutsceneLayerRegistry().getLayers();
+    private static final List<ICutsceneLayerType> LAYER_TYPES =
+            NarrativeCraftMod.getInstance().getCutsceneLayerRegistry().getTypes();
 
     private final ClientCutsceneMakerEditor cutsceneEditor;
     private final List<LayerSelectionButton> layerButtons = new ArrayList<>();
@@ -60,9 +60,9 @@ public class CutsceneMakerEditorLayerSelector {
         this.maxHeight = maxHeight;
         this.color = color;
 
-        for (ICutsceneLayer layer : CUTSCENE_LAYERS) {
-            layerButtons.add(new LayerSelectionButton(0, 0, width, 20, Component.literal(layer.getName()), b -> {
-                cutsceneEditor.addLayer(layer);
+        for (ICutsceneLayerType type : LAYER_TYPES) {
+            layerButtons.add(new LayerSelectionButton(0, 0, width, 20, Component.literal(type.getName()), b -> {
+                cutsceneEditor.addLayer(type.createLayer());
                 hide();
             }));
         }

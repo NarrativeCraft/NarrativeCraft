@@ -24,16 +24,35 @@
 package fr.loudo.narrativecraft.editors.cutscene.layers;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.Keyframe;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class CutsceneLayer implements ICutsceneLayer {
 
-    private final String name;
+    protected final CutsceneLayerType layerType;
 
-    public CutsceneLayer(String name) {
-        this.name = name;
+    public CutsceneLayer(CutsceneLayerType layerType) {
+        this.layerType = layerType;
     }
 
-    public String getName() {
-        return name;
+    private final List<Keyframe> keyframes = new ArrayList<>();
+
+    public void addKeyframe(Keyframe keyframe) {
+        keyframes.add(keyframe);
+    }
+
+    public void removeKeyframe(Keyframe keyframe) {
+        keyframes.remove(keyframe);
+    }
+
+    public List<Keyframe> getKeyframes() {
+        return keyframes;
+    }
+
+    @Override
+    public ICutsceneLayerType getType() {
+        return layerType;
     }
 }

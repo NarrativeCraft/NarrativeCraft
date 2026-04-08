@@ -21,18 +21,8 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.editors;
+package fr.loudo.narrativecraft.editors.cutscene.layers;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
-import java.util.List;
 
-public interface ICutsceneLayerRegistry {
-
-    void register(ICutsceneLayerType type);
-
-    void unregister(String typeId);
-
-    ICutsceneLayerType getType(String typeId);
-
-    List<ICutsceneLayerType> getTypes();
-}
+public abstract class CutsceneLayerType implements ICutsceneLayerType {}

@@ -21,18 +21,43 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.editors;
+package fr.loudo.narrativecraft.editors.cutscene.keyframes;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
-import java.util.List;
+import net.minecraft.world.phys.Vec3;
 
-public interface ICutsceneLayerRegistry {
+public class KeyframePosition {
 
-    void register(ICutsceneLayerType type);
+    private Vec3 position;
+    private Vec3 rotation;
+    private float zoom;
 
-    void unregister(String typeId);
+    public KeyframePosition(Vec3 position, Vec3 rotation, float zoom) {
+        this.position = position;
+        this.rotation = rotation;
+        this.zoom = zoom;
+    }
 
-    ICutsceneLayerType getType(String typeId);
+    public Vec3 getPosition() {
+        return position;
+    }
 
-    List<ICutsceneLayerType> getTypes();
+    public void setPosition(Vec3 position) {
+        this.position = position;
+    }
+
+    public Vec3 getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(Vec3 rotation) {
+        this.rotation = rotation;
+    }
+
+    public float getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
+    }
 }
