@@ -51,15 +51,28 @@ public class CutsceneMakerEditorLayer {
             int mouseX,
             int mouseY) {
         renderAddButton(graphics, layerY, layerHeight, mouseX, mouseY);
+        renderRemoveButton(graphics, layerY, layerHeight, mouseX, mouseY);
         renderKeyframes(graphics, delta, layerY, layerHeight, timelineWidth, maxTick);
     }
 
     private void renderAddButton(GuiGraphicsExtractor graphics, int layerY, int layerHeight, int mouseX, int mouseY) {
-        int btnX = getBtnX();
+        int btnX = getBtnXAdd();
         int btnY = layerY + (layerHeight - BTN_SIZE) / 2;
         boolean hovered = isAddButtonHovered(mouseX, mouseY, layerY, layerHeight);
+        renderButton(graphics, btnX, btnY, hovered, "+");
+    }
+
+    private void renderRemoveButton(
+            GuiGraphicsExtractor graphics, int layerY, int layerHeight, int mouseX, int mouseY) {
+        int btnX = getBtnXRemove();
+        int btnY = layerY + (layerHeight - BTN_SIZE) / 2;
+        boolean hovered = isRemoveButtonHovered(mouseX, mouseY, layerY, layerHeight);
+        renderButton(graphics, btnX, btnY, hovered, "×");
+    }
+
+    private void renderButton(GuiGraphicsExtractor graphics, int btnX, int btnY, boolean hovered, String text) {
         graphics.fill(btnX, btnY, btnX + BTN_SIZE, btnY + BTN_SIZE, hovered ? 0xFFAAAAAA : 0xFF666666);
-        graphics.text(Minecraft.getInstance().font, "+", btnX + 2, btnY + 1, 0xFFFFFFFF);
+        graphics.text(Minecraft.getInstance().font, text, btnX + 2, btnY + 1, 0xFFFFFFFF);
     }
 
     private void renderKeyframes(
@@ -78,9 +91,15 @@ public class CutsceneMakerEditorLayer {
     }
 
     public boolean isAddButtonHovered(int mouseX, int mouseY, int layerY, int layerHeight) {
-        int btnX = getBtnX();
-        int btnY = layerY + (layerHeight - BTN_SIZE) / 2;
-        return mouseX >= btnX && mouseX < btnX + BTN_SIZE && mouseY >= btnY && mouseY < btnY + BTN_SIZE;
+        int btnX = getBtnXAdd();
+        int btnY = getBtnY(layerY, layerHeight);
+        return isHovered(mouseX, mouseY, btnX, btnY);
+    }
+
+    public boolean isRemoveButtonHovered(int mouseX, int mouseY, int layerY, int layerHeight) {
+        int btnX = getBtnXRemove();
+        int btnY = getBtnY(layerY, layerHeight);
+        return isHovered(mouseX, mouseY, btnX, btnY);
     }
 
     public Keyframe getHoveredKeyframe(int mouseX, int mouseY) {
@@ -95,8 +114,20 @@ public class CutsceneMakerEditorLayer {
         layer.addKeyframe(keyframe);
     }
 
-    private int getBtnX() {
+    private int getBtnXAdd() {
         return layerGap - BTN_SIZE - 5;
+    }
+
+    private int getBtnXRemove() {
+        return getBtnXAdd() - BTN_SIZE - 5;
+    }
+
+    private int getBtnY(int layerY, int layerHeight) {
+        return layerY + (layerHeight - BTN_SIZE) / 2;
+    }
+
+    private boolean isHovered(int mouseX, int mouseY, int btnX, int btnY) {
+        return mouseX >= btnX && mouseX < btnX + BTN_SIZE && mouseY >= btnY && mouseY < btnY + BTN_SIZE;
     }
 
     public CutsceneLayer getLayer() {

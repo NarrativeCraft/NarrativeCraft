@@ -6,6 +6,8 @@
 
 ### cutscene maker
 - [ ] interpolate zoom
+- [ ] toggle hud visibility
+- [x] delete layer
 - [ ] rotate camera
 - [ ] change easing of a keyframe 
 - [ ] zoom on the timeline (x1.5, x2...)

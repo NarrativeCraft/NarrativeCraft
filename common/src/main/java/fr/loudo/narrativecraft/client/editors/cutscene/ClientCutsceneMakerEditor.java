@@ -35,8 +35,6 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -46,6 +44,9 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -219,11 +220,15 @@ public class ClientCutsceneMakerEditor implements Editor {
         // Check keyframes and layer buttons before the playhead to avoid conflicts
         int layerStartY = getStartLayerY();
         int currentY = layerStartY - scrollOffset;
+        List<CutsceneMakerEditorLayer> toRemove = new ArrayList<>();
         for (CutsceneMakerEditorLayer editorLayer : editorLayers) {
             if (currentY >= layerStartY && currentY < mc.getWindow().getGuiScaledHeight()) {
                 if (editorLayer.isAddButtonHovered(mousePos[0], mousePos[1], currentY, LAYER_HEIGHT)) {
                     editorLayer.addKeyframe((int) (playHead.getRatio() * getTotalTick()));
                     return;
+                }
+                if (editorLayer.isRemoveButtonHovered(mousePos[0], mousePos[1], currentY, LAYER_HEIGHT)) {
+                    toRemove.add(editorLayer);
                 }
                 Keyframe hovered = editorLayer.getHoveredKeyframe(mousePos[0], mousePos[1]);
                 if (hovered != null) {
@@ -234,6 +239,7 @@ public class ClientCutsceneMakerEditor implements Editor {
             }
             currentY += LAYER_HEIGHT;
         }
+        editorLayers.removeAll(toRemove);
 
         // Deselect keyframe when clicking elsewhere
         if (selectedKeyframe != null) {
