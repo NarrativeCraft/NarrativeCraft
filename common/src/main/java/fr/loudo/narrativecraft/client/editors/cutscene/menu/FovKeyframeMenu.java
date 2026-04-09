@@ -25,8 +25,6 @@ package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
-import java.util.List;
-import java.util.Locale;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -36,13 +34,16 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
+import java.util.Locale;
+
 public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
 
     private static final int FIELD_LABEL_HEIGHT = 7;
     private static final int FIELD_HEIGHT = 12;
+    private static final int FIELD_GAP = 4;
 
     private EditBox fieldFov;
-    private List<EditBox> fields;
+    private EasingDropdown easingDropdown;
 
     public FovKeyframeMenu(FovKeyframe keyframe) {
         super(keyframe);
@@ -53,12 +54,12 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
         int fieldWidth = WIDTH - PADDING * 2;
         fieldFov = new EditBox(Minecraft.getInstance().font, 0, 0, fieldWidth, FIELD_HEIGHT, Component.empty());
         fieldFov.setValue(String.format(Locale.US, "%.2f", keyframe.getFov()));
-        fields = List.of(fieldFov);
+        easingDropdown = new EasingDropdown(keyframe.getEasing());
     }
 
     @Override
     protected int getContentHeight() {
-        return FIELD_LABEL_HEIGHT + FIELD_HEIGHT;
+        return FIELD_LABEL_HEIGHT + FIELD_HEIGHT + FIELD_GAP + FIELD_LABEL_HEIGHT + easingDropdown.getHeight();
     }
 
     @Override
@@ -68,17 +69,33 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
         fieldFov.setPosition(x, y + FIELD_LABEL_HEIGHT);
         fieldFov.setWidth(contentWidth);
         fieldFov.extractRenderState(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
+
+        int easingY = y + FIELD_LABEL_HEIGHT + FIELD_HEIGHT + FIELD_GAP;
+        graphics.text(Minecraft.getInstance().font, "Easing", x, easingY - 2, 0xFFAAAAAA);
+        easingDropdown.setPosition(x, easingY + FIELD_LABEL_HEIGHT);
+        easingDropdown.setWidth(contentWidth);
+        easingDropdown.render(graphics, mouseX, mouseY);
     }
 
     @Override
     protected void onContentMouseClicked(
             MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
+        if (easingDropdown.mouseClicked(event)) {
+            fieldFov.setFocused(false);
+            return;
+        }
+        easingDropdown.close();
         boolean hovered = event.x() >= fieldFov.getX()
                 && event.x() < fieldFov.getX() + fieldFov.getWidth()
                 && event.y() >= fieldFov.getY()
                 && event.y() < fieldFov.getY() + fieldFov.getHeight();
         fieldFov.setFocused(hovered);
         if (hovered) fieldFov.mouseClicked(event, isDoubleClick);
+    }
+
+    @Override
+    public void mouseScrolled(double amount) {
+        easingDropdown.mouseScrolled(amount);
     }
 
     @Override
@@ -102,5 +119,6 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
             keyframe.setFov(Float.parseFloat(fieldFov.getValue()));
         } catch (NumberFormatException ignored) {
         }
+        keyframe.setEasing(easingDropdown.getSelected());
     }
 }

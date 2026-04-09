@@ -25,14 +25,14 @@ package fr.loudo.narrativecraft.client.editors.cutscene.layers.fov;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
-import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeSegment;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
-import java.util.Comparator;
-import java.util.List;
 import net.minecraft.client.Minecraft;
+
+import java.util.List;
 
 public class FovLayer extends CutsceneLayer {
 
@@ -62,39 +62,18 @@ public class FovLayer extends CutsceneLayer {
     }
 
     public float getInterpolatedFov(float tick) {
-        List<FovKeyframe> sorted = getKeyframes().stream()
-                .filter(k -> k instanceof FovKeyframe)
-                .map(k -> (FovKeyframe) k)
-                .sorted(Comparator.comparingInt(Keyframe::getTick))
-                .toList();
+        List<FovKeyframe> sorted = getSortedKeyframes(FovKeyframe.class);
 
-        if (sorted.isEmpty())
-            return (float) (int) Minecraft.getInstance().options.fov().get();
+        if (sorted.isEmpty()) return (float) (int) Minecraft.getInstance().options.fov().get();
         if (sorted.size() == 1) return sorted.get(0).getFov();
-
         if (tick <= sorted.get(0).getTick()) return sorted.get(0).getFov();
-        if (tick >= sorted.get(sorted.size() - 1).getTick())
-            return sorted.get(sorted.size() - 1).getFov();
+        if (tick >= sorted.get(sorted.size() - 1).getTick()) return sorted.get(sorted.size() - 1).getFov();
 
-        int fromIdx = 0;
-        for (int i = 0; i < sorted.size() - 1; i++) {
-            if (tick < sorted.get(i + 1).getTick()) {
-                fromIdx = i;
-                break;
-            }
-        }
-
-        FovKeyframe from = sorted.get(fromIdx);
-        FovKeyframe to = sorted.get(fromIdx + 1);
-        double rawT = (tick - from.getTick()) / (double) (to.getTick() - from.getTick());
-
-        if (from.getEasing() == EasingType.SMOOTH) {
-            FovKeyframe p0 = fromIdx > 0 ? sorted.get(fromIdx - 1) : from;
-            FovKeyframe p3 = fromIdx + 2 < sorted.size() ? sorted.get(fromIdx + 2) : to;
-            return (float) Interpolation.catmullRom(p0.getFov(), from.getFov(), to.getFov(), p3.getFov(), rawT);
+        KeyframeSegment<FovKeyframe> seg = findSegment(sorted, tick);
+        if (seg.from().getEasing() == EasingType.SMOOTH) {
+            return (float) Interpolation.catmullRom(seg.p0().getFov(), seg.from().getFov(), seg.to().getFov(), seg.p3().getFov(), seg.rawT());
         } else {
-            return (float)
-                    Interpolation.lerp(from.getFov(), to.getFov(), Interpolation.applyEasing(from.getEasing(), rawT));
+            return (float) Interpolation.lerp(seg.from().getFov(), seg.to().getFov(), Interpolation.applyEasing(seg.to().getEasing(), seg.rawT()));
         }
     }
 }

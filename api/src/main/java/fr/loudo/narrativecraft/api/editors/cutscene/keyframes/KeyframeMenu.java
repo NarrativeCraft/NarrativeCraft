@@ -112,6 +112,8 @@ public abstract class KeyframeMenu<T extends Keyframe> {
 
     public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {}
 
+    public void mouseScrolled(double amount) {}
+
     public void charTyped(CharacterEvent event) {}
 
     public void keyPressed(KeyEvent event) {}

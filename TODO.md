@@ -7,12 +7,11 @@
 
 ### cutscene maker
 - [x] interpolate zoom
-- [ ] preview button camera keyframe
 - [ ] toggle hud visibility
 - [x] delete layer
 - [x] rotate camera interpolation
 - [ ] rotate camera
-- [ ] change easing of a keyframe 
+- [x] change easing of a keyframe 
 - [ ] zoom on the timeline (x1.5, x2...)
 - [ ] show seconds/total seconds on timeline
 - [ ] render camera on path line (and dynamically update position based on tick)

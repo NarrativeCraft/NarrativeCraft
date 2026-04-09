@@ -26,8 +26,6 @@ package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
-import java.util.List;
-import java.util.Locale;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -37,6 +35,9 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.Locale;
 
 public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 
@@ -48,6 +49,7 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 
     private EditBox fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate;
     private List<EditBox> fields;
+    private EasingDropdown easingDropdown;
 
     public CameraKeyframeMenu(CameraKeyframe keyframe) {
         super(keyframe);
@@ -65,6 +67,7 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
         fieldYaw = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().y));
         fieldRotate = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().z));
         fields = List.of(fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate);
+        easingDropdown = new EasingDropdown(keyframe.getEasing());
     }
 
     private EditBox createField(Minecraft mc, int width, String value) {
@@ -75,7 +78,7 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 
     @Override
     protected int getContentHeight() {
-        return FIELD_COUNT * FIELD_TOTAL - FIELD_GAP;
+        return FIELD_COUNT * FIELD_TOTAL + FIELD_LABEL_HEIGHT + easingDropdown.getHeight();
     }
 
     @Override
@@ -94,11 +97,21 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
             boxes[i].extractRenderState(graphics, mouseX, mouseY, partialTick);
             currentY += FIELD_HEIGHT + FIELD_GAP;
         }
+        graphics.text(Minecraft.getInstance().font, "Easing", x, currentY - 2, 0xFFAAAAAA);
+        currentY += FIELD_LABEL_HEIGHT;
+        easingDropdown.setPosition(x, currentY);
+        easingDropdown.setWidth(contentWidth);
+        easingDropdown.render(graphics, mouseX, mouseY);
     }
 
     @Override
     protected void onContentMouseClicked(
             MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
+        if (easingDropdown.mouseClicked(event)) {
+            for (EditBox field : fields) field.setFocused(false);
+            return;
+        }
+        easingDropdown.close();
         for (EditBox field : fields) {
             boolean hovered = event.x() >= field.getX()
                     && event.x() < field.getX() + field.getWidth()
@@ -109,6 +122,11 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
                 field.mouseClicked(event, isDoubleClick);
             }
         }
+    }
+
+    @Override
+    public void mouseScrolled(double amount) {
+        easingDropdown.mouseScrolled(amount);
     }
 
     public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
@@ -155,5 +173,6 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
             pos.setRotation(new Vec3(pitch, yaw, rotate));
         } catch (NumberFormatException ignored) {
         }
+        keyframe.setEasing(easingDropdown.getSelected());
     }
 }

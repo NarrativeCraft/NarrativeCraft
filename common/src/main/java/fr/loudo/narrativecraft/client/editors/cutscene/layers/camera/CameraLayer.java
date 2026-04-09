@@ -25,18 +25,18 @@ package fr.loudo.narrativecraft.client.editors.cutscene.layers.camera;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
-import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeSegment;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
-import java.util.Comparator;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
 
 public class CameraLayer extends CutsceneLayer {
 
@@ -90,42 +90,19 @@ public class CameraLayer extends CutsceneLayer {
     }
 
     public KeyframePosition getInterpolatedPosition(float tick) {
-        List<CameraKeyframe> sorted = getKeyframes().stream()
-                .filter(k -> k instanceof CameraKeyframe)
-                .map(k -> (CameraKeyframe) k)
-                .sorted(Comparator.comparingInt(Keyframe::getTick))
-                .toList();
+        List<CameraKeyframe> sorted = getSortedKeyframes(CameraKeyframe.class);
 
         if (sorted.isEmpty()) return null;
         if (sorted.size() == 1) return sorted.get(0).getPosition();
-
-        // Clamp to the timeline boundaries
         if (tick <= sorted.get(0).getTick()) return sorted.get(0).getPosition();
-        if (tick >= sorted.get(sorted.size() - 1).getTick())
-            return sorted.get(sorted.size() - 1).getPosition();
+        if (tick >= sorted.get(sorted.size() - 1).getTick()) return sorted.get(sorted.size() - 1).getPosition();
 
-        // Find the segment [from, to] that contains tick
-        int fromIdx = 0;
-        for (int i = 0; i < sorted.size() - 1; i++) {
-            if (tick < sorted.get(i + 1).getTick()) {
-                fromIdx = i;
-                break;
-            }
-        }
-
-        CameraKeyframe from = sorted.get(fromIdx);
-        CameraKeyframe to = sorted.get(fromIdx + 1);
-        double rawT = (tick - from.getTick()) / (double) (to.getTick() - from.getTick());
-
-        if (from.getEasing() == EasingType.SMOOTH) {
-            // Catmull-Rom: use neighbouring keyframes as phantom control points
-            CameraKeyframe p0 = fromIdx > 0 ? sorted.get(fromIdx - 1) : from;
-            CameraKeyframe p3 = fromIdx + 2 < sorted.size() ? sorted.get(fromIdx + 2) : to;
+        KeyframeSegment<CameraKeyframe> seg = findSegment(sorted, tick);
+        if (seg.from().getEasing() == EasingType.SMOOTH) {
             return interpolateCatmullRom(
-                    p0.getPosition(), from.getPosition(), to.getPosition(), p3.getPosition(), rawT);
+                    seg.p0().getPosition(), seg.from().getPosition(), seg.to().getPosition(), seg.p3().getPosition(), seg.rawT());
         } else {
-            double easedT = Interpolation.applyEasing(from.getEasing(), rawT);
-            return interpolateLinear(from.getPosition(), to.getPosition(), easedT);
+            return interpolateLinear(seg.from().getPosition(), seg.to().getPosition(), Interpolation.applyEasing(seg.to().getEasing(), seg.rawT()));
         }
     }
 

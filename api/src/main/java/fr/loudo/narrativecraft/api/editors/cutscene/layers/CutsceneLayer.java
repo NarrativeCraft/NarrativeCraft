@@ -24,7 +24,9 @@
 package fr.loudo.narrativecraft.api.editors.cutscene.layers;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeSegment;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class CutsceneLayer implements ICutsceneLayer {
@@ -54,6 +56,30 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
     @Override
     public ICutsceneLayerType getType() {
         return layerType;
+    }
+
+    protected <K extends Keyframe> List<K> getSortedKeyframes(Class<K> type) {
+        return keyframes.stream()
+                .filter(type::isInstance)
+                .map(type::cast)
+                .sorted(Comparator.comparingInt(Keyframe::getTick))
+                .toList();
+    }
+
+    protected <K extends Keyframe> KeyframeSegment<K> findSegment(List<K> sorted, float tick) {
+        int fromIdx = 0;
+        for (int i = 0; i < sorted.size() - 1; i++) {
+            if (tick < sorted.get(i + 1).getTick()) {
+                fromIdx = i;
+                break;
+            }
+        }
+        K from = sorted.get(fromIdx);
+        K to = sorted.get(fromIdx + 1);
+        double rawT = (tick - from.getTick()) / (double) (to.getTick() - from.getTick());
+        K p0 = fromIdx > 0 ? sorted.get(fromIdx - 1) : from;
+        K p3 = fromIdx + 2 < sorted.size() ? sorted.get(fromIdx + 2) : to;
+        return new KeyframeSegment<>(from, to, p0, p3, rawT);
     }
 
     public int getSortIndex() {

@@ -35,8 +35,6 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -46,6 +44,9 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -165,6 +166,10 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     public void mouseScrolled(double deltaX, double deltaY) {
+        if (openMenu != null && openMenu.isVisible()) {
+            openMenu.mouseScrolled(deltaY);
+            return;
+        }
         layerSelector.mouseScrolled(deltaY);
         int[] mousePos = UtilsClient.getScaledMousePos();
         if (mousePos[1] < getStartLayerY()) return;
