@@ -24,7 +24,9 @@
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.minecraft.client.DeltaTracker;
 
 public class CutsceneEditorPlayback {
@@ -51,6 +53,7 @@ public class CutsceneEditorPlayback {
     public void pause() {
         playing = false;
         playerSession.setKeyframePosition(null);
+        playerSession.setFov(-1f);
     }
 
     public void tick(DeltaTracker delta) {
@@ -68,8 +71,13 @@ public class CutsceneEditorPlayback {
     }
 
     private void executeKeyframes() {
+        Set<String> executedTypes = new HashSet<>();
         for (CutsceneMakerEditorLayer editorLayer : editorLayers) {
-            if (editorLayer.getLayer().execute(currentTick)) return;
+            String typeId = editorLayer.getLayer().getTypeId();
+            if (executedTypes.contains(typeId)) continue;
+            if (editorLayer.getLayer().execute(currentTick)) {
+                executedTypes.add(typeId);
+            }
         }
     }
 

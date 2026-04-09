@@ -24,10 +24,12 @@
 package fr.loudo.narrativecraft.editors.cutscene;
 
 import fr.loudo.narrativecraft.client.editors.layers.camera.CameraLayerType;
+import fr.loudo.narrativecraft.client.editors.layers.fov.FovLayerType;
 
 public class CutsceneLayerRegister {
 
     public static void register(CutsceneLayerRegistry registry) {
         registry.register(new CameraLayerType());
+        registry.register(new FovLayerType());
     }
 }

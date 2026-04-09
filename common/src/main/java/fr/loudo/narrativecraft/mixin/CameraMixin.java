@@ -85,10 +85,9 @@ public abstract class CameraMixin {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return this.calculateFov(partialTicks);
+        float fov = playerSession.getFov();
+        if (fov == -1) return this.calculateFov(partialTicks);
 
-        KeyframePosition position = playerSession.getKeyframePosition();
-        if (position == null) return this.calculateFov(partialTicks);
-
-        return position.getZoom();
+        return fov;
     }
 }

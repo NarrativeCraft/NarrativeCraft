@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.client.editors.menu;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
+import java.util.List;
+import java.util.Locale;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -36,9 +38,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
-import java.util.Locale;
-
 public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 
     private static final int FIELD_LABEL_HEIGHT = 7;
@@ -47,7 +46,7 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
     private static final int FIELD_TOTAL = FIELD_LABEL_HEIGHT + FIELD_HEIGHT + FIELD_GAP;
     private static final int FIELD_COUNT = 6;
 
-    private EditBox fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate, fieldZoom;
+    private EditBox fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate;
     private List<EditBox> fields;
 
     public CameraKeyframeMenu(CameraKeyframe keyframe) {
@@ -65,8 +64,7 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
         fieldPitch = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().x));
         fieldYaw = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().y));
         fieldRotate = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().z));
-        fieldZoom = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getZoom()));
-        fields = List.of(fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate, fieldZoom);
+        fields = List.of(fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate);
     }
 
     private EditBox createField(Minecraft mc, int width, String value) {
@@ -83,8 +81,8 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
     @Override
     protected void renderContent(
             GuiGraphicsExtractor graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
-        String[] labels = {"X", "Y", "Z", "Pitch", "Yaw", "Rotate", "Zoom"};
-        EditBox[] boxes = {fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate, fieldZoom};
+        String[] labels = {"X", "Y", "Z", "Pitch", "Yaw", "Rotate"};
+        EditBox[] boxes = {fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate};
 
         int currentY = y;
         float partialTick = delta.getGameTimeDeltaTicks();
@@ -152,11 +150,9 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
             double pitch = Double.parseDouble(fieldPitch.getValue());
             double yaw = Double.parseDouble(fieldYaw.getValue());
             float rotate = Float.parseFloat(fieldRotate.getValue());
-            float zoom = Float.parseFloat(fieldZoom.getValue());
 
             pos.setPosition(new Vec3(x, y, z));
             pos.setRotation(new Vec3(pitch, yaw, rotate));
-            pos.setZoom(zoom);
         } catch (NumberFormatException ignored) {
         }
     }

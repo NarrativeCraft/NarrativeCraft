@@ -21,39 +21,26 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.session;
+package fr.loudo.narrativecraft.client.editors.layers.fov;
 
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.session.AbstractPlayerSession;
+import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 
-public class ClientPlayerSession extends AbstractPlayerSession {
+public class FovLayerType extends CutsceneLayerType {
 
-    private KeyframePosition keyframePosition;
-    private float fov = -1f;
+    public static final String ID = "fov";
 
-    public ClientPlayerSession() {
-        super(null, null);
+    @Override
+    public String getId() {
+        return ID;
     }
 
-    public ClientPlayerSession(Chapter chapter, Scene scene) {
-        super(chapter, scene);
+    @Override
+    public String getName() {
+        return "FOV";
     }
 
-    public KeyframePosition getKeyframePosition() {
-        return keyframePosition;
-    }
-
-    public void setKeyframePosition(KeyframePosition keyframePosition) {
-        this.keyframePosition = keyframePosition;
-    }
-
-    public float getFov() {
-        return fov;
-    }
-
-    public void setFov(float fov) {
-        this.fov = fov;
+    @Override
+    public FovLayer createLayer() {
+        return new FovLayer(this);
     }
 }

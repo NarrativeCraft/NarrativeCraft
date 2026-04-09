@@ -31,12 +31,13 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
-import java.util.Comparator;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Comparator;
+import java.util.List;
 
 public class CameraLayer extends CutsceneLayer {
 
@@ -57,8 +58,7 @@ public class CameraLayer extends CutsceneLayer {
         Minecraft mc = Minecraft.getInstance();
         Vec3 pos = mc.player.position();
         Vec3 rot = new Vec3(mc.player.getXRot(), mc.player.getYRot(), 0);
-        float fov = (float) (int) mc.options.fov().get();
-        return new CameraKeyframe(this, tick, new KeyframePosition(pos, rot, fov));
+        return new CameraKeyframe(this, tick, new KeyframePosition(pos, rot));
     }
 
     @Override
@@ -136,8 +136,7 @@ public class CameraLayer extends CutsceneLayer {
                 new Vec3(
                         Interpolation.lerp(a.getRotation().x, b.getRotation().x, t),
                         Interpolation.lerp(a.getRotation().y, b.getRotation().y, t),
-                        Interpolation.lerp(a.getRotation().z, b.getRotation().z, t)),
-                (float) Interpolation.lerp(a.getZoom(), b.getZoom(), t));
+                        Interpolation.lerp(a.getRotation().z, b.getRotation().z, t)));
     }
 
     private static KeyframePosition interpolateCatmullRom(
@@ -156,7 +155,6 @@ public class CameraLayer extends CutsceneLayer {
                         Interpolation.catmullRom(
                                 p0.getRotation().y, p1.getRotation().y, p2.getRotation().y, p3.getRotation().y, t),
                         Interpolation.catmullRom(
-                                p0.getRotation().z, p1.getRotation().z, p2.getRotation().z, p3.getRotation().z, t)),
-                (float) Interpolation.catmullRom(p0.getZoom(), p1.getZoom(), p2.getZoom(), p3.getZoom(), t));
+                                p0.getRotation().z, p1.getRotation().z, p2.getRotation().z, p3.getRotation().z, t)));
     }
 }

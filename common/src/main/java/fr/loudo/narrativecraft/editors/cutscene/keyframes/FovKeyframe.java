@@ -21,32 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.session;
+package fr.loudo.narrativecraft.editors.cutscene.keyframes;
 
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.session.AbstractPlayerSession;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.client.editors.menu.FovKeyframeMenu;
 
-public class ClientPlayerSession extends AbstractPlayerSession {
+public class FovKeyframe extends Keyframe {
 
-    private KeyframePosition keyframePosition;
-    private float fov = -1f;
+    private float fov;
+    private EasingType easing = EasingType.SMOOTH;
 
-    public ClientPlayerSession() {
-        super(null, null);
+    public FovKeyframe(CutsceneLayer layer, int tick, float fov) {
+        super(layer, tick);
+        this.fov = fov;
     }
 
-    public ClientPlayerSession(Chapter chapter, Scene scene) {
-        super(chapter, scene);
-    }
-
-    public KeyframePosition getKeyframePosition() {
-        return keyframePosition;
-    }
-
-    public void setKeyframePosition(KeyframePosition keyframePosition) {
-        this.keyframePosition = keyframePosition;
+    @Override
+    public KeyframeMenu<FovKeyframe> createMenu() {
+        return new FovKeyframeMenu(this);
     }
 
     public float getFov() {
@@ -55,5 +50,13 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public void setFov(float fov) {
         this.fov = fov;
+    }
+
+    public EasingType getEasing() {
+        return easing;
+    }
+
+    public void setEasing(EasingType easing) {
+        this.easing = easing;
     }
 }

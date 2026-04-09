@@ -29,12 +29,10 @@ public class KeyframePosition {
 
     private Vec3 position;
     private Vec3 rotation;
-    private float zoom;
 
-    public KeyframePosition(Vec3 position, Vec3 rotation, float zoom) {
+    public KeyframePosition(Vec3 position, Vec3 rotation) {
         this.position = position;
         this.rotation = rotation;
-        this.zoom = zoom;
     }
 
     public Vec3 getPosition() {
@@ -51,13 +49,5 @@ public class KeyframePosition {
 
     public void setRotation(Vec3 rotation) {
         this.rotation = rotation;
-    }
-
-    public float getZoom() {
-        return zoom;
-    }
-
-    public void setZoom(float zoom) {
-        this.zoom = zoom;
     }
 }
