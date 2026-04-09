@@ -31,6 +31,7 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
 
     protected final ICutsceneLayerType layerType;
     private final List<Keyframe> keyframes = new ArrayList<>();
+    private int sortIndex = 0;
 
     public CutsceneLayer(ICutsceneLayerType layerType) {
         this.layerType = layerType;
@@ -53,6 +54,14 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
     @Override
     public ICutsceneLayerType getType() {
         return layerType;
+    }
+
+    public int getSortIndex() {
+        return sortIndex;
+    }
+
+    public void setSortIndex(int sortIndex) {
+        this.sortIndex = sortIndex;
     }
 
     /**

@@ -32,6 +32,9 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class CutsceneMakerEditorLayer {
 
     private static final int BTN_SIZE = 9;
+    private static final int MOVE_BTN_X = 2;
+
+    public static final int NAME_X = MOVE_BTN_X + BTN_SIZE + 3;
 
     private final CutsceneLayer layer;
     private final int layerGap;
@@ -49,10 +52,26 @@ public class CutsceneMakerEditorLayer {
             int timelineWidth,
             int maxTick,
             int mouseX,
-            int mouseY) {
+            int mouseY,
+            boolean isFirst,
+            boolean isLast) {
+        if (!isFirst) renderMoveUpButton(graphics, layerY, mouseX, mouseY);
+        if (!isLast) renderMoveDownButton(graphics, layerY, mouseX, mouseY);
         renderAddButton(graphics, layerY, layerHeight, mouseX, mouseY);
         renderRemoveButton(graphics, layerY, layerHeight, mouseX, mouseY);
         renderKeyframes(graphics, delta, layerY, layerHeight, timelineWidth, maxTick);
+    }
+
+    private void renderMoveUpButton(GuiGraphicsExtractor graphics, int layerY, int mouseX, int mouseY) {
+        int btnY = layerY + 1;
+        boolean hovered = isMoveUpButtonHovered(mouseX, mouseY, layerY);
+        renderButton(graphics, MOVE_BTN_X, btnY, hovered, "⮝");
+    }
+
+    private void renderMoveDownButton(GuiGraphicsExtractor graphics, int layerY, int mouseX, int mouseY) {
+        int btnY = layerY + BTN_SIZE + 1;
+        boolean hovered = isMoveDownButtonHovered(mouseX, mouseY, layerY);
+        renderButton(graphics, MOVE_BTN_X, btnY, hovered, "⮟");
     }
 
     private void renderAddButton(GuiGraphicsExtractor graphics, int layerY, int layerHeight, int mouseX, int mouseY) {
@@ -100,6 +119,14 @@ public class CutsceneMakerEditorLayer {
         int btnX = getBtnXRemove();
         int btnY = getBtnY(layerY, layerHeight);
         return isHovered(mouseX, mouseY, btnX, btnY);
+    }
+
+    public boolean isMoveUpButtonHovered(int mouseX, int mouseY, int layerY) {
+        return isHovered(mouseX, mouseY, MOVE_BTN_X, layerY + 1);
+    }
+
+    public boolean isMoveDownButtonHovered(int mouseX, int mouseY, int layerY) {
+        return isHovered(mouseX, mouseY, MOVE_BTN_X, layerY + BTN_SIZE + 1);
     }
 
     public Keyframe getHoveredKeyframe(int mouseX, int mouseY) {

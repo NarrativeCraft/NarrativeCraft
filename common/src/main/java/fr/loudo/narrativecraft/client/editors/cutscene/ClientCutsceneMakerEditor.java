@@ -102,6 +102,7 @@ public class ClientCutsceneMakerEditor implements Editor {
     public void addLayer(ICutsceneLayer layer) {
         if (layer instanceof CutsceneLayer cutsceneLayer) {
             editorLayers.add(new CutsceneMakerEditorLayer(cutsceneLayer, LAYER_GAP));
+            rebuildSortIndices();
         }
     }
 
@@ -120,17 +121,28 @@ public class ClientCutsceneMakerEditor implements Editor {
         graphics.fill(0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, ARGB.color(0.8f, 0));
         graphics.fill(LAYER_GAP, layerStartY, LAYER_GAP + 1, screenHeight, 0xFFFFFFFF);
 
-        for (CutsceneMakerEditorLayer editorLayer : editorLayers) {
+        for (int i = 0; i < editorLayers.size(); i++) {
+            CutsceneMakerEditorLayer editorLayer = editorLayers.get(i);
             int layerBottom = currentY + LAYER_HEIGHT;
             if (currentY >= layerStartY && currentY < screenHeight) {
                 graphics.fill(0, layerBottom - 1, screenWidth, layerBottom, 0xFFFFFFFF);
                 graphics.text(
                         mc.font,
                         editorLayer.getLayer().getType().getName(),
-                        5,
+                        CutsceneMakerEditorLayer.NAME_X,
                         currentY + (mc.font.lineHeight / 2) + 1,
                         0xFFFFFFFF);
-                editorLayer.render(graphics, delta, currentY, LAYER_HEIGHT, timelineWidth, maxTick, mouseX, mouseY);
+                editorLayer.render(
+                        graphics,
+                        delta,
+                        currentY,
+                        LAYER_HEIGHT,
+                        timelineWidth,
+                        maxTick,
+                        mouseX,
+                        mouseY,
+                        i == 0,
+                        i == editorLayers.size() - 1);
             }
             currentY += LAYER_HEIGHT;
         }
@@ -221,8 +233,24 @@ public class ClientCutsceneMakerEditor implements Editor {
         int layerStartY = getStartLayerY();
         int currentY = layerStartY - scrollOffset;
         List<CutsceneMakerEditorLayer> toRemove = new ArrayList<>();
-        for (CutsceneMakerEditorLayer editorLayer : editorLayers) {
+        for (int i = 0; i < editorLayers.size(); i++) {
+            CutsceneMakerEditorLayer editorLayer = editorLayers.get(i);
             if (currentY >= layerStartY && currentY < mc.getWindow().getGuiScaledHeight()) {
+                if (i > 0 && editorLayer.isMoveUpButtonHovered(mousePos[0], mousePos[1], currentY)) {
+                    CutsceneMakerEditorLayer tmp = editorLayers.get(i - 1);
+                    editorLayers.set(i - 1, editorLayer);
+                    editorLayers.set(i, tmp);
+                    rebuildSortIndices();
+                    return;
+                }
+                if (i < editorLayers.size() - 1
+                        && editorLayer.isMoveDownButtonHovered(mousePos[0], mousePos[1], currentY)) {
+                    CutsceneMakerEditorLayer tmp = editorLayers.get(i + 1);
+                    editorLayers.set(i + 1, editorLayer);
+                    editorLayers.set(i, tmp);
+                    rebuildSortIndices();
+                    return;
+                }
                 if (editorLayer.isAddButtonHovered(mousePos[0], mousePos[1], currentY, LAYER_HEIGHT)) {
                     editorLayer.addKeyframe((int) (playHead.getRatio() * getTotalTick()));
                     return;
@@ -275,6 +303,12 @@ public class ClientCutsceneMakerEditor implements Editor {
         }
         if (openMenu != null && openMenu.isVisible()) {
             openMenu.mouseDragged(mouseButtonEvent, dragX, dragY);
+        }
+    }
+
+    private void rebuildSortIndices() {
+        for (int i = 0; i < editorLayers.size(); i++) {
+            editorLayers.get(i).getLayer().setSortIndex(i);
         }
     }
 
