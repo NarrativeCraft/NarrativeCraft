@@ -31,12 +31,13 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
-import java.util.Comparator;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Comparator;
+import java.util.List;
 
 public class CameraLayer extends CutsceneLayer {
 
@@ -135,8 +136,8 @@ public class CameraLayer extends CutsceneLayer {
                         Interpolation.lerp(a.getPosition().z, b.getPosition().z, t)),
                 new Vec3(
                         Interpolation.lerp(a.getRotation().x, b.getRotation().x, t),
-                        Interpolation.lerpAngle(a.getRotation().y, b.getRotation().y, t),
-                        Interpolation.lerpAngle(a.getRotation().z, b.getRotation().z, t)),
+                        Interpolation.lerp(a.getRotation().y, b.getRotation().y, t),
+                        Interpolation.lerp(a.getRotation().z, b.getRotation().z, t)),
                 (float) Interpolation.lerp(a.getZoom(), b.getZoom(), t));
     }
 

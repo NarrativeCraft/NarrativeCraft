@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.client.editors.cutscene;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
-import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -36,6 +35,9 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.Locale;
 
 public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 
@@ -57,12 +59,12 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
         KeyframePosition pos = keyframe.getPosition();
         Minecraft mc = Minecraft.getInstance();
         int fieldWidth = WIDTH - PADDING * 2;
-        fieldX = createField(mc, fieldWidth, String.format("%.2f", pos.getPosition().x));
-        fieldY = createField(mc, fieldWidth, String.format("%.2f", pos.getPosition().y));
-        fieldZ = createField(mc, fieldWidth, String.format("%.2f", pos.getPosition().z));
-        fieldPitch = createField(mc, fieldWidth, String.format("%.2f", pos.getRotation().x));
-        fieldYaw = createField(mc, fieldWidth, String.format("%.2f", pos.getRotation().y));
-        fieldZoom = createField(mc, fieldWidth, String.format("%.2f", pos.getZoom()));
+        fieldX = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getPosition().x));
+        fieldY = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getPosition().y));
+        fieldZ = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getPosition().z));
+        fieldPitch = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().x));
+        fieldYaw = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().y));
+        fieldZoom = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getZoom()));
         fields = List.of(fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldZoom);
     }
 
