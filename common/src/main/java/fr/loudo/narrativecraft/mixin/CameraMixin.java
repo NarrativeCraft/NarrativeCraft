@@ -69,7 +69,8 @@ public abstract class CameraMixin {
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return;
 
-        KeyframePosition keyframePosition = playerSession.getKeyframePosition();
+        KeyframePosition keyframePosition =
+                playerSession.getCutsceneDataSession().getKeyframePosition();
         if (keyframePosition == null) return;
 
         Vec3 position = keyframePosition.getPosition();
@@ -85,8 +86,8 @@ public abstract class CameraMixin {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return this.calculateFov(partialTicks);
-        float fov = playerSession.getFov();
-        if (fov == -1) return this.calculateFov(partialTicks);
+        float fov = playerSession.getCutsceneDataSession().getFov();
+        if (fov == -1f) return this.calculateFov(partialTicks);
 
         return fov;
     }

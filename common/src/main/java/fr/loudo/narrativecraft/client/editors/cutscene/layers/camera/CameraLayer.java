@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.editors.layers.camera;
+package fr.loudo.narrativecraft.client.editors.cutscene.layers.camera;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
@@ -31,13 +31,12 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
+import java.util.Comparator;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Comparator;
-import java.util.List;
 
 public class CameraLayer extends CutsceneLayer {
 
@@ -68,7 +67,10 @@ public class CameraLayer extends CutsceneLayer {
         Vec3 position = keyframePosition.getPosition();
         Vec3 rot = keyframePosition.getRotation();
 
-        ClientNarrativeCraftMod.getInstance().getPlayerSession().setKeyframePosition(keyframePosition);
+        ClientNarrativeCraftMod.getInstance()
+                .getPlayerSession()
+                .getCutsceneDataSession()
+                .setKeyframePosition(keyframePosition);
 
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         localPlayer.setPos(position);

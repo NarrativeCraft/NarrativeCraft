@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.editors.layers.fov;
+package fr.loudo.narrativecraft.client.editors.cutscene.layers.fov;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
@@ -54,7 +54,10 @@ public class FovLayer extends CutsceneLayer {
     @Override
     public boolean execute(float tick) {
         if (!isTickCoveredBy(tick)) return false;
-        ClientNarrativeCraftMod.getInstance().getPlayerSession().setFov(getInterpolatedFov(tick));
+        ClientNarrativeCraftMod.getInstance()
+                .getPlayerSession()
+                .getCutsceneDataSession()
+                .setFov(getInterpolatedFov(tick));
         return true;
     }
 

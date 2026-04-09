@@ -23,15 +23,14 @@
 
 package fr.loudo.narrativecraft.client.session;
 
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
+import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.AbstractPlayerSession;
 
 public class ClientPlayerSession extends AbstractPlayerSession {
 
-    private KeyframePosition keyframePosition;
-    private float fov = -1f;
+    private final CutsceneDataSession cutsceneDataSession = new CutsceneDataSession();
 
     public ClientPlayerSession() {
         super(null, null);
@@ -41,19 +40,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
         super(chapter, scene);
     }
 
-    public KeyframePosition getKeyframePosition() {
-        return keyframePosition;
-    }
-
-    public void setKeyframePosition(KeyframePosition keyframePosition) {
-        this.keyframePosition = keyframePosition;
-    }
-
-    public float getFov() {
-        return fov;
-    }
-
-    public void setFov(float fov) {
-        this.fov = fov;
+    public CutsceneDataSession getCutsceneDataSession() {
+        return cutsceneDataSession;
     }
 }

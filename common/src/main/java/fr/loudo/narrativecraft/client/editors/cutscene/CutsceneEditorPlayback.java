@@ -52,8 +52,8 @@ public class CutsceneEditorPlayback {
 
     public void pause() {
         playing = false;
-        playerSession.setKeyframePosition(null);
-        playerSession.setFov(-1f);
+        playerSession.getCutsceneDataSession().setFov(-1f);
+        playerSession.getCutsceneDataSession().setKeyframePosition(null);
     }
 
     public void tick(DeltaTracker delta) {

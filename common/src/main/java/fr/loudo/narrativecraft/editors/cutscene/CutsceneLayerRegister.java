@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.editors.cutscene;
 
-import fr.loudo.narrativecraft.client.editors.layers.camera.CameraLayerType;
-import fr.loudo.narrativecraft.client.editors.layers.fov.FovLayerType;
+import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayerType;
+import fr.loudo.narrativecraft.client.editors.cutscene.layers.fov.FovLayerType;
 
 public class CutsceneLayerRegister {
 

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.editors.layers.camera;
+package fr.loudo.narrativecraft.client.editors.cutscene.layers.camera;
 
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 

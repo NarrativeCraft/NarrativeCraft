@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.editors.menu;
+package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;

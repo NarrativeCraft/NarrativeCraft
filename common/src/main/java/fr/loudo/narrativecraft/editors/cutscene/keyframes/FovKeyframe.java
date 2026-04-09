@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
-import fr.loudo.narrativecraft.client.editors.menu.FovKeyframeMenu;
+import fr.loudo.narrativecraft.client.editors.cutscene.menu.FovKeyframeMenu;
 
 public class FovKeyframe extends Keyframe {
 

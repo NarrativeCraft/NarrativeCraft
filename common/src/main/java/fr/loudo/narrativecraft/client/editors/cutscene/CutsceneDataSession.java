@@ -21,38 +21,35 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.editors.cutscene.keyframes;
+package fr.loudo.narrativecraft.client.editors.cutscene;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
-import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
-import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
-import fr.loudo.narrativecraft.client.editors.cutscene.menu.CameraKeyframeMenu;
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 
-public class CameraKeyframe extends Keyframe {
+public class CutsceneDataSession {
 
-    private final KeyframePosition position;
-    private EasingType easing = EasingType.SMOOTH;
+    private KeyframePosition keyframePosition;
+    private float fov = -1f;
 
-    public CameraKeyframe(CutsceneLayer layer, int tick, KeyframePosition position) {
-        super(layer, tick);
-        this.position = position;
+    public CutsceneDataSession() {}
+
+    public KeyframePosition getKeyframePosition() {
+        return keyframePosition;
     }
 
-    @Override
-    public KeyframeMenu<CameraKeyframe> createMenu() {
-        return new CameraKeyframeMenu(this);
+    public void setKeyframePosition(KeyframePosition keyframePosition) {
+        this.keyframePosition = keyframePosition;
     }
 
-    public KeyframePosition getPosition() {
-        return position;
+    public float getFov() {
+        return fov;
     }
 
-    public EasingType getEasing() {
-        return easing;
+    public void setFov(float fov) {
+        this.fov = fov;
     }
 
-    public void setEasing(EasingType easing) {
-        this.easing = easing;
+    public void reset() {
+        keyframePosition = null;
+        fov = -1f;
     }
 }

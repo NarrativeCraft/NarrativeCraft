@@ -86,6 +86,7 @@ public class ClientCutsceneMakerEditor implements Editor {
     public void init() {
         buttons.add(Button.builder(Component.literal("✖"), button -> {
                     Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.QUIT));
+                    playerSession.getCutsceneDataSession().reset();
                     playerSession.setEditor(null);
                 })
                 .bounds(5, 5, 20, 20)

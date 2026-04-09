@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.editors.layers.fov;
+package fr.loudo.narrativecraft.client.editors.cutscene.layers.fov;
 
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 
