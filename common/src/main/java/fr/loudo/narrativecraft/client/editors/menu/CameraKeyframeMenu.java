@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.editors.cutscene;
+package fr.loudo.narrativecraft.client.editors.menu;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
@@ -47,7 +47,7 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
     private static final int FIELD_TOTAL = FIELD_LABEL_HEIGHT + FIELD_HEIGHT + FIELD_GAP;
     private static final int FIELD_COUNT = 6;
 
-    private EditBox fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldZoom;
+    private EditBox fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate, fieldZoom;
     private List<EditBox> fields;
 
     public CameraKeyframeMenu(CameraKeyframe keyframe) {
@@ -64,8 +64,9 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
         fieldZ = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getPosition().z));
         fieldPitch = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().x));
         fieldYaw = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().y));
+        fieldRotate = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getRotation().z));
         fieldZoom = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getZoom()));
-        fields = List.of(fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldZoom);
+        fields = List.of(fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate, fieldZoom);
     }
 
     private EditBox createField(Minecraft mc, int width, String value) {
@@ -82,8 +83,8 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
     @Override
     protected void renderContent(
             GuiGraphicsExtractor graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
-        String[] labels = {"X", "Y", "Z", "Pitch", "Yaw", "Zoom"};
-        EditBox[] boxes = {fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldZoom};
+        String[] labels = {"X", "Y", "Z", "Pitch", "Yaw", "Rotate", "Zoom"};
+        EditBox[] boxes = {fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate, fieldZoom};
 
         int currentY = y;
         float partialTick = delta.getGameTimeDeltaTicks();
@@ -150,10 +151,11 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
             double z = Double.parseDouble(fieldZ.getValue());
             double pitch = Double.parseDouble(fieldPitch.getValue());
             double yaw = Double.parseDouble(fieldYaw.getValue());
+            float rotate = Float.parseFloat(fieldRotate.getValue());
             float zoom = Float.parseFloat(fieldZoom.getValue());
 
             pos.setPosition(new Vec3(x, y, z));
-            pos.setRotation(new Vec3(pitch, yaw, 0));
+            pos.setRotation(new Vec3(pitch, yaw, rotate));
             pos.setZoom(zoom);
         } catch (NumberFormatException ignored) {
         }
