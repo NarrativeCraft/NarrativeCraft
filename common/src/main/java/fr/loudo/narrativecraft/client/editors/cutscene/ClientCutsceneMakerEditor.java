@@ -67,6 +67,7 @@ public class ClientCutsceneMakerEditor implements Editor {
             new CutsceneMakerEditorLayerSelector(this, 90, 120, ARGB.color(190, 0, 0, 0));
     private final CutsceneMakerEditorPlayHead playHead = new CutsceneMakerEditorPlayHead(11, 90, 5);
     private final CutsceneMakerEditorControl control;
+    private final CutsceneEditorPlayback playback;
 
     private Button addLayerButton;
     private int tick, totalTick;
@@ -78,6 +79,8 @@ public class ClientCutsceneMakerEditor implements Editor {
     public ClientCutsceneMakerEditor(Cutscene cutscene) {
         this.cutscene = cutscene;
         this.control = new CutsceneMakerEditorControl(15, 15);
+        this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getMaxTick());
+        control.setPlaybackCallbacks(() -> playback.play(tick), playback::pause);
     }
 
     public void init() {
@@ -173,6 +176,11 @@ public class ClientCutsceneMakerEditor implements Editor {
         control.setPosition(LAYER_GAP / 2 - control.getWidth() / 2, getStartLayerY() - control.getHeight() - 2);
         control.render(graphics, deltaTracker, mousePos[0], mousePos[1]);
 
+        playback.tick(deltaTracker);
+        if (playback.isPlaying()) {
+            playHead.setRatio(playback.getCurrentTick() / totalTick);
+        }
+
         playHead.setY(getStartLayerY() - 5);
         playHead.render(graphics, mousePos[0], mousePos[1], LAYER_GAP, getTimelineWidth());
 
@@ -231,6 +239,9 @@ public class ClientCutsceneMakerEditor implements Editor {
         if (selectedKeyframe != null) {
             selectedKeyframe.setSelected(false);
             selectedKeyframe = null;
+            if (openMenu != null && openMenu.isVisible()) {
+                openMenu.close();
+            }
         }
 
         if (playHead.isHovered()) {
@@ -247,20 +258,23 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     public void mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
-        if (openMenu != null && openMenu.isVisible()) {
-            openMenu.mouseDragged(mouseButtonEvent, dragX, dragY);
-            return;
-        }
         if (draggingKeyframe != null) {
             draggingKeyframe.drag(mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth(), getTotalTick());
-        } else {
+            return;
+        }
+        if (playHead.isDragging()) {
             playHead.onMouseDrag(mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth());
             updateTick();
+            return;
+        }
+        if (openMenu != null && openMenu.isVisible()) {
+            openMenu.mouseDragged(mouseButtonEvent, dragX, dragY);
         }
     }
 
     private void updateTick() {
         tick = (int) (playHead.getRatio() * totalTick);
+        playback.seekTo(tick);
         Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(tick));
     }
 

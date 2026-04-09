@@ -37,7 +37,7 @@ public class OnPlayerLeaveEventNeoForge {
         NeoForge.EVENT_BUS.addListener(OnPlayerLeaveEventNeoForge::onPlayerLeave);
     }
 
-    private static void onPlayerLeave(PlayerEvent.PlayerLoggedInEvent event) {
+    private static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         OnPlayerLeaveEvent.onPlayerLeave((ServerPlayer) event.getEntity());
     }
 }

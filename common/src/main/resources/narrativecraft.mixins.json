@@ -13,7 +13,9 @@
     "accessor.EntityAccessor",
     "accessor.LivingEntityAccessor"
   ],
-  "client": [],
+  "client": [
+    "CameraMixin"
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1

@@ -21,24 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.editors.cutscene.layers;
+package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
-public class CameraLayerType extends CutsceneLayerType {
-
-    public static final String ID = "camera";
-
-    @Override
-    public String getId() {
-        return ID;
-    }
-
-    @Override
-    public String getName() {
-        return "Camera";
-    }
-
-    @Override
-    public CameraLayer createLayer() {
-        return new CameraLayer(this);
-    }
+public enum EasingType {
+    LINEAR,
+    EASE_IN,
+    EASE_OUT,
+    SMOOTH
 }

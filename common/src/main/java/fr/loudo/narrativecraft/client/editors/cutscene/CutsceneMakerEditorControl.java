@@ -41,6 +41,8 @@ public class CutsceneMakerEditorControl {
     private final int height;
     private int x, y;
     private boolean playing = false;
+    private Runnable onPlay;
+    private Runnable onPause;
 
     public CutsceneMakerEditorControl(int width, int height) {
         this.width = width;
@@ -50,11 +52,18 @@ public class CutsceneMakerEditorControl {
                 .build();
     }
 
+    public void setPlaybackCallbacks(Runnable onPlay, Runnable onPause) {
+        this.onPlay = onPlay;
+        this.onPause = onPause;
+    }
+
     private void toggle() {
         playing = !playing;
         button.setMessage(playing ? PAUSE_LABEL : PLAY_LABEL);
         Services.PACKET.sendToServer(
                 new C2SCutsceneControl(playing ? C2SCutsceneControl.State.PLAY : C2SCutsceneControl.State.PAUSE));
+        if (playing && onPlay != null) onPlay.run();
+        else if (!playing && onPause != null) onPause.run();
     }
 
     public void play() {

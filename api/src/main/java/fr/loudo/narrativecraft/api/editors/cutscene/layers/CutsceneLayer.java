@@ -54,4 +54,26 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
     public ICutsceneLayerType getType() {
         return layerType;
     }
+
+    /**
+     * Verify to play a keyframe based on a range
+     * @param tick current tick of the cutscene
+     * @return if the current tick is between 2 keyframes on the timeline of his layer
+     */
+    protected boolean isTickCoveredBy(float tick) {
+        if (keyframes.isEmpty()) return false;
+        int first = keyframes.stream().mapToInt(Keyframe::getTick).min().getAsInt();
+        int last = keyframes.stream().mapToInt(Keyframe::getTick).max().getAsInt();
+        return tick >= first && tick <= last;
+    }
+
+    /**
+     * Verify to play a keyframe a single time
+     * @param tick current tick of the cutscene
+     * @return if the tick match exactly a keyframe tick on the timeline of his layer
+     */
+    protected boolean isExactTick(float tick) {
+        if (keyframes.isEmpty()) return false;
+        return keyframes.stream().mapToInt(Keyframe::getTick).max().getAsInt() == tick;
+    }
 }

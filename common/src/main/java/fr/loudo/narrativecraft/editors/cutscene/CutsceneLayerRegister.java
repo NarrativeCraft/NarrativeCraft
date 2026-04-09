@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.editors.cutscene;
 
-import fr.loudo.narrativecraft.editors.cutscene.layers.CameraLayerType;
+import fr.loudo.narrativecraft.client.editors.layers.camera.CameraLayerType;
 
 public class CutsceneLayerRegister {
 

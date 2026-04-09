@@ -21,30 +21,26 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.session;
+package fr.loudo.narrativecraft.client.editors.layers.camera;
 
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.session.AbstractPlayerSession;
+import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 
-public class ClientPlayerSession extends AbstractPlayerSession {
+public class CameraLayerType extends CutsceneLayerType {
 
-    private KeyframePosition keyframePosition;
+    public static final String ID = "camera";
 
-    public ClientPlayerSession() {
-        super(null, null);
+    @Override
+    public String getId() {
+        return ID;
     }
 
-    public ClientPlayerSession(Chapter chapter, Scene scene) {
-        super(chapter, scene);
+    @Override
+    public String getName() {
+        return "Camera";
     }
 
-    public KeyframePosition getKeyframePosition() {
-        return keyframePosition;
-    }
-
-    public void setKeyframePosition(KeyframePosition keyframePosition) {
-        this.keyframePosition = keyframePosition;
+    @Override
+    public CameraLayer createLayer() {
+        return new CameraLayer(this);
     }
 }

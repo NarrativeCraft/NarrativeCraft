@@ -41,4 +41,15 @@ public interface ICutsceneLayer {
      * @return the type descriptor that created this layer
      */
     ICutsceneLayerType getType();
+
+    /**
+     * Executes this layer at the given tick: applies whatever effect the layer produces
+     * (e.g. camera movement, entity animation) if the tick falls within its keyframe range or keyframe tick.
+     *
+     * @param tick the current playback position (fractional ticks)
+     * @return {@code true} if this layer handled the tick, {@code false} if the tick is outside its range
+     */
+    default boolean execute(float tick) {
+        return false;
+    }
 }

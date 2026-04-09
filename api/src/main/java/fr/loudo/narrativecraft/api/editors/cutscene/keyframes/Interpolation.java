@@ -21,31 +21,37 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.editors.cutscene.layers;
+package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.phys.Vec3;
+public final class Interpolation {
 
-public class CameraLayer extends CutsceneLayer {
+    private Interpolation() {}
 
-    public CameraLayer(CutsceneLayerType layerType) {
-        super(layerType);
+    public static double applyEasing(EasingType type, double t) {
+        return switch (type) {
+            case LINEAR -> t;
+            case EASE_IN -> t * t * t;
+            case EASE_OUT -> 1.0 - Math.pow(1.0 - t, 3.0);
+            case SMOOTH -> t;
+        };
     }
 
-    @Override
-    public String getTypeId() {
-        return CameraLayerType.ID;
+    public static double lerp(double a, double b, double t) {
+        return a + (b - a) * t;
     }
 
-    @Override
-    public CameraKeyframe createDefaultKeyframe(int tick) {
-        Minecraft mc = Minecraft.getInstance();
-        Vec3 pos = mc.player.position();
-        Vec3 rot = new Vec3(mc.player.getXRot(), mc.player.getYRot(), 0);
-        float fov = (float) (int) mc.options.fov().get();
-        return new CameraKeyframe(this, tick, new KeyframePosition(pos, rot, fov));
+    public static double lerpAngle(double fromDeg, double toDeg, double t) {
+        double diff = ((toDeg - fromDeg + 540.0) % 360.0) - 180.0;
+        return fromDeg + diff * t;
+    }
+
+    public static double catmullRom(double p0, double p1, double p2, double p3, double t) {
+        double t2 = t * t;
+        double t3 = t2 * t;
+        return 0.5
+                * ((2.0 * p1)
+                        + (-p0 + p2) * t
+                        + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2
+                        + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3);
     }
 }
