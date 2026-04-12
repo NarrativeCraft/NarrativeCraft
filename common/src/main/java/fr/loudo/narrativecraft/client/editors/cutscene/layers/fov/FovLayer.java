@@ -30,9 +30,8 @@ import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
-import net.minecraft.client.Minecraft;
-
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 public class FovLayer extends CutsceneLayer {
 
@@ -64,16 +63,26 @@ public class FovLayer extends CutsceneLayer {
     public float getInterpolatedFov(float tick) {
         List<FovKeyframe> sorted = getSortedKeyframes(FovKeyframe.class);
 
-        if (sorted.isEmpty()) return (float) (int) Minecraft.getInstance().options.fov().get();
+        if (sorted.isEmpty())
+            return (float) (int) Minecraft.getInstance().options.fov().get();
         if (sorted.size() == 1) return sorted.get(0).getFov();
         if (tick <= sorted.get(0).getTick()) return sorted.get(0).getFov();
-        if (tick >= sorted.get(sorted.size() - 1).getTick()) return sorted.get(sorted.size() - 1).getFov();
+        if (tick >= sorted.get(sorted.size() - 1).getTick())
+            return sorted.get(sorted.size() - 1).getFov();
 
         KeyframeSegment<FovKeyframe> seg = findSegment(sorted, tick);
         if (seg.from().getEasing() == EasingType.SMOOTH) {
-            return (float) Interpolation.catmullRom(seg.p0().getFov(), seg.from().getFov(), seg.to().getFov(), seg.p3().getFov(), seg.rawT());
+            return (float) Interpolation.catmullRom(
+                    seg.p0().getFov(),
+                    seg.from().getFov(),
+                    seg.to().getFov(),
+                    seg.p3().getFov(),
+                    seg.rawT());
         } else {
-            return (float) Interpolation.lerp(seg.from().getFov(), seg.to().getFov(), Interpolation.applyEasing(seg.to().getEasing(), seg.rawT()));
+            return (float) Interpolation.lerp(
+                    seg.from().getFov(),
+                    seg.to().getFov(),
+                    Interpolation.applyEasing(seg.to().getEasing(), seg.rawT()));
         }
     }
 }

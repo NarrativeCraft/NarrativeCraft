@@ -21,29 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.keys;
+package fr.loudo.narrativecraft.events.client;
 
-import com.mojang.blaze3d.platform.InputConstants;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.events.IFabricEventRegister;
+import fr.loudo.narrativecraft.keys.ModKeys;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
 
-public class ModKeys {
-
-    private static final KeyMapping.Category CATEGORY =
-            new KeyMapping.Category(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main"));
-
-    public static final List<KeyMapping> ALL_KEYS = new ArrayList<>();
-    public static final KeyMapping STORY_MANAGER =
-            registerKey("narrativecraft.key.story_manager", InputConstants.KEY_N);
-    public static final KeyMapping HIDE_CUTSCENE_MAKER_HUD =
-            registerKey("narrativecraft.key.hide_cutscene_maker_hud", InputConstants.KEY_H);
-
-    private static KeyMapping registerKey(String translationKey, int code) {
-        KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);
-        ALL_KEYS.add(key);
-        return key;
+public class OnKeyRegisterEventFabric implements IFabricEventRegister {
+    @Override
+    public void register() {
+        for (KeyMapping key : ModKeys.ALL_KEYS) {
+            KeyMappingHelper.registerKeyMapping(key);
+        }
     }
 }

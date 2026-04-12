@@ -24,37 +24,31 @@
 package fr.loudo.narrativecraft.keys;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.util.HashMap;
-import java.util.Map;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 
 public class PressKeyListener {
 
-    private static final Map<KeyMapping, Boolean> PREVIOUS_STATES_KEY_MAPPING = new HashMap<>();
-
     public static void onKeyPressed(Minecraft minecraft) {
-        handleKeyPress(ModKeys.STORY_MANAGER, () -> {
+        if (ModKeys.STORY_MANAGER.consumeClick()) {
             NarrativeEntryListScreen<Chapter> screen = new NarrativeEntryListScreen<>(
                     Translation.message("chapter"),
                     ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
                     Chapter.class,
                     "");
             minecraft.setScreen(screen);
-        });
-    }
-
-    public static void handleKeyPress(KeyMapping key, Runnable action) {
-        boolean isDown = key.isDown();
-        boolean wasDown = PREVIOUS_STATES_KEY_MAPPING.getOrDefault(key, false);
-
-        if (isDown && !wasDown) {
-            action.run();
         }
 
-        PREVIOUS_STATES_KEY_MAPPING.put(key, isDown);
+        if (ModKeys.HIDE_CUTSCENE_MAKER_HUD.consumeClick()) {
+            Editor editor =
+                    ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+            if (!(editor instanceof ClientCutsceneMakerEditor cutsceneMakerEditor)) return;
+
+            cutsceneMakerEditor.toggleHud();
+        }
     }
 }

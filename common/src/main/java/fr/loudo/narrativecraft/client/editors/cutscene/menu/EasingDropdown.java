@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
@@ -40,7 +63,12 @@ public class EasingDropdown {
         graphics.fill(x, y, x + width, y + HEADER_HEIGHT, headerHovered ? 0xFF888888 : 0xFF555555);
         graphics.text(Minecraft.getInstance().font, selected.name(), x + 2, y + 2, 0xFFFFFFFF);
         String arrow = open ? "-" : "+";
-        graphics.text(Minecraft.getInstance().font, arrow, x + width - Minecraft.getInstance().font.width(arrow) - 2, y + 2, 0xFFAAAAAA);
+        graphics.text(
+                Minecraft.getInstance().font,
+                arrow,
+                x + width - Minecraft.getInstance().font.width(arrow) - 2,
+                y + 2,
+                0xFFAAAAAA);
 
         if (!open) return;
 
@@ -50,7 +78,12 @@ public class EasingDropdown {
             EasingType type = values[i + scrollOffset];
             boolean hovered = mouseX >= x && mouseX < x + width && mouseY >= listY && mouseY < listY + ITEM_HEIGHT;
             boolean isSelected = type == selected;
-            graphics.fill(x, listY, x + width, listY + ITEM_HEIGHT, hovered ? 0xFF888888 : (isSelected ? 0xFF334433 : 0xFF333333));
+            graphics.fill(
+                    x,
+                    listY,
+                    x + width,
+                    listY + ITEM_HEIGHT,
+                    hovered ? 0xFF888888 : (isSelected ? 0xFF334433 : 0xFF333333));
             graphics.text(Minecraft.getInstance().font, type.name(), x + 2, listY + 1, 0xFFFFFFFF);
             listY += ITEM_HEIGHT;
         }

@@ -7,7 +7,7 @@
 
 ### cutscene maker
 - [x] interpolate zoom
-- [ ] toggle hud visibility
+- [x] toggle hud visibility
 - [x] delete layer
 - [x] rotate camera interpolation
 - [ ] rotate camera

@@ -35,6 +35,8 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -44,9 +46,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -73,6 +72,7 @@ public class ClientCutsceneMakerEditor implements Editor {
     private Button addLayerButton;
     private int tick, totalTick;
     private int scrollOffset = 0;
+    private boolean renderingHud = true;
     private Keyframe selectedKeyframe;
     private Keyframe draggingKeyframe;
     private KeyframeMenu<?> openMenu;
@@ -105,6 +105,10 @@ public class ClientCutsceneMakerEditor implements Editor {
             editorLayers.add(new CutsceneMakerEditorLayer(cutsceneLayer, LAYER_GAP));
             rebuildSortIndices();
         }
+    }
+
+    public void toggleHud() {
+        renderingHud = !renderingHud;
     }
 
     public void removeLayer(ICutsceneLayer layer) {
@@ -166,6 +170,7 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     public void mouseScrolled(double deltaX, double deltaY) {
+        if (!renderingHud) return;
         if (openMenu != null && openMenu.isVisible()) {
             openMenu.mouseScrolled(deltaY);
             return;
@@ -178,6 +183,10 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+        playback.tick(deltaTracker);
+
+        if (!renderingHud) return;
+
         int[] mousePos = UtilsClient.getScaledMousePos();
         int addLayerY = getStartLayerY() - ADD_NEW_LAYER_BUTTON_OFFSET;
 
@@ -194,7 +203,6 @@ public class ClientCutsceneMakerEditor implements Editor {
         control.setPosition(LAYER_GAP / 2 - control.getWidth() / 2, getStartLayerY() - control.getHeight() - 2);
         control.render(graphics, deltaTracker, mousePos[0], mousePos[1]);
 
-        playback.tick(deltaTracker);
         if (playback.isPlaying()) {
             playHead.setRatio(playback.getCurrentTick() / totalTick);
         }
@@ -208,18 +216,21 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     public void charTyped(CharacterEvent event) {
+        if (!renderingHud) return;
         if (openMenu != null && openMenu.isVisible()) {
             openMenu.charTyped(event);
         }
     }
 
     public void keyPressed(KeyEvent event) {
+        if (!renderingHud) return;
         if (openMenu != null && openMenu.isVisible()) {
             openMenu.keyPressed(event);
         }
     }
 
     public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
+        if (!renderingHud) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
 
         if (openMenu != null && openMenu.isVisible()) {
@@ -292,11 +303,13 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     public void mouseReleased(MouseButtonEvent mouseButtonEvent) {
+        if (!renderingHud) return;
         playHead.setDragging(false);
         draggingKeyframe = null;
     }
 
     public void mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
+        if (!renderingHud) return;
         if (draggingKeyframe != null) {
             draggingKeyframe.drag(mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth(), getTotalTick());
             return;
@@ -356,5 +369,13 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public CutsceneMakerEditorControl getControl() {
         return control;
+    }
+
+    public boolean isRenderingHud() {
+        return renderingHud;
+    }
+
+    public void setRenderingHud(boolean renderingHud) {
+        this.renderingHud = renderingHud;
     }
 }

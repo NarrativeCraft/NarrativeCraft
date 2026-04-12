@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
+import java.util.Locale;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -33,8 +34,6 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-
-import java.util.Locale;
 
 public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
 

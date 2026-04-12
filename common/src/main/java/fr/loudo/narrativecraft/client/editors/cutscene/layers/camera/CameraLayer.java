@@ -31,12 +31,11 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
 
 public class CameraLayer extends CutsceneLayer {
 
@@ -95,14 +94,22 @@ public class CameraLayer extends CutsceneLayer {
         if (sorted.isEmpty()) return null;
         if (sorted.size() == 1) return sorted.get(0).getPosition();
         if (tick <= sorted.get(0).getTick()) return sorted.get(0).getPosition();
-        if (tick >= sorted.get(sorted.size() - 1).getTick()) return sorted.get(sorted.size() - 1).getPosition();
+        if (tick >= sorted.get(sorted.size() - 1).getTick())
+            return sorted.get(sorted.size() - 1).getPosition();
 
         KeyframeSegment<CameraKeyframe> seg = findSegment(sorted, tick);
         if (seg.from().getEasing() == EasingType.SMOOTH) {
             return interpolateCatmullRom(
-                    seg.p0().getPosition(), seg.from().getPosition(), seg.to().getPosition(), seg.p3().getPosition(), seg.rawT());
+                    seg.p0().getPosition(),
+                    seg.from().getPosition(),
+                    seg.to().getPosition(),
+                    seg.p3().getPosition(),
+                    seg.rawT());
         } else {
-            return interpolateLinear(seg.from().getPosition(), seg.to().getPosition(), Interpolation.applyEasing(seg.to().getEasing(), seg.rawT()));
+            return interpolateLinear(
+                    seg.from().getPosition(),
+                    seg.to().getPosition(),
+                    Interpolation.applyEasing(seg.to().getEasing(), seg.rawT()));
         }
     }
 

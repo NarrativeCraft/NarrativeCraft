@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
+import java.util.List;
+import java.util.Locale;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -35,9 +37,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
-import java.util.Locale;
 
 public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 

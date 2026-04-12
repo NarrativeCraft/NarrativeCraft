@@ -1,4 +1,9 @@
 {
+  "key.category.narrativecraft.main": "NarrativeCraft",
+
+  "narrativecraft.key.story_manager": "Story Manager",
+  "narrativecraft.key.hide_cutscene_maker_hud": "Hide Cutscene Maker HUD",
+
   "narrativecraft.chapter": "Chapter",
   "narrativecraft.chapter_index": "Chapter Index",
   "narrativecraft.scene": "Scene",
