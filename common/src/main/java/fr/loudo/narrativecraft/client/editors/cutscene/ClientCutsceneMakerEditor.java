@@ -35,8 +35,6 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -46,6 +44,9 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -69,6 +70,8 @@ public class ClientCutsceneMakerEditor implements Editor {
     private final CutsceneMakerEditorControl control;
     private final CutsceneEditorPlayback playback;
 
+    private final CutsceneMakerRollWidget rollWidget = new CutsceneMakerRollWidget();
+
     private Button addLayerButton;
     private int tick, totalTick;
     private int scrollOffset = 0;
@@ -81,7 +84,10 @@ public class ClientCutsceneMakerEditor implements Editor {
         this.cutscene = cutscene;
         this.control = new CutsceneMakerEditorControl(15, 15);
         this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getMaxTick());
-        control.setPlaybackCallbacks(() -> playback.play(tick), playback::pause);
+        control.setPlaybackCallbacks(() -> playback.play(tick), () -> {
+            playback.pause();
+            setPreviewRoll(0.0f);
+        });
     }
 
     public void init() {
@@ -213,6 +219,13 @@ public class ClientCutsceneMakerEditor implements Editor {
         if (openMenu != null && openMenu.isVisible()) {
             openMenu.render(graphics, deltaTracker, mousePos[0], mousePos[1]);
         }
+
+        rollWidget.render(
+                graphics,
+                mc.getWindow().getGuiScaledWidth(),
+                mc.getWindow().getGuiScaledHeight(),
+                mousePos[0],
+                mousePos[1]);
     }
 
     public void charTyped(CharacterEvent event) {
@@ -232,6 +245,8 @@ public class ClientCutsceneMakerEditor implements Editor {
     public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
         if (!renderingHud) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
+
+        if (rollWidget.mouseClicked(mouseButtonEvent)) return;
 
         if (openMenu != null && openMenu.isVisible()) {
             if (openMenu.mouseClicked(mouseButtonEvent, isDoubleClick)) return;
@@ -304,12 +319,14 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public void mouseReleased(MouseButtonEvent mouseButtonEvent) {
         if (!renderingHud) return;
+        rollWidget.mouseReleased();
         playHead.setDragging(false);
         draggingKeyframe = null;
     }
 
     public void mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
         if (!renderingHud) return;
+        if (rollWidget.mouseDragged(mouseButtonEvent.y())) return;
         if (draggingKeyframe != null) {
             draggingKeyframe.drag(mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth(), getTotalTick());
             return;
@@ -377,5 +394,17 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public void setRenderingHud(boolean renderingHud) {
         this.renderingHud = renderingHud;
+    }
+
+    public float getPreviewRoll() {
+        return rollWidget.getValue();
+    }
+
+    public void setPreviewRoll(float roll) {
+        rollWidget.setValue(roll);
+    }
+
+    public CutsceneMakerRollWidget getRollWidget() {
+        return rollWidget;
     }
 }

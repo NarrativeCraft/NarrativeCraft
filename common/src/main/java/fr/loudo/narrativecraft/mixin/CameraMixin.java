@@ -24,10 +24,12 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -63,6 +65,10 @@ public abstract class CameraMixin {
     @Shadow
     protected abstract float calculateFov(float partialTicks);
 
+    @Shadow
+    @Final
+    private Minecraft minecraft;
+
     @Inject(method = "update", at = @At("RETURN"))
     private void narrativecraft$camera(DeltaTracker deltaTracker, CallbackInfo ci) {
         ClientPlayerSession playerSession =
@@ -71,7 +77,15 @@ public abstract class CameraMixin {
 
         KeyframePosition keyframePosition =
                 playerSession.getCutsceneDataSession().getKeyframePosition();
-        if (keyframePosition == null) return;
+        if (keyframePosition == null) {
+            ClientCutsceneMakerEditor editor =
+                    ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
+            if (editor != null && editor.getPreviewRoll() != 0f) {
+                this.setRotation(minecraft.player.getYRot(), minecraft.player.getXRot());
+                this.rotation.rotateZ(-(float) Math.toRadians(editor.getPreviewRoll()));
+            }
+            return;
+        }
 
         Vec3 position = keyframePosition.getPosition();
         position = position.add(0, this.entity.getEyeHeight(), 0);

@@ -28,14 +28,16 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeSegment;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
 
 public class CameraLayer extends CutsceneLayer {
 
@@ -55,7 +57,9 @@ public class CameraLayer extends CutsceneLayer {
     public CameraKeyframe createDefaultKeyframe(int tick) {
         Minecraft mc = Minecraft.getInstance();
         Vec3 pos = mc.player.position();
-        Vec3 rot = new Vec3(mc.player.getXRot(), mc.player.getYRot(), 0);
+        ClientCutsceneMakerEditor editor = ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
+        float roll = editor.getPreviewRoll();
+        Vec3 rot = new Vec3(mc.player.getXRot(), mc.player.getYRot(), roll);
         return new CameraKeyframe(this, tick, new KeyframePosition(pos, rot));
     }
 

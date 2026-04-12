@@ -25,10 +25,11 @@ package fr.loudo.narrativecraft.keys;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ModKeys {
 
@@ -40,6 +41,8 @@ public class ModKeys {
             registerKey("narrativecraft.key.story_manager", InputConstants.KEY_N);
     public static final KeyMapping HIDE_CUTSCENE_MAKER_HUD =
             registerKey("narrativecraft.key.hide_cutscene_maker_hud", InputConstants.KEY_H);
+    public static final KeyMapping TOGGLE_CAMERA_ROLL =
+            registerKey("narrativecraft.key.toggle_camera_roll", InputConstants.KEY_R);
 
     private static KeyMapping registerKey(String translationKey, int code) {
         KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);

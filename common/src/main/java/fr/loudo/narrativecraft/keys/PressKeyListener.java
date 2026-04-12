@@ -49,5 +49,13 @@ public class PressKeyListener {
 
             editor.toggleHud();
         }
+
+        if (ModKeys.TOGGLE_CAMERA_ROLL.consumeClick()) {
+            ClientCutsceneMakerEditor editor =
+                    ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
+            if (editor == null) return;
+
+            editor.getRollWidget().toggle();
+        }
     }
 }

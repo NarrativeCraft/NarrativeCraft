@@ -10,7 +10,7 @@
 - [x] toggle hud visibility
 - [x] delete layer
 - [x] rotate camera interpolation
-- [ ] rotate camera
+- [x] rotate camera
 - [x] change easing of a keyframe 
 - [ ] zoom on the timeline (x1.5, x2...)
 - [ ] show seconds/total seconds on timeline
