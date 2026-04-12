@@ -21,33 +21,35 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.keys;
+package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
-import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.client.screen.ClearScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.gui.screens.Screen;
+import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class PressKeyListener {
+@Mixin(Minecraft.class)
+public abstract class MinecraftMixin {
 
-    public static void onKeyPressed(Minecraft minecraft) {
-        if (ModKeys.STORY_MANAGER.consumeClick()) {
-            NarrativeEntryListScreen<Chapter> screen = new NarrativeEntryListScreen<>(
-                    Translation.message("chapter"),
-                    ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
-                    Chapter.class,
-                    "");
-            minecraft.setScreen(screen);
-        }
+    @Shadow
+    public abstract void setScreen(@Nullable Screen screen);
 
-        if (ModKeys.HIDE_CUTSCENE_MAKER_HUD.consumeClick()) {
-            ClientCutsceneMakerEditor editor =
-                    ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
-            if (editor == null) return;
+    @Inject(method = "openChatScreen", at = @At(value = "HEAD"), cancellable = true)
+    private void narrativecraft$openChat(ChatComponent.ChatMethod chatMethod, CallbackInfo ci) {
+        if (chatMethod != ChatComponent.ChatMethod.MESSAGE) return;
+        ClientCutsceneMakerEditor editor = ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
+        if (editor == null) return;
 
-            editor.toggleHud();
-        }
+        ClearScreen screen = new ClearScreen();
+        setScreen(screen);
+        ci.cancel();
     }
 }

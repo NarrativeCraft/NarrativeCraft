@@ -14,7 +14,8 @@
     "accessor.LivingEntityAccessor"
   ],
   "client": [
-    "CameraMixin"
+    "CameraMixin",
+    "MinecraftMixin"
   ],
   "server": [],
   "injectors": {

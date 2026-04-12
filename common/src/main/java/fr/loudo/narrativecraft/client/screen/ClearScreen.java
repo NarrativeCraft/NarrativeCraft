@@ -21,33 +21,28 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.keys;
+package fr.loudo.narrativecraft.client.screen;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
-import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
-public class PressKeyListener {
+public class ClearScreen extends Screen {
+    public ClearScreen() {
+        super(Component.empty());
+    }
 
-    public static void onKeyPressed(Minecraft minecraft) {
-        if (ModKeys.STORY_MANAGER.consumeClick()) {
-            NarrativeEntryListScreen<Chapter> screen = new NarrativeEntryListScreen<>(
-                    Translation.message("chapter"),
-                    ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
-                    Chapter.class,
-                    "");
-            minecraft.setScreen(screen);
-        }
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {}
 
-        if (ModKeys.HIDE_CUTSCENE_MAKER_HUD.consumeClick()) {
-            ClientCutsceneMakerEditor editor =
-                    ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
-            if (editor == null) return;
+    @Override
+    protected void extractBlurredBackground(GuiGraphicsExtractor graphics) {}
 
-            editor.toggleHud();
-        }
+    @Override
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {}
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 }
