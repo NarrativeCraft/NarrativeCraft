@@ -56,6 +56,8 @@ public class ClientCutsceneMakerEditor implements Editor {
     private static final int LAYER_HEIGHT = 20;
     private static final int LAYER_GAP = 85;
     private static final int LAYERS_START_Y_OFFSET = 80;
+    private static final int RULER_HEIGHT = 10;
+    private static final int TICKS_PER_SECOND = 20;
     private static final int ADD_NEW_LAYER_BUTTON_OFFSET = 13;
 
     private final Minecraft mc = Minecraft.getInstance();
@@ -125,17 +127,21 @@ public class ClientCutsceneMakerEditor implements Editor {
         int screenHeight = mc.getWindow().getGuiScaledHeight();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int layerStartY = getStartLayerY();
-        int currentY = layerStartY - scrollOffset;
+        int layersAreaStartY = getLayersAreaStartY();
+        int currentY = layersAreaStartY - scrollOffset;
         int timelineWidth = getTimelineWidth();
         int maxTick = getTotalTick();
+        int viewportHeight = LAYERS_START_Y_OFFSET - RULER_HEIGHT;
 
         graphics.fill(0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, ARGB.color(0.8f, 0));
         graphics.fill(LAYER_GAP, layerStartY, LAYER_GAP + 1, screenHeight, 0xFFFFFFFF);
 
+        renderRuler(graphics, screenWidth, screenHeight, layerStartY, timelineWidth, maxTick);
+
         for (int i = 0; i < editorLayers.size(); i++) {
             CutsceneMakerEditorLayer editorLayer = editorLayers.get(i);
             int layerBottom = currentY + LAYER_HEIGHT;
-            if (currentY >= layerStartY && currentY < screenHeight) {
+            if (currentY >= layersAreaStartY && currentY < screenHeight) {
                 graphics.fill(0, layerBottom - 1, screenWidth, layerBottom, 0xFFFFFFFF);
                 graphics.text(
                         mc.font,
@@ -159,16 +165,83 @@ public class ClientCutsceneMakerEditor implements Editor {
         }
 
         int totalLayerHeight = editorLayers.size() * LAYER_HEIGHT;
-        int maxScroll = totalLayerHeight - LAYERS_START_Y_OFFSET;
+        int maxScroll = totalLayerHeight - viewportHeight;
         if (maxScroll > 0) {
-            int indicatorHeight = LAYERS_START_Y_OFFSET * LAYERS_START_Y_OFFSET / totalLayerHeight;
-            int indicatorTop = (int) ((float) scrollOffset / maxScroll * (LAYERS_START_Y_OFFSET - indicatorHeight));
-            graphics.fill(0, layerStartY + indicatorTop, 1, layerStartY + indicatorTop + indicatorHeight, 0xFFFFFFFF);
+            int indicatorHeight = viewportHeight * viewportHeight / totalLayerHeight;
+            int indicatorTop = (int) ((float) scrollOffset / maxScroll * (viewportHeight - indicatorHeight));
+            graphics.fill(
+                    0,
+                    layersAreaStartY + indicatorTop,
+                    1,
+                    layersAreaStartY + indicatorTop + indicatorHeight,
+                    0xFFFFFFFF);
         }
+    }
+
+    private void renderRuler(
+            GuiGraphicsExtractor graphics,
+            int screenWidth,
+            int screenHeight,
+            int rulerY,
+            int timelineWidth,
+            int totalTick) {
+        if (totalTick <= 0 || timelineWidth <= 0) return;
+
+        int rulerEndY = rulerY + RULER_HEIGHT;
+        float pixelsPerTick = (float) timelineWidth / totalTick;
+        int totalSeconds = totalTick / TICKS_PER_SECOND;
+
+        // Global tick / time display in the left panel
+        int currentTick = (int) playback.getCurrentTick();
+        String tickDisplay = currentTick + " / " + formatTimeTicks(currentTick);
+        graphics.text(mc.font, Component.literal(tickDisplay), 2, rulerY + 1, 0xFFFFFFFF);
+
+        for (int s = 0; s <= totalSeconds; s++) {
+            int tickAtSecond = s * TICKS_PER_SECOND;
+            if (tickAtSecond > totalTick) break;
+            int x = LAYER_GAP + (int) (tickAtSecond * pixelsPerTick);
+            if (x > LAYER_GAP + timelineWidth) break;
+
+            // Faint vertical line through all layers
+            graphics.fill(x, rulerEndY, x + 1, screenHeight, 0x30FFFFFF);
+
+            // Big tick mark at ruler bottom
+            graphics.fill(x, rulerEndY - 5, x + 1, rulerEndY, 0xFFFFFFFF);
+
+            // mm:ss label
+            String label = formatTimeTicks(tickAtSecond);
+            int labelWidth = mc.font.width(label);
+            int labelX = Math.max(LAYER_GAP, Math.min(x - labelWidth / 2, LAYER_GAP + timelineWidth - labelWidth));
+            graphics.text(mc.font, Component.literal(label), labelX, rulerY + 1, 0xFFFFFFFF);
+
+            // 3 small subdivision lines between this second and the next
+            if (s < totalSeconds) {
+                for (int sub = 1; sub <= 3; sub++) {
+                    int subTick = tickAtSecond + sub * (TICKS_PER_SECOND / 4);
+                    if (subTick > totalTick) break;
+                    int subX = LAYER_GAP + (int) (subTick * pixelsPerTick);
+                    // Small tick mark
+                    graphics.fill(subX, rulerEndY - 2, subX + 1, rulerEndY, 0x80FFFFFF);
+                    // Faint grid line through layers
+                    graphics.fill(subX, rulerEndY, subX + 1, screenHeight, 0x18FFFFFF);
+                }
+            }
+        }
+    }
+
+    private String formatTimeTicks(int ticks) {
+        int totalSeconds = ticks / TICKS_PER_SECOND;
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return minutes + ":" + String.format("%02d", seconds);
     }
 
     private int getStartLayerY() {
         return mc.getWindow().getGuiScaledHeight() - LAYERS_START_Y_OFFSET;
+    }
+
+    private int getLayersAreaStartY() {
+        return getStartLayerY() + RULER_HEIGHT;
     }
 
     private int getTimelineWidth() {
@@ -183,8 +256,8 @@ public class ClientCutsceneMakerEditor implements Editor {
         }
         layerSelector.mouseScrolled(deltaY);
         int[] mousePos = UtilsClient.getScaledMousePos();
-        if (mousePos[1] < getStartLayerY()) return;
-        int maxScroll = Math.max(0, editorLayers.size() * LAYER_HEIGHT - LAYERS_START_Y_OFFSET);
+        if (mousePos[1] < getLayersAreaStartY()) return;
+        int maxScroll = Math.max(0, editorLayers.size() * LAYER_HEIGHT - (LAYERS_START_Y_OFFSET - RULER_HEIGHT));
         scrollOffset = (int) Math.clamp(scrollOffset - deltaY * LAYER_HEIGHT, 0, maxScroll);
     }
 
@@ -259,12 +332,12 @@ public class ClientCutsceneMakerEditor implements Editor {
         control.mouseClicked(mouseButtonEvent, isDoubleClick);
 
         // Check keyframes and layer buttons before the playhead to avoid conflicts
-        int layerStartY = getStartLayerY();
-        int currentY = layerStartY - scrollOffset;
+        int layersAreaStartY = getLayersAreaStartY();
+        int currentY = layersAreaStartY - scrollOffset;
         List<CutsceneMakerEditorLayer> toRemove = new ArrayList<>();
         for (int i = 0; i < editorLayers.size(); i++) {
             CutsceneMakerEditorLayer editorLayer = editorLayers.get(i);
-            if (currentY >= layerStartY && currentY < mc.getWindow().getGuiScaledHeight()) {
+            if (currentY >= layersAreaStartY && currentY < mc.getWindow().getGuiScaledHeight()) {
                 if (i > 0 && editorLayer.isMoveUpButtonHovered(mousePos[0], mousePos[1], currentY)) {
                     CutsceneMakerEditorLayer tmp = editorLayers.get(i - 1);
                     editorLayers.set(i - 1, editorLayer);
