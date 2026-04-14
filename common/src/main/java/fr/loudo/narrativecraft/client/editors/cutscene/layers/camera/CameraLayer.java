@@ -56,6 +56,7 @@ public class CameraLayer extends CutsceneLayer {
     public CameraKeyframe createDefaultKeyframe(int tick) {
         Minecraft mc = Minecraft.getInstance();
         Vec3 pos = mc.player.position();
+        pos = pos.add(0, mc.player.getEyeHeight(), 0);
         ClientCutsceneMakerEditor editor = ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         float roll = editor.getPreviewRoll();
         Vec3 rot = new Vec3(mc.player.getXRot(), mc.player.getYRot(), roll);
@@ -75,6 +76,7 @@ public class CameraLayer extends CutsceneLayer {
                 .setKeyframePosition(keyframePosition);
 
         LocalPlayer localPlayer = Minecraft.getInstance().player;
+        position = position.subtract(0, localPlayer.getEyeHeight(), 0);
         localPlayer.setPos(position);
         localPlayer.setXRot((float) rot.x);
         localPlayer.setYRot((float) rot.y);
@@ -89,6 +91,10 @@ public class CameraLayer extends CutsceneLayer {
             lastSentChunkZ = chunkZ;
         }
         return true;
+    }
+
+    public List<CameraKeyframe> getSortedCameraKeyframes() {
+        return getSortedKeyframes(CameraKeyframe.class);
     }
 
     public KeyframePosition getInterpolatedPosition(float tick) {

@@ -14,5 +14,5 @@
 - [x] change easing of a keyframe 
 - [x] zoom on the timeline (x1.5, x2...)
 - [x] show seconds/total seconds on timeline
-- [ ] render camera on path line (and dynamically update position based on tick)
-- [ ] render lines 
+- [x] render camera on path line (and dynamically update position based on tick)
+- [x] render lines 

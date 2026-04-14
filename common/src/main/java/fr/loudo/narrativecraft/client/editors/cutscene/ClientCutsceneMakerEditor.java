@@ -543,8 +543,8 @@ public class ClientCutsceneMakerEditor implements Editor {
         openMenu = keyframe.createMenu();
     }
 
-    public int getTick() {
-        return tick;
+    public float getTick() {
+        return playback.getCurrentTick();
     }
 
     public int getTotalTick() {
@@ -585,5 +585,9 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public CutsceneMakerRollWidget getRollWidget() {
         return rollWidget;
+    }
+
+    public List<CutsceneMakerEditorLayer> getEditorLayers() {
+        return editorLayers;
     }
 }

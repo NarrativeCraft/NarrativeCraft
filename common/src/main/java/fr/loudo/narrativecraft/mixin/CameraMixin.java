@@ -88,7 +88,6 @@ public abstract class CameraMixin {
         }
 
         Vec3 position = keyframePosition.getPosition();
-        position = position.add(0, this.entity.getEyeHeight(), 0);
         this.setPosition(position);
         this.setRotation((float) keyframePosition.getRotation().y, (float) keyframePosition.getRotation().x);
         this.rotation.rotateZ(

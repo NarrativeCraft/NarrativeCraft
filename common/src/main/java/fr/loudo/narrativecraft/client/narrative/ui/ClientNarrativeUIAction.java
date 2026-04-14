@@ -35,7 +35,7 @@ import net.minecraft.client.gui.screens.Screen;
  * <ul>
  *   <li>If {@link #subListSubScreen(NarrativeEntry, Screen)} returns a <b>non-null</b> screen,
  *       that screen takes priority and is opened on click.</li>
- *   <li>If it returns <b>null</b>, {@link #customClickAction()} is executed instead.</li>
+ *   <li>If it returns <b>null</b>, {@link #customClickAction(NarrativeEntry)} ()} is executed instead.</li>
  * </ul>
  *
  * @param <T> the type of {@link NarrativeEntry} this action operates on
@@ -47,12 +47,12 @@ public interface ClientNarrativeUIAction<T extends NarrativeEntry<?>> {
      * if no sub-screen should be shown.
      * <p>
      * <b>Click priority:</b> when this method returns a non-null value, the returned screen
-     * is opened and {@link #customClickAction()} is <em>not</em> called. If this method
-     * returns {@code null}, {@link #customClickAction()} is executed instead.
+     * is opened and {@link #customClickAction(NarrativeEntry)} ()} is <em>not</em> called. If this method
+     * returns {@code null}, {@link #customClickAction(NarrativeEntry)} ()} is executed instead.
      *
      * @param entry  the narrative entry that was clicked
      * @param parent the current parent screen, used as the "back" destination
-     * @return the sub-screen to open, or {@code null} to fall through to {@link #customClickAction()}
+     * @return the sub-screen to open, or {@code null} to fall through to {@link #customClickAction(NarrativeEntry)} ()}
      */
     Screen subListSubScreen(T entry, Screen parent);
 
