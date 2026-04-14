@@ -46,6 +46,7 @@ public class CutsceneMakerEditorCameraRenderer {
         ClientCutsceneMakerEditor editor = ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         if (editor == null) return;
 
+        if (editor.getPlayback().isPlaying()) return;
         Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
         VertexConsumer vertexConsumer = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
         Matrix4f matrix4f = poseStack.last().pose();

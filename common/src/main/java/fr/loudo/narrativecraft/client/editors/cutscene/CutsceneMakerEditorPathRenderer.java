@@ -28,12 +28,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
-import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+
+import java.util.List;
 
 public class CutsceneMakerEditorPathRenderer {
 
@@ -45,6 +46,7 @@ public class CutsceneMakerEditorPathRenderer {
         ClientCutsceneMakerEditor editor = ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         if (editor == null) return;
 
+        if (editor.getPlayback().isPlaying()) return;
         Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
         VertexConsumer vertexConsumer = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
         Matrix4f matrix4f = poseStack.last().pose();
@@ -93,7 +95,7 @@ public class CutsceneMakerEditorPathRenderer {
         }
         vc.addVertex(matrix, x1, y1, z1)
                 .setColor(1.0F, 1.0F, 0.0F, 1.0F)
-                .setLineWidth(3.0F)
+                .setLineWidth(1.0F)
                 .setNormal(dx, dy, dz);
         vc.addVertex(matrix, x2, y2, z2)
                 .setColor(1.0F, 1.0F, 0.0F, 1.0F)

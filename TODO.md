@@ -16,3 +16,5 @@
 - [x] show seconds/total seconds on timeline
 - [x] render camera on path line (and dynamically update position based on tick)
 - [x] render lines 
+- [x] hide camera when interpolating
+- [ ] fix fov interpolation
