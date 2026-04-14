@@ -55,8 +55,15 @@ public abstract class Keyframe {
     }
 
     public void drag(double mouseX, int timelineStartX, int timelineWidth, int maxTick) {
-        if (timelineWidth <= 0 || maxTick <= 0) return;
-        tick = (int) Math.clamp((mouseX - timelineStartX) / timelineWidth * maxTick, 0, maxTick);
+        drag(mouseX, timelineStartX, timelineWidth, (float) maxTick, 0f);
+    }
+
+    public void drag(double mouseX, int timelineStartX, int timelineWidth, float visibleTicks, float viewStartTick) {
+        if (timelineWidth <= 0 || visibleTicks <= 0) return;
+        tick = (int) Math.clamp(
+                viewStartTick + (mouseX - timelineStartX) / timelineWidth * visibleTicks,
+                0,
+                viewStartTick + visibleTicks);
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker delta) {

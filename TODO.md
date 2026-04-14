@@ -12,7 +12,7 @@
 - [x] rotate camera interpolation
 - [x] rotate camera
 - [x] change easing of a keyframe 
-- [ ] zoom on the timeline (x1.5, x2...)
-- [ ] show seconds/total seconds on timeline
+- [x] zoom on the timeline (x1.5, x2...)
+- [x] show seconds/total seconds on timeline
 - [ ] render camera on path line (and dynamically update position based on tick)
 - [ ] render lines 

@@ -35,6 +35,8 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -44,9 +46,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -58,6 +57,9 @@ public class ClientCutsceneMakerEditor implements Editor {
     private static final int LAYERS_START_Y_OFFSET = 80;
     private static final int RULER_HEIGHT = 10;
     private static final int TICKS_PER_SECOND = 20;
+    private static final float MIN_PHYSICAL_PIXELS_PER_SECOND = 5 * TICKS_PER_SECOND;
+    private static final int MIN_VISIBLE_TICKS_AT_MAX_ZOOM = 2 * TICKS_PER_SECOND;
+    private static final int SCROLLBAR_HEIGHT = 4;
     private static final int ADD_NEW_LAYER_BUTTON_OFFSET = 13;
 
     private final Minecraft mc = Minecraft.getInstance();
@@ -77,6 +79,11 @@ public class ClientCutsceneMakerEditor implements Editor {
     private Button addLayerButton;
     private int tick, totalTick;
     private int scrollOffset = 0;
+    private float zoomFactor = 1f;
+    private float viewStartTick = 0f;
+    private boolean scrollbarDragging = false;
+    private float scrollbarDragStartMouseX = 0f;
+    private float scrollbarDragStartViewTick = 0f;
     private boolean renderingHud = true;
     private Keyframe selectedKeyframe;
     private Keyframe draggingKeyframe;
@@ -106,6 +113,8 @@ public class ClientCutsceneMakerEditor implements Editor {
                 .build();
         buttons.add(addLayerButton);
         totalTick = cutscene.getMaxTick();
+        zoomFactor = getMinZoomFactor();
+        viewStartTick = 0f;
     }
 
     public void addLayer(ICutsceneLayer layer) {
@@ -130,13 +139,13 @@ public class ClientCutsceneMakerEditor implements Editor {
         int layersAreaStartY = getLayersAreaStartY();
         int currentY = layersAreaStartY - scrollOffset;
         int timelineWidth = getTimelineWidth();
-        int maxTick = getTotalTick();
+        float visibleTicks = getVisibleTicks();
         int viewportHeight = LAYERS_START_Y_OFFSET - RULER_HEIGHT;
 
         graphics.fill(0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, ARGB.color(0.8f, 0));
         graphics.fill(LAYER_GAP, layerStartY, LAYER_GAP + 1, screenHeight, 0xFFFFFFFF);
 
-        renderRuler(graphics, screenWidth, screenHeight, layerStartY, timelineWidth, maxTick);
+        renderRuler(graphics, screenWidth, screenHeight, layerStartY, timelineWidth, visibleTicks);
 
         for (int i = 0; i < editorLayers.size(); i++) {
             CutsceneMakerEditorLayer editorLayer = editorLayers.get(i);
@@ -155,7 +164,8 @@ public class ClientCutsceneMakerEditor implements Editor {
                         currentY,
                         LAYER_HEIGHT,
                         timelineWidth,
-                        maxTick,
+                        visibleTicks,
+                        viewStartTick,
                         mouseX,
                         mouseY,
                         i == 0,
@@ -176,6 +186,8 @@ public class ClientCutsceneMakerEditor implements Editor {
                     layersAreaStartY + indicatorTop + indicatorHeight,
                     0xFFFFFFFF);
         }
+
+        renderScrollbar(graphics, screenHeight, timelineWidth);
     }
 
     private void renderRuler(
@@ -184,49 +196,66 @@ public class ClientCutsceneMakerEditor implements Editor {
             int screenHeight,
             int rulerY,
             int timelineWidth,
-            int totalTick) {
-        if (totalTick <= 0 || timelineWidth <= 0) return;
+            float visibleTicks) {
+        if (totalTick <= 0 || timelineWidth <= 0 || visibleTicks <= 0) return;
 
         int rulerEndY = rulerY + RULER_HEIGHT;
-        float pixelsPerTick = (float) timelineWidth / totalTick;
-        int totalSeconds = totalTick / TICKS_PER_SECOND;
+        float pixelsPerTick = timelineWidth / visibleTicks;
 
         // Global tick / time display in the left panel
         int currentTick = (int) playback.getCurrentTick();
         String tickDisplay = currentTick + " / " + formatTimeTicks(currentTick);
         graphics.text(mc.font, Component.literal(tickDisplay), 2, rulerY + 1, 0xFFFFFFFF);
 
-        for (int s = 0; s <= totalSeconds; s++) {
+        int firstSecond = (int) (viewStartTick / TICKS_PER_SECOND);
+        int lastSecond = (int) Math.ceil((viewStartTick + visibleTicks) / TICKS_PER_SECOND);
+
+        for (int s = firstSecond; s <= lastSecond; s++) {
             int tickAtSecond = s * TICKS_PER_SECOND;
-            if (tickAtSecond > totalTick) break;
-            int x = LAYER_GAP + (int) (tickAtSecond * pixelsPerTick);
-            if (x > LAYER_GAP + timelineWidth) break;
+            if (tickAtSecond < 0 || tickAtSecond > totalTick) continue;
+            float x = LAYER_GAP + (tickAtSecond - viewStartTick) * pixelsPerTick;
+            if (x < LAYER_GAP || x > LAYER_GAP + timelineWidth) continue;
+            int xi = (int) x;
 
             // Faint vertical line through all layers
-            graphics.fill(x, rulerEndY, x + 1, screenHeight, 0x30FFFFFF);
+            graphics.fill(xi, rulerEndY, xi + 1, screenHeight, 0x30FFFFFF);
 
             // Big tick mark at ruler bottom
-            graphics.fill(x, rulerEndY - 5, x + 1, rulerEndY, 0xFFFFFFFF);
+            graphics.fill(xi, rulerEndY - 5, xi + 1, rulerEndY, 0xFFFFFFFF);
 
             // mm:ss label
             String label = formatTimeTicks(tickAtSecond);
             int labelWidth = mc.font.width(label);
-            int labelX = Math.max(LAYER_GAP, Math.min(x - labelWidth / 2, LAYER_GAP + timelineWidth - labelWidth));
+            int labelX = Math.clamp(xi - labelWidth / 2, LAYER_GAP, LAYER_GAP + timelineWidth - labelWidth);
             graphics.text(mc.font, Component.literal(label), labelX, rulerY + 1, 0xFFFFFFFF);
 
             // 3 small subdivision lines between this second and the next
-            if (s < totalSeconds) {
-                for (int sub = 1; sub <= 3; sub++) {
-                    int subTick = tickAtSecond + sub * (TICKS_PER_SECOND / 4);
-                    if (subTick > totalTick) break;
-                    int subX = LAYER_GAP + (int) (subTick * pixelsPerTick);
-                    // Small tick mark
-                    graphics.fill(subX, rulerEndY - 2, subX + 1, rulerEndY, 0x80FFFFFF);
-                    // Faint grid line through layers
-                    graphics.fill(subX, rulerEndY, subX + 1, screenHeight, 0x18FFFFFF);
-                }
+            for (int sub = 1; sub <= 3; sub++) {
+                int subTick = tickAtSecond + sub * (TICKS_PER_SECOND / 4);
+                if (subTick > totalTick) break;
+                float subXf = LAYER_GAP + (subTick - viewStartTick) * pixelsPerTick;
+                if (subXf < LAYER_GAP || subXf > LAYER_GAP + timelineWidth) continue;
+                int subX = (int) subXf;
+                graphics.fill(subX, rulerEndY - 2, subX + 1, rulerEndY, 0x80FFFFFF);
+                graphics.fill(subX, rulerEndY, subX + 1, screenHeight, 0x18FFFFFF);
             }
         }
+    }
+
+    private void renderScrollbar(GuiGraphicsExtractor graphics, int screenHeight, int timelineWidth) {
+        float visibleTicks = getVisibleTicks();
+        if (visibleTicks >= totalTick) return;
+
+        int barY = screenHeight - SCROLLBAR_HEIGHT;
+        // Track background
+        graphics.fill(LAYER_GAP, barY, LAYER_GAP + timelineWidth, screenHeight, 0x40000000);
+        // Active bar
+        float barStartRatio = viewStartTick / totalTick;
+        float barWidthRatio = visibleTicks / totalTick;
+        int barX = LAYER_GAP + (int) (barStartRatio * timelineWidth);
+        int barW = Math.max(4, (int) (barWidthRatio * timelineWidth));
+        barW = Math.min(barW, LAYER_GAP + timelineWidth - barX);
+        graphics.fill(barX, barY, barX + barW, screenHeight, 0xCCFFFFFF);
     }
 
     private String formatTimeTicks(int ticks) {
@@ -234,6 +263,61 @@ public class ClientCutsceneMakerEditor implements Editor {
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         return minutes + ":" + String.format("%02d", seconds);
+    }
+
+    private float getVisibleTicks() {
+        return Math.max(1f, totalTick / zoomFactor);
+    }
+
+    private float getMinZoomFactor() {
+        float maxVisibleTicks = getMaxVisibleTicksAtMinZoom();
+        if (totalTick <= maxVisibleTicks) return 1f;
+        return totalTick / maxVisibleTicks;
+    }
+
+    private float getMaxVisibleTicksAtMinZoom() {
+        float physicalTimelineWidth =
+                (float) (getTimelineWidth() * mc.getWindow().getGuiScale());
+        float maxVisibleSeconds = physicalTimelineWidth / MIN_PHYSICAL_PIXELS_PER_SECOND;
+        return Math.max(TICKS_PER_SECOND, maxVisibleSeconds * TICKS_PER_SECOND);
+    }
+
+    private float getMaxZoomFactor() {
+        if (totalTick <= MIN_VISIBLE_TICKS_AT_MAX_ZOOM) return 1f;
+        return (float) totalTick / MIN_VISIBLE_TICKS_AT_MAX_ZOOM;
+    }
+
+    private void clampViewStart() {
+        float maxStart = totalTick - getVisibleTicks();
+        viewStartTick = (float) Math.clamp(viewStartTick, 0f, Math.max(0f, maxStart));
+    }
+
+    private void applyZoom(double scrollDelta, int mouseX) {
+        float minZoom = getMinZoomFactor();
+        float maxZoom = getMaxZoomFactor();
+        float newZoom = (float) Math.clamp(zoomFactor * Math.pow(1.25, scrollDelta), minZoom, maxZoom);
+        if (newZoom == zoomFactor) return;
+
+        float timelineWidth = getTimelineWidth();
+        float mouseRatio = (float) Math.clamp((mouseX - LAYER_GAP) / timelineWidth, 0.0, 1.0);
+        float tickAtMouse = viewStartTick + mouseRatio * getVisibleTicks();
+
+        zoomFactor = newZoom;
+        viewStartTick = tickAtMouse - mouseRatio * getVisibleTicks();
+        clampViewStart();
+    }
+
+    private int getPlayHeadTick() {
+        return (int) Math.clamp(viewStartTick + playHead.getRatio() * getVisibleTicks(), 0, totalTick);
+    }
+
+    private boolean isOverScrollbar(double mouseX, double mouseY) {
+        if (getVisibleTicks() >= totalTick) return false;
+        int screenHeight = mc.getWindow().getGuiScaledHeight();
+        return mouseX >= LAYER_GAP
+                && mouseX <= LAYER_GAP + getTimelineWidth()
+                && mouseY >= screenHeight - SCROLLBAR_HEIGHT
+                && mouseY <= screenHeight;
     }
 
     private int getStartLayerY() {
@@ -250,12 +334,18 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public void mouseScrolled(double deltaX, double deltaY) {
         if (!renderingHud) return;
+        int[] mousePos = UtilsClient.getScaledMousePos();
+
+        if (Minecraft.getInstance().hasAltDown() && mousePos[1] >= getStartLayerY()) {
+            applyZoom(deltaY, mousePos[0]);
+            return;
+        }
+
         if (openMenu != null && openMenu.isVisible()) {
             openMenu.mouseScrolled(deltaY);
             return;
         }
         layerSelector.mouseScrolled(deltaY);
-        int[] mousePos = UtilsClient.getScaledMousePos();
         if (mousePos[1] < getLayersAreaStartY()) return;
         int maxScroll = Math.max(0, editorLayers.size() * LAYER_HEIGHT - (LAYERS_START_Y_OFFSET - RULER_HEIGHT));
         scrollOffset = (int) Math.clamp(scrollOffset - deltaY * LAYER_HEIGHT, 0, maxScroll);
@@ -282,7 +372,9 @@ public class ClientCutsceneMakerEditor implements Editor {
         control.setPosition(LAYER_GAP / 2 - control.getWidth() / 2, getStartLayerY() - control.getHeight() - 2);
         control.render(graphics, deltaTracker, mousePos[0], mousePos[1]);
 
-        playHead.setRatio(playback.getCurrentTick() / totalTick);
+        float visibleTicks = getVisibleTicks();
+        float playHeadRatio = (playback.getCurrentTick() - viewStartTick) / visibleTicks;
+        playHead.setRatio(playHeadRatio);
 
         playHead.setY(getStartLayerY() - 5);
         playHead.render(graphics, mousePos[0], mousePos[1], LAYER_GAP, getTimelineWidth());
@@ -319,6 +411,13 @@ public class ClientCutsceneMakerEditor implements Editor {
 
         if (rollWidget.mouseClicked(mouseButtonEvent)) return;
 
+        if (isOverScrollbar(mouseButtonEvent.x(), mouseButtonEvent.y())) {
+            scrollbarDragging = true;
+            scrollbarDragStartMouseX = (float) mouseButtonEvent.x();
+            scrollbarDragStartViewTick = viewStartTick;
+            return;
+        }
+
         if (openMenu != null && openMenu.isVisible()) {
             if (openMenu.mouseClicked(mouseButtonEvent, isDoubleClick)) return;
         }
@@ -354,7 +453,7 @@ public class ClientCutsceneMakerEditor implements Editor {
                     return;
                 }
                 if (editorLayer.isAddButtonHovered(mousePos[0], mousePos[1], currentY, LAYER_HEIGHT)) {
-                    editorLayer.addKeyframe((int) (playHead.getRatio() * getTotalTick()));
+                    editorLayer.addKeyframe(getPlayHeadTick());
                     return;
                 }
                 if (editorLayer.isRemoveButtonHovered(mousePos[0], mousePos[1], currentY, LAYER_HEIGHT)) {
@@ -393,13 +492,22 @@ public class ClientCutsceneMakerEditor implements Editor {
         rollWidget.mouseReleased();
         playHead.setDragging(false);
         draggingKeyframe = null;
+        scrollbarDragging = false;
     }
 
     public void mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
         if (!renderingHud) return;
         if (rollWidget.mouseDragged(mouseButtonEvent.y())) return;
+        if (scrollbarDragging) {
+            float dragDeltaPixels = (float) mouseButtonEvent.x() - scrollbarDragStartMouseX;
+            float tickDelta = dragDeltaPixels / getTimelineWidth() * totalTick;
+            viewStartTick = scrollbarDragStartViewTick + tickDelta;
+            clampViewStart();
+            return;
+        }
         if (draggingKeyframe != null) {
-            draggingKeyframe.drag(mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth(), getTotalTick());
+            draggingKeyframe.drag(
+                    mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth(), getVisibleTicks(), viewStartTick);
             return;
         }
         if (playHead.isDragging()) {
@@ -419,7 +527,7 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     private void updateTick() {
-        tick = (int) (playHead.getRatio() * totalTick);
+        tick = getPlayHeadTick();
         playback.seekTo(tick);
         Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(tick));
     }

@@ -50,7 +50,8 @@ public class CutsceneMakerEditorLayer {
             int layerY,
             int layerHeight,
             int timelineWidth,
-            int maxTick,
+            float visibleTicks,
+            float viewStartTick,
             int mouseX,
             int mouseY,
             boolean isFirst,
@@ -59,7 +60,7 @@ public class CutsceneMakerEditorLayer {
         if (!isLast) renderMoveDownButton(graphics, layerY, mouseX, mouseY);
         renderAddButton(graphics, layerY, layerHeight, mouseX, mouseY);
         renderRemoveButton(graphics, layerY, layerHeight, mouseX, mouseY);
-        renderKeyframes(graphics, delta, layerY, layerHeight, timelineWidth, maxTick);
+        renderKeyframes(graphics, delta, layerY, layerHeight, timelineWidth, visibleTicks, viewStartTick);
     }
 
     private void renderMoveUpButton(GuiGraphicsExtractor graphics, int layerY, int mouseX, int mouseY) {
@@ -100,9 +101,16 @@ public class CutsceneMakerEditorLayer {
             int layerY,
             int layerHeight,
             int timelineWidth,
-            int maxTick) {
+            float visibleTicks,
+            float viewStartTick) {
         for (Keyframe keyframe : layer.getKeyframes()) {
-            int kfX = layerGap + (int) ((float) keyframe.getTick() / maxTick * timelineWidth) - Keyframe.SIZE / 2;
+            int kfX = layerGap
+                    + (int) ((keyframe.getTick() - viewStartTick) / visibleTicks * timelineWidth)
+                    - Keyframe.SIZE / 2;
+            if (kfX + Keyframe.SIZE < layerGap || kfX > layerGap + timelineWidth) {
+                keyframe.setLayerPosition(Integer.MIN_VALUE, Integer.MIN_VALUE);
+                continue;
+            }
             int kfY = layerY + (layerHeight - Keyframe.SIZE) / 2;
             keyframe.setLayerPosition(kfX, kfY);
             keyframe.render(graphics, delta);
