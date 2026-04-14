@@ -32,7 +32,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SilentPlaceBlockAction extends DataBlockAction {
@@ -51,7 +50,7 @@ public class SilentPlaceBlockAction extends DataBlockAction {
 
     @Override
     public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
-        BlockState previous = session.getBlockStateMap().getOrDefault(blockPos, Blocks.AIR.defaultBlockState());
+        BlockState previous = session.getBlockStateAtTick(blockPos, tick);
         return List.of(new SilentPlaceBlockAction(tick, blockPos, previous));
     }
 
@@ -73,12 +72,7 @@ public class SilentPlaceBlockAction extends DataBlockAction {
             level.setBlock(blockPos, blockState, 3);
         }
 
-        if (blockState.is(Blocks.AIR)) {
-            session.getBlockStateMap().remove(blockPos);
-        } else {
-            session.getBlockStateMap().put(blockPos, blockState);
-        }
-
+        session.recordBlockState(tick, blockPos, blockState);
         return ActionResult.OK;
     }
 

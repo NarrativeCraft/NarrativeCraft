@@ -23,13 +23,13 @@
 
 package fr.loudo.narrativecraft.api.playback;
 
-import java.util.Collection;
-import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Collection;
 
 public interface IPlaybackSession {
 
@@ -54,5 +54,19 @@ public interface IPlaybackSession {
      */
     Collection<ServerPlayer> getTargetedPlayers();
 
-    Map<BlockPos, BlockState> getBlockStateMap();
+    /**
+     * Returns the virtual block state at the given position just before tick {@code tick} ran.
+     * Falls back to the real world state if no entry exists in the log.
+     */
+    BlockState getBlockStateAtTick(BlockPos pos, int tick);
+
+    /**
+     * Records the block state at the given position after an action ran at {@code tick}.
+     */
+    void recordBlockState(int tick, BlockPos pos, BlockState state);
+
+    /**
+     * Removes all recorded block states at or after the given tick (inclusive).
+     */
+    void clearBlockStateLogFrom(int tick);
 }

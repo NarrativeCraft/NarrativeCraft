@@ -220,6 +220,7 @@ public class PlaybackContext implements IPlaybackContext {
             }
         }
         rewindLog.tailMap(tick, true).clear();
+        playback.clearBlockStateLogFrom(tick);
         if (tick < recordingData.getSpawnTick()) {
             killEntity();
         }

@@ -72,8 +72,7 @@ public class BreakBlockAction extends DataBlockAction {
             session.getLevel().destroyBlock(blockPos, false, context.getEntity());
         }
 
-        session.getBlockStateMap().put(blockPos, blockState);
-
+        session.recordBlockState(tick, blockPos, Blocks.AIR.defaultBlockState());
         return ActionResult.OK;
     }
 
@@ -128,7 +127,7 @@ public class BreakBlockAction extends DataBlockAction {
                 BedPart part = blockState.getValue(BedBlock.PART);
                 otherState = blockState.setValue(BedBlock.PART, part == BedPart.FOOT ? BedPart.HEAD : BedPart.FOOT);
             } else {
-                otherState = session.getBlockStateMap().getOrDefault(otherPos, Blocks.AIR.defaultBlockState());
+                otherState = session.getBlockStateAtTick(otherPos, tick);
             }
             snapshots.add(new SilentPlaceBlockAction(tick, otherPos, otherState));
         }

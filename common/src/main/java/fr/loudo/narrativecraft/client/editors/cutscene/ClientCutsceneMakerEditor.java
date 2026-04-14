@@ -209,9 +209,7 @@ public class ClientCutsceneMakerEditor implements Editor {
         control.setPosition(LAYER_GAP / 2 - control.getWidth() / 2, getStartLayerY() - control.getHeight() - 2);
         control.render(graphics, deltaTracker, mousePos[0], mousePos[1]);
 
-        if (playback.isPlaying()) {
-            playHead.setRatio(playback.getCurrentTick() / totalTick);
-        }
+        playHead.setRatio(playback.getCurrentTick() / totalTick);
 
         playHead.setY(getStartLayerY() - 5);
         playHead.render(graphics, mousePos[0], mousePos[1], LAYER_GAP, getTimelineWidth());

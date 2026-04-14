@@ -37,6 +37,7 @@ public class CutsceneEditorPlayback {
     private float currentTick = 0f;
     private int totalTick;
     private boolean playing = false;
+    private boolean dragPause = false;
 
     public CutsceneEditorPlayback(
             List<CutsceneMakerEditorLayer> editorLayers, ClientPlayerSession playerSession, int totalTick) {
@@ -57,7 +58,7 @@ public class CutsceneEditorPlayback {
     }
 
     public void tick(DeltaTracker delta) {
-        if (!playing || totalTick <= 0) return;
+        if (!playing || dragPause || totalTick <= 0) return;
 
         currentTick += delta.getGameTimeDeltaTicks();
 
@@ -91,5 +92,13 @@ public class CutsceneEditorPlayback {
 
     public float getCurrentTick() {
         return currentTick;
+    }
+
+    public boolean isDragPause() {
+        return dragPause;
+    }
+
+    public void setDragPause(boolean dragPause) {
+        this.dragPause = dragPause;
     }
 }

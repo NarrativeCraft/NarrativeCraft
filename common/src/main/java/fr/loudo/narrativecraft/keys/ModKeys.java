@@ -25,11 +25,10 @@ package fr.loudo.narrativecraft.keys;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 
 public class ModKeys {
 

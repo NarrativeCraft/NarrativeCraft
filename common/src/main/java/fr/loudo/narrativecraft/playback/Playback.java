@@ -43,7 +43,7 @@ public class Playback implements IPlaybackSession {
     private final ServerPlayer requester;
     private final List<PlaybackContext> contexts = new ArrayList<>();
     private final Collection<ServerPlayer> targetedPlayers = new ArrayList<>();
-    private final Map<BlockPos, BlockState> blockStateMap = new HashMap<>();
+    private final NavigableMap<Integer, Map<BlockPos, BlockState>> blockStateLog = new TreeMap<>();
     private int tick = 0;
     private int maxTick = 0;
     private boolean isPlaying, killOnEnd;
@@ -59,7 +59,7 @@ public class Playback implements IPlaybackSession {
         maxTick = 0;
         ended = false;
         contexts.clear();
-        blockStateMap.clear();
+        blockStateLog.clear();
 
         for (RecordingData recordingData : animation.getRecordingDataList()) {
             contexts.add(new PlaybackContext(this, recordingData, requester.level()));
@@ -240,8 +240,24 @@ public class Playback implements IPlaybackSession {
         return null;
     }
 
-    public Map<BlockPos, BlockState> getBlockStateMap() {
-        return blockStateMap;
+    @Override
+    public BlockState getBlockStateAtTick(BlockPos pos, int tick) {
+        NavigableMap<Integer, Map<BlockPos, BlockState>> before = blockStateLog.headMap(tick, false);
+        for (int t : before.descendingKeySet()) {
+            Map<BlockPos, BlockState> changes = before.get(t);
+            if (changes != null && changes.containsKey(pos)) return changes.get(pos);
+        }
+        return getLevel().getBlockState(pos);
+    }
+
+    @Override
+    public void recordBlockState(int tick, BlockPos pos, BlockState state) {
+        blockStateLog.computeIfAbsent(tick, k -> new HashMap<>()).put(pos, state);
+    }
+
+    @Override
+    public void clearBlockStateLogFrom(int tick) {
+        blockStateLog.tailMap(tick, true).clear();
     }
 
     public boolean isPlaying() {

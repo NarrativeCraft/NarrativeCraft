@@ -32,12 +32,11 @@ import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
 
 public class CameraLayer extends CutsceneLayer {
 
