@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
+import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
 import net.neoforged.bus.api.IEventBus;
@@ -55,6 +56,8 @@ public class OnPacketRegisterEventNeoForge {
     }
 
     private static void registerS2CPackets(PayloadRegistrar registrar) {
+        registrar.playToClient(
+                S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC, ClientPacketHandlerNeoForge::handleDialogTest);
         registrar.playToClient(
                 S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC, ClientPacketHandlerNeoForge::showToast);
         registrar.playToClient(

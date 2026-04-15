@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.api;
 
+import fr.loudo.narrativecraft.api.dialog.ITextEffectRegistry;
 import fr.loudo.narrativecraft.api.editors.ICutsceneLayerRegistry;
 import fr.loudo.narrativecraft.api.events.IEventBus;
 import fr.loudo.narrativecraft.api.managers.IRecordingManager;
@@ -35,6 +36,7 @@ public class NarrativeCraftAPI {
     private String modId;
     private IActionRegistry actionRegistry;
     private ICutsceneLayerRegistry cutsceneLayerRegistry;
+    private ITextEffectRegistry textEffectRegistry;
     private IEventBus eventBus;
     private IRecordingManager recordingManager;
 
@@ -48,6 +50,14 @@ public class NarrativeCraftAPI {
 
     void setCutsceneLayerRegistry(ICutsceneLayerRegistry cutsceneLayerRegistry) {
         this.cutsceneLayerRegistry = cutsceneLayerRegistry;
+    }
+
+    public ITextEffectRegistry getTextEffectRegistry() {
+        return textEffectRegistry;
+    }
+
+    void setTextEffectRegistry(ITextEffectRegistry textEffectRegistry) {
+        this.textEffectRegistry = textEffectRegistry;
     }
 
     void setActionRegistry(IActionRegistry actionRegistry) {

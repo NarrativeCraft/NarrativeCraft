@@ -21,23 +21,40 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.dialog.effects;
 
-import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
-import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import fr.loudo.narrativecraft.api.dialog.ITextEffect;
+import fr.loudo.narrativecraft.api.dialog.ITextEffectRegistry;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ClientPacketRegisterFabric {
+public class TextEffectRegistry implements ITextEffectRegistry {
 
-    public static void register() {
-        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
+    private final Map<String, ITextEffect> effects = new HashMap<>();
+
+    @Override
+    public void register(String name, ITextEffect effect) {
+        String key = name.toLowerCase();
+        if (effects.containsKey(key)) {
+            throw new IllegalArgumentException("Text effect already registered: " + name);
+        }
+        effects.put(key, effect);
+    }
+
+    @Override
+    public void unregister(String name) {
+        effects.remove(name.toLowerCase());
+    }
+
+    @Override
+    public ITextEffect get(String name) {
+        return effects.get(name.toLowerCase());
+    }
+
+    @Override
+    public List<String> getNames() {
+        return new ArrayList<>(effects.keySet());
     }
 }

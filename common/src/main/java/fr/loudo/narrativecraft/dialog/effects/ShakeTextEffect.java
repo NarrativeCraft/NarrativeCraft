@@ -21,23 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.dialog.effects;
 
-import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
-import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import fr.loudo.narrativecraft.api.dialog.ITextEffect;
+import java.util.Map;
+import java.util.Random;
+import net.minecraft.world.phys.Vec2;
 
-public class ClientPacketRegisterFabric {
+public class ShakeTextEffect implements ITextEffect {
 
-    public static void register() {
-        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
+    @Override
+    public Vec2 apply(int letterIndex, long tick, float partialTick, Map<String, String> params) {
+        float force = parseFloat(params, "force", 1.0f);
+        float time = parseFloat(params, "time", 0.05f);
+
+        int shakeCycle = (int) ((tick + partialTick) / Math.max(0.001f, time * 20f));
+        long baseHash = shakeCycle * 1000003L + letterIndex * 999983L;
+        float offsetX = (new Random(baseHash ^ 0xDEADBEEFL).nextFloat() * 2f - 1f) * force;
+        float offsetY = (new Random(baseHash ^ 0xCAFEBABEL).nextFloat() * 2f - 1f) * force;
+        return new Vec2(offsetX, offsetY);
+    }
+
+    private float parseFloat(Map<String, String> params, String key, float defaultValue) {
+        String value = params.get(key);
+        if (value == null) return defaultValue;
+        try {
+            return Float.parseFloat(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 }

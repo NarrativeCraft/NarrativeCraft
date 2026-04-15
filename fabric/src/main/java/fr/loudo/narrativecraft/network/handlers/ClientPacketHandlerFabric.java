@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
+import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
@@ -55,6 +56,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(BiCutscenePlayHeadPacket.TYPE, (packet, context) -> {
             ClientPacketHandler.updatePlayHeadCutscene(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CDialogTest.TYPE, (packet, context) -> {
+            ClientPacketHandler.handleDialogTest(packet);
         });
     }
 }

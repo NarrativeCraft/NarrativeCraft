@@ -25,9 +25,15 @@ package fr.loudo.narrativecraft.events.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorCameraRenderer;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPathRenderer;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import org.joml.Matrix4fStack;
 import org.joml.Matrix4fc;
 
@@ -42,6 +48,22 @@ public class OnRenderWorldEvent {
         CutsceneMakerEditorPathRenderer.render(poseStack, deltaTracker);
         CutsceneMakerEditorCameraRenderer.render(poseStack, deltaTracker);
 
+        renderDialog3D(poseStack, deltaTracker);
+
         modelViewStack.popMatrix();
+    }
+
+    private static void renderDialog3D(PoseStack poseStack, DeltaTracker deltaTracker) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        List<DialogRenderer3D> dialogs = session.getActiveDialog3DRenderers();
+        if (dialogs.isEmpty()) return;
+
+        float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
+        MultiBufferSource.BufferSource bufferSource =
+                Minecraft.getInstance().renderBuffers().bufferSource();
+
+        for (DialogRenderer3D dialog : dialogs) {
+            dialog.render(poseStack, bufferSource, partialTick);
+        }
     }
 }

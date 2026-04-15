@@ -24,6 +24,9 @@
 package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.api.APISetup;
+import fr.loudo.narrativecraft.dialog.DialogPresetManager;
+import fr.loudo.narrativecraft.dialog.effects.TextEffectRegister;
+import fr.loudo.narrativecraft.dialog.effects.TextEffectRegistry;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneLayerRegister;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneLayerRegistry;
 import fr.loudo.narrativecraft.files.DeserializationResult;
@@ -58,6 +61,8 @@ public class NarrativeCraftMod {
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
     private final ActionRegistry actionRegistry = new ActionRegistry();
     private final CutsceneLayerRegistry cutsceneLayerRegistry = new CutsceneLayerRegistry();
+    private final TextEffectRegistry textEffectRegistry = new TextEffectRegistry();
+    private final DialogPresetManager dialogPresetManager = new DialogPresetManager();
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
@@ -71,6 +76,7 @@ public class NarrativeCraftMod {
 
         ActionRegister.register(getInstance().getActionRegistry());
         CutsceneLayerRegister.register(getInstance().getCutsceneLayerRegistry());
+        TextEffectRegister.register(getInstance().getTextEffectRegistry());
     }
 
     public ChapterManager getChapterManager() {
@@ -99,6 +105,14 @@ public class NarrativeCraftMod {
 
     public CutsceneLayerRegistry getCutsceneLayerRegistry() {
         return cutsceneLayerRegistry;
+    }
+
+    public TextEffectRegistry getTextEffectRegistry() {
+        return textEffectRegistry;
+    }
+
+    public DialogPresetManager getDialogPresetManager() {
+        return dialogPresetManager;
     }
 
     public NarrativeCraftFile getFile() {

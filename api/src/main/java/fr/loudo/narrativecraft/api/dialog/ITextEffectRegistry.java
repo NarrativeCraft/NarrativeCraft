@@ -21,26 +21,17 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.api.dialog;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.TriState;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import java.util.List;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnItemPickupEventNeoForge {
+public interface ITextEffectRegistry {
 
-    public OnItemPickupEventNeoForge(IEventBus modBus) {
-        NeoForge.EVENT_BUS.addListener(OnItemPickupEventNeoForge::itemPickup);
-    }
+    void register(String name, ITextEffect effect);
 
-    private static void itemPickup(ItemEntityPickupEvent.Pre event) {
-        OnItemPickupEvent.onPickup((ServerPlayer) event.getPlayer(), event.getItemEntity());
-        boolean canPickup = OnItemPickupEvent.canPickup(event.getItemEntity());
-        event.setCanPickup(canPickup ? TriState.TRUE : TriState.FALSE);
-    }
+    void unregister(String name);
+
+    ITextEffect get(String name);
+
+    List<String> getNames();
 }

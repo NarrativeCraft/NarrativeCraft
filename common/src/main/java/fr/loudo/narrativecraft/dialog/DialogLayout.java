@@ -21,23 +21,41 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.dialog;
 
-import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
-import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.client.gui.Font;
 
-public class ClientPacketRegisterFabric {
+public class DialogLayout {
 
-    public static void register() {
-        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
+    private float width;
+    private float height;
+    private float totalWidth;
+    private float totalHeight;
+
+    public void compute(DialogData data, DialogScrollText scrollText, Font font) {
+        float[] dims = scrollText.computeTextDimensions(data.getWidth(), font, data);
+        float contentWidth = dims[0];
+        float contentHeight = dims[1];
+
+        width = contentWidth;
+        height = contentHeight;
+        totalWidth = contentWidth + data.getPaddingX() * 2f;
+        totalHeight = contentHeight + data.getPaddingY() * 2f;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public float getTotalWidth() {
+        return totalWidth;
+    }
+
+    public float getTotalHeight() {
+        return totalHeight;
     }
 }

@@ -21,23 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.api.dialog;
 
-import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
-import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import java.util.Map;
+import net.minecraft.world.phys.Vec2;
 
-public class ClientPacketRegisterFabric {
+public interface ITextEffect {
 
-    public static void register() {
-        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
-    }
+    /**
+     * Computes a positional offset to apply to a single letter during rendering.
+     *
+     * @param letterIndex zero-based index of the letter within its effect span
+     * @param tick        current game tick
+     * @param partialTick partial tick for interpolation
+     * @param params      key-value parameters parsed from the inline tag
+     * @return the (x, y) offset to apply to the letter's position
+     */
+    Vec2 apply(int letterIndex, long tick, float partialTick, Map<String, String> params);
 }

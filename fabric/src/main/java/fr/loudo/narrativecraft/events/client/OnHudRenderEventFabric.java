@@ -34,5 +34,7 @@ public class OnHudRenderEventFabric implements IFabricEventRegister {
         HudElementRegistry.addLast(
                 Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_hud"),
                 OnHudRender::cutsceneHudRender);
+        HudElementRegistry.addLast(
+                Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_hud"), OnHudRender::dialogHudRender);
     }
 }

@@ -24,9 +24,11 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.commands.DialogTestCommand;
 import fr.loudo.narrativecraft.commands.PlaybackCommand;
 import fr.loudo.narrativecraft.commands.PlayerSessionCommand;
 import fr.loudo.narrativecraft.commands.RecordCommand;
+import fr.loudo.narrativecraft.platform.Services;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -43,5 +45,8 @@ public class OnCommandRegisterEventNeoForge {
         RecordCommand.register(event.getDispatcher());
         PlayerSessionCommand.register(event.getDispatcher());
         PlaybackCommand.register(event.getDispatcher());
+        if (Services.PLATFORM.isDevelopmentEnvironment()) {
+            DialogTestCommand.register(event.getDispatcher());
+        }
     }
 }

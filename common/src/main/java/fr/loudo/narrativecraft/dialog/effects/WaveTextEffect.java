@@ -21,23 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.dialog.effects;
 
-import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
-import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import fr.loudo.narrativecraft.api.dialog.ITextEffect;
+import java.util.Map;
+import net.minecraft.world.phys.Vec2;
 
-public class ClientPacketRegisterFabric {
+public class WaveTextEffect implements ITextEffect {
 
-    public static void register() {
-        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
+    private static final float AMPLITUDE = 1.5f;
+    private static final float SPEED = 4f;
+    private static final float PHASE_OFFSET = 0.4f;
+
+    @Override
+    public Vec2 apply(int letterIndex, long tick, float partialTick, Map<String, String> params) {
+        double time = (tick + partialTick) / 20.0 * SPEED;
+        float offsetY = (float) Math.sin(time + letterIndex * PHASE_OFFSET) * AMPLITUDE;
+        return new Vec2(0f, offsetY);
     }
 }

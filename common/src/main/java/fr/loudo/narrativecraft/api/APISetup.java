@@ -33,6 +33,7 @@ public class APISetup {
         api.setRecordingManager(mod.getRecordingManager());
         api.setActionRegistry(mod.getActionRegistry());
         api.setCutsceneLayerRegistry(mod.getCutsceneLayerRegistry());
+        api.setTextEffectRegistry(mod.getTextEffectRegistry());
         api.setEventBus(NarrativeCraftMod.EVENT_BUS);
         api.setModId(NarrativeCraftMod.MOD_ID);
     }

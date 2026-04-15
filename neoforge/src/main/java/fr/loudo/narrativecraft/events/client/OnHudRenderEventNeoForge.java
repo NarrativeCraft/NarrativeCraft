@@ -43,5 +43,6 @@ public class OnHudRenderEventNeoForge {
         DeltaTracker deltaTracker = event.getPartialTick();
 
         OnHudRender.cutsceneHudRender(graphics, deltaTracker);
+        OnHudRender.dialogHudRender(graphics, deltaTracker);
     }
 }

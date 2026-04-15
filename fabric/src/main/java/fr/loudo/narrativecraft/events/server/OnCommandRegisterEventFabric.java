@@ -23,10 +23,12 @@
 
 package fr.loudo.narrativecraft.events.server;
 
+import fr.loudo.narrativecraft.commands.DialogTestCommand;
 import fr.loudo.narrativecraft.commands.PlaybackCommand;
 import fr.loudo.narrativecraft.commands.PlayerSessionCommand;
 import fr.loudo.narrativecraft.commands.RecordCommand;
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
+import fr.loudo.narrativecraft.platform.Services;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
 public class OnCommandRegisterEventFabric implements IFabricEventRegister {
@@ -37,6 +39,9 @@ public class OnCommandRegisterEventFabric implements IFabricEventRegister {
             RecordCommand.register(commandDispatcher);
             PlayerSessionCommand.register(commandDispatcher);
             PlaybackCommand.register(commandDispatcher);
+            if (Services.PLATFORM.isDevelopmentEnvironment()) {
+                DialogTestCommand.register(commandDispatcher);
+            }
         });
     }
 }

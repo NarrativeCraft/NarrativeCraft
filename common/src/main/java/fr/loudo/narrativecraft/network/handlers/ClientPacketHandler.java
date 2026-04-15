@@ -28,6 +28,9 @@ import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
+import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -36,8 +39,11 @@ import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
+import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
 
 public class ClientPacketHandler {
 
@@ -80,6 +86,36 @@ public class ClientPacketHandler {
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         if (!(cutsceneMakerEditor instanceof ClientCutsceneMakerEditor editor)) return;
         editor.loadLayers(packet.layersJson());
+    }
+
+    public static void handleDialogTest(S2CDialogTest packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+
+        switch (packet.mode()) {
+            case "stop" -> {
+                new ArrayList<>(session.getActiveDialog2DRenderers()).forEach(session::removeDialog2D);
+                new ArrayList<>(session.getActiveDialog3DRenderers()).forEach(session::removeDialog3D);
+            }
+            case "2d" -> {
+                DialogData data = new DialogData();
+                DialogRenderer2D renderer = new DialogRenderer2D(data);
+                renderer.onStopped(() -> session.removeDialog2D(renderer));
+                renderer.start(packet.text());
+                session.addDialog2D(renderer);
+            }
+            case "3d" -> {
+                Entity entity = MINECRAFT.level != null ? MINECRAFT.level.getEntity(packet.entityId()) : null;
+                if (entity == null) return;
+                DialogData data = new DialogData();
+                data.setPaddingY(7);
+                data.setPaddingX(5);
+                data.setWidth(100);
+                DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
+                renderer.onStopped(() -> session.removeDialog3D(renderer));
+                renderer.start(packet.text());
+                session.addDialog3D(renderer);
+            }
+        }
     }
 
     public static void updatePlayHeadCutscene(BiCutscenePlayHeadPacket packet) {

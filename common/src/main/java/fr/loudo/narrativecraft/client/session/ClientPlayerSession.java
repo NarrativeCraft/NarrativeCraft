@@ -24,13 +24,20 @@
 package fr.loudo.narrativecraft.client.session;
 
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
+import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
+import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.AbstractPlayerSession;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ClientPlayerSession extends AbstractPlayerSession {
 
     private final CutsceneDataSession cutsceneDataSession = new CutsceneDataSession();
+    private final List<DialogRenderer2D> activeDialog2DRenderers = new ArrayList<>();
+    private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
 
     public ClientPlayerSession() {
         super(null, null);
@@ -42,5 +49,29 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public CutsceneDataSession getCutsceneDataSession() {
         return cutsceneDataSession;
+    }
+
+    public List<DialogRenderer2D> getActiveDialog2DRenderers() {
+        return Collections.unmodifiableList(activeDialog2DRenderers);
+    }
+
+    public List<DialogRenderer3D> getActiveDialog3DRenderers() {
+        return Collections.unmodifiableList(activeDialog3DRenderers);
+    }
+
+    public void addDialog2D(DialogRenderer2D renderer) {
+        activeDialog2DRenderers.add(renderer);
+    }
+
+    public void addDialog3D(DialogRenderer3D renderer) {
+        activeDialog3DRenderers.add(renderer);
+    }
+
+    public void removeDialog2D(DialogRenderer2D renderer) {
+        activeDialog2DRenderers.remove(renderer);
+    }
+
+    public void removeDialog3D(DialogRenderer3D renderer) {
+        activeDialog3DRenderers.remove(renderer);
     }
 }

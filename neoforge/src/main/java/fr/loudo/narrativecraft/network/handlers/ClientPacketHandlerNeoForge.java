@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
+import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
@@ -69,6 +70,12 @@ public class ClientPacketHandlerNeoForge {
     public static void updatePlayHeadCutscene(BiCutscenePlayHeadPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.updatePlayHeadCutscene(packet);
+        });
+    }
+
+    public static void handleDialogTest(S2CDialogTest packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.handleDialogTest(packet);
         });
     }
 }

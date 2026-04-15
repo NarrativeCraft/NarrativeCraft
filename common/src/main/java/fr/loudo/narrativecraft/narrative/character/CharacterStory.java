@@ -26,8 +26,19 @@ package fr.loudo.narrativecraft.narrative.character;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 
 public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
+
+    private String dialogPresetName;
+
     public CharacterStory(String name, String description) {
         super(name, description);
+    }
+
+    public String getDialogPresetName() {
+        return dialogPresetName;
+    }
+
+    public void setDialogPresetName(String dialogPresetName) {
+        this.dialogPresetName = dialogPresetName;
     }
 
     @Override
