@@ -1,0 +1,13 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/save.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE200"
+      ]
+    }
+  ]
+}

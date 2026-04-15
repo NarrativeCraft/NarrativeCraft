@@ -21,30 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.OnClientDisconnectEventFabric;
-import fr.loudo.narrativecraft.events.client.OnClientTickEventFabric;
-import fr.loudo.narrativecraft.events.client.OnHudRenderEventFabric;
-import fr.loudo.narrativecraft.events.client.OnKeyRegisterEventFabric;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
+import fr.loudo.narrativecraft.platform.Services;
+import net.minecraft.client.player.LocalPlayer;
 
-public class ClientFabricEventList {
+public class OnClientDisconnectEvent {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
+    public static void clientDisconnect(LocalPlayer player) {
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (playerSession == null) return;
 
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-    }
-
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+        Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.QUIT));
+        playerSession.getCutsceneDataSession().reset();
+        playerSession.setEditor(null);
     }
 }

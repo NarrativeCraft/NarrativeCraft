@@ -27,7 +27,9 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
+import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
+import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
@@ -44,6 +46,12 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CPlayerSession.TYPE, (packet, context) -> {
             ClientPacketHandler.setSession(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CToastMessage.TYPE, (packet, context) -> {
+            ClientPacketHandler.showToast(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CCutsceneEditorData.TYPE, (packet, context) -> {
+            ClientPacketHandler.loadCutsceneEditorData(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(BiCutscenePlayHeadPacket.TYPE, (packet, context) -> {
             ClientPacketHandler.updatePlayHeadCutscene(packet);

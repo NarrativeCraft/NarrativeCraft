@@ -27,7 +27,9 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
+import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
+import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
@@ -49,6 +51,18 @@ public class ClientPacketHandlerNeoForge {
     public static void setSession(S2CPlayerSession packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.setSession(packet);
+        });
+    }
+
+    public static void showToast(S2CToastMessage packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.showToast(packet);
+        });
+    }
+
+    public static void loadCutsceneEditorData(S2CCutsceneEditorData packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.loadCutsceneEditorData(packet);
         });
     }
 

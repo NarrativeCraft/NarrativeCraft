@@ -23,8 +23,18 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
+import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
+import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -32,6 +42,7 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,6 +85,75 @@ public class CutsceneDeserializer extends NarrativeDeserializer<Cutscene> {
             }
         }
 
-        return new Cutscene(id, name, description, scene, animations, subscenes);
+        Cutscene cutscene = new Cutscene(id, name, description, scene, animations, subscenes);
+
+        if (obj.has("layers")) {
+            List<CutsceneMakerEditorLayer> editorLayers = new ArrayList<>();
+            for (JsonElement layerElement : obj.getAsJsonArray("layers")) {
+                JsonObject layerObject = layerElement.getAsJsonObject();
+                if (!layerObject.has("type")) continue;
+
+                String typeId = layerObject.get("type").getAsString();
+                int sortIndex = layerObject.has("sortIndex")
+                        ? layerObject.get("sortIndex").getAsInt()
+                        : 0;
+
+                ICutsceneLayerType rawLayerType = NarrativeCraftMod.getInstance()
+                        .getCutsceneLayerRegistry()
+                        .getType(typeId);
+                if (!(rawLayerType instanceof CutsceneLayerType layerType)) continue;
+
+                CutsceneLayer layer = (CutsceneLayer) layerType.createLayer();
+                layer.setSortIndex(sortIndex);
+
+                if (layerObject.has("keyframes")) {
+                    for (JsonElement keyframeElement : layerObject.getAsJsonArray("keyframes")) {
+                        Keyframe keyframe = layerType.deserializeKeyframe(layer, keyframeElement.getAsJsonObject());
+                        if (keyframe != null) layer.addKeyframe(keyframe);
+                    }
+                }
+
+                editorLayers.add(new CutsceneMakerEditorLayer(layer, 85));
+            }
+            editorLayers.sort(Comparator.comparingInt(
+                    editorLayer -> editorLayer.getLayer().getSortIndex()));
+            cutscene.setEditorLayers(editorLayers);
+        }
+
+        return cutscene;
+    }
+
+    public static void deserializeLayers(String layersJson, Cutscene cutscene) {
+        JsonArray layersArray = JsonParser.parseString(layersJson).getAsJsonArray();
+        List<CutsceneMakerEditorLayer> editorLayers = new ArrayList<>();
+
+        for (JsonElement layerElement : layersArray) {
+            JsonObject layerObject = layerElement.getAsJsonObject();
+            if (!layerObject.has("type")) continue;
+
+            String typeId = layerObject.get("type").getAsString();
+            int sortIndex =
+                    layerObject.has("sortIndex") ? layerObject.get("sortIndex").getAsInt() : 0;
+
+            ICutsceneLayerType rawLayerType =
+                    NarrativeCraftMod.getInstance().getCutsceneLayerRegistry().getType(typeId);
+            if (!(rawLayerType instanceof CutsceneLayerType layerType)) continue;
+
+            CutsceneLayer layer = (CutsceneLayer) layerType.createLayer();
+            layer.setSortIndex(sortIndex);
+
+            if (layerObject.has("keyframes")) {
+                for (JsonElement keyframeElement : layerObject.getAsJsonArray("keyframes")) {
+                    Keyframe keyframe = layerType.deserializeKeyframe(layer, keyframeElement.getAsJsonObject());
+                    if (keyframe != null) layer.addKeyframe(keyframe);
+                }
+            }
+
+            editorLayers.add(new CutsceneMakerEditorLayer(layer, 85));
+        }
+
+        editorLayers.sort(
+                Comparator.comparingInt(editorLayer -> editorLayer.getLayer().getSortIndex()));
+        cutscene.setEditorLayers(editorLayers);
     }
 }

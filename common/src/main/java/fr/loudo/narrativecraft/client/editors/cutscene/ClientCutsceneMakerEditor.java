@@ -31,22 +31,26 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -102,11 +106,28 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public void init() {
         buttons.add(Button.builder(Component.literal("✖"), button -> {
-                    Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.QUIT));
-                    playerSession.getCutsceneDataSession().reset();
-                    playerSession.setEditor(null);
+                    ConfirmScreen confirmScreen = new ConfirmScreen(
+                            b -> {
+                                if (b) {
+                                    String layersJson = CutsceneSerializer.serializeLayers(editorLayers);
+                                    Services.PACKET.sendToServer(new C2SCutsceneSave(cutscene, layersJson));
+                                }
+                                Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.QUIT));
+                                playerSession.getCutsceneDataSession().reset();
+                                playerSession.setEditor(null);
+                                mc.setScreen(null);
+                            },
+                            Translation.message("screen.confirm.title"),
+                            Translation.message("screen.confirm.save_cutscene"));
+                    mc.setScreen(confirmScreen);
                 })
                 .bounds(5, 5, 20, 20)
+                .build());
+        buttons.add(Button.builder(Component.literal("\uE200"), button -> {
+                    String layersJson = CutsceneSerializer.serializeLayers(editorLayers);
+                    Services.PACKET.sendToServer(new C2SCutsceneSave(cutscene, layersJson));
+                })
+                .bounds(30, 5, 20, 20)
                 .build());
 
         addLayerButton = Button.builder(Component.literal("+"), b -> layerSelector.toggle())
@@ -116,6 +137,14 @@ public class ClientCutsceneMakerEditor implements Editor {
         totalTick = cutscene.getMaxTick();
         zoomFactor = getMinZoomFactor();
         viewStartTick = 0f;
+    }
+
+    public void loadLayers(String layersJson) {
+        editorLayers.clear();
+        CutsceneDeserializer.deserializeLayers(layersJson, cutscene);
+        if (cutscene.getEditorLayers() != null) {
+            editorLayers.addAll(cutscene.getEditorLayers());
+        }
     }
 
     public void addLayer(ICutsceneLayer layer) {

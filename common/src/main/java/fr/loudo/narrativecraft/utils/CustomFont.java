@@ -21,30 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.utils;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.OnClientDisconnectEventFabric;
-import fr.loudo.narrativecraft.events.client.OnClientTickEventFabric;
-import fr.loudo.narrativecraft.events.client.OnHudRenderEventFabric;
-import fr.loudo.narrativecraft.events.client.OnKeyRegisterEventFabric;
-import java.util.ArrayList;
-import java.util.List;
+public class CustomFont {
 
-public class ClientFabricEventList {
-
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-    }
-
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
-    }
+    public static final String SAVE = "\uE200";
 }

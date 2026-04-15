@@ -21,30 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.OnClientDisconnectEventFabric;
-import fr.loudo.narrativecraft.events.client.OnClientTickEventFabric;
-import fr.loudo.narrativecraft.events.client.OnHudRenderEventFabric;
-import fr.loudo.narrativecraft.events.client.OnKeyRegisterEventFabric;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class ClientFabricEventList {
+public record S2CToastMessage(Component title, Component message) implements CustomPacketPayload {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
+    public static final Type<S2CToastMessage> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "toast_message"));
 
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-    }
+    public static final StreamCodec<ByteBuf, S2CToastMessage> STREAM_CODEC = StreamCodec.composite(
+            ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,
+            S2CToastMessage::title,
+            ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,
+            S2CToastMessage::message,
+            S2CToastMessage::new);
 
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

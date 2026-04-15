@@ -21,30 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.OnClientDisconnectEventFabric;
-import fr.loudo.narrativecraft.events.client.OnClientTickEventFabric;
-import fr.loudo.narrativecraft.events.client.OnHudRenderEventFabric;
-import fr.loudo.narrativecraft.events.client.OnKeyRegisterEventFabric;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 
-public class ClientFabricEventList {
-
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-    }
-
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
+public class OnClientDisconnectEventNeoForge {
+    @SubscribeEvent
+    public static void onClientDisconnectEvent(ClientPlayerNetworkEvent.LoggingOut event) {
+        OnClientDisconnectEvent.clientDisconnect(event.getPlayer());
     }
 }

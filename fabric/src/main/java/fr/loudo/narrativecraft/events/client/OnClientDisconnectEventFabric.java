@@ -21,30 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.OnClientDisconnectEventFabric;
-import fr.loudo.narrativecraft.events.client.OnClientTickEventFabric;
-import fr.loudo.narrativecraft.events.client.OnHudRenderEventFabric;
-import fr.loudo.narrativecraft.events.client.OnKeyRegisterEventFabric;
-import java.util.ArrayList;
-import java.util.List;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 
-public class ClientFabricEventList {
-
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-    }
-
+public class OnClientDisconnectEventFabric implements IFabricEventRegister {
+    @Override
     public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, connection) -> {
+            OnClientDisconnectEvent.clientDisconnect(connection.player);
+        });
     }
 }

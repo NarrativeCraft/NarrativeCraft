@@ -23,6 +23,11 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene.layers.fov;
 
+import com.google.gson.JsonObject;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 
 public class FovLayerType extends CutsceneLayerType {
@@ -42,5 +47,35 @@ public class FovLayerType extends CutsceneLayerType {
     @Override
     public FovLayer createLayer() {
         return new FovLayer(this);
+    }
+
+    @Override
+    public JsonObject serializeKeyframe(Keyframe keyframe) {
+        if (!(keyframe instanceof FovKeyframe fovKeyframe)) return null;
+
+        JsonObject json = new JsonObject();
+        json.addProperty("tick", fovKeyframe.getTick());
+        json.addProperty("fov", fovKeyframe.getFov());
+        json.addProperty("easing", fovKeyframe.getEasing().name());
+        return json;
+    }
+
+    @Override
+    public Keyframe deserializeKeyframe(CutsceneLayer layer, JsonObject json) {
+        if (!json.has("tick") || !json.has("fov")) return null;
+
+        int tick = json.get("tick").getAsInt();
+        float fov = json.get("fov").getAsFloat();
+        String easing = json.get("easing").getAsString();
+        EasingType easingType;
+        try {
+            easingType = EasingType.valueOf(easing.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            easingType = EasingType.LINEAR;
+        }
+        FovKeyframe fovKeyframe = new FovKeyframe(layer, tick, fov);
+        fovKeyframe.setEasing(easingType);
+
+        return fovKeyframe;
     }
 }

@@ -28,9 +28,12 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
+import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
+import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
 import net.neoforged.bus.api.IEventBus;
@@ -52,6 +55,12 @@ public class OnPacketRegisterEventNeoForge {
     }
 
     private static void registerS2CPackets(PayloadRegistrar registrar) {
+        registrar.playToClient(
+                S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC, ClientPacketHandlerNeoForge::showToast);
+        registrar.playToClient(
+                S2CCutsceneEditorData.TYPE,
+                S2CCutsceneEditorData.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::loadCutsceneEditorData);
         registrar.playBidirectional(
                 BiSyncNarrativeEntryPacket.TYPE,
                 BiSyncNarrativeEntryPacket.STREAM_CODEC,
@@ -71,6 +80,8 @@ public class OnPacketRegisterEventNeoForge {
                 C2SCutsceneEnter.TYPE, C2SCutsceneEnter.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneState);
         registrar.playToServer(
                 C2SCutsceneControl.TYPE, C2SCutsceneControl.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneControl);
+        registrar.playToServer(
+                C2SCutsceneSave.TYPE, C2SCutsceneSave.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneSave);
         registrar.playBidirectional(
                 BiCutscenePlayHeadPacket.TYPE,
                 BiCutscenePlayHeadPacket.STREAM_CODEC,

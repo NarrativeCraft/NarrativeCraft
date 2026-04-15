@@ -23,6 +23,24 @@
 
 package fr.loudo.narrativecraft.editors.cutscene.layers;
 
+import com.google.gson.JsonObject;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 
-public abstract class CutsceneLayerType implements ICutsceneLayerType {}
+public abstract class CutsceneLayerType implements ICutsceneLayerType {
+
+    /**
+     * Serializes a keyframe of this layer type to JSON.
+     *
+     * @return the JSON object, or {@code null} if the keyframe type is not supported
+     */
+    public abstract JsonObject serializeKeyframe(Keyframe keyframe);
+
+    /**
+     * Deserializes a keyframe of this layer type from JSON and adds it to the given layer.
+     *
+     * @return the created keyframe, or {@code null} if the JSON is invalid
+     */
+    public abstract Keyframe deserializeKeyframe(CutsceneLayer layer, JsonObject json);
+}

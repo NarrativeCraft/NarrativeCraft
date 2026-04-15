@@ -33,7 +33,10 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
+import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
+import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
+import fr.loudo.narrativecraft.utils.UtilsClient;
 import net.minecraft.client.Minecraft;
 
 public class ClientPacketHandler {
@@ -66,6 +69,17 @@ public class ClientPacketHandler {
         if (scene == null) return;
 
         ClientNarrativeCraftMod.getInstance().getPlayerSession().apply(chapter, scene);
+    }
+
+    public static void showToast(S2CToastMessage packet) {
+        UtilsClient.sendToast(packet.title(), packet.message());
+    }
+
+    public static void loadCutsceneEditorData(S2CCutsceneEditorData packet) {
+        ClientCutsceneMakerEditor cutsceneMakerEditor =
+                ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
+        if (!(cutsceneMakerEditor instanceof ClientCutsceneMakerEditor editor)) return;
+        editor.loadLayers(packet.layersJson());
     }
 
     public static void updatePlayHeadCutscene(BiCutscenePlayHeadPacket packet) {

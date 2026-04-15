@@ -38,7 +38,8 @@
   "narrativecraft.screen.pagination.empty": "Feeling a bit empty...",
 
   "narrativecraft.screen.confirm.title": "Confirm",
-  "narrativecraft.screen.confirm.message": "Are you sure you want to delete %s?",
+  "narrativecraft.screen.confirm.delete": "Are you sure you want to delete %s?",
+  "narrativecraft.screen.confirm.save_cutscene": "Do you want to save before leaving?",
 
   "narrativecraft.error.delete": "Failed to remove %s %s.",
   "narrativecraft.error.add": "Failed to add %s %s.",
@@ -74,5 +75,8 @@
 
   "narrativecraft.session.set": "Your session is now set to §lchapter§r %s and §lscene§r %s.",
   "narrativecraft.session.clear": "Session cleared.",
-  "narrativecraft.session.no_session": "You need to set you a session."
+  "narrativecraft.session.no_session": "You need to set you a session.",
+
+  "narrativecraft.cutscene.save.success": "Cutscene saved",
+  "narrativecraft.cutscene.save.failed": "Cutscene save failed"
 }

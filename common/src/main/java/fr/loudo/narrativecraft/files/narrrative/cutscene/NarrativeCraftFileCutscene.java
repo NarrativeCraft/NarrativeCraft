@@ -97,21 +97,21 @@ public class NarrativeCraftFileCutscene extends NarrativeCraftFileDefault
         gsonBuilder.registerTypeAdapter(Cutscene.class, new CutsceneDeserializer());
         Gson gson = gsonBuilder.create();
 
-        java.io.File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
-        java.io.File[] chapterDirs = chaptersFolder.listFiles();
+        File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
+        File[] chapterDirs = chaptersFolder.listFiles();
         if (chapterDirs == null) return results;
 
-        for (java.io.File chapterDir : chapterDirs) {
-            java.io.File scenesFolder = new java.io.File(chapterDir, SCENES_FOLDER_NAME);
-            java.io.File[] sceneDirs = scenesFolder.listFiles();
+        for (File chapterDir : chapterDirs) {
+            File scenesFolder = new File(chapterDir, SCENES_FOLDER_NAME);
+            File[] sceneDirs = scenesFolder.listFiles();
             if (sceneDirs == null) continue;
 
-            for (java.io.File sceneDir : sceneDirs) {
-                java.io.File cutsceneFolder = new java.io.File(sceneDir, CUTSCENES_FOLDER_NAME);
-                java.io.File[] cutsceneFiles = cutsceneFolder.listFiles();
+            for (File sceneDir : sceneDirs) {
+                File cutsceneFolder = new File(sceneDir, CUTSCENES_FOLDER_NAME);
+                File[] cutsceneFiles = cutsceneFolder.listFiles();
                 if (cutsceneFiles == null) continue;
 
-                for (java.io.File cutsceneFile : cutsceneFiles) {
+                for (File cutsceneFile : cutsceneFiles) {
                     try {
                         String content = Files.readString(cutsceneFile.toPath());
                         Cutscene cutscene = gson.fromJson(content, Cutscene.class);

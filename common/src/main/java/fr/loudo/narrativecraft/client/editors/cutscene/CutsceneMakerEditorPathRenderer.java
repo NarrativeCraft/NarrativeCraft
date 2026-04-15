@@ -28,13 +28,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
-
-import java.util.List;
 
 public class CutsceneMakerEditorPathRenderer {
 

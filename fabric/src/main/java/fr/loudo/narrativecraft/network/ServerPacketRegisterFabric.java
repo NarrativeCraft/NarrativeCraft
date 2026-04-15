@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.network;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
+import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class ServerPacketRegisterFabric {
@@ -33,6 +34,7 @@ public class ServerPacketRegisterFabric {
     public static void register() {
         PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneEnter.TYPE, C2SCutsceneEnter.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneControl.TYPE, C2SCutsceneControl.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneSave.TYPE, C2SCutsceneSave.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay()
                 .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
     }

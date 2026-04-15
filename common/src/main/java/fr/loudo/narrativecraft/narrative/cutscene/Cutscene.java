@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene;
 
+import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -36,6 +37,7 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> {
     private final Scene scene;
     private List<Animation> animations;
     private List<Subscene> subscenes;
+    private List<CutsceneMakerEditorLayer> editorLayers;
 
     public Cutscene(
             UUID id,
@@ -95,6 +97,14 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> {
 
     public void setSubscenes(List<Subscene> subscenes) {
         this.subscenes = new ArrayList<>(subscenes);
+    }
+
+    public List<CutsceneMakerEditorLayer> getEditorLayers() {
+        return editorLayers;
+    }
+
+    public void setEditorLayers(List<CutsceneMakerEditorLayer> editorLayers) {
+        this.editorLayers = new ArrayList<>(editorLayers);
     }
 
     @Override

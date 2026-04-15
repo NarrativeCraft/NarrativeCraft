@@ -25,16 +25,22 @@ package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditor;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
+import fr.loudo.narrativecraft.network.S2CToastMessage;
+import fr.loudo.narrativecraft.network.cutscene.*;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class ServerPacketHandler {
@@ -64,6 +70,12 @@ public class ServerPacketHandler {
         session.setEditor(editor);
         editor.init();
         editor.start();
+
+        if (cutscene.getEditorLayers() != null && !cutscene.getEditorLayers().isEmpty()) {
+            String layersJson = CutsceneSerializer.serializeLayers(cutscene.getEditorLayers());
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player, new S2CCutsceneEditorData(cutscene.getId(), layersJson));
+        }
     }
 
     public static void cutsceneControl(C2SCutsceneControl packet, Player player) {
@@ -79,6 +91,30 @@ public class ServerPacketHandler {
                 editor.stop();
                 session.setEditor(null);
             }
+        }
+    }
+
+    public static void cutsceneSave(C2SCutsceneSave packet, Player player) {
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
+        if (scene == null) return;
+        Cutscene cutscene = scene.getCutsceneManager().getById(packet.getCutsceneId());
+        if (cutscene == null) return;
+
+        CutsceneDeserializer.deserializeLayers(packet.getLayersJson(), cutscene);
+        int result = NarrativeCraftFileRegistry.getInstance().edit(cutscene);
+        Services.PACKET.sendToPlayer(
+                (ServerPlayer) player, new S2CCutsceneEditorData(cutscene.getId(), packet.getLayersJson()));
+
+        if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player,
+                    new S2CToastMessage(Translation.message("cutscene"), Translation.message("cutscene.save.success")));
+        } else {
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player,
+                    new S2CToastMessage(Translation.message("cutscene"), Translation.message("cutscene.save.failed")));
         }
     }
 

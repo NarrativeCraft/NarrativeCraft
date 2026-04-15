@@ -21,30 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.network.cutscene;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.OnClientDisconnectEventFabric;
-import fr.loudo.narrativecraft.events.client.OnClientTickEventFabric;
-import fr.loudo.narrativecraft.events.client.OnHudRenderEventFabric;
-import fr.loudo.narrativecraft.events.client.OnKeyRegisterEventFabric;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class ClientFabricEventList {
+public record S2CCutsceneEditorData(UUID cutsceneId, String layersJson) implements CustomPacketPayload {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
+    public static final Type<S2CCutsceneEditorData> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_editor_data"));
 
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-    }
+    public static final StreamCodec<ByteBuf, S2CCutsceneEditorData> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC,
+            S2CCutsceneEditorData::cutsceneId,
+            ByteBufCodecs.STRING_UTF8,
+            S2CCutsceneEditorData::layersJson,
+            S2CCutsceneEditorData::new);
 
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
