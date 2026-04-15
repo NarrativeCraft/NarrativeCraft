@@ -32,6 +32,7 @@ import net.minecraft.client.player.LocalPlayer;
 public class OnClientDisconnectEvent {
 
     public static void clientDisconnect(LocalPlayer player) {
+        if (player == null) return;
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return;

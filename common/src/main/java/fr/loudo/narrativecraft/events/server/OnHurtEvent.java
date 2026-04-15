@@ -24,16 +24,25 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.HurtAction;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
 public class OnHurtEvent {
-    public static void onHurt(LivingEntity entity) {
+    public static void onHurt(LivingEntity entity, DamageSource damageSource) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
         if (data == null) return;
 
         data.addAction(new HurtAction(data.getRecordingTick()));
+
+        Recording recording = data.getRecording();
+        Entity attacker = damageSource.getEntity();
+        if (attacker != null && recording.getPlayer().getId() == attacker.getId()) {
+            data.markAsTracked();
+        }
     }
 }

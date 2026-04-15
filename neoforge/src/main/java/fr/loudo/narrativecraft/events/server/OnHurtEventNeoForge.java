@@ -37,6 +37,6 @@ public class OnHurtEventNeoForge {
     }
 
     private static void onHurt(LivingDamageEvent.Post event) {
-        OnHurtEvent.onHurt(event.getEntity());
+        OnHurtEvent.onHurt(event.getEntity(), event.getSource());
     }
 }

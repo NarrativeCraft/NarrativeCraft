@@ -30,7 +30,7 @@ public class OnHurtEventFabric implements IFabricEventRegister {
     @Override
     public void register() {
         ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamageTaken, damageTaken, blocked) -> {
-            OnHurtEvent.onHurt(entity);
+            OnHurtEvent.onHurt(entity, source);
         });
     }
 }
