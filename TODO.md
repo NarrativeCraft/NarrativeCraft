@@ -3,7 +3,8 @@
 - [ ] undo all actions when leaving cutscene maker editor
 - [ ] play subscenes through playback command
 - [ ] fix all actions undo at last tick in cutscene editor
-- [ ] fix block not air on rewind
+- [x] fix block not air on rewind
+- [ ] put animations in cutscenes
 
 ### cutscene maker
 - [x] interpolate zoom
@@ -18,4 +19,4 @@
 - [x] render lines 
 - [x] hide camera when interpolating
 - [x] fix fov interpolation
-- [ ] shortcuts
+- [x] shortcuts

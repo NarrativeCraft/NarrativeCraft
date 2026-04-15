@@ -40,7 +40,9 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -78,8 +80,14 @@ public class ClientCutsceneMakerEditor implements Editor {
     private final CutsceneMakerEditorPlayHead playHead = new CutsceneMakerEditorPlayHead(11, 90, 5);
     private final CutsceneMakerEditorControl control;
     private final CutsceneEditorPlayback playback;
-
     private final CutsceneMakerRollWidget rollWidget = new CutsceneMakerRollWidget();
+    private final CutsceneMakerEditorShortcuts shortcuts = new CutsceneMakerEditorShortcuts(this);
+
+    private final List<Keyframe> selectedKeyframes = new ArrayList<>();
+    private KeyframeMenu<?> openMenu;
+
+    private Map<Keyframe, Integer> draggingOriginalTicks;
+    private float draggingStartMouseX;
 
     private Button addLayerButton;
     private int tick, totalTick;
@@ -90,9 +98,6 @@ public class ClientCutsceneMakerEditor implements Editor {
     private float scrollbarDragStartMouseX = 0f;
     private float scrollbarDragStartViewTick = 0f;
     private boolean renderingHud = true;
-    private Keyframe selectedKeyframe;
-    private Keyframe draggingKeyframe;
-    private KeyframeMenu<?> openMenu;
 
     public ClientCutsceneMakerEditor(Cutscene cutscene) {
         this.cutscene = cutscene;
@@ -160,6 +165,16 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public void removeLayer(ICutsceneLayer layer) {
         editorLayers.removeIf(el -> el.getLayer() == layer);
+    }
+
+    public void clearSelection() {
+        for (Keyframe keyframe : selectedKeyframes) {
+            keyframe.setSelected(false);
+        }
+        selectedKeyframes.clear();
+        if (openMenu != null && openMenu.isVisible()) {
+            openMenu.close();
+        }
     }
 
     private void renderLayers(GuiGraphicsExtractor graphics, DeltaTracker delta, int mouseX, int mouseY) {
@@ -337,7 +352,7 @@ public class ClientCutsceneMakerEditor implements Editor {
         clampViewStart();
     }
 
-    private int getPlayHeadTick() {
+    public int getPlayHeadTick() {
         return (int) Math.clamp(viewStartTick + playHead.getRatio() * getVisibleTicks(), 0, totalTick);
     }
 
@@ -430,6 +445,8 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public void keyPressed(KeyEvent event) {
         if (!renderingHud) return;
+        // Shortcuts are handled first; they consume the event if matched
+        if (shortcuts.handleKeyPressed(event)) return;
         if (openMenu != null && openMenu.isVisible()) {
             openMenu.keyPressed(event);
         }
@@ -491,8 +508,7 @@ public class ClientCutsceneMakerEditor implements Editor {
                 }
                 Keyframe hovered = editorLayer.getHoveredKeyframe(mousePos[0], mousePos[1]);
                 if (hovered != null) {
-                    selectKeyframe(hovered, mouseButtonEvent, isDoubleClick);
-                    draggingKeyframe = hovered;
+                    handleKeyframeClick(hovered, mouseButtonEvent, isDoubleClick);
                     return;
                 }
             }
@@ -500,13 +516,9 @@ public class ClientCutsceneMakerEditor implements Editor {
         }
         editorLayers.removeAll(toRemove);
 
-        // Deselect keyframe when clicking elsewhere
-        if (selectedKeyframe != null) {
-            selectedKeyframe.setSelected(false);
-            selectedKeyframe = null;
-            if (openMenu != null && openMenu.isVisible()) {
-                openMenu.close();
-            }
+        // Deselect all keyframes when clicking on an empty area
+        if (!selectedKeyframes.isEmpty()) {
+            clearSelection();
         }
 
         if (playHead.isHovered()) {
@@ -517,11 +529,49 @@ public class ClientCutsceneMakerEditor implements Editor {
         }
     }
 
+    private void handleKeyframeClick(Keyframe keyframe, MouseButtonEvent event, boolean isDoubleClick) {
+        if (Minecraft.getInstance().hasShiftDown()) {
+            // Shift+click: toggle this keyframe in/out of the selection
+            if (selectedKeyframes.contains(keyframe)) {
+                keyframe.setSelected(false);
+                selectedKeyframes.remove(keyframe);
+            } else {
+                keyframe.setSelected(true);
+                selectedKeyframes.add(keyframe);
+            }
+            // Refresh menu: show only for exactly one selected keyframe
+            if (openMenu != null) openMenu.close();
+            openMenu = selectedKeyframes.size() == 1 ? selectedKeyframes.get(0).createMenu() : null;
+        } else {
+            // Regular click: if keyframe is not in the selection, switch to single selection
+            if (!selectedKeyframes.contains(keyframe)) {
+                clearSelection();
+                keyframe.setSelected(true);
+                selectedKeyframes.add(keyframe);
+            }
+            // Open menu for a single-keyframe selection
+            if (selectedKeyframes.size() == 1) {
+                if (openMenu != null) openMenu.close();
+                openMenu = keyframe.createMenu();
+            }
+        }
+
+        // Start drag tracking for all currently selected keyframes
+        draggingStartMouseX = (float) event.x();
+        draggingOriginalTicks = new HashMap<>();
+        for (Keyframe selected : selectedKeyframes) {
+            draggingOriginalTicks.put(selected, selected.getTick());
+        }
+    }
+
     public void mouseReleased(MouseButtonEvent mouseButtonEvent) {
         if (!renderingHud) return;
         rollWidget.mouseReleased();
         playHead.setDragging(false);
-        draggingKeyframe = null;
+        if (draggingOriginalTicks != null) {
+            shortcuts.recordMoveAction(draggingOriginalTicks);
+            draggingOriginalTicks = null;
+        }
         scrollbarDragging = false;
     }
 
@@ -535,9 +585,13 @@ public class ClientCutsceneMakerEditor implements Editor {
             clampViewStart();
             return;
         }
-        if (draggingKeyframe != null) {
-            draggingKeyframe.drag(
-                    mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth(), getVisibleTicks(), viewStartTick);
+        if (draggingOriginalTicks != null && !draggingOriginalTicks.isEmpty()) {
+            float deltaTick =
+                    (float) ((mouseButtonEvent.x() - draggingStartMouseX) / getTimelineWidth() * getVisibleTicks());
+            for (Map.Entry<Keyframe, Integer> entry : draggingOriginalTicks.entrySet()) {
+                int newTick = (int) Math.clamp(entry.getValue() + deltaTick, 0, totalTick);
+                entry.getKey().setTick(newTick);
+            }
             return;
         }
         if (playHead.isDragging()) {
@@ -560,17 +614,6 @@ public class ClientCutsceneMakerEditor implements Editor {
         tick = getPlayHeadTick();
         playback.seekTo(tick);
         Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(tick));
-    }
-
-    private void selectKeyframe(Keyframe keyframe, MouseButtonEvent event, boolean isDoubleClick) {
-        if (selectedKeyframe != null && selectedKeyframe != keyframe) {
-            selectedKeyframe.setSelected(false);
-        }
-        selectedKeyframe = keyframe;
-        keyframe.click(event, isDoubleClick);
-
-        if (openMenu != null) openMenu.close();
-        openMenu = keyframe.createMenu();
     }
 
     public float getTick() {
@@ -623,5 +666,9 @@ public class ClientCutsceneMakerEditor implements Editor {
 
     public List<CutsceneMakerEditorLayer> getEditorLayers() {
         return editorLayers;
+    }
+
+    public List<Keyframe> getSelectedKeyframes() {
+        return selectedKeyframes;
     }
 }
