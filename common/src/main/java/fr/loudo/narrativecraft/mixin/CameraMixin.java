@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -39,8 +40,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
@@ -69,6 +70,12 @@ public abstract class CameraMixin {
     @Final
     private Minecraft minecraft;
 
+    @Shadow
+    private float oldFovModifier;
+
+    @Shadow
+    private float fovModifier;
+
     @Inject(method = "update", at = @At("RETURN"))
     private void narrativecraft$camera(DeltaTracker deltaTracker, CallbackInfo ci) {
         ClientPlayerSession playerSession =
@@ -94,14 +101,14 @@ public abstract class CameraMixin {
                 -(float) Math.toRadians(keyframePosition.getRotation().z()));
     }
 
-    @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;calculateFov(F)F"))
-    private float narrativecraft$getFov(Camera instance, float partialTicks) {
+    @Inject(method = "calculateFov", at = @At("HEAD"), cancellable = true)
+    private void modifyFov(float partialTicks, CallbackInfoReturnable<Float> cir) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession == null) return this.calculateFov(partialTicks);
-        float fov = playerSession.getCutsceneDataSession().getFov();
-        if (fov == -1f) return this.calculateFov(partialTicks);
-
-        return fov;
+        if (playerSession != null && playerSession.getCutsceneDataSession() != null) {
+            float customFov = playerSession.getCutsceneDataSession().getFov();
+            if (customFov == -1f) return;
+            cir.setReturnValue(customFov * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier));
+        }
     }
 }
