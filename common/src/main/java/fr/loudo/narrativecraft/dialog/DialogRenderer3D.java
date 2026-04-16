@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -45,22 +46,17 @@ public class DialogRenderer3D extends DialogRenderer {
     private final Entity entity;
     private final DialogTail tail;
 
-    private double prevEntityX, prevEntityY, prevEntityZ;
-    private double entityX, entityY, entityZ;
-
     private static final float SKIP_SLIDE_OFFSET = -4f;
 
     public DialogRenderer3D(DialogData data, Entity entity) {
         super(data);
         this.entity = entity;
         this.tail = new DialogTail(this, 3f, 5f, 0f);
-        captureEntityPosition();
     }
 
     @Override
     public void tick() {
         super.tick();
-        captureEntityPosition();
     }
 
     public void render(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float partialTick) {
@@ -72,9 +68,9 @@ public class DialogRenderer3D extends DialogRenderer {
         float opacity = animator.getOpacity(partialTick);
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 
-        double interpX = prevEntityX + (entityX - prevEntityX) * partialTick;
-        double interpY = prevEntityY + (entityY - prevEntityY) * partialTick;
-        double interpZ = prevEntityZ + (entityZ - prevEntityZ) * partialTick;
+        double interpX = Mth.lerp(partialTick, entity.xo, entity.getX());
+        double interpY = Mth.lerp(partialTick, entity.yo, entity.getY());
+        double interpZ = Mth.lerp(partialTick, entity.zo, entity.getZ());
 
         Vec3 cameraPos = camera.position();
         // Animation: dialog slides from entity head (t=0) to its final position (t=1)
@@ -131,7 +127,7 @@ public class DialogRenderer3D extends DialogRenderer {
     }
 
     public Vec3 getDialogPosition() {
-        return new Vec3(entityX, entityY + entity.getBbHeight() + data.getOffsetY(), entityZ);
+        return new Vec3(entity.getX(), entity.getY() + entity.getBbHeight() + data.getOffsetY(), entity.getZ());
     }
 
     public Vec3 translateToRelative(Vec3 worldPos) {
@@ -223,15 +219,6 @@ public class DialogRenderer3D extends DialogRenderer {
                 .setColor(color);
 
         bufferSource.endBatch();
-    }
-
-    private void captureEntityPosition() {
-        prevEntityX = entityX;
-        prevEntityY = entityY;
-        prevEntityZ = entityZ;
-        entityX = entity.getX();
-        entityY = entity.getY();
-        entityZ = entity.getZ();
     }
 
     private int applyOpacity(int color, float opacity) {

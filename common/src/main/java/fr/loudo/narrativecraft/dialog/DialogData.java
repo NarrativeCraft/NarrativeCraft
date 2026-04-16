@@ -27,6 +27,12 @@ import net.minecraft.resources.Identifier;
 
 public class DialogData {
 
+    public enum TextAlignment {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
+
     private float offsetX = 0f;
     private float offsetY = 0.3f;
 
@@ -34,7 +40,7 @@ public class DialogData {
     private float paddingX = 4f;
     private float paddingY = 4f;
     private float scale = 1f;
-    private float letterSpacing = 1f;
+    private float letterSpacing = 0f;
     private float lineGap = 2f;
 
     private int backgroundColor = 0xCC000000;
@@ -52,6 +58,8 @@ public class DialogData {
 
     private float shakeSpeed = 0f;
     private float shakeForce = 0f;
+
+    private TextAlignment textAlignment = TextAlignment.LEFT;
 
     public DialogData() {}
 
@@ -76,6 +84,7 @@ public class DialogData {
         this.autoSkipSeconds = source.autoSkipSeconds;
         this.shakeSpeed = source.shakeSpeed;
         this.shakeForce = source.shakeForce;
+        this.textAlignment = source.textAlignment;
     }
 
     public static DialogData from(DialogData preset, DialogData overrides) {
@@ -103,12 +112,9 @@ public class DialogData {
         if (overrides.autoSkipSeconds != defaults.autoSkipSeconds) base.autoSkipSeconds = overrides.autoSkipSeconds;
         if (overrides.shakeSpeed != defaults.shakeSpeed) base.shakeSpeed = overrides.shakeSpeed;
         if (overrides.shakeForce != defaults.shakeForce) base.shakeForce = overrides.shakeForce;
+        if (overrides.textAlignment != defaults.textAlignment) base.textAlignment = overrides.textAlignment;
         return base;
     }
-
-    // -------------------------------------------------------------------------
-    // Getters & setters
-    // -------------------------------------------------------------------------
 
     public float getOffsetX() {
         return offsetX;
@@ -268,5 +274,13 @@ public class DialogData {
 
     public void setShakeForce(float shakeForce) {
         this.shakeForce = shakeForce;
+    }
+
+    public TextAlignment getTextAlignment() {
+        return textAlignment;
+    }
+
+    public void setTextAlignment(TextAlignment textAlignment) {
+        this.textAlignment = textAlignment;
     }
 }

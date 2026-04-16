@@ -85,6 +85,7 @@ public class DialogAnimator {
     public void startAppear() {
         state = State.STARTING;
         animationProgress = 0f;
+        previousProgress = 0f;
     }
 
     public void startDisappear() {

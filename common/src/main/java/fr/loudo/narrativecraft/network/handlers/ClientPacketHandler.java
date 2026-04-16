@@ -41,9 +41,10 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
+
+import java.util.ArrayList;
 
 public class ClientPacketHandler {
 
@@ -98,6 +99,8 @@ public class ClientPacketHandler {
             }
             case "2d" -> {
                 DialogData data = new DialogData();
+                data.setScale(2f);
+                data.setWidth(200f);
                 DialogRenderer2D renderer = new DialogRenderer2D(data);
                 renderer.onStopped(() -> session.removeDialog2D(renderer));
                 renderer.start(packet.text());
@@ -109,7 +112,6 @@ public class ClientPacketHandler {
                 DialogData data = new DialogData();
                 data.setPaddingY(7);
                 data.setPaddingX(5);
-                data.setWidth(100);
                 DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
                 renderer.onStopped(() -> session.removeDialog3D(renderer));
                 renderer.start(packet.text());

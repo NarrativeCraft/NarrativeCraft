@@ -27,6 +27,8 @@ import fr.loudo.narrativecraft.mixin.accessor.GuiGraphicsExtractorAccessor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.client.renderer.state.gui.GuiTextRenderState;
 import net.minecraft.locale.Language;
@@ -55,6 +57,19 @@ public record GuiGraphicsExtractorExtension(GuiGraphicsExtractor graphics) {
         ((IGuiTextRenderStateExtension) (Object) renderState).setFloatX(x);
         ((IGuiTextRenderStateExtension) (Object) renderState).setFloatY(y);
         this.getGuiRenderState().addText(renderState);
+    }
+
+    public void skipArrow(float x, float y, float halfWidth, float halfHeight, int color) {
+        Matrix3x2f pose = new Matrix3x2f(graphics.pose()).translate(x, y);
+        this.getGuiRenderState()
+                .addGuiElement(new GuiSkipTriangleRenderState(
+                        RenderPipelines.GUI,
+                        TextureSetup.noTexture(),
+                        pose,
+                        halfWidth,
+                        halfHeight,
+                        color,
+                        getScreenRectangle()));
     }
 
     private GuiRenderState getGuiRenderState() {

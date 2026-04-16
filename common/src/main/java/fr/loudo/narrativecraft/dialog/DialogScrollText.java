@@ -36,10 +36,7 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Matrix4f;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,7 +102,7 @@ public class DialogScrollText {
         return visibleCount;
     }
 
-    public List<float[]> computeLetterPositions(
+    private List<float[]> computeLetterPositionsRaw(
             float originX, float originY, float maxWidth, Font font, DialogData data) {
         List<float[]> positions = new ArrayList<>(letters.size());
         for (int i = 0; i < letters.size(); i++) positions.add(new float[] {originX, originY});
@@ -117,7 +114,6 @@ public class DialogScrollText {
         while (i < letters.size()) {
             String letter = letters.get(i).letter;
 
-            // Invisible wait markers occupy no space
             if (letter.isEmpty()) {
                 positions.get(i)[0] = x;
                 positions.get(i)[1] = y;
@@ -172,8 +168,40 @@ public class DialogScrollText {
         return positions;
     }
 
+    public List<float[]> computeLetterPositions(
+            float originX, float originY, float maxWidth, Font font, DialogData data) {
+        List<float[]> positions = computeLetterPositionsRaw(originX, originY, maxWidth, font, data);
+
+        DialogData.TextAlignment alignment = data.getTextAlignment();
+        if (alignment != DialogData.TextAlignment.LEFT) {
+            Map<Float, Float> rowRightEdge = new LinkedHashMap<>();
+            for (int index = 0; index < letters.size(); index++) {
+                LetterEntry entry = letters.get(index);
+                if (entry.letter.isEmpty() || entry.letter.equals("\n") || entry.letter.equals(" ")) continue;
+                float[] letterPosition = positions.get(index);
+                float rightEdge = (letterPosition[0] - originX) + font.width(entry.letter);
+                rowRightEdge.merge(letterPosition[1], rightEdge, Math::max);
+            }
+            for (int index = 0; index < letters.size(); index++) {
+                LetterEntry entry = letters.get(index);
+                if (entry.letter.isEmpty() || entry.letter.equals("\n") || entry.letter.equals(" ")) continue;
+                float[] letterPosition = positions.get(index);
+                float lineWidth = rowRightEdge.getOrDefault(letterPosition[1], 0f);
+                float offset =
+                        switch (alignment) {
+                            case CENTER -> -lineWidth / 2f;
+                            case RIGHT -> -lineWidth;
+                            default -> 0f;
+                        };
+                letterPosition[0] += offset;
+            }
+        }
+
+        return positions;
+    }
+
     public float[] computeTextDimensions(float maxWidth, Font font, DialogData data) {
-        List<float[]> positions = computeLetterPositions(0f, 0f, maxWidth, font, data);
+        List<float[]> positions = computeLetterPositionsRaw(0f, 0f, maxWidth, font, data);
         float maxX = 0f;
         float maxY = 0f;
         for (int i = 0; i < letters.size(); i++) {
