@@ -102,7 +102,7 @@ public abstract class CameraMixin {
     }
 
     @Inject(method = "calculateFov", at = @At("HEAD"), cancellable = true)
-    private void modifyFov(float partialTicks, CallbackInfoReturnable<Float> cir) {
+    private void narrativecraft$modifyFov(float partialTicks, CallbackInfoReturnable<Float> cir) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession != null && playerSession.getCutsceneDataSession() != null) {

@@ -26,13 +26,8 @@ package fr.loudo.narrativecraft.dialog;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.dialog.ITextEffect;
+import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
 import fr.loudo.narrativecraft.dialog.effects.WaitTextEffect;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -40,6 +35,13 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Matrix4f;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DialogScrollText {
 
@@ -199,7 +201,9 @@ public class DialogScrollText {
             float[] pos = positions.get(i);
             Vec2 offset = getEffectOffset(entry, i, partialTick);
             int color = applyOpacity(data.getTextColor(), 1f);
-            graphics.text(font, entry.letter, (int) (pos[0] + offset.x), (int) (pos[1] + offset.y), color, false);
+
+            GuiGraphicsExtractorExtension graphicsExtension = new GuiGraphicsExtractorExtension(graphics);
+            graphicsExtension.text(font, entry.letter, pos[0] + offset.x, pos[1] + offset.y, color, false);
         }
     }
 

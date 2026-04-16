@@ -21,17 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.dialog;
+package fr.loudo.narrativecraft.client.gui;
 
-public interface IDialogPresetProvider {
+public interface IGuiTextRenderStateExtension {
+    void setFloatX(float x);
 
-    /**
-     * Called during preset loading. Implementations should call
-     * {@code manager.registerPreset(name, dialogData)} for each preset they provide.
-     */
-    void providePresets(IDialogPresetConsumer consumer);
-
-    interface IDialogPresetConsumer {
-        void registerPreset(String name, Object dialogData);
-    }
+    void setFloatY(float y);
 }

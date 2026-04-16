@@ -21,17 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.dialog;
+package fr.loudo.narrativecraft.mixin;
 
-public interface IDialogPresetProvider {
+import fr.loudo.narrativecraft.client.gui.IGuiGraphicsExtractorExtension;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
-    /**
-     * Called during preset loading. Implementations should call
-     * {@code manager.registerPreset(name, dialogData)} for each preset they provide.
-     */
-    void providePresets(IDialogPresetConsumer consumer);
+@Mixin(GuiGraphicsExtractor.class)
+public class GuiGraphicsExtractorMixinFabric implements IGuiGraphicsExtractorExtension {
+    @Shadow
+    @Final
+    public GuiGraphicsExtractor.ScissorStack scissorStack;
 
-    interface IDialogPresetConsumer {
-        void registerPreset(String name, Object dialogData);
+    @Override
+    public ScreenRectangle getPeekScissorStack() {
+        return this.scissorStack.peek();
     }
 }

@@ -58,7 +58,7 @@ public class OnRenderWorldEvent {
         List<DialogRenderer3D> dialogs = session.getActiveDialog3DRenderers();
         if (dialogs.isEmpty()) return;
 
-        float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
+        float partialTick = deltaTracker.getGameTimeDeltaTicks();
         MultiBufferSource.BufferSource bufferSource =
                 Minecraft.getInstance().renderBuffers().bufferSource();
 

@@ -15,6 +15,7 @@
   ],
   "client": [
     "GameRendererMixinFabric",
+    "GuiGraphicsExtractorMixinFabric",
     "KeyboardHandlerMixinFabric",
     "MouseHandlerMixinFabric"
   ],

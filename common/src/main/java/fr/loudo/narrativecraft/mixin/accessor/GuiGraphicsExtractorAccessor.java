@@ -21,17 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.dialog;
+package fr.loudo.narrativecraft.mixin.accessor;
 
-public interface IDialogPresetProvider {
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-    /**
-     * Called during preset loading. Implementations should call
-     * {@code manager.registerPreset(name, dialogData)} for each preset they provide.
-     */
-    void providePresets(IDialogPresetConsumer consumer);
+@Mixin(GuiGraphicsExtractor.class)
+public interface GuiGraphicsExtractorAccessor {
 
-    interface IDialogPresetConsumer {
-        void registerPreset(String name, Object dialogData);
-    }
+    @Accessor
+    GuiRenderState getGuiRenderState();
 }

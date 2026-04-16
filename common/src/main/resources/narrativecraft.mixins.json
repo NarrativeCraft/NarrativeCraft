@@ -15,7 +15,9 @@
   ],
   "client": [
     "CameraMixin",
-    "MinecraftMixin"
+    "GuiTextRenderStateMixin",
+    "MinecraftMixin",
+    "accessor.GuiGraphicsExtractorAccessor"
   ],
   "server": [],
   "injectors": {
