@@ -21,41 +21,53 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.narrative.animation;
+package fr.loudo.narrativecraft.client.screens.narrative.cutscene;
 
-import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.screens.Screen;
 
-public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<Animation> {
+public class CutsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cutscene> {
 
     private final Scene scene;
 
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen, Scene scene) {
-        super(entry, lastScreen);
-        this.scene = scene;
-    }
-
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen) {
+    public CutsceneEntryEditScreen(Cutscene entry, Screen lastScreen) {
         super(entry, lastScreen);
         this.scene = entry.getScene();
     }
 
-    public AnimationEntryEditScreen(Scene scene, Screen lastScreen) {
+    public CutsceneEntryEditScreen(Scene scene, Screen lastScreen) {
         super(null, lastScreen);
         this.scene = scene;
     }
 
     @Override
-    protected void addCustomFields() {
-        // hack lol
-        widgets.removeIf(widget -> widget.equals(descriptionText));
-        widgets.removeIf(widget -> widget.equals(descriptionBox));
+    protected boolean hasValidated() {
+        if (!super.hasValidated()) {
+            return false;
+        }
+
+        Cutscene cutscene = scene.getCutsceneManager().getByName(getName());
+        if (cutscene != null) {
+            sendToastError(
+                    Translation.message("error"),
+                    Translation.message(
+                            "error.already_exists",
+                            Translation.message("cutscene").getString(),
+                            cutscene.getName()));
+            return false;
+        }
+
+        return true;
     }
 
     @Override
-    protected Animation createInstance() {
-        return new Animation(getName(), scene);
+    protected void addCustomFields() {}
+
+    @Override
+    protected Cutscene createInstance() {
+        return new Cutscene(getName(), getDescription(), scene);
     }
 }

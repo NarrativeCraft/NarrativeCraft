@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.client.editors.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
-import fr.loudo.narrativecraft.screens.components.LayerSelectionButton;
+import fr.loudo.narrativecraft.client.screens.components.LayerSelectionButton;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
 import java.util.List;

@@ -21,24 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.narrative.cutscene;
+package fr.loudo.narrativecraft.client.screens.narrative.subscene;
 
-import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.screens.Screen;
 
-public class CutsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cutscene> {
+public class SubsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Subscene> {
 
     private final Scene scene;
 
-    public CutsceneEntryEditScreen(Cutscene entry, Screen lastScreen) {
+    public SubsceneEntryEditScreen(Subscene entry, Screen lastScreen) {
         super(entry, lastScreen);
         this.scene = entry.getScene();
     }
 
-    public CutsceneEntryEditScreen(Scene scene, Screen lastScreen) {
+    public SubsceneEntryEditScreen(Scene scene, Screen lastScreen) {
         super(null, lastScreen);
         this.scene = scene;
     }
@@ -49,14 +49,14 @@ public class CutsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cu
             return false;
         }
 
-        Cutscene cutscene = scene.getCutsceneManager().getByName(getName());
-        if (cutscene != null) {
+        Subscene subscene = scene.getSubsceneManager().getByName(getName());
+        if (subscene != null) {
             sendToastError(
                     Translation.message("error"),
                     Translation.message(
                             "error.already_exists",
-                            Translation.message("cutscene").getString(),
-                            cutscene.getName()));
+                            Translation.message("subscene").getString(),
+                            subscene.getName()));
             return false;
         }
 
@@ -67,7 +67,7 @@ public class CutsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cu
     protected void addCustomFields() {}
 
     @Override
-    protected Cutscene createInstance() {
-        return new Cutscene(getName(), getDescription(), scene);
+    protected Subscene createInstance() {
+        return new Subscene(getName(), getDescription(), scene);
     }
 }

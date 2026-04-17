@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.utils;
 
 import com.mojang.blaze3d.platform.Window;
-import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.network.chat.Component;

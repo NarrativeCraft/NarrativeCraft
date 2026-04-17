@@ -21,13 +21,13 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens;
+package fr.loudo.narrativecraft.client.screens;
 
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.screens.components.BreadcrumbWidget;
+import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;

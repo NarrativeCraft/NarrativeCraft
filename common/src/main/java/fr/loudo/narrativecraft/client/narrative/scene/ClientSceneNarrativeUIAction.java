@@ -27,9 +27,9 @@ import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.screens.narrative.scene.SceneEntryEditScreen;
-import fr.loudo.narrativecraft.screens.narrative.scene.SceneMenuScreen;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.scene.SceneEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.scene.SceneMenuScreen;
 import net.minecraft.client.gui.screens.Screen;
 
 public class ClientSceneNarrativeUIAction implements ClientNarrativeUIAction<Scene> {

@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.client.narrative.ui;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.client.gui.screens.Screen;

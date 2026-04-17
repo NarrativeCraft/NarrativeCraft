@@ -26,8 +26,8 @@ package fr.loudo.narrativecraft.client.narrative.animation;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.screens.narrative.animation.AnimationEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.animation.AnimationEntryEditScreen;
 import net.minecraft.client.gui.screens.Screen;
 
 public class ClientAnimationNarrativeUIAction implements ClientNarrativeUIAction<Animation> {

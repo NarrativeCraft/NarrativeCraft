@@ -21,9 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens;
+package fr.loudo.narrativecraft.client.screens;
 
-import fr.loudo.narrativecraft.screens.components.BreadcrumbWidget;
+import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.ArrayList;
 import java.util.List;

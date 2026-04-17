@@ -21,11 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.narrative.subscene;
+package fr.loudo.narrativecraft.client.screens.narrative.subscene;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;

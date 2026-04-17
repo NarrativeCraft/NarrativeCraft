@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
-import fr.loudo.narrativecraft.client.screen.ClearScreen;
+import fr.loudo.narrativecraft.client.screens.ClearScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.Screen;

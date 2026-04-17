@@ -21,53 +21,41 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.narrative.subscene;
+package fr.loudo.narrativecraft.client.screens.narrative.animation;
 
+import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import net.minecraft.client.gui.screens.Screen;
 
-public class SubsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Subscene> {
+public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<Animation> {
 
     private final Scene scene;
 
-    public SubsceneEntryEditScreen(Subscene entry, Screen lastScreen) {
+    public AnimationEntryEditScreen(Animation entry, Screen lastScreen, Scene scene) {
+        super(entry, lastScreen);
+        this.scene = scene;
+    }
+
+    public AnimationEntryEditScreen(Animation entry, Screen lastScreen) {
         super(entry, lastScreen);
         this.scene = entry.getScene();
     }
 
-    public SubsceneEntryEditScreen(Scene scene, Screen lastScreen) {
+    public AnimationEntryEditScreen(Scene scene, Screen lastScreen) {
         super(null, lastScreen);
         this.scene = scene;
     }
 
     @Override
-    protected boolean hasValidated() {
-        if (!super.hasValidated()) {
-            return false;
-        }
-
-        Subscene subscene = scene.getSubsceneManager().getByName(getName());
-        if (subscene != null) {
-            sendToastError(
-                    Translation.message("error"),
-                    Translation.message(
-                            "error.already_exists",
-                            Translation.message("subscene").getString(),
-                            subscene.getName()));
-            return false;
-        }
-
-        return true;
+    protected void addCustomFields() {
+        // hack lol
+        widgets.removeIf(widget -> widget.equals(descriptionText));
+        widgets.removeIf(widget -> widget.equals(descriptionBox));
     }
 
     @Override
-    protected void addCustomFields() {}
-
-    @Override
-    protected Subscene createInstance() {
-        return new Subscene(getName(), getDescription(), scene);
+    protected Animation createInstance() {
+        return new Animation(getName(), scene);
     }
 }
