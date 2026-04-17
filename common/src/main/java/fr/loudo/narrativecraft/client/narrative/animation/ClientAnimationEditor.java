@@ -59,6 +59,7 @@ public class ClientAnimationEditor implements ClientNarrativeEntryEditor<Animati
         if (animation == null) return;
 
         animation.setName(payload.getName());
+        animation.setCharacterRef(payload.getCharacterRef());
 
         UtilsClient.reloadListScreen();
     }

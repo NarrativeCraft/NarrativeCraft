@@ -42,6 +42,7 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
     private final Scene scene;
     private final List<RecordingData> recordingDataList = new ArrayList<>();
     private int totalTick;
+    private String characterRef = "";
 
     public Animation(UUID id, String name, String description, Scene scene) {
         super(id, name, description);
@@ -115,10 +116,24 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
         return totalTick;
     }
 
+    public String getCharacterRef() {
+        return characterRef;
+    }
+
+    public UUID getCharacterId() {
+        if (characterRef.isEmpty()) return null;
+        String[] split = characterRef.split(":");
+        return UUID.fromString(split[1]);
+    }
+
+    public void setCharacterRef(String characterRef) {
+        this.characterRef = characterRef != null ? characterRef : "";
+    }
+
     @Override
     public AnimationPayload toPayload() {
         return new AnimationPayload(
-                name, description, scene.getId(), scene.getChapter().getId(), totalTick);
+                name, description, scene.getId(), scene.getChapter().getId(), totalTick, characterRef);
     }
 
     @Override

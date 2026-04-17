@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.api.recording.IRecording;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.mixin.accessor.AbstractHorseAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
@@ -186,7 +187,9 @@ public class Recording implements IRecording {
         playerSession.getScene().getAnimationManager().add(animation);
         Services.PACKET.sendToPlayer(
                 getPlayer(), BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
-
+        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        String ref = "C:" + characterManager.getList().get(0).getId().toString();
+        animation.setCharacterRef(ref);
         NarrativeCraftMod.EVENT_BUS.post(new RecordingSaveEvent(getPlayer(), this, animation.getName()));
         return true;
     }

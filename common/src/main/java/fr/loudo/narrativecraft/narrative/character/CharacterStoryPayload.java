@@ -40,27 +40,18 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
             ByteBufCodecs.STRING_UTF8,
             CharacterStoryPayload::getModelType,
             ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getCharacterType,
-            ByteBufCodecs.STRING_UTF8,
             CharacterStoryPayload::getEntityTypeId,
             CharacterStoryPayload::new);
 
     private final String dialogPresetName;
     private final String modelType;
-    private final String characterType;
     private final String entityTypeId;
 
     public CharacterStoryPayload(
-            String name,
-            String description,
-            String dialogPresetName,
-            String modelType,
-            String characterType,
-            String entityTypeId) {
+            String name, String description, String dialogPresetName, String modelType, String entityTypeId) {
         super(name, description);
         this.dialogPresetName = dialogPresetName != null ? dialogPresetName : "";
         this.modelType = modelType != null ? modelType : "";
-        this.characterType = characterType;
         this.entityTypeId = entityTypeId;
     }
 
@@ -70,10 +61,6 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
 
     public String getModelType() {
         return modelType;
-    }
-
-    public String getCharacterType() {
-        return characterType;
     }
 
     public String getEntityTypeId() {

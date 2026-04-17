@@ -79,6 +79,7 @@ public class AnimationEditor implements NarrativeEntryEditor<AnimationPayload, A
 
         Animation newAnimation =
                 new Animation(entryId, payload.getName(), payload.getDescription(), oldAnimation.getScene());
+        newAnimation.setCharacterRef(payload.getCharacterRef());
         int result = NarrativeCraftFileRegistry.getInstance().edit(newAnimation);
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
             ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
@@ -88,6 +89,7 @@ public class AnimationEditor implements NarrativeEntryEditor<AnimationPayload, A
 
         oldAnimation.setName(payload.getName());
         oldAnimation.setDescription(payload.getDescription());
+        oldAnimation.setCharacterRef(payload.getCharacterRef());
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }

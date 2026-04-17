@@ -68,9 +68,6 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
 
         applySharedCharacterFields(jsonObject, character);
 
-        String characterTypeName = jsonObject.get("characterType").getAsString();
-        character.setCharacterType(CharacterType.valueOf(characterTypeName));
-
         return character;
     }
 }

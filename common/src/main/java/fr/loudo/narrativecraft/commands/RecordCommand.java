@@ -28,6 +28,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -143,6 +144,12 @@ public class RecordCommand {
 
         if (recording.isRecording()) {
             context.getSource().sendFailure(Translation.message("record.recording"));
+        }
+
+        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        if (characterManager.getList().isEmpty()) {
+            context.getSource().sendFailure(Translation.message("error.record.no_characters"));
+            return 0;
         }
 
         context.getSource().sendSuccess(() -> Translation.message("record.saving"), false);

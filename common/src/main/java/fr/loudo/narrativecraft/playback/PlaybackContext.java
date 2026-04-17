@@ -24,14 +24,18 @@
 package fr.loudo.narrativecraft.playback;
 
 import com.mojang.authlib.GameProfile;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.Npc;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.util.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -76,7 +80,16 @@ public class PlaybackContext implements IPlaybackContext {
     }
 
     private void createEntity() {
-        if (recordingData.getInitialNbt() != null) {
+        EntityType<?> linkedEntityType = resolveLinkedEntityType();
+        String linkedName = resolveLinkedName();
+
+        String entityId = linkedEntityType != null
+                ? net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+                        .getKey(linkedEntityType)
+                        .toString()
+                : recordingData.getEntityId();
+
+        if (recordingData.getInitialNbt() != null && linkedEntityType == null) {
             Optional<EntityType<?>> typeOpt = EntityType.byString(recordingData.getEntityId());
             if (typeOpt.isEmpty()) {
                 Utils.sendError(
@@ -104,30 +117,65 @@ public class PlaybackContext implements IPlaybackContext {
             return;
         }
 
-        if (recordingData.getEntityId().equals("minecraft:player")) {
-            entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "fakeP"), true);
+        if (entityId.equals("minecraft:player")) {
+            String playerName = linkedName != null ? linkedName : "fakeP";
+            entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), playerName), true);
             return;
         }
 
-        Optional<EntityType<?>> entityType = EntityType.byString(recordingData.getEntityId());
+        Optional<EntityType<?>> entityType = EntityType.byString(entityId);
         EntityType<?> type = entityType.orElse(null);
         if (type == null) {
-            Utils.sendError(
-                    Translation.message("error.playback_entity_type", recordingData.getEntityId()),
-                    playback.getRequester());
+            Utils.sendError(Translation.message("error.playback_entity_type", entityId), playback.getRequester());
             playback.stop();
             return;
         }
         entity = type.create(level, EntitySpawnReason.MOB_SUMMONED);
         if (entity == null) {
-            Utils.sendError(
-                    Translation.message("error.playback_entity_null", recordingData.getEntityId()),
-                    playback.getRequester());
+            Utils.sendError(Translation.message("error.playback_entity_null", entityId), playback.getRequester());
             playback.stop();
             return;
         }
+        if (linkedName != null) {
+            entity.setCustomName(Component.literal(linkedName));
+            entity.setCustomNameVisible(true);
+        }
         entity.setInvulnerable(true);
         entity.entityTags().add(Playback.ENTITY_TAG);
+    }
+
+    private EntityType<?> resolveLinkedEntityType() {
+        String characterRef = playback.getAnimation().getCharacterRef();
+        if (characterRef.isEmpty()) return null;
+        if (characterRef.startsWith("C:")) {
+            UUID characterId = UUID.fromString(characterRef.substring(2));
+            CharacterStory character =
+                    NarrativeCraftMod.getInstance().getCharacterManager().getById(characterId);
+            return character != null ? character.getEntityType() : null;
+        }
+        if (characterRef.startsWith("N:")) {
+            UUID npcId = UUID.fromString(characterRef.substring(2));
+            Npc npc = playback.getAnimation().getScene().getNpcManager().getById(npcId);
+            return npc != null ? npc.getEntityType() : null;
+        }
+        return null;
+    }
+
+    private String resolveLinkedName() {
+        String characterRef = playback.getAnimation().getCharacterRef();
+        if (characterRef.isEmpty()) return null;
+        if (characterRef.startsWith("C:")) {
+            UUID characterId = UUID.fromString(characterRef.substring(2));
+            CharacterStory character =
+                    NarrativeCraftMod.getInstance().getCharacterManager().getById(characterId);
+            return character != null ? character.getName() : null;
+        }
+        if (characterRef.startsWith("N:")) {
+            UUID npcId = UUID.fromString(characterRef.substring(2));
+            Npc npc = playback.getAnimation().getScene().getNpcManager().getById(npcId);
+            return npc != null ? npc.getName() : null;
+        }
+        return null;
     }
 
     private void addEntityToWorld() {

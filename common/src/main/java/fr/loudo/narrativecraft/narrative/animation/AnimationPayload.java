@@ -35,6 +35,7 @@ public class AnimationPayload extends NarrativeEntryPayload {
     private final UUID chapterId;
     private final UUID sceneId;
     private final int totalTick;
+    private final String characterRef;
 
     public static final StreamCodec<ByteBuf, AnimationPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
@@ -47,13 +48,17 @@ public class AnimationPayload extends NarrativeEntryPayload {
             AnimationPayload::getChapterId,
             ByteBufCodecs.INT,
             AnimationPayload::getTotalTick,
+            ByteBufCodecs.STRING_UTF8,
+            AnimationPayload::getCharacterRef,
             AnimationPayload::new);
 
-    public AnimationPayload(String name, String description, UUID sceneId, UUID chapterId, int totalTick) {
+    public AnimationPayload(
+            String name, String description, UUID sceneId, UUID chapterId, int totalTick, String characterRef) {
         super(name, description);
         this.chapterId = chapterId;
         this.sceneId = sceneId;
         this.totalTick = totalTick;
+        this.characterRef = characterRef != null ? characterRef : "";
     }
 
     public UUID getChapterId() {
@@ -66,5 +71,9 @@ public class AnimationPayload extends NarrativeEntryPayload {
 
     public int getTotalTick() {
         return totalTick;
+    }
+
+    public String getCharacterRef() {
+        return characterRef;
     }
 }

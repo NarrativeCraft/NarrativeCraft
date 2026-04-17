@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryPayload;
-import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -65,7 +64,6 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
         if (!payload.getModelType().isEmpty()) {
             oldCharacter.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
-        oldCharacter.setCharacterType(CharacterType.valueOf(payload.getCharacterType()));
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         UtilsClient.reloadListScreen();
     }
@@ -83,7 +81,6 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
         if (!payload.getModelType().isEmpty()) {
             character.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
-        character.setCharacterType(CharacterType.valueOf(payload.getCharacterType()));
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         return character;
     }

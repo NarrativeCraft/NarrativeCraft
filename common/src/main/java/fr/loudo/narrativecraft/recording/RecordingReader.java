@@ -99,7 +99,7 @@ public class RecordingReader implements Action.Reader {
         return new BlockPos(input.readInt(), input.readInt(), input.readInt());
     }
 
-    public record RecordingHeader(UUID recordingId, String name, int entityCount, int totalTick) {}
+    public record RecordingHeader(UUID recordingId, String name, int entityCount, int totalTick, String characterRef) {}
 
     public record EntityHeader(
             int entityRecordingId, String entityType, CompoundTag initialNbt, int spawnTick, int actionCount) {}
@@ -115,7 +115,8 @@ public class RecordingReader implements Action.Reader {
         String name = input.readUTF();
         int totalTick = input.readInt();
         int entityCount = input.readInt();
-        return new RecordingHeader(recordingId, name, entityCount, totalTick);
+        String characterRef = input.readUTF();
+        return new RecordingHeader(recordingId, name, entityCount, totalTick, characterRef);
     }
 
     public Map<Byte, String> readLocalActionsId() throws IOException {

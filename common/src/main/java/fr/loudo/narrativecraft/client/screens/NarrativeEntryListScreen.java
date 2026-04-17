@@ -107,7 +107,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                                         .getList(),
                                 this,
                                 CharacterStory.class,
-                                "Characters"));
+                                ""));
                     })
                     .bounds(10, 10, 20, 20)
                     .build();
@@ -115,7 +115,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
         }
 
         if (!breadCrumb.isEmpty()) {
-            addRenderableWidget(new BreadcrumbWidget(20, 20, breadCrumb, this.font));
+            addRenderableWidget(new BreadcrumbWidget(20, this.height / 2, breadCrumb, this.font));
         }
     }
 

@@ -41,6 +41,8 @@ import java.util.Map;
 public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
         implements NarrativeCraftFileEditor<Animation> {
 
+    private record EntityData(RecordingReader.EntityHeader header, List<AbstractAction> actions) {}
+
     @Override
     public int create(Animation entry) {
 
@@ -59,7 +61,11 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                 new DataOutputStream(new FileOutputStream(new File(animationsFolder, entry.toFileName())))) {
             RecordingWriter writer = new RecordingWriter(stream);
             writer.writeHeader(
-                    recording.getId(), entry.getName(), recording.getEntityTrackedSize(), recording.getTick());
+                    recording.getId(),
+                    entry.getName(),
+                    recording.getEntityTrackedSize(),
+                    recording.getTick(),
+                    entry.getCharacterRef());
             writer.writeLocalActionsId();
             for (RecordingEntityData recordingEntityData : recording.getRecordingEntityDataList()) {
                 if (!recordingEntityData.isTracked()) continue;
@@ -89,43 +95,53 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
         Animation oldAnimation = entry.getScene().getAnimationManager().getById(entry.getId());
 
         File animationsFolder = NarrativeCraftFileUtil.getAnimationsFolder(entry.getScene());
-
         File oldFileRecord = new File(animationsFolder, oldAnimation.toFileName());
         File newFileRecord = new File(animationsFolder, entry.toFileName());
 
+        RecordingReader.RecordingHeader header;
+        Map<Byte, String> actionsDict;
+        List<EntityData> entities = new ArrayList<>();
+
         try (DataInputStream inStream = new DataInputStream(new FileInputStream(oldFileRecord))) {
             RecordingReader reader = new RecordingReader(inStream);
-            RecordingReader.RecordingHeader header = reader.readHeader();
-            Map<Byte, String> actionsDict = reader.readLocalActionsId();
+            header = reader.readHeader();
+            actionsDict = reader.readLocalActionsId();
+            for (int i = 0; i < header.entityCount(); i++) {
+                RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();
+                List<AbstractAction> actions = reader.readAllActions(entityHeader.actionCount());
+                entities.add(new EntityData(entityHeader, actions));
+            }
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Failed to read animation {}", oldAnimation.getName(), e);
+            return NarrativeCraftFileEditor.OPERATION_FAILED;
+        }
 
-            try (DataOutputStream outStream = new DataOutputStream(new FileOutputStream(newFileRecord))) {
-                RecordingWriter writer = new RecordingWriter(outStream);
-                writer.writeHeader(header.recordingId(), entry.getName(), header.entityCount(), header.totalTick());
-                writer.writeActionSize((byte) actionsDict.size());
-
-                for (Map.Entry<Byte, String> actionTypeEntry : actionsDict.entrySet()) {
-                    byte id = actionTypeEntry.getKey();
-                    String actionId = actionTypeEntry.getValue();
-                    writer.writeActionId(id, actionId);
-                }
-
-                for (int i = 0; i < header.entityCount(); i++) {
-                    RecordingReader.EntityHeader entityHeader = reader.readEntityHeader();
-
-                    writer.writeEntityHeader(
-                            entityHeader.entityRecordingId(),
-                            entityHeader.entityType(),
-                            entityHeader.initialNbt(),
-                            entityHeader.spawnTick(),
-                            entityHeader.actionCount());
-
-                    for (AbstractAction action : reader.readAllActions(entityHeader.actionCount())) {
-                        writer.writeActionRecord(action);
-                    }
+        try (DataOutputStream outStream = new DataOutputStream(new FileOutputStream(newFileRecord))) {
+            RecordingWriter writer = new RecordingWriter(outStream);
+            writer.writeHeader(
+                    header.recordingId(),
+                    entry.getName(),
+                    header.entityCount(),
+                    header.totalTick(),
+                    entry.getCharacterRef());
+            writer.writeActionSize((byte) actionsDict.size());
+            for (Map.Entry<Byte, String> actionTypeEntry : actionsDict.entrySet()) {
+                writer.writeActionId(actionTypeEntry.getKey(), actionTypeEntry.getValue());
+            }
+            for (EntityData entityData : entities) {
+                RecordingReader.EntityHeader entityHeader = entityData.header();
+                writer.writeEntityHeader(
+                        entityHeader.entityRecordingId(),
+                        entityHeader.entityType(),
+                        entityHeader.initialNbt(),
+                        entityHeader.spawnTick(),
+                        entityHeader.actionCount());
+                for (AbstractAction action : entityData.actions()) {
+                    writer.writeActionRecord(action);
                 }
             }
         } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to edit animation {}", oldAnimation.getName(), e);
+            NarrativeCraftMod.LOGGER.error("Failed to write animation {}", entry.getName(), e);
             return NarrativeCraftFileEditor.OPERATION_FAILED;
         }
 
@@ -174,11 +190,13 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                 }
 
                 for (File file : animations) {
+                    if (!file.getName().endsWith(Recording.RECORDING_EXTENSION)) continue;
                     try (DataInputStream stream = new DataInputStream(new FileInputStream(file))) {
                         RecordingReader reader = new RecordingReader(stream);
                         RecordingReader.RecordingHeader header = reader.readHeader();
                         Animation animation =
                                 new Animation(header.recordingId(), header.name(), scene, header.totalTick());
+                        animation.setCharacterRef(header.characterRef());
 
                         deserializationResults.add(new DeserializationResult<>(animation, false, file.getName()));
                     } catch (IOException e) {

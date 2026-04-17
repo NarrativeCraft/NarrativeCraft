@@ -33,7 +33,6 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
 
     private String dialogPresetName;
     private EntityType<?> entityType = EntityType.PLAYER;
-    private CharacterType characterType = CharacterType.NORMAL;
     private PlayerModelType modelType;
 
     public CharacterStory(String name, String description) {
@@ -60,14 +59,6 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
         this.entityType = entityType;
     }
 
-    public CharacterType getCharacterType() {
-        return characterType;
-    }
-
-    public void setCharacterType(CharacterType characterType) {
-        this.characterType = characterType;
-    }
-
     public PlayerModelType getModelType() {
         return modelType;
     }
@@ -80,8 +71,7 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
     public CharacterStoryPayload toPayload() {
         String modelTypeName = modelType != null ? modelType.name() : "";
         String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
-        return new CharacterStoryPayload(
-                name, description, dialogPresetName, modelTypeName, characterType.name(), entityTypeId);
+        return new CharacterStoryPayload(name, description, dialogPresetName, modelTypeName, entityTypeId);
     }
 
     @Override

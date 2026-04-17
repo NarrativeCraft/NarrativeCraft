@@ -84,7 +84,6 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
         if (!payload.getModelType().isEmpty()) {
             oldCharacter.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
-        oldCharacter.setCharacterType(CharacterType.valueOf(payload.getCharacterType()));
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
@@ -111,7 +110,6 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
         if (!payload.getModelType().isEmpty()) {
             character.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
-        character.setCharacterType(CharacterType.valueOf(payload.getCharacterType()));
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         return character;
     }

@@ -52,8 +52,7 @@ public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
         String entityTypeLabel =
                 BuiltInRegistries.ENTITY_TYPE.getKey(selectedEntityType).toString();
         Button entityTypeButton = Button.builder(
-                        Component.literal(Translation.message("screen.character.entity_type")
-                                        .getString() + ": " + entityTypeLabel),
+                        Component.literal(Translation.message("entity_type").getString() + ": " + entityTypeLabel),
                         b -> minecraft.setScreen(
                                 new EntityTypePickerScreen(this, picked -> selectedEntityType = picked)))
                 .size(GLOBAL_WIDTH, 20)

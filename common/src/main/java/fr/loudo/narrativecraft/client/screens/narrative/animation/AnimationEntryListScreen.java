@@ -23,40 +23,40 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.animation;
 
-import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.util.List;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
-public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<Animation> {
+public class AnimationEntryListScreen extends NarrativeEntryListScreen<Animation> {
 
-    private final Scene scene;
-
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen, Scene scene) {
-        super(entry, lastScreen);
-        this.scene = scene;
-    }
-
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen) {
-        super(entry, lastScreen);
-        this.scene = entry.getScene();
-    }
-
-    public AnimationEntryEditScreen(Scene scene, Screen lastScreen) {
-        super(null, lastScreen);
-        this.scene = scene;
+    public AnimationEntryListScreen(
+            Component title,
+            List<Animation> entries,
+            Screen lastScreen,
+            NarrativeEntry<?> parentEntry,
+            String breadCrumb) {
+        super(title, entries, lastScreen, Animation.class, parentEntry, breadCrumb);
     }
 
     @Override
-    protected boolean showDescription() {
-        return false;
+    public void addWidgetsForItem(int x, int y, Animation item) {
+        addMainButton(x - 30, y, item);
+        Button editButton = addEditButton(x + buttonWidth - 25, y, item);
+        Button linkButton = addLinkButton(editButton.getX() + editButton.getWidth() + 5, y, item);
+        addDeleteButton(linkButton.getX() + linkButton.getWidth() + 5, y, item);
     }
 
-    @Override
-    protected void addCustomFields() {}
-
-    @Override
-    protected Animation createInstance() {
-        return new Animation(getName(), scene);
+    private Button addLinkButton(int x, int y, Animation item) {
+        Button linkButton = Button.builder(
+                        Component.literal("⚙"),
+                        b -> minecraft.setScreen(new AnimationCharacterPickerScreen(item, this)))
+                .bounds(x, y, 20, 20)
+                .build();
+        addRenderableWidget(linkButton);
+        return linkButton;
     }
 }

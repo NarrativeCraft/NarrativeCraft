@@ -25,9 +25,9 @@ package fr.loudo.narrativecraft.client.screens.narrative.scene;
 
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
+import fr.loudo.narrativecraft.client.screens.narrative.animation.AnimationEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cutscene.CutsceneEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.subscene.SubsceneEntryListScreen;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.character.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -57,11 +57,10 @@ public class SceneMenuScreen extends Screen {
         Map<Component, Runnable> labels = new LinkedHashMap<>();
 
         labels.put(Translation.message("screen.scene_menu.animations"), () -> {
-            minecraft.setScreen(new NarrativeEntryListScreen<>(
+            minecraft.setScreen(new AnimationEntryListScreen(
                     Translation.message("animation"),
                     scene.getAnimationManager().getList(),
                     this,
-                    Animation.class,
                     scene,
                     String.format(
                             "%s;%s;%s",
@@ -129,7 +128,7 @@ public class SceneMenuScreen extends Screen {
                 .build());
 
         String breadcrumb = scene.getChapter().getName() + ";" + scene.getName();
-        addRenderableWidget(new BreadcrumbWidget(20, 20, breadcrumb, this.font));
+        addRenderableWidget(new BreadcrumbWidget(20, this.height / 2, breadcrumb, this.font));
     }
 
     @Override
