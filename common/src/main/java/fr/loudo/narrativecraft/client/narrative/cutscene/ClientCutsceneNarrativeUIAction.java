@@ -26,14 +26,14 @@ package fr.loudo.narrativecraft.client.narrative.cutscene;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.cutscene.CutsceneEntryEditScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.client.screens.narrative.cutscene.CutsceneEntryEditScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 

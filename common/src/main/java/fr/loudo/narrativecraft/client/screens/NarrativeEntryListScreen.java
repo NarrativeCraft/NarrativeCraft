@@ -23,11 +23,13 @@
 
 package fr.loudo.narrativecraft.client.screens;
 
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
+import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
@@ -89,6 +91,27 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                     .bounds(this.width / 2 + buttonWidth / 2 + 10, 20, 20, 20)
                     .build();
             this.addRenderableWidget(addButton);
+        }
+
+        if (entryClass == CharacterStory.class) {
+            Button storiesButton = Button.builder(Component.literal("S"), b -> onClose())
+                    .bounds(10, 10, 20, 20)
+                    .build();
+            this.addRenderableWidget(storiesButton);
+        } else {
+            Button charactersButton = Button.builder(Component.literal("C"), b -> {
+                        minecraft.setScreen(new NarrativeEntryListScreen<>(
+                                Translation.message("character"),
+                                ClientNarrativeCraftMod.getInstance()
+                                        .getCharacterManager()
+                                        .getList(),
+                                this,
+                                CharacterStory.class,
+                                "Characters"));
+                    })
+                    .bounds(10, 10, 20, 20)
+                    .build();
+            this.addRenderableWidget(charactersButton);
         }
 
         if (!breadCrumb.isEmpty()) {

@@ -21,41 +21,37 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.screens.narrative.animation;
+package fr.loudo.narrativecraft.client.screens;
 
-import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
-public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<Animation> {
+public abstract class AbstractNarrativeEntryPickerScreen<T> extends PaginationsItemsScreen<T> {
 
-    private final Scene scene;
+    private final Screen lastScreen;
+    private final Consumer<T> onPick;
 
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen, Scene scene) {
-        super(entry, lastScreen);
-        this.scene = scene;
-    }
-
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen) {
-        super(entry, lastScreen);
-        this.scene = entry.getScene();
-    }
-
-    public AnimationEntryEditScreen(Scene scene, Screen lastScreen) {
-        super(null, lastScreen);
-        this.scene = scene;
+    public AbstractNarrativeEntryPickerScreen(Component title, List<T> items, Screen lastScreen, Consumer<T> onPick) {
+        super(title, items);
+        this.lastScreen = lastScreen;
+        this.onPick = onPick;
     }
 
     @Override
-    protected void addCustomFields() {
-        // hack lol
-        widgets.removeIf(widget -> widget.equals(descriptionText));
-        widgets.removeIf(widget -> widget.equals(descriptionBox));
+    protected void onItemClicked(T item) {
+        onPick.accept(item);
+        minecraft.setScreen(lastScreen);
     }
 
     @Override
-    protected Animation createInstance() {
-        return new Animation(getName(), scene);
+    protected boolean isItemClickable(T item) {
+        return true;
+    }
+
+    @Override
+    public void onClose() {
+        minecraft.setScreen(lastScreen);
     }
 }

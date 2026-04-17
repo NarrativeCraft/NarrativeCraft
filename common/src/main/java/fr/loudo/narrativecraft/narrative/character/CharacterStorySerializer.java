@@ -21,41 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.screens.narrative.animation;
+package fr.loudo.narrativecraft.narrative.character;
 
-import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import net.minecraft.client.gui.screens.Screen;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import java.lang.reflect.Type;
+import net.minecraft.core.registries.BuiltInRegistries;
 
-public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<Animation> {
-
-    private final Scene scene;
-
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen, Scene scene) {
-        super(entry, lastScreen);
-        this.scene = scene;
-    }
-
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen) {
-        super(entry, lastScreen);
-        this.scene = entry.getScene();
-    }
-
-    public AnimationEntryEditScreen(Scene scene, Screen lastScreen) {
-        super(null, lastScreen);
-        this.scene = scene;
-    }
+public class CharacterStorySerializer implements JsonSerializer<CharacterStory> {
 
     @Override
-    protected void addCustomFields() {
-        // hack lol
-        widgets.removeIf(widget -> widget.equals(descriptionText));
-        widgets.removeIf(widget -> widget.equals(descriptionBox));
-    }
-
-    @Override
-    protected Animation createInstance() {
-        return new Animation(getName(), scene);
+    public JsonElement serialize(CharacterStory src, Type typeOfSrc, JsonSerializationContext context) {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", src.getId().toString());
+        json.addProperty("name", src.getName());
+        json.addProperty("description", src.getDescription());
+        json.addProperty("dialogPresetName", src.getDialogPresetName() != null ? src.getDialogPresetName() : "");
+        json.addProperty(
+                "modelType", src.getModelType() != null ? src.getModelType().name() : "");
+        json.addProperty("characterType", src.getCharacterType().name());
+        json.addProperty(
+                "entityTypeId",
+                BuiltInRegistries.ENTITY_TYPE.getKey(src.getEntityType()).toString());
+        return json;
     }
 }

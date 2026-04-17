@@ -27,8 +27,10 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
@@ -43,6 +45,7 @@ public class NarrativeEntryInit {
     public static void init() {
         // Not supposed to be populated on servers, but on singleplayer world it stills on memory so data aren't updated
         NarrativeCraftMod.getInstance().getChapterManager().clear();
+        NarrativeCraftMod.getInstance().getCharacterManager().clear();
         NarrativeCraftMod.getInstance().getCorruptedDeserialization().clear();
 
         // Order is important!! e.g. Chapters must be initialized before scenes of chapter can be initialized.
@@ -51,6 +54,7 @@ public class NarrativeEntryInit {
         animations();
         subscenes();
         cutscenes();
+        characters();
     }
 
     private static void chapters() {
@@ -120,6 +124,20 @@ public class NarrativeEntryInit {
         }
     }
 
+    private static void characters() {
+        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        List<DeserializationResult<CharacterStory>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(CharacterStory.class);
+
+        for (DeserializationResult<CharacterStory> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            characterManager.add(deserializationResult.entry());
+        }
+    }
+
     public static void sendDataToPlayer(ServerPlayer player) {
         Services.PACKET.sendToPlayer(player, S2CNarrativeDataClear.INSTANCE);
         for (Chapter chapter :
@@ -140,6 +158,11 @@ public class NarrativeEntryInit {
                             player, BiSyncNarrativeEntryPacket.add(cutscene.getId(), cutscene.toPayload()));
                 }
             }
+        }
+        for (CharacterStory character :
+                NarrativeCraftMod.getInstance().getCharacterManager().getList()) {
+            Services.PACKET.sendToPlayer(
+                    player, BiSyncNarrativeEntryPacket.add(character.getId(), character.toPayload()));
         }
     }
 }

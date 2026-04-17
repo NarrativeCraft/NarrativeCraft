@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative;
 
 import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryPayload;
 import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
 import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
@@ -36,7 +37,8 @@ public enum NarrativeEntryType {
     SCENE(ScenePayload.class, ScenePayload.STREAM_CODEC),
     ANIMATION(AnimationPayload.class, AnimationPayload.STREAM_CODEC),
     SUBSCENE(SubscenePayload.class, SubscenePayload.STREAM_CODEC),
-    CUTSCENE(CutscenePayload.class, CutscenePayload.STREAM_CODEC);
+    CUTSCENE(CutscenePayload.class, CutscenePayload.STREAM_CODEC),
+    CHARACTER(CharacterStoryPayload.class, CharacterStoryPayload.STREAM_CODEC);
 
     private final Class<? extends NarrativeEntryPayload> clazz;
     private final StreamCodec<? super ByteBuf, ? extends NarrativeEntryPayload> codec;

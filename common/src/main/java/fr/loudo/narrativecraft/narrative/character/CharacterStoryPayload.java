@@ -24,9 +24,59 @@
 package fr.loudo.narrativecraft.narrative.character;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public class CharacterStoryPayload extends NarrativeEntryPayload {
-    public CharacterStoryPayload(String name, String description) {
+
+    public static final StreamCodec<ByteBuf, CharacterStoryPayload> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8,
+            CharacterStoryPayload::getName,
+            ByteBufCodecs.STRING_UTF8,
+            CharacterStoryPayload::getDescription,
+            ByteBufCodecs.STRING_UTF8,
+            CharacterStoryPayload::getDialogPresetName,
+            ByteBufCodecs.STRING_UTF8,
+            CharacterStoryPayload::getModelType,
+            ByteBufCodecs.STRING_UTF8,
+            CharacterStoryPayload::getCharacterType,
+            ByteBufCodecs.STRING_UTF8,
+            CharacterStoryPayload::getEntityTypeId,
+            CharacterStoryPayload::new);
+
+    private final String dialogPresetName;
+    private final String modelType;
+    private final String characterType;
+    private final String entityTypeId;
+
+    public CharacterStoryPayload(
+            String name,
+            String description,
+            String dialogPresetName,
+            String modelType,
+            String characterType,
+            String entityTypeId) {
         super(name, description);
+        this.dialogPresetName = dialogPresetName != null ? dialogPresetName : "";
+        this.modelType = modelType != null ? modelType : "";
+        this.characterType = characterType;
+        this.entityTypeId = entityTypeId;
+    }
+
+    public String getDialogPresetName() {
+        return dialogPresetName;
+    }
+
+    public String getModelType() {
+        return modelType;
+    }
+
+    public String getCharacterType() {
+        return characterType;
+    }
+
+    public String getEntityTypeId() {
+        return entityTypeId;
     }
 }

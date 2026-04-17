@@ -23,9 +23,9 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.cutscene;
 
+import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;

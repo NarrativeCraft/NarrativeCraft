@@ -23,9 +23,9 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.cutscene;
 
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.screens.Screen;
 

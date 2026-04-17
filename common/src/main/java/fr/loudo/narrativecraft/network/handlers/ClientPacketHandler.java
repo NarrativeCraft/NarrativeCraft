@@ -60,6 +60,7 @@ public class ClientPacketHandler {
 
     public static void clearNarrativeData() {
         ClientNarrativeCraftMod.getInstance().getChapterManager().clear();
+        ClientNarrativeCraftMod.getInstance().getCharacterManager().clear();
     }
 
     public static void clearScreen() {

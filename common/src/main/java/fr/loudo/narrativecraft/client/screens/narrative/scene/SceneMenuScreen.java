@@ -23,12 +23,12 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.scene;
 
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.client.screens.narrative.cutscene.CutsceneEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.subscene.SubsceneEntryListScreen;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.LinkedHashMap;
 import java.util.Map;

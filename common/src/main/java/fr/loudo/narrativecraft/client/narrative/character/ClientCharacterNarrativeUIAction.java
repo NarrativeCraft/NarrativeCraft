@@ -21,53 +21,33 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.screens.narrative.subscene;
+package fr.loudo.narrativecraft.client.narrative.character;
 
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.client.screens.narrative.character.CharacterEntryEditScreen;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import net.minecraft.client.gui.screens.Screen;
 
-public class SubsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Subscene> {
+public class ClientCharacterNarrativeUIAction implements ClientNarrativeUIAction<CharacterStory> {
 
-    private final Scene scene;
-
-    public SubsceneEntryEditScreen(Subscene entry, Screen lastScreen) {
-        super(entry, lastScreen);
-        this.scene = entry.getScene();
-    }
-
-    public SubsceneEntryEditScreen(Scene scene, Screen lastScreen) {
-        super(null, lastScreen);
-        this.scene = scene;
+    @Override
+    public Screen subListSubScreen(CharacterStory entry, Screen parent) {
+        return null;
     }
 
     @Override
-    protected boolean hasValidated() {
-        if (!super.hasValidated()) {
-            return false;
-        }
-
-        Subscene subscene = scene.getSubsceneManager().getByName(getName());
-        if (subscene != null) {
-            sendToastError(
-                    Translation.message("error"),
-                    Translation.message(
-                            "error.already_exists",
-                            Translation.message("subscene").getString(),
-                            subscene.getName()));
-            return false;
-        }
-
-        return true;
+    public boolean isClickable() {
+        return false;
     }
 
     @Override
-    protected void addCustomFields() {}
+    public void customClickAction(CharacterStory entry) {}
 
     @Override
-    protected Subscene createInstance() {
-        return new Subscene(getName(), getDescription(), scene);
+    public AbstractNarrativeEntryEditScreen<CharacterStory> showEditScreen(CharacterStory entry, Screen lastScreen) {
+        return entry == null
+                ? new CharacterEntryEditScreen(lastScreen)
+                : new CharacterEntryEditScreen(entry, lastScreen);
     }
 }

@@ -30,13 +30,12 @@ import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorCamera
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPathRenderer;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import org.joml.Matrix4fStack;
 import org.joml.Matrix4fc;
-
-import java.util.List;
 
 public class OnRenderWorldEvent {
 

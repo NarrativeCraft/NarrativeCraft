@@ -27,6 +27,8 @@ import fr.loudo.narrativecraft.narrative.animation.AnimationEditor;
 import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterEditor;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
+import fr.loudo.narrativecraft.narrative.character.CharacterEditor;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryPayload;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneEditor;
 import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
 import fr.loudo.narrativecraft.narrative.scene.SceneEditor;
@@ -42,5 +44,6 @@ public class NarrativeEditorsRegister {
         NarrativeEntryEditorRegistry.getInstance().register(AnimationPayload.class, new AnimationEditor());
         NarrativeEntryEditorRegistry.getInstance().register(SubscenePayload.class, new SubsceneEditor());
         NarrativeEntryEditorRegistry.getInstance().register(CutscenePayload.class, new CutsceneEditor());
+        NarrativeEntryEditorRegistry.getInstance().register(CharacterStoryPayload.class, new CharacterEditor());
     }
 }

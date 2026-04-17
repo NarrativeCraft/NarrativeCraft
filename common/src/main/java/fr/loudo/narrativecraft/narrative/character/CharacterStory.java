@@ -24,13 +24,24 @@
 package fr.loudo.narrativecraft.narrative.character;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import java.util.UUID;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.PlayerModelType;
 
 public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
 
     private String dialogPresetName;
+    private EntityType<?> entityType = EntityType.PLAYER;
+    private CharacterType characterType = CharacterType.NORMAL;
+    private PlayerModelType modelType;
 
     public CharacterStory(String name, String description) {
         super(name, description);
+    }
+
+    public CharacterStory(UUID id, String name, String description) {
+        super(id, name, description);
     }
 
     public String getDialogPresetName() {
@@ -41,9 +52,36 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
         this.dialogPresetName = dialogPresetName;
     }
 
+    public EntityType<?> getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(EntityType<?> entityType) {
+        this.entityType = entityType;
+    }
+
+    public CharacterType getCharacterType() {
+        return characterType;
+    }
+
+    public void setCharacterType(CharacterType characterType) {
+        this.characterType = characterType;
+    }
+
+    public PlayerModelType getModelType() {
+        return modelType;
+    }
+
+    public void setModelType(PlayerModelType modelType) {
+        this.modelType = modelType;
+    }
+
     @Override
     public CharacterStoryPayload toPayload() {
-        return new CharacterStoryPayload(name, description);
+        String modelTypeName = modelType != null ? modelType.name() : "";
+        String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
+        return new CharacterStoryPayload(
+                name, description, dialogPresetName, modelTypeName, characterType.name(), entityTypeId);
     }
 
     @Override
@@ -53,6 +91,6 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
 
     @Override
     public String toFileName() {
-        return name.toLowerCase();
+        return name.toLowerCase().replace(" ", "_");
     }
 }

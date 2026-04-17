@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.cutscene;
 
+import fr.loudo.narrativecraft.client.screens.AbstractAssignScreen;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
@@ -30,7 +31,6 @@ import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.client.screens.AbstractAssignScreen;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.ArrayList;
 import java.util.HashSet;

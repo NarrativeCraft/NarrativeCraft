@@ -21,41 +21,28 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.screens.narrative.animation;
+package fr.loudo.narrativecraft.client.screens.narrative.character;
 
-import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryPickerScreen;
+import fr.loudo.narrativecraft.utils.Translation;
+import java.util.ArrayList;
+import java.util.function.Consumer;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.EntityType;
 
-public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<Animation> {
+public class EntityTypePickerScreen extends AbstractNarrativeEntryPickerScreen<EntityType<?>> {
 
-    private final Scene scene;
-
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen, Scene scene) {
-        super(entry, lastScreen);
-        this.scene = scene;
-    }
-
-    public AnimationEntryEditScreen(Animation entry, Screen lastScreen) {
-        super(entry, lastScreen);
-        this.scene = entry.getScene();
-    }
-
-    public AnimationEntryEditScreen(Scene scene, Screen lastScreen) {
-        super(null, lastScreen);
-        this.scene = scene;
+    public EntityTypePickerScreen(Screen lastScreen, Consumer<EntityType<?>> onPick) {
+        super(
+                Translation.message("screen.entity_type_picker"),
+                new ArrayList<>(BuiltInRegistries.ENTITY_TYPE.stream().toList()),
+                lastScreen,
+                onPick);
     }
 
     @Override
-    protected void addCustomFields() {
-        // hack lol
-        widgets.removeIf(widget -> widget.equals(descriptionText));
-        widgets.removeIf(widget -> widget.equals(descriptionBox));
-    }
-
-    @Override
-    protected Animation createInstance() {
-        return new Animation(getName(), scene);
+    protected String getItemName(EntityType<?> item) {
+        return BuiltInRegistries.ENTITY_TYPE.getKey(item).toString();
     }
 }

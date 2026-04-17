@@ -24,8 +24,8 @@
 package fr.loudo.narrativecraft.client.screens.narrative.chapter;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.client.gui.components.AbstractWidget;

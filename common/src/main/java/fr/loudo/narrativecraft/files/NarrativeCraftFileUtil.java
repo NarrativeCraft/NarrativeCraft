@@ -34,6 +34,10 @@ public class NarrativeCraftFileUtil {
         return NarrativeCraftMod.getInstance().getFile().getInit().getChaptersDirectory();
     }
 
+    public static File getCharactersFolder() {
+        return NarrativeCraftMod.getInstance().getFile().getInit().getCharactersDirectory();
+    }
+
     public static File getScenesFolder(Chapter chapter) {
         File chaptersFolder = getChaptersFolder();
         File chapterFolder = new File(chaptersFolder, chapter.toFileName());

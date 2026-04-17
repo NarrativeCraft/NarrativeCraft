@@ -21,36 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative.animation;
+package fr.loudo.narrativecraft.narrative.character;
 
-import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
-import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.client.screens.narrative.animation.AnimationEntryEditScreen;
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import net.minecraft.client.gui.screens.Screen;
-
-public class ClientAnimationNarrativeUIAction implements ClientNarrativeUIAction<Animation> {
-    @Override
-    public Screen subListSubScreen(Animation entry, Screen parent) {
-        return null;
-    }
-
-    @Override
-    public boolean isClickable() {
-        return false;
-    }
-
-    @Override
-    public void customClickAction(Animation entry) {}
-
-    @Override
-    public AbstractNarrativeEntryEditScreen<Animation> showEditScreen(Animation entry, Screen lastScreen) {
-        return new AnimationEntryEditScreen(entry, lastScreen);
-    }
-
-    @Override
-    public AbstractNarrativeEntryEditScreen<Animation> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
-        return null;
-    }
+public enum CharacterType {
+    NORMAL,
+    NPC;
 }

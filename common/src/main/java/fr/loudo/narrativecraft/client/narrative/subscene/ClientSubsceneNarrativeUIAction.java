@@ -24,11 +24,11 @@
 package fr.loudo.narrativecraft.client.narrative.subscene;
 
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.subscene.SubsceneEntryEditScreen;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.client.screens.narrative.subscene.SubsceneEntryEditScreen;
 import net.minecraft.client.gui.screens.Screen;
 
 public class ClientSubsceneNarrativeUIAction implements ClientNarrativeUIAction<Subscene> {

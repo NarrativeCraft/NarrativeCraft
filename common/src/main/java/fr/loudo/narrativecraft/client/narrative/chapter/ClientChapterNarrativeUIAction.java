@@ -24,11 +24,11 @@
 package fr.loudo.narrativecraft.client.narrative.chapter;
 
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.chapter.ChapterEntryEditScreen;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.screens.Screen;
 
