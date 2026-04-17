@@ -21,15 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.files.narrrative.cutscene;
+package fr.loudo.narrativecraft.files.narrrative.character;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
-import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
+import fr.loudo.narrativecraft.narrative.character.Npc;
+import fr.loudo.narrativecraft.narrative.character.NpcDeserializer;
+import fr.loudo.narrativecraft.narrative.character.NpcSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,43 +37,42 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-public class NarrativeCraftFileCutscene extends AbstractNarrativeCraftFileSceneJsonEntry<Cutscene> {
+public class NarrativeCraftFileNpc extends AbstractNarrativeCraftFileSceneJsonEntry<Npc> {
 
     @Override
     protected String getSubFolderName() {
-        return CUTSCENES_FOLDER_NAME;
+        return NPC_FOLDER_NAME;
     }
 
     @Override
-    protected Scene getScene(Cutscene entry) {
+    protected Scene getScene(Npc entry) {
         return entry.getScene();
     }
 
     @Override
-    protected Cutscene getOldEntry(Cutscene entry) {
-        return entry.getScene().getCutsceneManager().getById(entry.getId());
+    protected Npc getOldEntry(Npc entry) {
+        return entry.getScene().getNpcManager().getById(entry.getId());
     }
 
     @Override
     protected void registerDeserializer(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(Cutscene.class, new CutsceneDeserializer());
+        gsonBuilder.registerTypeAdapter(Npc.class, new NpcDeserializer());
     }
 
     @Override
-    protected Cutscene deserializeEntry(Gson gson, String content) throws Exception {
-        return gson.fromJson(content, Cutscene.class);
+    protected Npc deserializeEntry(Gson gson, String content) throws Exception {
+        return gson.fromJson(content, Npc.class);
     }
 
     @Override
-    protected int writeJson(Cutscene entry, File file) {
-        Gson gson = gsonBuilder
-                .registerTypeAdapter(Cutscene.class, new CutsceneSerializer())
-                .create();
+    protected int writeJson(Npc entry, File file) {
+        Gson gson =
+                gsonBuilder.registerTypeAdapter(Npc.class, new NpcSerializer()).create();
         try (Writer writer = new BufferedWriter(new FileWriter(file))) {
             gson.toJson(entry, writer);
             return OPERATION_SUCCESS;
         } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to write cutscene data {}", entry.getName(), e);
+            NarrativeCraftMod.LOGGER.error("Failed to write npc data {}", entry.getName(), e);
             return OPERATION_FAILED;
         }
     }

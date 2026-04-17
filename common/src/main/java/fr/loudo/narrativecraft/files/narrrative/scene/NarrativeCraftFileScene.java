@@ -72,6 +72,12 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             return OPERATION_FAILED;
         }
 
+        File npcFolder = createDirectory(sceneFile, NPC_FOLDER_NAME);
+        if (npcFolder == null) {
+            NarrativeCraftMod.LOGGER.error("Failed to create npc directory of scene {}", entry.getName());
+            return OPERATION_FAILED;
+        }
+
         return edit(entry);
     }
 

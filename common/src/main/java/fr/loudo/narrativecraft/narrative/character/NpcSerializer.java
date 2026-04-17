@@ -30,9 +30,11 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import net.minecraft.core.registries.BuiltInRegistries;
 
-public class CharacterStorySerializer implements JsonSerializer<CharacterStory> {
+public class NpcSerializer implements JsonSerializer<Npc> {
 
-    public static void serializeSharedCharacterFields(JsonObject json, CharacterStory src) {
+    @Override
+    public JsonElement serialize(Npc src, Type typeOfSrc, JsonSerializationContext context) {
+        JsonObject json = new JsonObject();
         json.addProperty("id", src.getId().toString());
         json.addProperty("name", src.getName());
         json.addProperty("dialogPresetName", src.getDialogPresetName() != null ? src.getDialogPresetName() : "");
@@ -41,14 +43,8 @@ public class CharacterStorySerializer implements JsonSerializer<CharacterStory> 
         json.addProperty(
                 "entityTypeId",
                 BuiltInRegistries.ENTITY_TYPE.getKey(src.getEntityType()).toString());
-    }
-
-    @Override
-    public JsonElement serialize(CharacterStory src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
-        serializeSharedCharacterFields(json, src);
-        json.addProperty("description", src.getDescription());
-        json.addProperty("characterType", src.getCharacterType().name());
+        json.addProperty("sceneId", src.getScene().getId().toString());
+        json.addProperty("chapterId", src.getScene().getChapter().getId().toString());
         return json;
     }
 }

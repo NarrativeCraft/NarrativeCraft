@@ -41,10 +41,9 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
-
-import java.util.ArrayList;
 
 public class ClientPacketHandler {
 

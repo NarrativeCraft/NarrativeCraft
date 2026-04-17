@@ -36,6 +36,7 @@ public class NarrativeCraftFileDefault {
     public static final String SCENES_FOLDER_NAME = "scenes";
     public static final String SUBSCENES_FOLDER_NAME = "subscenes";
     public static final String CUTSCENES_FOLDER_NAME = "cutscenes";
+    public static final String NPC_FOLDER_NAME = "npc";
 
     protected final GsonBuilder gsonBuilder = new GsonBuilder();
     protected final String DIRECTORY_NAME = NarrativeCraftMod.MOD_ID;

@@ -27,7 +27,10 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.lang.reflect.Type;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,42 +38,47 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.PlayerModelType;
 
-public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterStory> {
+public class NpcDeserializer extends NarrativeDeserializer<Npc> {
 
-    public static void applySharedCharacterFields(JsonObject jsonObject, CharacterStory character) {
+    @Override
+    public Npc deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
+        JsonObject jsonObject = json.getAsJsonObject();
+
+        UUID id = parseId(jsonObject);
+        String name = parseName(jsonObject);
+
+        UUID chapterId = UUID.fromString(jsonObject.get("chapterId").getAsString());
+        UUID sceneId = UUID.fromString(jsonObject.get("sceneId").getAsString());
+
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(chapterId);
+        if (chapter == null) {
+            throw new JsonParseException("Chapter " + chapterId + " not found for NPC " + name);
+        }
+
+        Scene scene = chapter.getSceneManager().getById(sceneId);
+        if (scene == null) {
+            throw new JsonParseException("Scene " + sceneId + " not found for NPC " + name);
+        }
+
+        Npc npc = new Npc(id, name, scene);
+
         String dialogPresetName = jsonObject.get("dialogPresetName").getAsString();
         if (!dialogPresetName.isEmpty()) {
-            character.setDialogPresetName(dialogPresetName);
+            npc.setDialogPresetName(dialogPresetName);
         }
 
         String modelTypeName = jsonObject.get("modelType").getAsString();
         if (!modelTypeName.isEmpty()) {
-            character.setModelType(PlayerModelType.valueOf(modelTypeName));
+            npc.setModelType(PlayerModelType.valueOf(modelTypeName));
         }
 
         String entityTypeId = jsonObject.get("entityTypeId").getAsString();
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE
                 .getOptional(Identifier.parse(entityTypeId))
                 .orElse(EntityType.PLAYER);
-        character.setEntityType(entityType);
-    }
+        npc.setEntityType(entityType);
 
-    @Override
-    public CharacterStory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-            throws JsonParseException {
-        JsonObject jsonObject = json.getAsJsonObject();
-
-        UUID id = parseId(jsonObject);
-        String name = parseName(jsonObject);
-        String description = parseDescription(jsonObject);
-
-        CharacterStory character = new CharacterStory(id, name, description);
-
-        applySharedCharacterFields(jsonObject, character);
-
-        String characterTypeName = jsonObject.get("characterType").getAsString();
-        character.setCharacterType(CharacterType.valueOf(characterTypeName));
-
-        return character;
+        return npc;
     }
 }

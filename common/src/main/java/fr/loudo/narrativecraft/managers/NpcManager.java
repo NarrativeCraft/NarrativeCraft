@@ -21,25 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.screens.narrative.character;
+package fr.loudo.narrativecraft.managers;
 
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import net.minecraft.client.gui.screens.Screen;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.narrative.character.Npc;
 
-public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<CharacterStory> {
-
-    public CharacterEntryEditScreen(Screen lastScreen) {
-        super(lastScreen);
-    }
-
-    public CharacterEntryEditScreen(CharacterStory entry, Screen lastScreen) {
-        super(entry, lastScreen);
-    }
-
-    @Override
-    protected CharacterStory createInstance() {
-        CharacterStory character = new CharacterStory(getName(), getDescription());
-        character.setEntityType(selectedEntityType);
-        return character;
-    }
-}
+public class NpcManager extends NarrativeManager<Npc> {}

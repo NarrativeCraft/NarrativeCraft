@@ -21,25 +21,39 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.screens.narrative.character;
+package fr.loudo.narrativecraft.client.narrative.character;
 
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
+import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.character.NpcEntryEditScreen;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.character.Npc;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import net.minecraft.client.gui.screens.Screen;
 
-public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<CharacterStory> {
+public class ClientNpcNarrativeUIAction implements ClientNarrativeUIAction<Npc> {
 
-    public CharacterEntryEditScreen(Screen lastScreen) {
-        super(lastScreen);
-    }
-
-    public CharacterEntryEditScreen(CharacterStory entry, Screen lastScreen) {
-        super(entry, lastScreen);
+    @Override
+    public Screen subListSubScreen(Npc entry, Screen parent) {
+        return null;
     }
 
     @Override
-    protected CharacterStory createInstance() {
-        CharacterStory character = new CharacterStory(getName(), getDescription());
-        character.setEntityType(selectedEntityType);
-        return character;
+    public boolean isClickable() {
+        return false;
+    }
+
+    @Override
+    public void customClickAction(Npc entry) {}
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Npc> showEditScreen(Npc entry, Screen lastScreen) {
+        return new NpcEntryEditScreen(entry, lastScreen);
+    }
+
+    @Override
+    public AbstractNarrativeEntryEditScreen<Npc> showCreateScreen(NarrativeEntry<?> parent, Screen lastScreen) {
+        if (!(parent instanceof Scene scene)) return null;
+        return new NpcEntryEditScreen(scene, lastScreen);
     }
 }

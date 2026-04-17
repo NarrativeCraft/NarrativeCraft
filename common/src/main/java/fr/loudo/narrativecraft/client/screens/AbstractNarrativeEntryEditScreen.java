@@ -29,13 +29,12 @@ import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<?>> extends Screen {
 
@@ -74,7 +73,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
         descriptionText = new StringWidget(Translation.message("description"), this.font);
         descriptionBox =
                 new MultiLineEditBox.Builder().build(this.font, GLOBAL_WIDTH, 90, Translation.message("description"));
-        descriptionBox.setValue(entry != null ? entry.getDescription() : "");
+        if (entry != null) descriptionBox.setValue(entry.getDescription());
 
         sendButton = Button.builder(Translation.message("send"), (b) -> {
                     boolean validated = hasValidated();
@@ -102,8 +101,10 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
         addElementToWidgetsList(nameText);
         addElementToWidgetsList(nameBox);
-        addElementToWidgetsList(descriptionText);
-        addElementToWidgetsList(descriptionBox);
+        if (showDescription()) {
+            addElementToWidgetsList(descriptionText);
+            addElementToWidgetsList(descriptionBox);
+        }
 
         addCustomFields();
 
@@ -140,6 +141,10 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
     protected void sendToastError(Component title, Component message) {
         minecraft.getToastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
+    }
+
+    protected boolean showDescription() {
+        return true;
     }
 
     protected abstract void addCustomFields();

@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.Npc;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
@@ -54,6 +55,7 @@ public class NarrativeEntryInit {
         animations();
         subscenes();
         cutscenes();
+        npcs();
         characters();
     }
 
@@ -124,6 +126,19 @@ public class NarrativeEntryInit {
         }
     }
 
+    private static void npcs() {
+        List<DeserializationResult<Npc>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Npc.class);
+        for (DeserializationResult<Npc> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Npc npc = deserializationResult.entry();
+            npc.getScene().getNpcManager().add(npc);
+        }
+    }
+
     private static void characters() {
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
         List<DeserializationResult<CharacterStory>> deserializationResults =
@@ -156,6 +171,9 @@ public class NarrativeEntryInit {
                 for (Cutscene cutscene : scene.getCutsceneManager().getList()) {
                     Services.PACKET.sendToPlayer(
                             player, BiSyncNarrativeEntryPacket.add(cutscene.getId(), cutscene.toPayload()));
+                }
+                for (Npc npc : scene.getNpcManager().getList()) {
+                    Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(npc.getId(), npc.toPayload()));
                 }
             }
         }
