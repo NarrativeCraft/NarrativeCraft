@@ -8,6 +8,60 @@
       "chars": [
         "\uE200"
       ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/undo.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE201"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/check.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE202"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/camera.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE203"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/character.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE204"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/character_template.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE205"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/burger_menu.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE206"
+      ]
     }
   ]
 }

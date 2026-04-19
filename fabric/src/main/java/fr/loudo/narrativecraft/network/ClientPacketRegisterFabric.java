@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.network;
 
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
@@ -39,5 +41,9 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay()
                 .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay()
+                .register(S2CCameraAngleEditorData.TYPE, S2CCameraAngleEditorData.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay()
+                .register(S2CCameraAngleCharacterCaptured.TYPE, S2CCameraAngleCharacterCaptured.STREAM_CODEC);
     }
 }

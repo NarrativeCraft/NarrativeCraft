@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.events.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cameraangle.CameraAngleMakerEditorCameraRenderer;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorCameraRenderer;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPathRenderer;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
@@ -47,6 +48,7 @@ public class OnRenderWorldEvent {
 
         CutsceneMakerEditorPathRenderer.render(poseStack, deltaTracker);
         CutsceneMakerEditorCameraRenderer.render(poseStack, deltaTracker);
+        CameraAngleMakerEditorCameraRenderer.render(poseStack, deltaTracker);
 
         renderDialog3D(poseStack, deltaTracker);
 

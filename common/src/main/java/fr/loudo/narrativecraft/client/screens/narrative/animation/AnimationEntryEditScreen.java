@@ -55,8 +55,9 @@ public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<A
     @Override
     protected void addCustomFields() {}
 
+    // Not used
     @Override
     protected Animation createInstance() {
-        return new Animation(getName(), scene);
+        return null;
     }
 }

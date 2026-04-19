@@ -29,10 +29,11 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.Npc;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
@@ -50,13 +51,14 @@ public class NarrativeEntryInit {
         NarrativeCraftMod.getInstance().getCorruptedDeserialization().clear();
 
         // Order is important!! e.g. Chapters must be initialized before scenes of chapter can be initialized.
+        characters();
         chapters();
         scenes();
+        npcs();
         animations();
         subscenes();
         cutscenes();
-        npcs();
-        characters();
+        cameraAngles();
     }
 
     private static void chapters() {
@@ -126,6 +128,19 @@ public class NarrativeEntryInit {
         }
     }
 
+    private static void cameraAngles() {
+        List<DeserializationResult<CameraAngle>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(CameraAngle.class);
+        for (DeserializationResult<CameraAngle> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            CameraAngle cameraAngle = deserializationResult.entry();
+            cameraAngle.getScene().getCameraAngleManager().add(cameraAngle);
+        }
+    }
+
     private static void npcs() {
         List<DeserializationResult<Npc>> deserializationResults =
                 NarrativeCraftFileRegistry.getInstance().deserialize(Npc.class);
@@ -155,11 +170,19 @@ public class NarrativeEntryInit {
 
     public static void sendDataToPlayer(ServerPlayer player) {
         Services.PACKET.sendToPlayer(player, S2CNarrativeDataClear.INSTANCE);
+        for (CharacterStory character :
+                NarrativeCraftMod.getInstance().getCharacterManager().getList()) {
+            Services.PACKET.sendToPlayer(
+                    player, BiSyncNarrativeEntryPacket.add(character.getId(), character.toPayload()));
+        }
         for (Chapter chapter :
                 NarrativeCraftMod.getInstance().getChapterManager().getList()) {
             Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(chapter.getId(), chapter.toPayload()));
             for (Scene scene : chapter.getSceneManager().getList()) {
                 Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(scene.getId(), scene.toPayload()));
+                for (Npc npc : scene.getNpcManager().getList()) {
+                    Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(npc.getId(), npc.toPayload()));
+                }
                 for (Animation animation : scene.getAnimationManager().getList()) {
                     Services.PACKET.sendToPlayer(
                             player, BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
@@ -172,15 +195,11 @@ public class NarrativeEntryInit {
                     Services.PACKET.sendToPlayer(
                             player, BiSyncNarrativeEntryPacket.add(cutscene.getId(), cutscene.toPayload()));
                 }
-                for (Npc npc : scene.getNpcManager().getList()) {
-                    Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(npc.getId(), npc.toPayload()));
+                for (CameraAngle cameraAngle : scene.getCameraAngleManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(cameraAngle.getId(), cameraAngle.toPayload()));
                 }
             }
-        }
-        for (CharacterStory character :
-                NarrativeCraftMod.getInstance().getCharacterManager().getList()) {
-            Services.PACKET.sendToPlayer(
-                    player, BiSyncNarrativeEntryPacket.add(character.getId(), character.toPayload()));
         }
     }
 }

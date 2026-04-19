@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.session;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.AbstractPlayerSession;
@@ -38,6 +39,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     private final CutsceneDataSession cutsceneDataSession = new CutsceneDataSession();
     private final List<DialogRenderer2D> activeDialog2DRenderers = new ArrayList<>();
     private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
+    private CameraView cameraView;
 
     public ClientPlayerSession() {
         super(null, null);
@@ -73,5 +75,13 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public void removeDialog3D(DialogRenderer3D renderer) {
         activeDialog3DRenderers.remove(renderer);
+    }
+
+    public CameraView getCameraView() {
+        return cameraView;
+    }
+
+    public void setCameraView(CameraView cameraView) {
+        this.cameraView = cameraView;
     }
 }

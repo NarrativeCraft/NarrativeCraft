@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.client.screens.narrative.character;
 
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
-import fr.loudo.narrativecraft.narrative.character.Npc;
+import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.components.Button;

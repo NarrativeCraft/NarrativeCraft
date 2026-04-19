@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.character.NpcEntryEditScreen;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.character.Npc;
+import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import net.minecraft.client.gui.screens.Screen;
 

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.narrative.npc;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import io.netty.buffer.ByteBuf;

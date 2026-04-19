@@ -25,5 +25,24 @@ package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.util.UUID;
+import javax.annotation.Nullable;
 
-public class CharacterManager extends NarrativeManager<CharacterStory> {}
+public class CharacterManager extends NarrativeManager<CharacterStory> {
+
+    /**
+     * Retrieve a global character or a npc if you have a scene by his id.
+     * @param characterId id of the character
+     * @param scene scene of the npc if it is set
+     * @return instance of {@link ICharacterStory}
+     */
+    public ICharacterStory resolveCharacter(UUID characterId, @Nullable Scene scene) {
+        ICharacterStory characterStory = getById(characterId);
+        if (characterStory == null && scene != null) {
+            return scene.getNpcManager().getById(characterId);
+        }
+        return characterStory;
+    }
+}

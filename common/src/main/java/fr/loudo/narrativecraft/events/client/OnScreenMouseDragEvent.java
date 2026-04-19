@@ -24,8 +24,10 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.editors.Editor;
 import net.minecraft.client.input.MouseButtonEvent;
 
 public class OnScreenMouseDragEvent {
@@ -33,8 +35,11 @@ public class OnScreenMouseDragEvent {
     public static void onCutsceneTimelineDrag(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (!(playerSession.getEditor() instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
-
-        cutsceneEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
+        Editor editor = playerSession.getEditor();
+        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+            cutsceneEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
+        } else if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+            cameraAngleEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
+        }
     }
 }

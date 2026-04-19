@@ -21,30 +21,13 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.narrative.cameraangle;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import java.lang.reflect.Type;
-import net.minecraft.core.registries.BuiltInRegistries;
+import java.util.UUID;
 
-public class NpcSerializer implements JsonSerializer<Npc> {
+public record TemplateReference(UUID id, TemplateSourceType sourceType, UUID refId) {
 
-    @Override
-    public JsonElement serialize(Npc src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
-        json.addProperty("id", src.getId().toString());
-        json.addProperty("name", src.getName());
-        json.addProperty("dialogPresetName", src.getDialogPresetName() != null ? src.getDialogPresetName() : "");
-        json.addProperty(
-                "modelType", src.getModelType() != null ? src.getModelType().name() : "");
-        json.addProperty(
-                "entityTypeId",
-                BuiltInRegistries.ENTITY_TYPE.getKey(src.getEntityType()).toString());
-        json.addProperty("sceneId", src.getScene().getId().toString());
-        json.addProperty("chapterId", src.getScene().getChapter().getId().toString());
-        return json;
+    public TemplateReference(TemplateSourceType sourceType, UUID refId) {
+        this(UUID.randomUUID(), sourceType, refId);
     }
 }

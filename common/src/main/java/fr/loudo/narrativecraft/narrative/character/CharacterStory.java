@@ -29,8 +29,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.PlayerModelType;
 
-public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
+public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implements ICharacterStory {
 
+    private final CharacterType characterType = CharacterType.NORMAL;
     private String dialogPresetName;
     private EntityType<?> entityType = EntityType.PLAYER;
     private PlayerModelType modelType;
@@ -65,6 +66,10 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> {
 
     public void setModelType(PlayerModelType modelType) {
         this.modelType = modelType;
+    }
+
+    public CharacterType getCharacterType() {
+        return characterType;
     }
 
     @Override

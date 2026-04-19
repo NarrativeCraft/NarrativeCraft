@@ -24,9 +24,11 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -82,6 +84,11 @@ public abstract class CameraMixin {
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return;
 
+        narrativecraft$handleCutsceneKeyframe(playerSession);
+        narrativecraft$handleCameraAngle(playerSession);
+    }
+
+    private void narrativecraft$handleCutsceneKeyframe(ClientPlayerSession playerSession) {
         KeyframePosition keyframePosition =
                 playerSession.getCutsceneDataSession().getKeyframePosition();
         if (keyframePosition == null) {
@@ -93,22 +100,39 @@ public abstract class CameraMixin {
             }
             return;
         }
+        narrativecraft$overrideCamera(keyframePosition.getPosition(), keyframePosition.getRotation());
+    }
 
-        Vec3 position = keyframePosition.getPosition();
+    private void narrativecraft$handleCameraAngle(ClientPlayerSession playerSession) {
+        CameraView cameraView = playerSession.getCameraView();
+        if (cameraView == null) return;
+        ClientCameraAngleMakerEditor editor =
+                ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
+        if (editor != null && editor.isEditingCameraViewPosition()) return;
+
+        narrativecraft$overrideCamera(cameraView.getPosition(), cameraView.getRotation());
+    }
+
+    private void narrativecraft$overrideCamera(Vec3 position, Vec3 rotation) {
         this.setPosition(position);
-        this.setRotation((float) keyframePosition.getRotation().y, (float) keyframePosition.getRotation().x);
-        this.rotation.rotateZ(
-                -(float) Math.toRadians(keyframePosition.getRotation().z()));
+        this.setRotation((float) rotation.y, (float) rotation.x);
+        this.rotation.rotateZ(-(float) Math.toRadians(rotation.z()));
     }
 
     @Inject(method = "calculateFov", at = @At("HEAD"), cancellable = true)
     private void narrativecraft$modifyFov(float partialTicks, CallbackInfoReturnable<Float> cir) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession != null && playerSession.getCutsceneDataSession() != null) {
-            float customFov = playerSession.getCutsceneDataSession().getFov();
-            if (customFov == -1f) return;
-            cir.setReturnValue(customFov * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier));
+        if (playerSession == null) return;
+        float customFov = -1;
+
+        if (playerSession.getCutsceneDataSession() != null) {
+            customFov = playerSession.getCutsceneDataSession().getFov();
         }
+        if (playerSession.getCameraView() != null) {
+            customFov = playerSession.getCameraView().getFov();
+        }
+        if (customFov == -1f) return;
+        cir.setReturnValue(customFov * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier));
     }
 }

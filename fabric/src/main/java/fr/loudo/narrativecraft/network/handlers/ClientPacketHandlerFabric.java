@@ -28,6 +28,8 @@ import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
@@ -59,6 +61,12 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CDialogTest.TYPE, (packet, context) -> {
             ClientPacketHandler.handleDialogTest(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CCameraAngleEditorData.TYPE, (packet, context) -> {
+            ClientPacketHandler.loadCameraAngleEditorData(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CCameraAngleCharacterCaptured.TYPE, (packet, context) -> {
+            ClientPacketHandler.addCameraAngleCharacter(packet);
         });
     }
 }

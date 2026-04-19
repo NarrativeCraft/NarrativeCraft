@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.files.narrrative.animation.NarrativeCraftFileAnimation;
+import fr.loudo.narrativecraft.files.narrrative.cameraangle.NarrativeCraftFileCameraAngle;
 import fr.loudo.narrativecraft.files.narrrative.chapter.NarrativeCraftFileChapter;
 import fr.loudo.narrativecraft.files.narrrative.character.NarrativeCraftFileCharacter;
 import fr.loudo.narrativecraft.files.narrrative.character.NarrativeCraftFileNpc;
@@ -31,10 +32,11 @@ import fr.loudo.narrativecraft.files.narrrative.cutscene.NarrativeCraftFileCutsc
 import fr.loudo.narrativecraft.files.narrrative.scene.NarrativeCraftFileScene;
 import fr.loudo.narrativecraft.files.narrrative.subscene.NarrativeCraftFileSubscene;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.Npc;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 
@@ -46,6 +48,7 @@ public class NarrativeCraftFileEditorsRegister {
         NarrativeCraftFileRegistry.getInstance().register(Animation.class, new NarrativeCraftFileAnimation());
         NarrativeCraftFileRegistry.getInstance().register(Subscene.class, new NarrativeCraftFileSubscene());
         NarrativeCraftFileRegistry.getInstance().register(Cutscene.class, new NarrativeCraftFileCutscene());
+        NarrativeCraftFileRegistry.getInstance().register(CameraAngle.class, new NarrativeCraftFileCameraAngle());
         NarrativeCraftFileRegistry.getInstance().register(CharacterStory.class, new NarrativeCraftFileCharacter());
         NarrativeCraftFileRegistry.getInstance().register(Npc.class, new NarrativeCraftFileNpc());
     }

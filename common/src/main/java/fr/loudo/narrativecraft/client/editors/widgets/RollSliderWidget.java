@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.editors.cutscene;
+package fr.loudo.narrativecraft.client.editors.widgets;
 
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
@@ -29,7 +29,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.util.ARGB;
 
-public class CutsceneMakerRollWidget {
+public class RollSliderWidget {
 
     private static final int TRACK_WIDTH = 10;
     private static final int TRACK_HEIGHT = 150;
@@ -50,6 +50,10 @@ public class CutsceneMakerRollWidget {
         visible = !visible;
     }
 
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
     public boolean isVisible() {
         return visible;
     }
@@ -58,55 +62,52 @@ public class CutsceneMakerRollWidget {
         return value;
     }
 
-    public void setValue(float v) {
-        value = (float) Math.clamp(v, MIN, MAX);
+    public void setValue(float value) {
+        this.value = (float) Math.clamp(value, MIN, MAX);
     }
 
     public void render(GuiGraphicsExtractor graphics, int screenWidth, int screenHeight, int mouseX, int mouseY) {
         if (!visible) return;
 
-        int tx = getTrackX(screenWidth);
-        int ty = getTrackY(screenHeight);
+        int trackX = getTrackX(screenWidth);
+        int trackY = getTrackY(screenHeight);
 
-        // Background panel
-        int panelX1 = tx - PANEL_PADDING_X;
-        int panelY1 = ty - PANEL_PADDING_TOP;
-        int panelX2 = tx + TRACK_WIDTH + PANEL_PADDING_X;
-        int panelY2 = ty + TRACK_HEIGHT + PANEL_PADDING_BOTTOM;
+        int panelX1 = trackX - PANEL_PADDING_X;
+        int panelY1 = trackY - PANEL_PADDING_TOP;
+        int panelX2 = trackX + TRACK_WIDTH + PANEL_PADDING_X;
+        int panelY2 = trackY + TRACK_HEIGHT + PANEL_PADDING_BOTTOM;
         graphics.fill(panelX1, panelY1, panelX2, panelY2, ARGB.color(200, 0, 0, 0));
         graphics.fill(panelX1, panelY1, panelX2, panelY1 + 1, 0xFFAAAAAA);
         graphics.fill(panelX1, panelY2 - 1, panelX2, panelY2, 0xFFAAAAAA);
         graphics.fill(panelX1, panelY1, panelX1 + 1, panelY2, 0xFFAAAAAA);
         graphics.fill(panelX2 - 1, panelY1, panelX2, panelY2, 0xFFAAAAAA);
 
-        Minecraft mc = Minecraft.getInstance();
+        Minecraft minecraft = Minecraft.getInstance();
 
-        // Title
         String title = Translation.message("roll").getString();
-        int titleX = tx + TRACK_WIDTH / 2 - mc.font.width(title) / 2;
-        graphics.text(mc.font, title, titleX, ty - PANEL_PADDING_TOP + 4, 0xFFFFFFFF);
+        int titleX = trackX + TRACK_WIDTH / 2 - minecraft.font.width(title) / 2;
+        graphics.text(minecraft.font, title, titleX, trackY - PANEL_PADDING_TOP + 4, 0xFFFFFFFF);
 
-        // Track background
-        graphics.fill(tx, ty, tx + TRACK_WIDTH, ty + TRACK_HEIGHT, 0xFF333333);
+        graphics.fill(trackX, trackY, trackX + TRACK_WIDTH, trackY + TRACK_HEIGHT, 0xFF333333);
 
-        // Center notch (zero line)
-        int centerY = ty + TRACK_HEIGHT / 2;
-        graphics.fill(tx - 3, centerY, tx + TRACK_WIDTH + 3, centerY + 1, 0xFF888888);
+        int centerY = trackY + TRACK_HEIGHT / 2;
+        graphics.fill(trackX - 3, centerY, trackX + TRACK_WIDTH + 3, centerY + 1, 0xFF888888);
 
-        // Thumb
-        int thumbY = getThumbY(ty);
-        boolean hovered = isOverTrackArea(mouseX, mouseY, tx, ty);
+        int thumbY = getThumbY(trackY);
+        boolean hovered = isOverTrackArea(mouseX, mouseY, trackX, trackY);
         graphics.fill(
-                tx, thumbY, tx + TRACK_WIDTH, thumbY + THUMB_HEIGHT, hovered || dragging ? 0xFFFFFFFF : 0xFFCCCCCC);
+                trackX,
+                thumbY,
+                trackX + TRACK_WIDTH,
+                thumbY + THUMB_HEIGHT,
+                hovered || dragging ? 0xFFFFFFFF : 0xFFCCCCCC);
 
-        // Value label
         String label = String.format("%.0f\u00b0", value);
-        int labelX = tx + TRACK_WIDTH / 2 - mc.font.width(label) / 2;
-        graphics.text(mc.font, label, labelX, ty + TRACK_HEIGHT + 4, 0xFFFFFFFF);
+        int labelX = trackX + TRACK_WIDTH / 2 - minecraft.font.width(label) / 2;
+        graphics.text(minecraft.font, label, labelX, trackY + TRACK_HEIGHT + 4, 0xFFFFFFFF);
 
-        // Reset button
-        int resetX = tx + TRACK_WIDTH / 2 - RESET_BTN_SIZE / 2;
-        int resetY = ty + TRACK_HEIGHT + 4 + mc.font.lineHeight + 3;
+        int resetX = trackX + TRACK_WIDTH / 2 - RESET_BTN_SIZE / 2;
+        int resetY = trackY + TRACK_HEIGHT + 4 + minecraft.font.lineHeight + 3;
         boolean resetHovered = isOverResetButton(mouseX, mouseY, resetX, resetY);
         graphics.fill(
                 resetX,
@@ -114,23 +115,23 @@ public class CutsceneMakerRollWidget {
                 resetX + RESET_BTN_SIZE,
                 resetY + RESET_BTN_SIZE,
                 resetHovered ? 0xFFAAAAAA : 0xFF666666);
-        graphics.text(mc.font, "0", resetX + 2, resetY + 1, 0xFFFFFFFF);
+        graphics.text(minecraft.font, "0", resetX + 2, resetY + 1, 0xFFFFFFFF);
     }
 
     public boolean mouseClicked(MouseButtonEvent event) {
         if (!visible) return false;
-        Minecraft mc = Minecraft.getInstance();
-        int tx = getTrackX(mc.getWindow().getGuiScaledWidth());
-        int ty = getTrackY(mc.getWindow().getGuiScaledHeight());
-        int resetX = tx + TRACK_WIDTH / 2 - RESET_BTN_SIZE / 2;
-        int resetY = ty + TRACK_HEIGHT + 4 + mc.font.lineHeight + 3;
+        Minecraft minecraft = Minecraft.getInstance();
+        int trackX = getTrackX(minecraft.getWindow().getGuiScaledWidth());
+        int trackY = getTrackY(minecraft.getWindow().getGuiScaledHeight());
+        int resetX = trackX + TRACK_WIDTH / 2 - RESET_BTN_SIZE / 2;
+        int resetY = trackY + TRACK_HEIGHT + 4 + minecraft.font.lineHeight + 3;
         if (isOverResetButton((int) event.x(), (int) event.y(), resetX, resetY)) {
             value = 0f;
             return true;
         }
-        if (isOverTrackArea((int) event.x(), (int) event.y(), tx, ty)) {
+        if (isOverTrackArea((int) event.x(), (int) event.y(), trackX, trackY)) {
             dragging = true;
-            updateValue((int) event.y(), ty);
+            updateValue((int) event.y(), trackY);
             return true;
         }
         return false;
@@ -142,15 +143,15 @@ public class CutsceneMakerRollWidget {
 
     public boolean mouseDragged(double mouseY) {
         if (!dragging) return false;
-        Minecraft mc = Minecraft.getInstance();
-        int ty = getTrackY(mc.getWindow().getGuiScaledHeight());
-        updateValue((int) mouseY, ty);
+        Minecraft minecraft = Minecraft.getInstance();
+        int trackY = getTrackY(minecraft.getWindow().getGuiScaledHeight());
+        updateValue((int) mouseY, trackY);
         return true;
     }
 
     private void updateValue(int mouseY, int trackY) {
-        float t = (float) (mouseY - trackY) / TRACK_HEIGHT;
-        value = Math.clamp(MIN + t * (MAX - MIN), MIN, MAX);
+        float ratio = (float) (mouseY - trackY) / TRACK_HEIGHT;
+        value = Math.clamp(MIN + ratio * (MAX - MIN), MIN, MAX);
     }
 
     private int getThumbY(int trackY) {
@@ -164,11 +165,11 @@ public class CutsceneMakerRollWidget {
                 && mouseY < resetY + RESET_BTN_SIZE;
     }
 
-    private boolean isOverTrackArea(int mouseX, int mouseY, int tx, int ty) {
-        return mouseX >= tx - PANEL_PADDING_X
-                && mouseX < tx + TRACK_WIDTH + PANEL_PADDING_X
-                && mouseY >= ty
-                && mouseY < ty + TRACK_HEIGHT;
+    private boolean isOverTrackArea(int mouseX, int mouseY, int trackX, int trackY) {
+        return mouseX >= trackX - PANEL_PADDING_X
+                && mouseX < trackX + TRACK_WIDTH + PANEL_PADDING_X
+                && mouseY >= trackY
+                && mouseY < trackY + TRACK_HEIGHT;
     }
 
     private int getTrackX(int screenWidth) {

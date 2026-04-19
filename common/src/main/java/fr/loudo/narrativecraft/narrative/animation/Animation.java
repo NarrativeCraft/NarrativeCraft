@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.RecordingData;
@@ -42,27 +43,19 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
     private final Scene scene;
     private final List<RecordingData> recordingDataList = new ArrayList<>();
     private int totalTick;
-    private String characterRef = "";
+    private ICharacterStory characterStory;
 
-    public Animation(UUID id, String name, String description, Scene scene) {
+    public Animation(UUID id, String name, String description, Scene scene, ICharacterStory characterStory) {
         super(id, name, description);
         this.scene = scene;
+        this.characterStory = characterStory;
     }
 
-    public Animation(UUID id, String name, Scene scene, int totalTick) {
+    public Animation(UUID id, String name, Scene scene, int totalTick, ICharacterStory characterStory) {
         super(id, name, "");
         this.scene = scene;
         this.totalTick = totalTick;
-    }
-
-    public Animation(String name, String description, Scene scene) {
-        super(name, description);
-        this.scene = scene;
-    }
-
-    public Animation(String name, Scene scene) {
-        super(name, "");
-        this.scene = scene;
+        this.characterStory = characterStory;
     }
 
     public Animation(UUID id, String name, Scene scene) {
@@ -116,24 +109,18 @@ public class Animation extends NarrativeEntry<AnimationPayload> {
         return totalTick;
     }
 
-    public String getCharacterRef() {
-        return characterRef;
+    public ICharacterStory getCharacterStory() {
+        return characterStory;
     }
 
-    public UUID getCharacterId() {
-        if (characterRef.isEmpty()) return null;
-        String[] split = characterRef.split(":");
-        return UUID.fromString(split[1]);
-    }
-
-    public void setCharacterRef(String characterRef) {
-        this.characterRef = characterRef != null ? characterRef : "";
+    public void setCharacterStory(ICharacterStory characterStory) {
+        this.characterStory = characterStory;
     }
 
     @Override
     public AnimationPayload toPayload() {
         return new AnimationPayload(
-                name, description, scene.getId(), scene.getChapter().getId(), totalTick, characterRef);
+                name, description, scene.getId(), scene.getChapter().getId(), totalTick, characterStory.getId());
     }
 
     @Override

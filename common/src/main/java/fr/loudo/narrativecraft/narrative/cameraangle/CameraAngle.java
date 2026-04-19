@@ -21,29 +21,28 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
 
-public class Npc extends NarrativeEntry<NpcPayload> {
+public class CameraAngle extends NarrativeEntry<CameraAnglePayload> {
 
     private final Scene scene;
-    private String dialogPresetName;
-    private EntityType<?> entityType = EntityType.PLAYER;
-    private PlayerModelType modelType;
+    private final List<CameraView> cameraViews = new ArrayList<>();
+    private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
+    private final List<TemplateReference> templateReferences = new ArrayList<>();
 
-    public Npc(UUID id, String name, Scene scene) {
-        super(id, name, "");
+    public CameraAngle(UUID id, String name, String description, Scene scene) {
+        super(id, name, description);
         this.scene = scene;
     }
 
-    public Npc(String name, Scene scene) {
-        super(name, "");
+    public CameraAngle(String name, String description, Scene scene) {
+        super(name, description);
         this.scene = scene;
     }
 
@@ -51,43 +50,29 @@ public class Npc extends NarrativeEntry<NpcPayload> {
         return scene;
     }
 
-    public String getDialogPresetName() {
-        return dialogPresetName;
+    public List<CameraView> getCameras() {
+        return cameraViews;
     }
 
-    public void setDialogPresetName(String dialogPresetName) {
-        this.dialogPresetName = dialogPresetName;
+    public List<CharacterPlacement> getCharacterPlacements() {
+        return characterPlacements;
     }
 
-    public EntityType<?> getEntityType() {
-        return entityType;
+    public List<TemplateReference> getTemplateReferences() {
+        return templateReferences;
     }
 
-    public void setEntityType(EntityType<?> entityType) {
-        this.entityType = entityType;
-    }
-
-    public PlayerModelType getModelType() {
-        return modelType;
-    }
-
-    public void setModelType(PlayerModelType modelType) {
-        this.modelType = modelType;
+    public CameraView getCameraByName(String name) {
+        for (CameraView cameraView : cameraViews) {
+            if (cameraView.getName().equalsIgnoreCase(name)) return cameraView;
+        }
+        return null;
     }
 
     @Override
-    public NpcPayload toPayload() {
-        String modelTypeName = modelType != null ? modelType.name() : "";
-        String entityTypeIdStr =
-                BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
-        String dialogPresetNameStr = dialogPresetName != null ? dialogPresetName : "";
-        return new NpcPayload(
-                name,
-                dialogPresetNameStr,
-                modelTypeName,
-                entityTypeIdStr,
-                scene.getId(),
-                scene.getChapter().getId());
+    public CameraAnglePayload toPayload() {
+        return new CameraAnglePayload(
+                name, description, scene.getId(), scene.getChapter().getId());
     }
 
     @Override
@@ -97,6 +82,6 @@ public class Npc extends NarrativeEntry<NpcPayload> {
 
     @Override
     public String toFileName() {
-        return name.toLowerCase().replace(" ", "_") + ".json";
+        return name.replace(" ", "_").toLowerCase() + ".json";
     }
 }

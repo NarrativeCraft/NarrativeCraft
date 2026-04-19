@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -59,7 +60,10 @@ public class AnimationEditor implements NarrativeEntryEditor<AnimationPayload, A
         Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
         if (scene == null) return;
 
-        Animation animation = new Animation(entryId, payload.getName(), payload.getDescription(), scene);
+        ICharacterStory characterStory =
+                NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(payload.getCharacterId(), scene);
+        Animation animation =
+                new Animation(entryId, payload.getName(), payload.getDescription(), scene, characterStory);
         int result = NarrativeCraftFileRegistry.getInstance().create(animation);
 
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
@@ -77,9 +81,11 @@ public class AnimationEditor implements NarrativeEntryEditor<AnimationPayload, A
         Animation oldAnimation = resolve(entryId, payload);
         if (oldAnimation == null) return;
 
-        Animation newAnimation =
-                new Animation(entryId, payload.getName(), payload.getDescription(), oldAnimation.getScene());
-        newAnimation.setCharacterRef(payload.getCharacterRef());
+        ICharacterStory characterStory = NarrativeCraftMod.getInstance()
+                .getCharacterManager()
+                .resolveCharacter(payload.getCharacterId(), oldAnimation.getScene());
+        Animation newAnimation = new Animation(
+                entryId, payload.getName(), payload.getDescription(), oldAnimation.getScene(), characterStory);
         int result = NarrativeCraftFileRegistry.getInstance().edit(newAnimation);
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
             ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
@@ -89,7 +95,7 @@ public class AnimationEditor implements NarrativeEntryEditor<AnimationPayload, A
 
         oldAnimation.setName(payload.getName());
         oldAnimation.setDescription(payload.getDescription());
-        oldAnimation.setCharacterRef(payload.getCharacterRef());
+        oldAnimation.setCharacterStory(characterStory);
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }

@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.widgets.RollSliderWidget;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
@@ -37,12 +38,9 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -53,6 +51,11 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -80,7 +83,7 @@ public class ClientCutsceneMakerEditor implements Editor {
     private final CutsceneMakerEditorPlayHead playHead = new CutsceneMakerEditorPlayHead(11, 90, 5);
     private final CutsceneMakerEditorControl control;
     private final CutsceneEditorPlayback playback;
-    private final CutsceneMakerRollWidget rollWidget = new CutsceneMakerRollWidget();
+    private final RollSliderWidget rollWidget = new RollSliderWidget();
     private final CutsceneMakerEditorShortcuts shortcuts = new CutsceneMakerEditorShortcuts(this);
 
     private final List<Keyframe> selectedKeyframes = new ArrayList<>();
@@ -123,12 +126,12 @@ public class ClientCutsceneMakerEditor implements Editor {
                                 mc.setScreen(null);
                             },
                             Translation.message("screen.confirm.title"),
-                            Translation.message("screen.confirm.save_cutscene"));
+                            Translation.message("screen.confirm.save"));
                     mc.setScreen(confirmScreen);
                 })
                 .bounds(5, 5, 20, 20)
                 .build());
-        buttons.add(Button.builder(Component.literal("\uE200"), button -> {
+        buttons.add(Button.builder(Component.literal(CustomFont.SAVE), button -> {
                     String layersJson = CutsceneSerializer.serializeLayers(editorLayers);
                     Services.PACKET.sendToServer(new C2SCutsceneSave(cutscene, layersJson));
                 })
@@ -143,6 +146,8 @@ public class ClientCutsceneMakerEditor implements Editor {
         zoomFactor = getMinZoomFactor();
         viewStartTick = 0f;
     }
+
+    public void tick() {}
 
     public void loadLayers(String layersJson) {
         editorLayers.clear();
@@ -660,7 +665,7 @@ public class ClientCutsceneMakerEditor implements Editor {
         rollWidget.setValue(roll);
     }
 
-    public CutsceneMakerRollWidget getRollWidget() {
+    public RollSliderWidget getRollWidget() {
         return rollWidget;
     }
 

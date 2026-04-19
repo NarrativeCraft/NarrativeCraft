@@ -23,4 +23,7 @@
 
 package fr.loudo.narrativecraft.editors;
 
-public interface Editor {}
+public interface Editor {
+
+    void tick();
+}

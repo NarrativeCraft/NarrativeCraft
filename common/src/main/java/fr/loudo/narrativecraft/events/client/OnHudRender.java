@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
@@ -36,9 +37,16 @@ public class OnHudRender {
 
     public static void cutsceneHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
+        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+            cutsceneEditor.render(graphics, deltaTracker);
+        }
+    }
 
-        cutsceneEditor.render(graphics, deltaTracker);
+    public static void cameraAngleHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+            cameraAngleEditor.render(graphics, deltaTracker);
+        }
     }
 
     public static void dialogHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {

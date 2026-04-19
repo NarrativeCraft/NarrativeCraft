@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.recording.*;
 import java.io.*;
@@ -65,7 +66,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                     entry.getName(),
                     recording.getEntityTrackedSize(),
                     recording.getTick(),
-                    entry.getCharacterRef());
+                    entry.getCharacterStory().getId());
             writer.writeLocalActionsId();
             for (RecordingEntityData recordingEntityData : recording.getRecordingEntityDataList()) {
                 if (!recordingEntityData.isTracked()) continue;
@@ -123,7 +124,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                     entry.getName(),
                     header.entityCount(),
                     header.totalTick(),
-                    entry.getCharacterRef());
+                    entry.getCharacterStory().getId());
             writer.writeActionSize((byte) actionsDict.size());
             for (Map.Entry<Byte, String> actionTypeEntry : actionsDict.entrySet()) {
                 writer.writeActionId(actionTypeEntry.getKey(), actionTypeEntry.getValue());
@@ -142,6 +143,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
             }
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to write animation {}", entry.getName(), e);
+            newFileRecord.delete();
             return NarrativeCraftFileEditor.OPERATION_FAILED;
         }
 
@@ -194,9 +196,11 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                     try (DataInputStream stream = new DataInputStream(new FileInputStream(file))) {
                         RecordingReader reader = new RecordingReader(stream);
                         RecordingReader.RecordingHeader header = reader.readHeader();
-                        Animation animation =
-                                new Animation(header.recordingId(), header.name(), scene, header.totalTick());
-                        animation.setCharacterRef(header.characterRef());
+                        ICharacterStory characterStory = NarrativeCraftMod.getInstance()
+                                .getCharacterManager()
+                                .resolveCharacter(header.characterId(), scene);
+                        Animation animation = new Animation(
+                                header.recordingId(), header.name(), scene, header.totalTick(), characterStory);
 
                         deserializationResults.add(new DeserializationResult<>(animation, false, file.getName()));
                     } catch (IOException e) {

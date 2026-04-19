@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.narrative.npc;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;

@@ -1,0 +1,134 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.narrative.cameraangle;
+
+import com.google.gson.*;
+import com.mojang.serialization.DataResult;
+import java.lang.reflect.Type;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+
+public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
+
+    public static String serializeData(CameraAngle cameraAngle) {
+        JsonObject data = new JsonObject();
+        data.add("cameras", serializeCameras(cameraAngle));
+        data.add("characterPlacements", serializeCharacterPlacements(cameraAngle));
+        data.add("templateReferences", serializeTemplateReferences(cameraAngle));
+        return new Gson().toJson(data);
+    }
+
+    public static String serializeSingleCharacterPlacement(CharacterPlacement placement) {
+        return new Gson().toJson(serializeCharacterPlacement(placement));
+    }
+
+    @Override
+    public JsonElement serialize(CameraAngle src, Type typeOfSrc, JsonSerializationContext context) {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", src.getId().toString());
+        json.addProperty("name", src.getName());
+        json.addProperty("description", src.getDescription());
+        json.addProperty("sceneId", src.getScene().getId().toString());
+        json.addProperty("chapterId", src.getScene().getChapter().getId().toString());
+        json.add("cameras", serializeCameras(src));
+        json.add("characterPlacements", serializeCharacterPlacements(src));
+        json.add("templateReferences", serializeTemplateReferences(src));
+        return json;
+    }
+
+    private static JsonArray serializeCameras(CameraAngle cameraAngle) {
+        JsonArray cameras = new JsonArray();
+        for (CameraView cameraView : cameraAngle.getCameras()) {
+            cameras.add(serializeCamera(cameraView));
+        }
+        return cameras;
+    }
+
+    private static JsonArray serializeCharacterPlacements(CameraAngle cameraAngle) {
+        JsonArray placements = new JsonArray();
+        for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
+            placements.add(serializeCharacterPlacement(placement));
+        }
+        return placements;
+    }
+
+    private static JsonArray serializeTemplateReferences(CameraAngle cameraAngle) {
+        JsonArray references = new JsonArray();
+        for (TemplateReference reference : cameraAngle.getTemplateReferences()) {
+            references.add(serializeTemplateReference(reference));
+        }
+        return references;
+    }
+
+    static JsonObject serializeCamera(CameraView cameraView) {
+        JsonObject json = new JsonObject();
+        json.addProperty("name", cameraView.getName());
+        json.addProperty("x", cameraView.getPosition().x);
+        json.addProperty("y", cameraView.getPosition().y);
+        json.addProperty("z", cameraView.getPosition().z);
+        json.addProperty("xRot", cameraView.getRotation().x);
+        json.addProperty("yRot", cameraView.getRotation().y);
+        json.addProperty("roll", cameraView.getRotation().z);
+        json.addProperty("fov", cameraView.getFov());
+        return json;
+    }
+
+    static JsonObject serializeCharacterPlacement(CharacterPlacement placement) {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", placement.getId().toString());
+        json.addProperty("characterId", placement.getCharacterStory().getId().toString());
+        json.addProperty("x", placement.getPosition().x);
+        json.addProperty("y", placement.getPosition().y);
+        json.addProperty("z", placement.getPosition().z);
+        json.addProperty("xRot", placement.getRotation().x);
+        json.addProperty("yRot", placement.getRotation().y);
+        json.addProperty("roll", placement.getRotation().z);
+
+        JsonArray items = new JsonArray();
+        for (ItemStack stack : placement.getItems()) {
+            JsonElement serialized = serializeItemStack(stack);
+            if (serialized != null) items.add(serialized);
+        }
+        json.add("items", items);
+        return json;
+    }
+
+    private static JsonElement serializeItemStack(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return null;
+        DataResult<Tag> result = ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, stack);
+        Tag tag = result.resultOrPartial(error -> {}).orElse(null);
+        if (!(tag instanceof CompoundTag compound)) return null;
+        return new com.google.gson.JsonPrimitive(compound.toString());
+    }
+
+    static JsonObject serializeTemplateReference(TemplateReference reference) {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", reference.id().toString());
+        json.addProperty("sourceType", reference.sourceType().name());
+        json.addProperty("characterId", reference.refId().toString());
+        return json;
+    }
+}

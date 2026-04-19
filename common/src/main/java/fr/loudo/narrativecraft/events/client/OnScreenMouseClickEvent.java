@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.editors.Editor;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -32,15 +33,19 @@ public class OnScreenMouseClickEvent {
 
     public static void cutsceneHudClick(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
         Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
-
-        cutsceneEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+            cutsceneEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+        } else if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+            cameraAngleEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+        }
     }
 
     public static void cutsceneHudRelease(MouseButtonEvent mouseButtonEvent) {
         Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCutsceneMakerEditor cutsceneEditor)) return;
-
-        cutsceneEditor.mouseReleased(mouseButtonEvent);
+        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+            cutsceneEditor.mouseReleased(mouseButtonEvent);
+        } else if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+            cameraAngleEditor.mouseReleased(mouseButtonEvent);
+        }
     }
 }

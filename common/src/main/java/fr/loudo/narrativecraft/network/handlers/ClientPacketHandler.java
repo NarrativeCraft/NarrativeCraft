@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
@@ -37,6 +38,8 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
@@ -87,6 +90,20 @@ public class ClientPacketHandler {
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         if (!(cutsceneMakerEditor instanceof ClientCutsceneMakerEditor editor)) return;
         editor.loadLayers(packet.layersJson());
+    }
+
+    public static void loadCameraAngleEditorData(S2CCameraAngleEditorData packet) {
+        ClientCameraAngleMakerEditor editor =
+                ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
+        if (editor == null) return;
+        editor.loadData(packet.dataJson());
+    }
+
+    public static void addCameraAngleCharacter(S2CCameraAngleCharacterCaptured packet) {
+        ClientCameraAngleMakerEditor editor =
+                ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
+        if (editor == null) return;
+        editor.addCharacterPlacementFromJson(packet.placementJson());
     }
 
     public static void handleDialogTest(S2CDialogTest packet) {

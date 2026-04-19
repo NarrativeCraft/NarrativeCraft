@@ -29,6 +29,15 @@ import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleControl;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleEnter;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
@@ -76,6 +85,14 @@ public class OnPacketRegisterEventNeoForge {
                 S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC, ClientPacketHandlerNeoForge::clearScreen);
         registrar.playToClient(
                 S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC, ClientPacketHandlerNeoForge::setSession);
+        registrar.playToClient(
+                S2CCameraAngleEditorData.TYPE,
+                S2CCameraAngleEditorData.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::loadCameraAngleEditorData);
+        registrar.playToClient(
+                S2CCameraAngleCharacterCaptured.TYPE,
+                S2CCameraAngleCharacterCaptured.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::addCameraAngleCharacter);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
@@ -90,5 +107,31 @@ public class OnPacketRegisterEventNeoForge {
                 BiCutscenePlayHeadPacket.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::playHeadUpdate,
                 ClientPacketHandlerNeoForge::updatePlayHeadCutscene);
+        registrar.playToServer(
+                C2SCameraAngleEnter.TYPE,
+                C2SCameraAngleEnter.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleEnter);
+        registrar.playToServer(
+                C2SCameraAngleControl.TYPE,
+                C2SCameraAngleControl.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleControl);
+        registrar.playToServer(
+                C2SCameraAngleSave.TYPE, C2SCameraAngleSave.STREAM_CODEC, ServerPacketHandlerNeoForge::cameraAngleSave);
+        registrar.playToServer(
+                C2SCameraAngleCaptureCharacter.TYPE,
+                C2SCameraAngleCaptureCharacter.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleCaptureCharacter);
+        registrar.playToServer(
+                C2SCameraAngleRemovePlacement.TYPE,
+                C2SCameraAngleRemovePlacement.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleRemovePlacement);
+        registrar.playToServer(
+                C2SCameraAngleAddTemplateReference.TYPE,
+                C2SCameraAngleAddTemplateReference.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleAddTemplateReference);
+        registrar.playToServer(
+                C2SCameraAngleRemoveTemplateReference.TYPE,
+                C2SCameraAngleRemoveTemplateReference.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleRemoveTemplateReference);
     }
 }

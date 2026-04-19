@@ -24,6 +24,13 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleControl;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleEnter;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
@@ -60,5 +67,35 @@ public class ServerPacketHandlerNeoForge {
         context.enqueueWork(() -> {
             ServerPacketHandler.playHeadUpdate(packet, context.player());
         });
+    }
+
+    public static void cameraAngleEnter(C2SCameraAngleEnter packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.cameraAngleEnter(packet, context.player()));
+    }
+
+    public static void cameraAngleControl(C2SCameraAngleControl packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.cameraAngleControl(packet, context.player()));
+    }
+
+    public static void cameraAngleSave(C2SCameraAngleSave packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.cameraAngleSave(packet, context.player()));
+    }
+
+    public static void cameraAngleCaptureCharacter(C2SCameraAngleCaptureCharacter packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.cameraAngleCaptureCharacter(packet, context.player()));
+    }
+
+    public static void cameraAngleRemovePlacement(C2SCameraAngleRemovePlacement packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.cameraAngleRemovePlacement(packet, context.player()));
+    }
+
+    public static void cameraAngleAddTemplateReference(
+            C2SCameraAngleAddTemplateReference packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.cameraAngleAddTemplateReference(packet, context.player()));
+    }
+
+    public static void cameraAngleRemoveTemplateReference(
+            C2SCameraAngleRemoveTemplateReference packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.cameraAngleRemoveTemplateReference(packet, context.player()));
     }
 }

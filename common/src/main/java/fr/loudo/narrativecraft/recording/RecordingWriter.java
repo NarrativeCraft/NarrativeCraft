@@ -50,7 +50,7 @@ public class RecordingWriter implements Action.Writer {
         this.output = output;
     }
 
-    public void writeHeader(UUID recordingId, String name, int entityCount, int totalTick, String characterRef)
+    public void writeHeader(UUID recordingId, String name, int entityCount, int totalTick, UUID characterId)
             throws IOException {
         output.writeByte('N');
         output.writeByte('C');
@@ -59,7 +59,7 @@ public class RecordingWriter implements Action.Writer {
         output.writeUTF(name);
         output.writeInt(totalTick);
         output.writeInt(entityCount);
-        output.writeUTF(characterRef);
+        addUUID(characterId);
     }
 
     public void writeLocalActionsId() throws IOException {

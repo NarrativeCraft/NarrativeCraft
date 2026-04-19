@@ -24,6 +24,6 @@
 package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
-import fr.loudo.narrativecraft.narrative.character.Npc;
+import fr.loudo.narrativecraft.narrative.npc.Npc;
 
 public class NpcManager extends NarrativeManager<Npc> {}

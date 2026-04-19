@@ -31,11 +31,11 @@ import fr.loudo.narrativecraft.api.recording.IRecording;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
-import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.mixin.accessor.AbstractHorseAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.actions.*;
@@ -173,7 +173,9 @@ public class Recording implements IRecording {
     }
 
     public boolean save(String name) {
-        Animation animation = new Animation(id, name, playerSession.getScene(), tick);
+        ICharacterStory characterStory =
+                NarrativeCraftMod.getInstance().getCharacterManager().getList().get(0);
+        Animation animation = new Animation(id, name, playerSession.getScene(), tick, characterStory);
 
         if (NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_FAILED) {
             return false;
@@ -187,9 +189,6 @@ public class Recording implements IRecording {
         playerSession.getScene().getAnimationManager().add(animation);
         Services.PACKET.sendToPlayer(
                 getPlayer(), BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
-        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
-        String ref = "C:" + characterManager.getList().get(0).getId().toString();
-        animation.setCharacterRef(ref);
         NarrativeCraftMod.EVENT_BUS.post(new RecordingSaveEvent(getPlayer(), this, animation.getName()));
         return true;
     }

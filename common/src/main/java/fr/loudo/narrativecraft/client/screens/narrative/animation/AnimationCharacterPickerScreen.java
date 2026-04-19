@@ -26,21 +26,19 @@ package fr.loudo.narrativecraft.client.screens.narrative.animation;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.screens.PaginationsItemsScreen;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.Npc;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-public class AnimationCharacterPickerScreen extends PaginationsItemsScreen<Object> {
+public class AnimationCharacterPickerScreen extends PaginationsItemsScreen<ICharacterStory> {
 
     private final Animation animation;
     private final Screen lastScreen;
@@ -54,7 +52,7 @@ public class AnimationCharacterPickerScreen extends PaginationsItemsScreen<Objec
 
     @Override
     protected void init() {
-        List<Object> items = new ArrayList<>();
+        List<ICharacterStory> items = new ArrayList<>();
         if (npcMode) {
             items.addAll(animation.getScene().getNpcManager().getList());
         } else {
@@ -87,40 +85,25 @@ public class AnimationCharacterPickerScreen extends PaginationsItemsScreen<Objec
     }
 
     @Override
-    protected String getItemName(Object item) {
-        String name = "";
-        UUID selectedCharacterId = null;
-        if (item instanceof CharacterStory character) {
-            name = character.getName();
-            selectedCharacterId = character.getId();
-        } else if (item instanceof Npc npc) {
-            name = npc.getName();
-            selectedCharacterId = npc.getId();
-        }
-        if (selectedCharacterId == null || name.isEmpty()) return "";
-        UUID characterId = animation.getCharacterId();
-        if (characterId != null && characterId.equals(selectedCharacterId)) {
+    protected String getItemName(ICharacterStory item) {
+        String name = item.getName();
+        UUID characterId = animation.getCharacterStory().getId();
+        if (characterId != null && characterId.equals(item.getId())) {
             name += " ◀";
         }
         return name;
     }
 
     @Override
-    protected void onItemClicked(Object item) {
-        String characterRef = "";
-        if (item instanceof CharacterStory character) {
-            characterRef = "C:" + character.getId();
-        } else if (item instanceof Npc npc) {
-            characterRef = "N:" + npc.getId();
-        }
-        animation.setCharacterRef(characterRef);
+    protected void onItemClicked(ICharacterStory item) {
+        animation.setCharacterStory(item);
         Services.PACKET.sendToServer(
                 new BiSyncNarrativeEntryPacket(animation.getId(), animation.toPayload(), NarrativeEntryAction.EDIT));
         minecraft.setScreen(lastScreen);
     }
 
     @Override
-    protected boolean isItemClickable(Object item) {
+    protected boolean isItemClickable(ICharacterStory item) {
         return true;
     }
 

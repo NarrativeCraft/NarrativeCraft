@@ -23,12 +23,14 @@
 
 package fr.loudo.narrativecraft.client.narrative.animation;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.UUID;
@@ -46,7 +48,10 @@ public class ClientAnimationEditor implements ClientNarrativeEntryEditor<Animati
         Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
         if (scene == null) return;
 
-        Animation animation = new Animation(entryId, payload.getName(), scene, payload.getTotalTick());
+        ICharacterStory characterStory = ClientNarrativeCraftMod.getInstance()
+                .getCharacterManager()
+                .resolveCharacter(payload.getCharacterId(), scene);
+        Animation animation = new Animation(entryId, payload.getName(), scene, payload.getTotalTick(), characterStory);
         scene.getAnimationManager().add(animation);
 
         UtilsClient.reloadListScreen();
@@ -58,8 +63,11 @@ public class ClientAnimationEditor implements ClientNarrativeEntryEditor<Animati
         Animation animation = resolve(entryId, payload);
         if (animation == null) return;
 
+        ICharacterStory characterStory = NarrativeCraftMod.getInstance()
+                .getCharacterManager()
+                .resolveCharacter(payload.getCharacterId(), animation.getScene());
         animation.setName(payload.getName());
-        animation.setCharacterRef(payload.getCharacterRef());
+        animation.setCharacterStory(characterStory);
 
         UtilsClient.reloadListScreen();
     }
