@@ -23,66 +23,52 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.world.phys.Vec3;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import java.util.UUID;
 
-public class CameraView {
+public class CameraViewDialogSetup {
 
-    private String name;
-    private Vec3 position;
-    private Vec3 rotation;
-    private float fov;
-    private final List<CameraViewDialogSetup> dialogSetups = new ArrayList<>();
+    private static final float DEFAULT_OFFSET_Y = 1.0f;
 
-    public CameraView(String name, Vec3 position, Vec3 rotation, float fov) {
-        this.name = name;
-        this.position = position;
-        this.rotation = rotation;
-        this.fov = fov;
+    private final UUID id;
+    private final UUID characterPlacementId;
+    private transient String previewText = "";
+    private DialogData dialogData;
+
+    public CameraViewDialogSetup(UUID characterPlacementId) {
+        this.id = UUID.randomUUID();
+        this.characterPlacementId = characterPlacementId;
+        this.dialogData = new DialogData();
+        this.dialogData.setOffsetY(DEFAULT_OFFSET_Y);
     }
 
-    public String getName() {
-        return name;
+    public CameraViewDialogSetup(UUID id, UUID characterPlacementId, DialogData dialogData) {
+        this.id = id;
+        this.characterPlacementId = characterPlacementId;
+        this.dialogData = dialogData;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public UUID getId() {
+        return id;
     }
 
-    public Vec3 getPosition() {
-        return position;
+    public UUID getCharacterPlacementId() {
+        return characterPlacementId;
     }
 
-    public void setPosition(Vec3 position) {
-        this.position = position;
+    public String getPreviewText() {
+        return previewText;
     }
 
-    public Vec3 getRotation() {
-        return rotation;
+    public void setPreviewText(String previewText) {
+        this.previewText = previewText;
     }
 
-    public void setRotation(Vec3 rotation) {
-        this.rotation = rotation;
+    public DialogData getDialogData() {
+        return dialogData;
     }
 
-    public float getFov() {
-        return fov;
-    }
-
-    public void setFov(float fov) {
-        this.fov = fov;
-    }
-
-    public float getRoll() {
-        return (float) rotation.z;
-    }
-
-    public void setRoll(float roll) {
-        this.rotation = new Vec3(rotation.x, rotation.y, roll);
-    }
-
-    public List<CameraViewDialogSetup> getDialogSetups() {
-        return dialogSetups;
+    public void setDialogData(DialogData dialogData) {
+        this.dialogData = dialogData;
     }
 }

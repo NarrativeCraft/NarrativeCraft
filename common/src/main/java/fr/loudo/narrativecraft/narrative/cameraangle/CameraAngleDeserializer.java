@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import com.google.gson.*;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
@@ -109,7 +111,61 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
         double roll = json.has("roll") ? json.get("roll").getAsDouble() : 0.0;
         float fov = json.has("fov") ? json.get("fov").getAsFloat() : 70f;
 
-        return new CameraView(name, new Vec3(x, y, z), new Vec3(xRot, yRot, roll), fov);
+        CameraView cameraView = new CameraView(name, new Vec3(x, y, z), new Vec3(xRot, yRot, roll), fov);
+        if (json.has("dialogSetups")) {
+            for (JsonElement element : json.getAsJsonArray("dialogSetups")) {
+                CameraViewDialogSetup setup = deserializeDialogSetup(element.getAsJsonObject());
+                if (setup != null) cameraView.getDialogSetups().add(setup);
+            }
+        }
+        return cameraView;
+    }
+
+    private static CameraViewDialogSetup deserializeDialogSetup(JsonObject json) {
+        if (!json.has("id") || !json.has("characterPlacementId")) return null;
+        UUID id = UUID.fromString(json.get("id").getAsString());
+        UUID characterPlacementId =
+                UUID.fromString(json.get("characterPlacementId").getAsString());
+        DialogData dialogData =
+                json.has("dialogData") ? deserializeDialogData(json.getAsJsonObject("dialogData")) : new DialogData();
+        return new CameraViewDialogSetup(id, characterPlacementId, dialogData);
+    }
+
+    static DialogData deserializeDialogData(JsonObject json) {
+        DialogData data = new DialogData();
+        if (json.has("offsetX")) data.setOffsetX(json.get("offsetX").getAsFloat());
+        if (json.has("offsetY")) data.setOffsetY(json.get("offsetY").getAsFloat());
+        if (json.has("width")) data.setWidth(json.get("width").getAsFloat());
+        if (json.has("paddingX")) data.setPaddingX(json.get("paddingX").getAsFloat());
+        if (json.has("paddingY")) data.setPaddingY(json.get("paddingY").getAsFloat());
+        if (json.has("scale")) data.setScale(json.get("scale").getAsFloat());
+        if (json.has("letterSpacing"))
+            data.setLetterSpacing(json.get("letterSpacing").getAsFloat());
+        if (json.has("lineGap")) data.setLineGap(json.get("lineGap").getAsFloat());
+        if (json.has("backgroundColor"))
+            data.setBackgroundColor(json.get("backgroundColor").getAsInt());
+        if (json.has("textColor")) data.setTextColor(json.get("textColor").getAsInt());
+        if (json.has("backgroundImage")) {
+            data.setBackgroundImage(Identifier.parse(json.get("backgroundImage").getAsString()));
+        }
+        if (json.has("scrollSpeed")) data.setScrollSpeed(json.get("scrollSpeed").getAsFloat());
+        if (json.has("letterSound")) {
+            data.setLetterSound(Identifier.parse(json.get("letterSound").getAsString()));
+        }
+        if (json.has("soundMuted")) data.setSoundMuted(json.get("soundMuted").getAsBoolean());
+        if (json.has("tailVisible")) data.setTailVisible(json.get("tailVisible").getAsBoolean());
+        if (json.has("autoSkipEnabled"))
+            data.setAutoSkipEnabled(json.get("autoSkipEnabled").getAsBoolean());
+        if (json.has("autoSkipSeconds"))
+            data.setAutoSkipSeconds(json.get("autoSkipSeconds").getAsFloat());
+        if (json.has("textAlignment")) {
+            try {
+                data.setTextAlignment(DialogData.TextAlignment.valueOf(
+                        json.get("textAlignment").getAsString()));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return data;
     }
 
     public static CharacterPlacement deserializeCharacterPlacementFromJson(String json, Scene scene) {

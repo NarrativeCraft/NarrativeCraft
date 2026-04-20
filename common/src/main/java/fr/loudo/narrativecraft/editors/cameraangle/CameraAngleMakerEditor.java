@@ -36,6 +36,8 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.recording.actions.ChangeItemAction;
 import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
@@ -59,7 +61,8 @@ public class CameraAngleMakerEditor implements Editor {
 
     public static final String ENTITY_TAG = "nc_camera_angle";
 
-    private final List<Entity> entities = new ArrayList<>();
+    private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
+    private final List<Entity> characterEntities = new ArrayList<>();
     private final Map<UUID, List<Entity>> entitiesByTemplateReference = new HashMap<>();
     private final CameraAngle cameraAngle;
     private final PlayerSession playerSession;
@@ -86,14 +89,22 @@ public class CameraAngleMakerEditor implements Editor {
     public void hideEntitiesForOthers() {
         for (ServerPlayer player : playerSession.getPlayer().level().players()) {
             if (player.getId() == playerSession.getPlayer().getId()) continue;
-            entities.forEach(entity -> player.connection.send(new ClientboundRemoveEntitiesPacket(entity.getId())));
+            characterEntities.forEach(
+                    entity -> player.connection.send(new ClientboundRemoveEntitiesPacket(entity.getId())));
+            entitiesByTemplateReference
+                    .values()
+                    .forEach(list -> list.forEach(
+                            entity -> player.connection.send(new ClientboundRemoveEntitiesPacket(entity.getId()))));
         }
     }
 
     public void stop() {
         playerSession.changeGameMode(playerSession.getLastGameType());
-        for (Entity entity : entities) {
+        for (Entity entity : characterEntities) {
             entity.remove(Entity.RemovalReason.DISCARDED);
+        }
+        for (List<Entity> list : entitiesByTemplateReference.values()) {
+            list.forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED));
         }
     }
 
@@ -124,7 +135,10 @@ public class CameraAngleMakerEditor implements Editor {
         }
 
         entity.entityTags().add(ENTITY_TAG);
-        entities.add(entity);
+        characterPlacements.add(characterPlacement);
+        characterEntities.add(entity);
+        Services.PACKET.sendToPlayer(
+                player, new S2CCameraAnglePlacementEntitySpawned(characterPlacement.getId(), entity.getId()));
     }
 
     public void spawnTemplateReference(TemplateReference reference) {
@@ -135,7 +149,6 @@ public class CameraAngleMakerEditor implements Editor {
             if (entity != null) spawned.add(entity);
         }
         entitiesByTemplateReference.put(reference.id(), spawned);
-        entities.addAll(spawned);
     }
 
     private List<Animation> resolveAnimations(TemplateReference reference) {
@@ -238,12 +251,12 @@ public class CameraAngleMakerEditor implements Editor {
     }
 
     public void removePlacement(UUID placementId) {
-        List<CharacterPlacement> placements = cameraAngle.getCharacterPlacements();
-        for (int i = 0; i < placements.size(); i++) {
-            if (placements.get(i).getId().equals(placementId)) {
-                entities.get(i).remove(Entity.RemovalReason.DISCARDED);
-                entities.remove(i);
-                placements.remove(i);
+        for (int i = 0; i < characterPlacements.size(); i++) {
+            if (characterPlacements.get(i).getId().equals(placementId)) {
+                characterEntities.get(i).remove(Entity.RemovalReason.DISCARDED);
+                characterEntities.remove(i);
+                characterPlacements.remove(i);
+                cameraAngle.getCharacterPlacements().removeIf(p -> p.getId().equals(placementId));
                 return;
             }
         }
@@ -253,13 +266,24 @@ public class CameraAngleMakerEditor implements Editor {
         List<Entity> toRemove = entitiesByTemplateReference.remove(templateReferenceId);
         if (toRemove != null) {
             toRemove.forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED));
-            entities.removeAll(toRemove);
+            characterEntities.removeAll(toRemove);
         }
         cameraAngle.getTemplateReferences().removeIf(ref -> ref.id().equals(templateReferenceId));
     }
 
     public List<Entity> getEntities() {
-        return entities;
+        List<Entity> all = new ArrayList<>(characterEntities);
+        entitiesByTemplateReference.values().forEach(all::addAll);
+        return all;
+    }
+
+    public Entity getEntityForPlacement(UUID placementId) {
+        for (int i = 0; i < characterPlacements.size(); i++) {
+            if (characterPlacements.get(i).getId().equals(placementId)) {
+                return characterEntities.get(i);
+            }
+        }
+        return null;
     }
 
     public CameraAngle getCameraAngle() {

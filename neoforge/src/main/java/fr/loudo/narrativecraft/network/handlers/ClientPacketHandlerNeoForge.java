@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
@@ -90,6 +91,12 @@ public class ClientPacketHandlerNeoForge {
     public static void addCameraAngleCharacter(S2CCameraAngleCharacterCaptured packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.addCameraAngleCharacter(packet);
+        });
+    }
+
+    public static void onPlacementEntitySpawned(S2CCameraAnglePlacementEntitySpawned packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.onPlacementEntitySpawned(packet);
         });
     }
 }

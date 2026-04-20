@@ -40,8 +40,6 @@ import org.joml.Matrix4f;
 public class DialogRenderer3D extends DialogRenderer {
 
     private static final float SKIP_INDICATOR_SIZE = 3.5f;
-    private static final float BOBBING_AMPLITUDE = 0.05f;
-    private static final float BOBBING_SPEED = 2.0f;
 
     private final Entity entity;
     private final DialogTail tail;
@@ -96,13 +94,6 @@ public class DialogRenderer3D extends DialogRenderer {
 
         // Billboard: align to camera plane
         poseStack.mulPose(camera.rotation());
-
-        // Bobbing
-        if (data.isBobbingEnabled()) {
-            double bobbingTime = (System.currentTimeMillis() / 1000.0) * BOBBING_SPEED;
-            float bobY = (float) Math.sin(bobbingTime) * BOBBING_AMPLITUDE;
-            poseStack.translate(0, bobY, 0);
-        }
 
         // Scale from entity head (scale origin = bottom-centre of dialog)
         poseStack.scale(scale, -scale, scale);

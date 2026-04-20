@@ -88,14 +88,10 @@ public class DialogPresetManager {
         }
         if (obj.has("soundMuted")) data.setSoundMuted(obj.get("soundMuted").getAsBoolean());
         if (obj.has("tailVisible")) data.setTailVisible(obj.get("tailVisible").getAsBoolean());
-        if (obj.has("bobbingEnabled"))
-            data.setBobbingEnabled(obj.get("bobbingEnabled").getAsBoolean());
         if (obj.has("autoSkipEnabled"))
             data.setAutoSkipEnabled(obj.get("autoSkipEnabled").getAsBoolean());
         if (obj.has("autoSkipSeconds"))
             data.setAutoSkipSeconds(obj.get("autoSkipSeconds").getAsFloat());
-        if (obj.has("shakeSpeed")) data.setShakeSpeed(obj.get("shakeSpeed").getAsFloat());
-        if (obj.has("shakeForce")) data.setShakeForce(obj.get("shakeForce").getAsFloat());
 
         return data;
     }

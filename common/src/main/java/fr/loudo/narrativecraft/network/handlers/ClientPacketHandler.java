@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
@@ -104,6 +105,13 @@ public class ClientPacketHandler {
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor == null) return;
         editor.addCharacterPlacementFromJson(packet.placementJson());
+    }
+
+    public static void onPlacementEntitySpawned(S2CCameraAnglePlacementEntitySpawned packet) {
+        ClientCameraAngleMakerEditor editor =
+                ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
+        if (editor == null) return;
+        editor.registerPlacementEntityId(packet.placementId(), packet.entityId());
     }
 
     public static void handleDialogTest(S2CDialogTest packet) {

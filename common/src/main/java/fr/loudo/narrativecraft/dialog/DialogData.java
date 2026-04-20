@@ -52,12 +52,8 @@ public class DialogData {
     private boolean soundMuted = false;
 
     private boolean tailVisible = true;
-    private boolean bobbingEnabled = false;
     private boolean autoSkipEnabled = false;
     private float autoSkipSeconds = 3f;
-
-    private float shakeSpeed = 0f;
-    private float shakeForce = 0f;
 
     private TextAlignment textAlignment = TextAlignment.LEFT;
 
@@ -79,11 +75,8 @@ public class DialogData {
         this.letterSound = source.letterSound;
         this.soundMuted = source.soundMuted;
         this.tailVisible = source.tailVisible;
-        this.bobbingEnabled = source.bobbingEnabled;
         this.autoSkipEnabled = source.autoSkipEnabled;
         this.autoSkipSeconds = source.autoSkipSeconds;
-        this.shakeSpeed = source.shakeSpeed;
-        this.shakeForce = source.shakeForce;
         this.textAlignment = source.textAlignment;
     }
 
@@ -107,11 +100,8 @@ public class DialogData {
         if (overrides.letterSound != null) base.letterSound = overrides.letterSound;
         if (overrides.soundMuted != defaults.soundMuted) base.soundMuted = overrides.soundMuted;
         if (overrides.tailVisible != defaults.tailVisible) base.tailVisible = overrides.tailVisible;
-        if (overrides.bobbingEnabled != defaults.bobbingEnabled) base.bobbingEnabled = overrides.bobbingEnabled;
         if (overrides.autoSkipEnabled != defaults.autoSkipEnabled) base.autoSkipEnabled = overrides.autoSkipEnabled;
         if (overrides.autoSkipSeconds != defaults.autoSkipSeconds) base.autoSkipSeconds = overrides.autoSkipSeconds;
-        if (overrides.shakeSpeed != defaults.shakeSpeed) base.shakeSpeed = overrides.shakeSpeed;
-        if (overrides.shakeForce != defaults.shakeForce) base.shakeForce = overrides.shakeForce;
         if (overrides.textAlignment != defaults.textAlignment) base.textAlignment = overrides.textAlignment;
         return base;
     }
@@ -236,14 +226,6 @@ public class DialogData {
         this.tailVisible = tailVisible;
     }
 
-    public boolean isBobbingEnabled() {
-        return bobbingEnabled;
-    }
-
-    public void setBobbingEnabled(boolean bobbingEnabled) {
-        this.bobbingEnabled = bobbingEnabled;
-    }
-
     public boolean isAutoSkipEnabled() {
         return autoSkipEnabled;
     }
@@ -258,22 +240,6 @@ public class DialogData {
 
     public void setAutoSkipSeconds(float autoSkipSeconds) {
         this.autoSkipSeconds = autoSkipSeconds;
-    }
-
-    public float getShakeSpeed() {
-        return shakeSpeed;
-    }
-
-    public void setShakeSpeed(float shakeSpeed) {
-        this.shakeSpeed = shakeSpeed;
-    }
-
-    public float getShakeForce() {
-        return shakeForce;
-    }
-
-    public void setShakeForce(float shakeForce) {
-        this.shakeForce = shakeForce;
     }
 
     public TextAlignment getTextAlignment() {

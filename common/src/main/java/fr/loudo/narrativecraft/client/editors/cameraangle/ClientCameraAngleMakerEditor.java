@@ -24,14 +24,14 @@
 package fr.loudo.narrativecraft.client.editors.cameraangle;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.widgets.CameraAngleDialogPreviewPanel;
+import fr.loudo.narrativecraft.client.editors.widgets.CameraViewDialogSetupAdvancedPanel;
 import fr.loudo.narrativecraft.client.editors.widgets.FovSliderWidget;
 import fr.loudo.narrativecraft.client.editors.widgets.RollSliderWidget;
 import fr.loudo.narrativecraft.client.screens.ClearScreen;
-import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleCameraNameScreen;
-import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleCharacterPickerScreen;
-import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleEditorMenuScreen;
-import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleTemplatePickerScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.Editor;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
@@ -53,12 +53,12 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundChangeGameModePacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
+import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ClientCameraAngleMakerEditor implements Editor {
 
@@ -74,9 +74,19 @@ public class ClientCameraAngleMakerEditor implements Editor {
     private final RollSliderWidget rollWidget = new RollSliderWidget();
     private final FovSliderWidget fovWidget = new FovSliderWidget();
 
+    public enum PreviewMode {
+        CAMERA,
+        DIALOG
+    }
+
     private CameraView previewCameraView;
+    private PreviewMode previewMode = PreviewMode.CAMERA;
     private boolean renderingHud = true;
     private boolean editingCameraViewPosition = false;
+    private final Map<UUID, Integer> placementEntityIds = new HashMap<>();
+    private final List<DialogRenderer3D> previewDialogRenderers = new ArrayList<>();
+    private final CameraAngleDialogPreviewPanel dialogPreviewPanel = new CameraAngleDialogPreviewPanel(this);
+    private final CameraViewDialogSetupAdvancedPanel advancedPanel = new CameraViewDialogSetupAdvancedPanel();
 
     public ClientCameraAngleMakerEditor(CameraAngle cameraAngle) {
         this.cameraAngle = cameraAngle;
@@ -98,6 +108,10 @@ public class ClientCameraAngleMakerEditor implements Editor {
                 .build());
         buttons.add(Button.builder(Component.literal(CustomFont.BURGER_MENU), b -> openMenu())
                 .tooltip(Tooltip.create(Translation.message("screen.camera_angle_editor.open_menu")))
+                .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build());
+        buttons.add(Button.builder(Component.literal("\uE207"), b -> openDialogSetupScreen())
+                .tooltip(Tooltip.create(Translation.message("screen.camera_angle_editor.dialog_setups")))
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
 
@@ -280,10 +294,84 @@ public class ClientCameraAngleMakerEditor implements Editor {
     }
 
     public void exitPreview() {
+        exitDialogMode();
+        previewMode = PreviewMode.CAMERA;
         this.previewCameraView = null;
         playerSession.setCameraView(null);
         rollWidget.setVisible(false);
         fovWidget.setVisible(false);
+    }
+
+    public void enterDialogMode() {
+        if (previewCameraView == null) return;
+        previewMode = PreviewMode.DIALOG;
+        rollWidget.setVisible(false);
+        fovWidget.setVisible(false);
+        for (CameraViewDialogSetup setup : previewCameraView.getDialogSetups()) {
+            Entity entity = getEntityForPlacement(setup.getCharacterPlacementId());
+            if (entity == null) continue;
+            DialogRenderer3D renderer = new DialogRenderer3D(setup.getDialogData(), entity);
+            renderer.onStopped(() -> {
+                previewDialogRenderers.remove(renderer);
+                playerSession.removeDialog3D(renderer);
+            });
+            String text = setup.getPreviewText().isEmpty() ? "..." : setup.getPreviewText();
+            renderer.start(text);
+            previewDialogRenderers.add(renderer);
+            playerSession.addDialog3D(renderer);
+        }
+        dialogPreviewPanel.setCameraView(previewCameraView);
+    }
+
+    public void exitDialogMode() {
+        previewMode = PreviewMode.CAMERA;
+        for (DialogRenderer3D renderer : new ArrayList<>(previewDialogRenderers)) {
+            renderer.stop();
+        }
+        previewDialogRenderers.clear();
+        if (previewCameraView != null) {
+            rollWidget.setVisible(true);
+            fovWidget.setVisible(true);
+        }
+    }
+
+    public void registerPlacementEntityId(UUID placementId, int entityId) {
+        placementEntityIds.put(placementId, entityId);
+    }
+
+    public Entity getEntityForPlacement(UUID placementId) {
+        Integer entityId = placementEntityIds.get(placementId);
+        if (entityId == null || minecraft.level == null) return null;
+        return minecraft.level.getEntity(entityId);
+    }
+
+    public DialogRenderer3D getRendererForSetup(CameraViewDialogSetup setup) {
+        int index =
+                previewCameraView != null ? previewCameraView.getDialogSetups().indexOf(setup) : -1;
+        if (index < 0 || index >= previewDialogRenderers.size()) return null;
+        return previewDialogRenderers.get(index);
+    }
+
+    public void openAdvancedPanel(CameraViewDialogSetup setup) {
+        advancedPanel.setSetup(setup);
+        advancedPanel.setVisible(true);
+    }
+
+    public void toggleAdvancedPanel(CameraViewDialogSetup setup) {
+        if (advancedPanel.isVisible()) {
+            advancedPanel.setVisible(false);
+        } else {
+            advancedPanel.setSetup(setup);
+            advancedPanel.setVisible(true);
+        }
+    }
+
+    public void closetAdvancedPanel() {
+        advancedPanel.setVisible(false);
+    }
+
+    private void openDialogSetupScreen() {
+        minecraft.setScreen(new CameraAngleDialogSetupScreen(this, minecraft.screen));
     }
 
     private void editCameraPosition() {
@@ -320,12 +408,12 @@ public class ClientCameraAngleMakerEditor implements Editor {
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
 
-        Button quitButton = buttons.get(4);
-        Button saveButton = buttons.get(5);
-        Button leavePreviewButton = buttons.get(6);
-        Button editPositionButton = buttons.get(7);
-        Button acceptPositionButton = buttons.get(8);
-        Button stopPositionButton = buttons.get(9);
+        Button quitButton = buttons.get(5);
+        Button saveButton = buttons.get(6);
+        Button leavePreviewButton = buttons.get(7);
+        Button editPositionButton = buttons.get(8);
+        Button acceptPositionButton = buttons.get(9);
+        Button stopPositionButton = buttons.get(10);
 
         quitButton.setPosition(5, 5);
         saveButton.setPosition(quitButton.getX() + quitButton.getWidth() + 5, 5);
@@ -333,10 +421,10 @@ public class ClientCameraAngleMakerEditor implements Editor {
         boolean inPreview = previewCameraView != null;
 
         if (!inPreview) {
-            int totalWidth = 4 * BUTTON_WIDTH + 3 * BUTTON_GAP;
+            int totalWidth = 5 * BUTTON_WIDTH + 4 * BUTTON_GAP;
             int startX = screenWidth / 2 - totalWidth / 2;
             int y = screenHeight - BUTTON_HEIGHT - 30;
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 Button b = buttons.get(i);
                 b.setPosition(startX + i * (BUTTON_WIDTH + BUTTON_GAP), y);
                 b.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
@@ -351,6 +439,10 @@ public class ClientCameraAngleMakerEditor implements Editor {
                     graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
             editPositionButton.extractRenderState(
                     graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+
+            if (previewMode == PreviewMode.DIALOG) {
+                dialogPreviewPanel.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
+            }
         } else {
             acceptPositionButton.setPosition(5, 5);
             acceptPositionButton.extractRenderState(
@@ -361,27 +453,37 @@ public class ClientCameraAngleMakerEditor implements Editor {
                     graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
         }
 
-        rollWidget.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
-        fovWidget.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
+        if (previewMode == PreviewMode.CAMERA) {
+            rollWidget.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
+            fovWidget.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
+        }
+
+        if (previewMode == PreviewMode.DIALOG) {
+            advancedPanel.render(graphics, mousePos[0], mousePos[1]);
+        }
     }
 
     public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
         if (!renderingHud || !clearScreenOpened()) return;
+        if (advancedPanel.mouseClicked(event)) return;
         if (rollWidget.mouseClicked(event)) return;
         if (fovWidget.mouseClicked(event)) return;
 
         boolean inPreview = previewCameraView != null;
 
         if (!inPreview) {
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 7; i++) {
                 buttons.get(i).mouseClicked(event, isDoubleClick);
             }
         } else if (!editingCameraViewPosition) {
-            buttons.get(6).mouseClicked(event, isDoubleClick);
             buttons.get(7).mouseClicked(event, isDoubleClick);
-        } else {
             buttons.get(8).mouseClicked(event, isDoubleClick);
+            if (previewMode == PreviewMode.DIALOG) {
+                dialogPreviewPanel.mouseClicked(event);
+            }
+        } else {
             buttons.get(9).mouseClicked(event, isDoubleClick);
+            buttons.get(10).mouseClicked(event, isDoubleClick);
         }
     }
 
@@ -389,10 +491,14 @@ public class ClientCameraAngleMakerEditor implements Editor {
         if (!renderingHud || !clearScreenOpened()) return;
         rollWidget.mouseReleased();
         fovWidget.mouseReleased();
+        if (previewMode == PreviewMode.DIALOG) dialogPreviewPanel.mouseReleased();
     }
 
     public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
         if (!renderingHud || !clearScreenOpened()) return;
+        if (previewMode == PreviewMode.DIALOG) {
+            if (dialogPreviewPanel.mouseDragged(event.y())) return;
+        }
         if (rollWidget.mouseDragged(event.y())) return;
         fovWidget.mouseDragged(event.y());
     }
@@ -401,9 +507,35 @@ public class ClientCameraAngleMakerEditor implements Editor {
         return minecraft.screen != null && minecraft.screen instanceof ClearScreen;
     }
 
-    public void keyPressed(KeyEvent event) {}
+    public void keyPressed(KeyEvent event) {
+        if (previewMode == PreviewMode.DIALOG) {
+            dialogPreviewPanel.keyPressed(event);
+            if (dialogPreviewPanel.isAnyBoxFocused()) return;
+        }
+        if (advancedPanel.isVisible()) {
+            advancedPanel.keyPressed(event);
+            if (advancedPanel.isAnyBoxFocused()) return;
+        }
+        if (previewCameraView != null && !editingCameraViewPosition && event.key() == GLFW.GLFW_KEY_G) {
+            if (previewMode == PreviewMode.CAMERA) {
+                enterDialogMode();
+            } else {
+                exitDialogMode();
+            }
+        }
+        if (event.key() == GLFW.GLFW_KEY_H) {
+            renderingHud = !renderingHud;
+        }
+    }
 
-    public void charTyped(CharacterEvent event) {}
+    public void charTyped(CharacterEvent event) {
+        if (previewMode == PreviewMode.DIALOG) {
+            dialogPreviewPanel.charTyped(event);
+        }
+        if (advancedPanel.isVisible()) {
+            advancedPanel.charTyped(event);
+        }
+    }
 
     public CameraAngle getCameraAngle() {
         return cameraAngle;
@@ -423,6 +555,14 @@ public class ClientCameraAngleMakerEditor implements Editor {
 
     public boolean isEditingCameraViewPosition() {
         return editingCameraViewPosition;
+    }
+
+    public PreviewMode getPreviewMode() {
+        return previewMode;
+    }
+
+    public List<DialogRenderer3D> getPreviewDialogRenderers() {
+        return previewDialogRenderers;
     }
 
     public record CharacterPick(CharacterType type, UUID characterId) {}
