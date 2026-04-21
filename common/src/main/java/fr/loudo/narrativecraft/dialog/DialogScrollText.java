@@ -181,6 +181,8 @@ public class DialogScrollText {
                 float rightEdge = (letterPosition[0] - originX) + font.width(entry.letter);
                 rowRightEdge.merge(letterPosition[1], rightEdge, Math::max);
             }
+            float maxLineWidth =
+                    rowRightEdge.values().stream().max(Float::compareTo).orElse(0f);
             for (int index = 0; index < letters.size(); index++) {
                 LetterEntry entry = letters.get(index);
                 if (entry.letter.isEmpty() || entry.letter.equals("\n") || entry.letter.equals(" ")) continue;
@@ -188,8 +190,8 @@ public class DialogScrollText {
                 float lineWidth = rowRightEdge.getOrDefault(letterPosition[1], 0f);
                 float offset =
                         switch (alignment) {
-                            case CENTER -> -lineWidth / 2f;
-                            case RIGHT -> -lineWidth;
+                            case CENTER -> (maxLineWidth - lineWidth) / 2f;
+                            case RIGHT -> maxLineWidth - lineWidth;
                             default -> 0f;
                         };
                 letterPosition[0] += offset;

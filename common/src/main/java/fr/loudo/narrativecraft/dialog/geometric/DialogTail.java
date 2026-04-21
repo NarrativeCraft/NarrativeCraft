@@ -30,8 +30,6 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 public class DialogTail {
@@ -65,47 +63,9 @@ public class DialogTail {
             MultiBufferSource.BufferSource bufferSource,
             Camera camera,
             float opacity) {
-        TailDirection tailDirection = TailDirection.TOP;
-        float offsetX = dialog.getDialogOffsetX();
-        float offsetY = dialog.getDialogOffsetY();
-
-        if (offsetX > 0) {
-            tailDirection = TailDirection.LEFT;
-        } else if (offsetX < 0) {
-            tailDirection = TailDirection.RIGHT;
-        } else if (offsetY > 0) {
-            tailDirection = TailDirection.BOTTOM;
-        }
-
-        Vec2 tailOffset = getTailOffset(camera);
+        TailDirection tailDirection = getTailDirection();
 
         poseStack.pushPose();
-
-        if (offsetX != 0) {
-            if (offsetY < 0) {
-                poseStack.translate(0, (height / 2.0f) - width / 2.0f, 0);
-            } else if (offsetY > 0) {
-                poseStack.translate(0, -(height / 2.0f) + width / 2.0f, 0);
-            }
-        }
-
-        if (tailDirection == TailDirection.RIGHT || tailDirection == TailDirection.LEFT) {
-            float halfHeight = dialog.getDialogHeight() / 2f;
-            float minY = -halfHeight + width / 2f;
-            float maxY = halfHeight - width / 2f;
-
-            if (offsetY != 0) {
-                if (tailOffset.y < minY) {
-                    tailDirection = tailDirection == TailDirection.RIGHT
-                            ? TailDirection.RIGHT_UP_CORNER
-                            : TailDirection.LEFT_UP_CORNER;
-                } else if (tailOffset.y > maxY) {
-                    tailDirection = tailDirection == TailDirection.RIGHT
-                            ? TailDirection.RIGHT_DOWN_CORNER
-                            : TailDirection.LEFT_DOWN_CORNER;
-                }
-            }
-        }
 
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
         Matrix4f matrix = poseStack.last().pose();
@@ -128,16 +88,20 @@ public class DialogTail {
         poseStack.popPose();
     }
 
-    public Vec2 getTailOffset(Camera camera) {
-        Vec3 entityPos = dialog.translateToRelative(dialog.getDialogPosition());
-        Vec3 dialogPos = dialog.translateToRelativeApplyOffset(dialog.getDialogPosition());
-        Vec3 toDialog = dialogPos.subtract(entityPos);
+    private TailDirection getTailDirection() {
+        float offsetX = dialog.getDialogOffsetX();
+        float offsetY = dialog.getDialogOffsetY();
 
-        Vec3 camRight = new Vec3(camera.leftVector()).scale(-1);
-        Vec3 camUp = new Vec3(camera.upVector());
-
-        float scale = dialog.getData().getScale() * 0.025f;
-        return new Vec2((float) (toDialog.dot(camRight) / scale), (float) (toDialog.dot(camUp) / scale));
+        TailDirection tailDirection;
+        if (offsetX > 0 && offsetY > 0) tailDirection = TailDirection.LEFT_DOWN_CORNER;
+        else if (offsetX < 0 && offsetY > 0) tailDirection = TailDirection.RIGHT_DOWN_CORNER;
+        else if (offsetX > 0 && offsetY < 0) tailDirection = TailDirection.LEFT_UP_CORNER;
+        else if (offsetX < 0 && offsetY < 0) tailDirection = TailDirection.RIGHT_UP_CORNER;
+        else if (offsetX > 0) tailDirection = TailDirection.LEFT;
+        else if (offsetX < 0) tailDirection = TailDirection.RIGHT;
+        else if (offsetY > 0) tailDirection = TailDirection.BOTTOM;
+        else tailDirection = TailDirection.TOP;
+        return tailDirection;
     }
 
     private void addVertex(Matrix4f matrix, VertexConsumer consumer, float x, float y, float opacity) {
@@ -154,10 +118,10 @@ public class DialogTail {
     }
 
     private void drawTailTop(Matrix4f m, VertexConsumer c, float topRight, float topLeft, float op) {
-        addVertex(m, c, 0, -dialog.getDialogHeight() - height, op);
-        addVertex(m, c, -topRight, -dialog.getDialogHeight(), op);
-        addVertex(m, c, -topLeft, -dialog.getDialogHeight(), op);
-        addVertex(m, c, -topRight, -dialog.getDialogHeight(), op);
+        addVertex(m, c, 0, -height, op);
+        addVertex(m, c, -topRight, height, op);
+        addVertex(m, c, -topLeft, 0, op);
+        addVertex(m, c, -topRight, 0, op);
     }
 
     private void drawTailBottom(Matrix4f m, VertexConsumer c, float topRight, float topLeft, float op) {
@@ -182,30 +146,30 @@ public class DialogTail {
     }
 
     private void drawTailUpRightCorner(Matrix4f m, VertexConsumer c, float op) {
-        addVertex(m, c, height / 2, -4, op);
-        addVertex(m, c, -width, -width / 2, op);
-        addVertex(m, c, 0, width / 2, op);
-        addVertex(m, c, height / 2, -4, op);
+        addVertex(m, c, 0, 0, op);
+        addVertex(m, c, 0, height / 2, op);
+        addVertex(m, c, width / 2, -height / 2, op);
+        addVertex(m, c, -width / 2, 0, op);
     }
 
     private void drawTailDownRightCorner(Matrix4f m, VertexConsumer c, float op) {
-        addVertex(m, c, height / 2, 4, op);
-        addVertex(m, c, 0, -width / 2, op);
-        addVertex(m, c, -width, width / 2, op);
-        addVertex(m, c, height / 2, 4, op);
+        addVertex(m, c, 0, 0, op);
+        addVertex(m, c, -width / 2, 0, op);
+        addVertex(m, c, width / 2, height / 2, op);
+        addVertex(m, c, 0, -height / 2, op);
     }
 
     private void drawTailUpLeftCorner(Matrix4f m, VertexConsumer c, float op) {
-        addVertex(m, c, -height / 2, -4, op);
-        addVertex(m, c, 0, width / 2, op);
-        addVertex(m, c, width, -width / 2, op);
-        addVertex(m, c, -height / 2, -4, op);
+        addVertex(m, c, 0, 0, op);
+        addVertex(m, c, width / 2, 0, op);
+        addVertex(m, c, -width / 2, -height / 2, op);
+        addVertex(m, c, 0, height / 2, op);
     }
 
     private void drawTailDownLeftCorner(Matrix4f m, VertexConsumer c, float op) {
-        addVertex(m, c, -height / 2, 4, op);
-        addVertex(m, c, width, width / 2, op);
-        addVertex(m, c, width, -width * 2, op);
-        addVertex(m, c, -height / 2, 4, op);
+        addVertex(m, c, -width / 2, height / 2, op);
+        addVertex(m, c, width / 2, 0, op);
+        addVertex(m, c, 0, 0, op);
+        addVertex(m, c, 0, -height / 2, op);
     }
 }

@@ -65,6 +65,7 @@ public class DialogRenderer3D extends DialogRenderer {
 
         float opacity = animator.getOpacity(partialTick);
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Vec3 camRight = new Vec3(camera.leftVector()).scale(-1);
 
         double interpX = Mth.lerp(partialTick, entity.xo, entity.getX());
         double interpY = Mth.lerp(partialTick, entity.yo, entity.getY());
@@ -72,8 +73,11 @@ public class DialogRenderer3D extends DialogRenderer {
 
         Vec3 cameraPos = camera.position();
         // Animation: dialog slides from entity head (t=0) to its final position (t=1)
-        Vec3 entityHeadPos = new Vec3(interpX, interpY + entity.getBbHeight(), interpZ);
-        Vec3 dialogFinalPos = new Vec3(interpX, interpY + entity.getBbHeight() + data.getOffsetY(), interpZ);
+        Vec3 entityHeadPos = new Vec3(interpX, interpY + entity.getEyeHeight(), interpZ);
+        Vec3 dialogFinalPos = new Vec3(
+                interpX + camRight.x * data.getOffsetX(),
+                interpY + entity.getEyeHeight() + data.getOffsetY() + camRight.y * data.getOffsetX(),
+                interpZ + camRight.z * data.getOffsetX());
         Vec3 dialogPos = animator.getPosition(entityHeadPos, dialogFinalPos, partialTick);
 
         // Recompute layout
@@ -84,30 +88,27 @@ public class DialogRenderer3D extends DialogRenderer {
 
         poseStack.pushPose();
 
-        // Translate to entity head position (relative to camera)
+        // Translate to dialog position (relative to camera), offset already included in dialogFinalPos
         poseStack.translate(dialogPos.x - cameraPos.x, dialogPos.y - cameraPos.y, dialogPos.z - cameraPos.z);
-
-        // Apply horizontal offset
-        Vec3 camRight = new Vec3(camera.leftVector()).scale(-1);
-        poseStack.translate(
-                camRight.x * data.getOffsetX(), camRight.y * data.getOffsetX(), camRight.z * data.getOffsetX());
 
         // Billboard: align to camera plane
         poseStack.mulPose(camera.rotation());
 
-        // Scale from entity head (scale origin = bottom-centre of dialog)
+        // Scale from entity head (scale origin = anchor corner of dialog)
         poseStack.scale(scale, -scale, scale);
 
-        // Center horizontally, anchor bottom at entity head
-        poseStack.translate(-totalWidth / 2f, -totalHeight, 0);
+        // Anchor point: determined by offset direction so the dialog never covers the entity head
+        float anchorX = data.getOffsetX() == 0 ? -totalWidth / 2f : (data.getOffsetX() > 0 ? 0f : -totalWidth);
+        float anchorY = data.getOffsetY() == 0 ? -totalHeight / 2f : (data.getOffsetY() > 0 ? -totalHeight : 0f);
+        poseStack.translate(anchorX, anchorY, 0);
 
         renderBackground(poseStack, bufferSource, totalWidth, totalHeight, opacity);
         renderText(poseStack, bufferSource, partialTick);
 
         if (data.isTailVisible()) {
-            // Translate tail to bottom-centre of dialog
+            // Translate tail to the anchor corner (the corner closest to the entity head)
             poseStack.pushPose();
-            poseStack.translate(totalWidth / 2f, totalHeight, 0);
+            poseStack.translate(-anchorX, -anchorY, 0);
             tail.render(poseStack, partialTick, bufferSource, camera, opacity);
             poseStack.popPose();
         }
