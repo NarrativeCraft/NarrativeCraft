@@ -40,7 +40,6 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.*;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -59,11 +58,14 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.*;
+
 public class ClientCameraAngleMakerEditor implements Editor {
 
     private static final int BUTTON_WIDTH = 20;
     private static final int BUTTON_HEIGHT = 20;
     private static final int BUTTON_GAP = 10;
+    public static final String DEFAULT_DIALOG_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
 
     private final Minecraft minecraft = Minecraft.getInstance();
     private final CameraAngle cameraAngle;
@@ -314,7 +316,9 @@ public class ClientCameraAngleMakerEditor implements Editor {
                 previewDialogRenderers.remove(renderer);
                 playerSession.removeDialog3D(renderer);
             });
-            String text = setup.getPreviewText().isEmpty() ? "..." : setup.getPreviewText();
+            String text = setup.getPreviewText().isEmpty()
+                    ? ClientCameraAngleMakerEditor.DEFAULT_DIALOG_TEXT
+                    : setup.getPreviewText();
             renderer.start(text);
             previewDialogRenderers.add(renderer);
             playerSession.addDialog3D(renderer);
@@ -464,7 +468,10 @@ public class ClientCameraAngleMakerEditor implements Editor {
 
     public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
         if (!renderingHud || !clearScreenOpened()) return;
-        if (advancedPanel.mouseClicked(event)) return;
+        if (advancedPanel.mouseClicked(event)) {
+            dialogPreviewPanel.unfocusAll();
+            return;
+        }
         if (rollWidget.mouseClicked(event)) return;
         if (fovWidget.mouseClicked(event)) return;
 
@@ -478,7 +485,9 @@ public class ClientCameraAngleMakerEditor implements Editor {
             buttons.get(7).mouseClicked(event, isDoubleClick);
             buttons.get(8).mouseClicked(event, isDoubleClick);
             if (previewMode == PreviewMode.DIALOG) {
-                dialogPreviewPanel.mouseClicked(event);
+                if (dialogPreviewPanel.mouseClicked(event)) {
+                    advancedPanel.unfocusAll();
+                }
             }
         } else {
             buttons.get(9).mouseClicked(event, isDoubleClick);

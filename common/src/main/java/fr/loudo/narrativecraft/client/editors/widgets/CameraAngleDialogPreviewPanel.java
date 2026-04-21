@@ -29,7 +29,6 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
@@ -38,6 +37,8 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+
+import java.util.List;
 
 public class CameraAngleDialogPreviewPanel {
 
@@ -82,14 +83,14 @@ public class CameraAngleDialogPreviewPanel {
             current.setPreviewText(text);
             DialogRenderer3D renderer = editor.getRendererForSetup(current);
             if (renderer != null) {
-                renderer.update(text.isEmpty() ? "..." : text);
+                renderer.update(text.isEmpty() ? ClientCameraAngleMakerEditor.DEFAULT_DIALOG_TEXT : text);
             }
         });
 
         if (setup != null) {
             DialogData data = setup.getDialogData();
 
-            offsetXBox = makeEditBox(mc, 16, String.format("%.2f", data.getOffsetX()));
+            offsetXBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getOffsetX()));
             offsetXBox.setResponder(text -> {
                 CameraViewDialogSetup s = getSelectedSetup();
                 if (s == null) return;
@@ -99,7 +100,7 @@ public class CameraAngleDialogPreviewPanel {
                 }
             });
 
-            offsetYBox = makeEditBox(mc, 16, String.format("%.2f", data.getOffsetY()));
+            offsetYBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getOffsetY()));
             offsetYBox.setResponder(text -> {
                 CameraViewDialogSetup s = getSelectedSetup();
                 if (s == null) return;
@@ -109,7 +110,7 @@ public class CameraAngleDialogPreviewPanel {
                 }
             });
 
-            scaleBox = makeEditBox(mc, 16, String.format("%.2f", data.getScale()));
+            scaleBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getScale()));
             scaleBox.setResponder(text -> {
                 CameraViewDialogSetup s = getSelectedSetup();
                 if (s == null) return;
@@ -280,7 +281,7 @@ public class CameraAngleDialogPreviewPanel {
         return false;
     }
 
-    private void unfocusAll() {
+    public void unfocusAll() {
         setBoxFocus(previewTextBox, false);
         setBoxFocus(offsetXBox, false);
         setBoxFocus(offsetYBox, false);

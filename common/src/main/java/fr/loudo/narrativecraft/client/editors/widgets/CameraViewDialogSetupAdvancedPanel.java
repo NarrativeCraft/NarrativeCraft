@@ -83,44 +83,45 @@ public class CameraViewDialogSetupAdvancedPanel {
         Minecraft mc = Minecraft.getInstance();
         DialogData data = setup.getDialogData();
 
-        widthBox = makeBox(mc, 16, String.format("%.2f", data.getWidth()), text -> {
+        widthBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getWidth()), text -> {
             try {
                 data.setWidth(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
-        paddingXBox = makeBox(mc, 16, String.format("%.2f", data.getPaddingX()), text -> {
+        paddingXBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getPaddingX()), text -> {
             try {
                 data.setPaddingX(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
-        paddingYBox = makeBox(mc, 16, String.format("%.2f", data.getPaddingY()), text -> {
+        paddingYBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getPaddingY()), text -> {
             try {
                 data.setPaddingY(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
-        letterSpacingBox = makeBox(mc, 16, String.format("%.2f", data.getLetterSpacing()), text -> {
-            try {
-                data.setLetterSpacing(Float.parseFloat(text));
-            } catch (NumberFormatException ignored) {
-            }
-        });
-        lineGapBox = makeBox(mc, 16, String.format("%.2f", data.getLineGap()), text -> {
+        letterSpacingBox =
+                makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getLetterSpacing()), text -> {
+                    try {
+                        data.setLetterSpacing(Float.parseFloat(text));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+        lineGapBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getLineGap()), text -> {
             try {
                 data.setLineGap(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
-        scrollSpeedBox = makeBox(mc, 16, String.format("%.2f", data.getScrollSpeed()), text -> {
+        scrollSpeedBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getScrollSpeed()), text -> {
             try {
                 data.setScrollSpeed(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
         skipSecondsBox = data.isAutoSkipEnabled()
-                ? makeBox(mc, 16, String.format("%.2f", data.getAutoSkipSeconds()), text -> {
+                ? makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getAutoSkipSeconds()), text -> {
                     try {
                         data.setAutoSkipSeconds(Float.parseFloat(text));
                     } catch (NumberFormatException ignored) {
@@ -408,7 +409,7 @@ public class CameraViewDialogSetupAdvancedPanel {
                 || isFocused(letterSoundBox);
     }
 
-    private void unfocusAll() {
+    public void unfocusAll() {
         setFocus(widthBox, false);
         setFocus(paddingXBox, false);
         setFocus(paddingYBox, false);
