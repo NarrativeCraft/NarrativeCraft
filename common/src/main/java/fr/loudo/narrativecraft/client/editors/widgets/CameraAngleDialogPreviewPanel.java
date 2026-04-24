@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
@@ -37,8 +38,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
-
-import java.util.List;
 
 public class CameraAngleDialogPreviewPanel {
 
@@ -146,6 +145,8 @@ public class CameraAngleDialogPreviewPanel {
             backgroundColorBox = null;
             textColorBox = null;
         }
+        editor.closeAdvancedPanel();
+        editor.openAdvancedPanel(getSelectedSetup());
     }
 
     private EditBox makeEditBox(Minecraft mc, int maxLength, String value) {

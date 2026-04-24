@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.*;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -57,8 +58,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.*;
 
 public class ClientCameraAngleMakerEditor implements Editor {
 
@@ -88,6 +87,10 @@ public class ClientCameraAngleMakerEditor implements Editor {
     private final List<DialogRenderer3D> previewDialogRenderers = new ArrayList<>();
     private final CameraAngleDialogPreviewPanel dialogPreviewPanel = new CameraAngleDialogPreviewPanel(this);
     private final CameraViewDialogSetupAdvancedPanel advancedPanel = new CameraViewDialogSetupAdvancedPanel();
+
+    private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
+    private final List<TemplateReference> templateReferences = new ArrayList<>();
+    private final List<CameraView> cameraViews = new ArrayList<>();
 
     public ClientCameraAngleMakerEditor(CameraAngle cameraAngle) {
         this.cameraAngle = cameraAngle;
@@ -136,6 +139,10 @@ public class ClientCameraAngleMakerEditor implements Editor {
         buttons.add(Button.builder(Component.literal(CustomFont.UNDO), b -> stopNewCameraPosition())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
+
+        characterPlacements.addAll(cameraAngle.getCharacterPlacements());
+        templateReferences.addAll(cameraAngle.getTemplateReferences());
+        cameraViews.addAll(cameraAngle.getCameras());
     }
 
     public void tick() {
@@ -162,7 +169,7 @@ public class ClientCameraAngleMakerEditor implements Editor {
         CharacterPlacement placement =
                 CameraAngleDeserializer.deserializeCharacterPlacementFromJson(placementJson, cameraAngle.getScene());
         if (placement != null) {
-            cameraAngle.getCharacterPlacements().add(placement);
+            characterPlacements.add(placement);
         }
     }
 
@@ -206,24 +213,18 @@ public class ClientCameraAngleMakerEditor implements Editor {
         cameraView.setName(newName);
     }
 
-    public void recaptureCamera(CameraView cameraView) {
-        if (minecraft.player == null) return;
-        cameraView.setPosition(minecraft.player.position());
-        cameraView.setRotation(new Vec3(minecraft.player.getXRot(), minecraft.player.getYRot(), cameraView.getRoll()));
-    }
-
     public void removeCamera(CameraView cameraView) {
         if (previewCameraView == cameraView) exitPreview();
-        cameraAngle.getCameras().remove(cameraView);
+        cameraViews.remove(cameraView);
     }
 
     public void removeCharacterPlacement(CharacterPlacement placement) {
-        cameraAngle.getCharacterPlacements().remove(placement);
+        characterPlacements.remove(placement);
         Services.PACKET.sendToServer(new C2SCameraAngleRemovePlacement(cameraAngle, placement.getId()));
     }
 
     public void removeTemplateReference(TemplateReference reference) {
-        cameraAngle.getTemplateReferences().remove(reference);
+        templateReferences.remove(reference);
         Services.PACKET.sendToServer(new C2SCameraAngleRemoveTemplateReference(cameraAngle, reference.id()));
     }
 
@@ -245,7 +246,7 @@ public class ClientCameraAngleMakerEditor implements Editor {
 
     public void addTemplateReference(TemplateSourceType sourceType, UUID refId) {
         TemplateReference reference = new TemplateReference(sourceType, refId);
-        cameraAngle.getTemplateReferences().add(reference);
+        templateReferences.add(reference);
         Services.PACKET.sendToServer(new C2SCameraAngleAddTemplateReference(cameraAngle, reference));
     }
 
@@ -270,6 +271,15 @@ public class ClientCameraAngleMakerEditor implements Editor {
     }
 
     private void save() {
+        cameraAngle.getCharacterPlacements().clear();
+        cameraAngle.getCharacterPlacements().addAll(characterPlacements);
+
+        cameraAngle.getTemplateReferences().clear();
+        cameraAngle.getTemplateReferences().addAll(templateReferences);
+
+        cameraAngle.getCameras().clear();
+        cameraAngle.getCameras().addAll(cameraViews);
+
         String dataJson = CameraAngleSerializer.serializeData(cameraAngle);
         Services.PACKET.sendToServer(new C2SCameraAngleSave(cameraAngle, dataJson));
     }
@@ -369,7 +379,7 @@ public class ClientCameraAngleMakerEditor implements Editor {
         }
     }
 
-    public void closetAdvancedPanel() {
+    public void closeAdvancedPanel() {
         advancedPanel.setVisible(false);
     }
 

@@ -5,6 +5,7 @@
 - [ ] fix all actions undo at last tick in cutscene editor
 - [x] fix block not air on rewind
 - [ ] put animations in cutscenes
+- [ ] global dialog data 
 
 ### cutscene maker
 - [x] interpolate zoom
@@ -27,4 +28,4 @@
 - [x] change buttons layout
 - [x] center items in screens
 - [ ] tp to camera/entity when clicking on button list
-- [ ] separate camera angle maker data and camera angle
+- [x] separate camera angle maker data and camera angle

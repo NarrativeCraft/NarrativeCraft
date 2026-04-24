@@ -96,7 +96,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
         if (tab == Tab.CAMERAS) {
             int rowX = centerX - (NAME_WIDTH + ACTION_WIDTH + ACTION_SMALL_WIDTH * 2 + ROW_GAP * 3) / 2;
             renderPagedList(
-                    editor.getCameraAngle().getCameras(),
+                    editor.getCameraViews(),
                     camerasPage,
                     centerX,
                     paginationY,
@@ -112,7 +112,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
         } else if (tab == Tab.CHARACTERS) {
             int rowX = centerX - (NAME_WIDTH + ACTION_SMALL_WIDTH + ROW_GAP) / 2;
             renderPagedList(
-                    editor.getCameraAngle().getCharacterPlacements(),
+                    editor.getCharacterPlacements(),
                     entitiesPage,
                     centerX,
                     paginationY,
@@ -136,7 +136,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
         } else {
             int rowX = centerX - (NAME_WIDTH + ACTION_SMALL_WIDTH + ROW_GAP) / 2;
             renderPagedList(
-                    editor.getCameraAngle().getTemplateReferences(),
+                    editor.getTemplateReferences(),
                     templatesPage,
                     centerX,
                     paginationY,

@@ -236,7 +236,6 @@ public class ServerPacketHandler {
         }
 
         TemplateReference reference = new TemplateReference(packet.templateReferenceId(), sourceType, packet.refId());
-        cameraAngle.getTemplateReferences().add(reference);
         editor.spawnTemplateReference(reference);
     }
 
