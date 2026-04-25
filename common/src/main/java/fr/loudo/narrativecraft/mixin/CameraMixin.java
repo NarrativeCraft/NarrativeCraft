@@ -24,8 +24,8 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
@@ -92,7 +92,7 @@ public abstract class CameraMixin {
         KeyframePosition keyframePosition =
                 playerSession.getCutsceneDataSession().getKeyframePosition();
         if (keyframePosition == null) {
-            ClientCutsceneMakerEditor editor =
+            ClientCutsceneMakerEditorMaker editor =
                     ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
             if (editor != null && editor.getPreviewRoll() != 0f) {
                 this.setRotation(minecraft.player.getYRot(), minecraft.player.getXRot());
@@ -106,7 +106,7 @@ public abstract class CameraMixin {
     private void narrativecraft$handleCameraAngle(ClientPlayerSession playerSession) {
         CameraView cameraView = playerSession.getCameraView();
         if (cameraView == null) return;
-        ClientCameraAngleMakerEditor editor =
+        ClientCameraAngleMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor != null && editor.isEditingCameraViewPosition()) return;
 

@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.client.narrative.cameraangle;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleEntryEditScreen;
@@ -53,7 +53,7 @@ public class ClientCameraAngleNarrativeUIAction implements ClientNarrativeUIActi
     public void customClickAction(CameraAngle entry) {
         Services.PACKET.sendToServer(new C2SCameraAngleEnter(entry));
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        ClientCameraAngleMakerEditor cameraAngleEditor = new ClientCameraAngleMakerEditor(entry);
+        ClientCameraAngleMakerEditorMaker cameraAngleEditor = new ClientCameraAngleMakerEditorMaker(entry);
         cameraAngleEditor.init();
         session.setEditor(cameraAngleEditor);
         Minecraft.getInstance().setScreen(null);

@@ -21,25 +21,26 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.client;
+package fr.loudo.narrativecraft.network.cameraangle;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
-import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.editors.EditorMaker;
-import net.minecraft.client.input.MouseButtonEvent;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class OnScreenMouseDragEvent {
+public record C2SCameraAngleTeleportToTemplate(UUID refId) implements CustomPacketPayload {
 
-    public static void onCutsceneTimelineDrag(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        EditorMaker editorMaker = playerSession.getEditor();
-        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
-        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
-        }
+    public static final Type<C2SCameraAngleTeleportToTemplate> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_teleport_to_template"));
+
+    public static final StreamCodec<ByteBuf, C2SCameraAngleTeleportToTemplate> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC, C2SCameraAngleTeleportToTemplate::refId, C2SCameraAngleTeleportToTemplate::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

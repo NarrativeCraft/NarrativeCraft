@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.PressKeyListener;
 import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
@@ -41,9 +41,9 @@ public class OnClientTickEvent {
         new ArrayList<>(session.getActiveDialog2DRenderers()).forEach(DialogRenderer2D::tick);
         new ArrayList<>(session.getActiveDialog3DRenderers()).forEach(DialogRenderer3D::tick);
 
-        Editor editor = session.getEditor();
-        if (editor != null) {
-            editor.tick();
+        EditorMaker editorMaker = session.getEditor();
+        if (editorMaker != null) {
+            editorMaker.tick();
         }
     }
 }

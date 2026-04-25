@@ -49,12 +49,12 @@ public class CutsceneMakerEditorShortcuts {
 
     private record KeyframeCopy(CutsceneLayer layer, int tickOffset, JsonObject data) {}
 
-    private final ClientCutsceneMakerEditor editor;
+    private final ClientCutsceneMakerEditorMaker editor;
     private final Deque<EditorAction> undoStack = new ArrayDeque<>();
     private final Deque<EditorAction> redoStack = new ArrayDeque<>();
     private final List<KeyframeCopy> clipboard = new ArrayList<>();
 
-    public CutsceneMakerEditorShortcuts(ClientCutsceneMakerEditor editor) {
+    public CutsceneMakerEditorShortcuts(ClientCutsceneMakerEditorMaker editor) {
         this.editor = editor;
     }
 

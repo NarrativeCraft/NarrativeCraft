@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.client.screens.narrative.cameraangle;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor.CharacterPick;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker.CharacterPick;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryPickerScreen;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;

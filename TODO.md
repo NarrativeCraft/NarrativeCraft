@@ -1,8 +1,8 @@
 - [ ] play multiple subscene when recording for sync
 - [ ] fix that override action when saving same recording name
-- [ ] undo all actions when leaving cutscene maker editor
+- [ ] undo all actions when leaving cutscene maker editorMaker
 - [ ] play subscenes through playback command
-- [ ] fix all actions undo at last tick in cutscene editor
+- [ ] fix all actions undo at last tick in cutscene editorMaker
 - [x] fix block not air on rewind
 - [ ] put animations in cutscenes
 - [ ] global dialog data 
@@ -27,5 +27,5 @@
 - [x] leave camera view preview
 - [x] change buttons layout
 - [x] center items in screens
-- [ ] tp to camera/entity when clicking on button list
+- [x] tp to camera/entity when clicking on button list
 - [x] separate camera angle maker data and camera angle

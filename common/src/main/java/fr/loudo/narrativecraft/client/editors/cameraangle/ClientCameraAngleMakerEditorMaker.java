@@ -32,7 +32,8 @@ import fr.loudo.narrativecraft.client.screens.ClearScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.network.cameraangle.*;
@@ -40,7 +41,6 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.*;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -57,9 +57,10 @@ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import org.lwjgl.glfw.GLFW;
 
-public class ClientCameraAngleMakerEditor implements Editor {
+import java.util.*;
+
+public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private static final int BUTTON_WIDTH = 20;
     private static final int BUTTON_HEIGHT = 20;
@@ -92,7 +93,7 @@ public class ClientCameraAngleMakerEditor implements Editor {
     private final List<TemplateReference> templateReferences = new ArrayList<>();
     private final List<CameraView> cameraViews = new ArrayList<>();
 
-    public ClientCameraAngleMakerEditor(CameraAngle cameraAngle) {
+    public ClientCameraAngleMakerEditorMaker(CameraAngle cameraAngle) {
         this.cameraAngle = cameraAngle;
     }
 
@@ -139,10 +140,6 @@ public class ClientCameraAngleMakerEditor implements Editor {
         buttons.add(Button.builder(Component.literal(CustomFont.UNDO), b -> stopNewCameraPosition())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
-
-        characterPlacements.addAll(cameraAngle.getCharacterPlacements());
-        templateReferences.addAll(cameraAngle.getTemplateReferences());
-        cameraViews.addAll(cameraAngle.getCameras());
     }
 
     public void tick() {
@@ -161,8 +158,14 @@ public class ClientCameraAngleMakerEditor implements Editor {
         }
     }
 
+    @Override
+    public void teleportToEditorOrigin() {}
+
     public void loadData(String json) {
         CameraAngleDeserializer.deserializeInto(json, cameraAngle);
+        characterPlacements.addAll(cameraAngle.getCharacterPlacements());
+        templateReferences.addAll(cameraAngle.getTemplateReferences());
+        cameraViews.addAll(cameraAngle.getCameras());
     }
 
     public void addCharacterPlacementFromJson(String placementJson) {
@@ -196,7 +199,7 @@ public class ClientCameraAngleMakerEditor implements Editor {
         Vec3 position = minecraft.player.position().add(0, minecraft.player.getEyeHeight(), 0);
         Vec3 rotation = new Vec3(minecraft.player.getXRot(), minecraft.player.getYRot(), 0.0);
         float fov = minecraft.options.fov().get();
-        cameraAngle.getCameras().add(new CameraView(name, position, rotation, fov));
+        cameraViews.add(new CameraView(name, position, rotation, fov));
     }
 
     public void renameCamera(CameraView cameraView, String newName) {
@@ -284,6 +287,14 @@ public class ClientCameraAngleMakerEditor implements Editor {
         Services.PACKET.sendToServer(new C2SCameraAngleSave(cameraAngle, dataJson));
     }
 
+    public void teleportPlayerToPlacement(Vec3 position) {
+        minecraft.setScreen(null);
+        LocalPlayer player = minecraft.player;
+        if (player == null) return;
+        player.setPos(position);
+        player.connection.send(new ServerboundMovePlayerPacket.Pos(position, player.onGround(), false));
+    }
+
     public void enterPreview(CameraView cameraView) {
         this.previewCameraView = cameraView;
         minecraft.player.connection.send(new ServerboundChangeGameModePacket(GameType.SPECTATOR));
@@ -327,7 +338,7 @@ public class ClientCameraAngleMakerEditor implements Editor {
                 playerSession.removeDialog3D(renderer);
             });
             String text = setup.getPreviewText().isEmpty()
-                    ? ClientCameraAngleMakerEditor.DEFAULT_DIALOG_TEXT
+                    ? ClientCameraAngleMakerEditorMaker.DEFAULT_DIALOG_TEXT
                     : setup.getPreviewText();
             renderer.start(text);
             previewDialogRenderers.add(renderer);
@@ -346,6 +357,7 @@ public class ClientCameraAngleMakerEditor implements Editor {
             rollWidget.setVisible(true);
             fovWidget.setVisible(true);
         }
+        advancedPanel.setVisible(false);
     }
 
     public void registerPlacementEntityId(UUID placementId, int entityId) {
@@ -368,6 +380,10 @@ public class ClientCameraAngleMakerEditor implements Editor {
     public void openAdvancedPanel(CameraViewDialogSetup setup) {
         advancedPanel.setSetup(setup);
         advancedPanel.setVisible(true);
+    }
+
+    public boolean advancedPanelVisible() {
+        return advancedPanel.isVisible();
     }
 
     public void toggleAdvancedPanel(CameraViewDialogSetup setup) {
@@ -534,14 +550,19 @@ public class ClientCameraAngleMakerEditor implements Editor {
             advancedPanel.keyPressed(event);
             if (advancedPanel.isAnyBoxFocused()) return;
         }
-        if (previewCameraView != null && !editingCameraViewPosition && event.key() == GLFW.GLFW_KEY_G) {
+        if (previewCameraView != null
+                && !editingCameraViewPosition
+                && event.key()
+                        == ModKeys.TOGGLE_DIALOG_MODE_CAMERA_ANGLE
+                                .getDefaultKey()
+                                .getValue()) {
             if (previewMode == PreviewMode.CAMERA) {
                 enterDialogMode();
             } else {
                 exitDialogMode();
             }
         }
-        if (event.key() == GLFW.GLFW_KEY_H) {
+        if (event.key() == ModKeys.HIDE_EDITOR_MAKER_HUD.getDefaultKey().getValue()) {
             renderingHud = !renderingHud;
         }
     }
@@ -581,6 +602,18 @@ public class ClientCameraAngleMakerEditor implements Editor {
 
     public List<DialogRenderer3D> getPreviewDialogRenderers() {
         return previewDialogRenderers;
+    }
+
+    public List<TemplateReference> getTemplateReferences() {
+        return templateReferences;
+    }
+
+    public List<CharacterPlacement> getCharacterPlacements() {
+        return characterPlacements;
+    }
+
+    public List<CameraView> getCameraViews() {
+        return cameraViews;
     }
 
     public record CharacterPick(CharacterType type, UUID characterId) {}

@@ -24,8 +24,10 @@
 package fr.loudo.narrativecraft.playback;
 
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.recording.RecordingData;
+import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -33,6 +35,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class Playback implements IPlaybackSession {
 
@@ -181,6 +184,18 @@ public class Playback implements IPlaybackSession {
         if (target != null) {
             target.respawnEntity();
         }
+    }
+
+    public Vec3 getFirstPosition() {
+        RecordingData recordingData = animation.getRecordingDataList().get(0);
+        for (List<AbstractAction> actions : recordingData.getActions().values()) {
+            for (AbstractAction action : actions) {
+                if (action instanceof MovementAction movementAction) {
+                    return movementAction.getPosition();
+                }
+            }
+        }
+        return null;
     }
 
     public boolean isEnded() {

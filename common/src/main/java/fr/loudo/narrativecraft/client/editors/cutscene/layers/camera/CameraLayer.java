@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeSegment;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
@@ -57,7 +57,8 @@ public class CameraLayer extends CutsceneLayer {
         Minecraft mc = Minecraft.getInstance();
         Vec3 pos = mc.player.position();
         pos = pos.add(0, mc.player.getEyeHeight(), 0);
-        ClientCutsceneMakerEditor editor = ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
+        ClientCutsceneMakerEditorMaker editor =
+                ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         float roll = editor.getPreviewRoll();
         Vec3 rot = new Vec3(mc.player.getXRot(), mc.player.getYRot(), roll);
         return new CameraKeyframe(this, tick, new KeyframePosition(pos, rot));

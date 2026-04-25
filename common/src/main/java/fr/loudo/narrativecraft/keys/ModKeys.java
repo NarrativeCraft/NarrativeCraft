@@ -38,8 +38,10 @@ public class ModKeys {
     public static final List<KeyMapping> ALL_KEYS = new ArrayList<>();
     public static final KeyMapping STORY_MANAGER =
             registerKey("narrativecraft.key.story_manager", InputConstants.KEY_N);
-    public static final KeyMapping HIDE_CUTSCENE_MAKER_HUD =
-            registerKey("narrativecraft.key.hide_cutscene_maker_hud", InputConstants.KEY_H);
+    public static final KeyMapping HIDE_EDITOR_MAKER_HUD =
+            registerKey("narrativecraft.key.hide_editor_maker_hud", InputConstants.KEY_H);
+    public static final KeyMapping TOGGLE_DIALOG_MODE_CAMERA_ANGLE =
+            registerKey("narrativecraft.key.toogle_dialog_mode_camera_angle", InputConstants.KEY_G);
     public static final KeyMapping TOGGLE_CAMERA_ROLL =
             registerKey("narrativecraft.key.toggle_camera_roll", InputConstants.KEY_R);
 

@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.widgets;
 
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
@@ -48,7 +48,7 @@ public class CameraAngleDialogPreviewPanel {
     private static final int EDITBOX_HEIGHT = 10;
     private static final int FIELD_GAP = 3;
 
-    private final ClientCameraAngleMakerEditor editor;
+    private final ClientCameraAngleMakerEditorMaker editor;
     private CameraView cameraView;
     private int selectedIndex = 0;
 
@@ -61,7 +61,7 @@ public class CameraAngleDialogPreviewPanel {
 
     private int advancedButtonY = 0;
 
-    public CameraAngleDialogPreviewPanel(ClientCameraAngleMakerEditor editor) {
+    public CameraAngleDialogPreviewPanel(ClientCameraAngleMakerEditorMaker editor) {
         this.editor = editor;
     }
 
@@ -82,7 +82,7 @@ public class CameraAngleDialogPreviewPanel {
             current.setPreviewText(text);
             DialogRenderer3D renderer = editor.getRendererForSetup(current);
             if (renderer != null) {
-                renderer.update(text.isEmpty() ? ClientCameraAngleMakerEditor.DEFAULT_DIALOG_TEXT : text);
+                renderer.update(text.isEmpty() ? ClientCameraAngleMakerEditorMaker.DEFAULT_DIALOG_TEXT : text);
             }
         });
 
@@ -146,7 +146,9 @@ public class CameraAngleDialogPreviewPanel {
             textColorBox = null;
         }
         editor.closeAdvancedPanel();
-        editor.openAdvancedPanel(getSelectedSetup());
+        if (editor.advancedPanelVisible()) {
+            editor.openAdvancedPanel(getSelectedSetup());
+        }
     }
 
     private EditBox makeEditBox(Minecraft mc, int maxLength, String value) {
@@ -376,7 +378,7 @@ public class CameraAngleDialogPreviewPanel {
     private String resolveCharacterName(CameraViewDialogSetup setup) {
         if (editor.getCameraAngle() == null)
             return setup.getCharacterPlacementId().toString().substring(0, 8);
-        for (CharacterPlacement placement : editor.getCameraAngle().getCharacterPlacements()) {
+        for (CharacterPlacement placement : editor.getCharacterPlacements()) {
             if (placement.getId().equals(setup.getCharacterPlacementId())) {
                 return placement.getCharacterStory().getName();
             }

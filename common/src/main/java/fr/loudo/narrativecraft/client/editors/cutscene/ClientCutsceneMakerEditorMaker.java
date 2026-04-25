@@ -30,7 +30,7 @@ import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.widgets.RollSliderWidget;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
@@ -59,7 +59,7 @@ import net.minecraft.util.ARGB;
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
  */
-public class ClientCutsceneMakerEditor implements Editor {
+public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
     private static final int LAYER_HEIGHT = 20;
     private static final int LAYER_GAP = 85;
@@ -101,7 +101,7 @@ public class ClientCutsceneMakerEditor implements Editor {
     private float scrollbarDragStartViewTick = 0f;
     private boolean renderingHud = true;
 
-    public ClientCutsceneMakerEditor(Cutscene cutscene) {
+    public ClientCutsceneMakerEditorMaker(Cutscene cutscene) {
         this.cutscene = cutscene;
         this.control = new CutsceneMakerEditorControl(15, 15);
         this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getMaxTick());
@@ -147,6 +147,9 @@ public class ClientCutsceneMakerEditor implements Editor {
     }
 
     public void tick() {}
+
+    @Override
+    public void teleportToEditorOrigin() {}
 
     public void loadLayers(String layersJson) {
         editorLayers.clear();

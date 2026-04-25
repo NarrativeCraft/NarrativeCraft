@@ -24,7 +24,9 @@
 package fr.loudo.narrativecraft.editors.cutscene;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
+import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
@@ -35,9 +37,11 @@ import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
 
-public class CutsceneMakerEditor implements Editor {
+public class CutsceneMakerEditorMaker implements EditorMaker {
 
     private final Cutscene cutscene;
     private final List<Playback> playbacks = new ArrayList<>();
@@ -47,7 +51,7 @@ public class CutsceneMakerEditor implements Editor {
     private int currentTick;
     private boolean playing;
 
-    public CutsceneMakerEditor(Cutscene cutscene, PlayerSession playerSession) {
+    public CutsceneMakerEditorMaker(Cutscene cutscene, PlayerSession playerSession) {
         this.cutscene = cutscene;
         this.playerSession = playerSession;
     }
@@ -77,6 +81,30 @@ public class CutsceneMakerEditor implements Editor {
         }
         playerSession.changeGameMode(GameType.SPECTATOR);
         totalTick = cutscene.getMaxTick();
+        teleportToEditorOrigin();
+    }
+
+    public void teleportToEditorOrigin() {
+        ServerPlayer player = playerSession.getPlayer();
+        Vec3 position = null;
+
+        if (!playbacks.isEmpty()) {
+            Playback playback = playbacks.get(0);
+            position = playback.getFirstPosition();
+        } else {
+            for (ICutsceneLayer layer : layersAdded) {
+                if (layer instanceof CameraLayer cameraLayer) {
+                    List<CameraKeyframe> cameraKeyframes = cameraLayer.getSortedCameraKeyframes();
+                    if (cameraKeyframes.isEmpty()) continue;
+                    CameraKeyframe keyframe = cameraKeyframes.get(0);
+                    position = keyframe.getPosition().getPosition();
+                    break;
+                }
+            }
+        }
+        if (position != null) {
+            player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
+        }
     }
 
     public void start() {

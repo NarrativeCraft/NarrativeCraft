@@ -24,27 +24,29 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import net.minecraft.client.input.MouseButtonEvent;
 
 public class OnScreenMouseClickEvent {
 
     public static void cutsceneHudClick(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
-        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+        EditorMaker editorMaker =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
             cutsceneEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
-        } else if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
         }
     }
 
     public static void cutsceneHudRelease(MouseButtonEvent mouseButtonEvent) {
-        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+        EditorMaker editorMaker =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
             cutsceneEditor.mouseReleased(mouseButtonEvent);
-        } else if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.mouseReleased(mouseButtonEvent);
         }
     }

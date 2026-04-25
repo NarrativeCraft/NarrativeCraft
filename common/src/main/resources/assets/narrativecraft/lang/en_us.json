@@ -2,7 +2,8 @@
   "key.category.narrativecraft.main": "NarrativeCraft",
 
   "narrativecraft.key.story_manager": "Story Manager",
-  "narrativecraft.key.hide_cutscene_maker_hud": "Hide Cutscene Maker HUD",
+  "narrativecraft.key.hide_editor_maker_hud": "Hide Cutscene Maker HUD",
+  "narrativecraft.key.toogle_dialog_mode_camera_angle": "Toggle Dialog Mode Camera Angle",
   "narrativecraft.key.toggle_camera_roll": "Toggle Camera Roll",
 
   "narrativecraft.chapter": "Chapter",

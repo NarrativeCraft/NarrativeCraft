@@ -23,12 +23,12 @@
 
 package fr.loudo.narrativecraft.client;
 
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegister;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 
@@ -56,16 +56,16 @@ public class ClientNarrativeCraftMod {
         return playerSession;
     }
 
-    public ClientCutsceneMakerEditor getCutsceneMakerEditor() {
-        Editor editor = getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCutsceneMakerEditor)) return null;
-        return (ClientCutsceneMakerEditor) editor;
+    public ClientCutsceneMakerEditorMaker getCutsceneMakerEditor() {
+        EditorMaker editorMaker = getPlayerSession().getEditor();
+        if (!(editorMaker instanceof ClientCutsceneMakerEditorMaker)) return null;
+        return (ClientCutsceneMakerEditorMaker) editorMaker;
     }
 
-    public ClientCameraAngleMakerEditor getCameraAngleMakerEditor() {
-        Editor editor = getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCameraAngleMakerEditor)) return null;
-        return (ClientCameraAngleMakerEditor) editor;
+    public ClientCameraAngleMakerEditorMaker getCameraAngleMakerEditor() {
+        EditorMaker editorMaker = getPlayerSession().getEditor();
+        if (!(editorMaker instanceof ClientCameraAngleMakerEditorMaker)) return null;
+        return (ClientCameraAngleMakerEditorMaker) editorMaker;
     }
 
     public static ClientNarrativeCraftMod getInstance() {

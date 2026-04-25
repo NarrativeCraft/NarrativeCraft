@@ -42,7 +42,8 @@ public class CutsceneMakerEditorPathRenderer {
 
     public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
-        ClientCutsceneMakerEditor editor = ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
+        ClientCutsceneMakerEditorMaker editor =
+                ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         if (editor == null) return;
 
         if (editor.getPlayback().isPlaying()) return;

@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
@@ -138,5 +139,9 @@ public class OnPacketRegisterEventNeoForge {
                 C2SCameraAngleRemoveTemplateReference.TYPE,
                 C2SCameraAngleRemoveTemplateReference.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::cameraAngleRemoveTemplateReference);
+        registrar.playToServer(
+                C2SCameraAngleTeleportToTemplate.TYPE,
+                C2SCameraAngleTeleportToTemplate.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleTeleportToTemplate);
     }
 }

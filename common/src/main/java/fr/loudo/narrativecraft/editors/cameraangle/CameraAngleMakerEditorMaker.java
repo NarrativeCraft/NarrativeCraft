@@ -26,10 +26,11 @@ package fr.loudo.narrativecraft.editors.cameraangle;
 import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
 import fr.loudo.narrativecraft.narrative.cameraangle.TemplateReference;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
@@ -56,18 +57,20 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.phys.Vec3;
 
-public class CameraAngleMakerEditor implements Editor {
+public class CameraAngleMakerEditorMaker implements EditorMaker {
 
     public static final String ENTITY_TAG = "nc_camera_angle";
 
     private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
     private final List<Entity> characterEntities = new ArrayList<>();
+    private final List<TemplateReference> templateReferences = new ArrayList<>();
     private final Map<UUID, List<Entity>> entitiesByTemplateReference = new HashMap<>();
     private final CameraAngle cameraAngle;
     private final PlayerSession playerSession;
 
-    public CameraAngleMakerEditor(CameraAngle cameraAngle, PlayerSession playerSession) {
+    public CameraAngleMakerEditorMaker(CameraAngle cameraAngle, PlayerSession playerSession) {
         this.cameraAngle = cameraAngle;
         this.playerSession = playerSession;
     }
@@ -80,6 +83,24 @@ public class CameraAngleMakerEditor implements Editor {
         for (TemplateReference reference : cameraAngle.getTemplateReferences()) {
             spawnTemplateReference(reference);
         }
+        teleportToEditorOrigin();
+    }
+
+    public void teleportToEditorOrigin() {
+        ServerPlayer player = playerSession.getPlayer();
+        Vec3 position = null;
+        if (!characterEntities.isEmpty()) {
+            Entity entity = characterEntities.get(0);
+            position = entity.position();
+        } else {
+            List<CameraView> cameraViews = cameraAngle.getCameras();
+            if (!cameraViews.isEmpty()) {
+                CameraView cameraView = cameraViews.get(0);
+                position = cameraView.getPosition();
+            }
+        }
+        if (position == null) return;
+        player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
     }
 
     public void tick() {
@@ -250,6 +271,29 @@ public class CameraAngleMakerEditor implements Editor {
         }
     }
 
+    public void teleportPlayerToTemplate(UUID refId) {
+        TemplateReference reference = templateReferences.stream()
+                .filter(ref -> ref.refId().equals(refId))
+                .findFirst()
+                .orElse(null);
+        if (reference == null) return;
+        List<Animation> animations = resolveAnimations(reference);
+        for (Animation animation : animations) {
+            if (!animation.initialize()) continue;
+            RecordingData mainData = animation.getRecordingDataList().stream()
+                    .filter(data -> data.getRecordingId() == 0)
+                    .findFirst()
+                    .orElse(null);
+            if (mainData == null) continue;
+            MovementAction lastMovement = findLastAction(mainData, MovementAction.class);
+            if (lastMovement == null) continue;
+            Vec3 position = lastMovement.getPosition();
+            ServerPlayer player = playerSession.getPlayer();
+            player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
+            return;
+        }
+    }
+
     public void removePlacement(UUID placementId) {
         for (int i = 0; i < characterPlacements.size(); i++) {
             if (characterPlacements.get(i).getId().equals(placementId)) {
@@ -292,6 +336,18 @@ public class CameraAngleMakerEditor implements Editor {
 
     public PlayerSession getPlayerSession() {
         return playerSession;
+    }
+
+    public List<CharacterPlacement> getCharacterPlacements() {
+        return characterPlacements;
+    }
+
+    public List<Entity> getCharacterEntities() {
+        return characterEntities;
+    }
+
+    public List<TemplateReference> getTemplateReferences() {
+        return templateReferences;
     }
 
     private static final class SingleEntityContext implements IPlaybackContext {

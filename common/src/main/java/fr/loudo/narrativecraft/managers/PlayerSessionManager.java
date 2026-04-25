@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.managers;
 
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +47,7 @@ public class PlayerSessionManager extends Manager<PlayerSession> {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Editor> T getEditor(Player player, Class<T> clazz) {
+    public <T extends EditorMaker> T getEditor(Player player, Class<T> clazz) {
         for (PlayerSession playerSession : list) {
             if (playerSession.getPlayer().getUUID().equals(player.getUUID())
                     && playerSession.getEditor() != null

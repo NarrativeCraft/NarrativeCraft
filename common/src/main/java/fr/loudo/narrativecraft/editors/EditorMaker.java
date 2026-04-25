@@ -23,7 +23,11 @@
 
 package fr.loudo.narrativecraft.editors;
 
-public interface Editor {
+public interface EditorMaker {
+
+    void init();
 
     void tick();
+
+    void teleportToEditorOrigin();
 }

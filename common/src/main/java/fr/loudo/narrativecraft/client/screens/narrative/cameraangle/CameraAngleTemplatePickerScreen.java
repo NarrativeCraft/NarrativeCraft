@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.cameraangle;
 
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor.TemplatePick;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker.TemplatePick;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryPickerScreen;
 import fr.loudo.narrativecraft.narrative.cameraangle.TemplateSourceType;
 import fr.loudo.narrativecraft.narrative.scene.Scene;

@@ -24,11 +24,11 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -36,15 +36,17 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class OnHudRender {
 
     public static void cutsceneHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
-        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+        EditorMaker editorMaker =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
             cutsceneEditor.render(graphics, deltaTracker);
         }
     }
 
     public static void cameraAngleHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
-        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+        EditorMaker editorMaker =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.render(graphics, deltaTracker);
         }
     }

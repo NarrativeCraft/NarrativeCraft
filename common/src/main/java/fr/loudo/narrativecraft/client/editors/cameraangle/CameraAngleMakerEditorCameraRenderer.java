@@ -27,7 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.rendering.CameraWireframeRenderer;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -42,8 +42,9 @@ public class CameraAngleMakerEditorCameraRenderer {
     private static final float NAME_TAG_SCALE = 0.025f;
 
     public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
-        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor)) return;
+        EditorMaker editorMaker =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (!(editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor)) return;
         if (cameraAngleEditor.getPreviewCamera() != null) return;
 
         Minecraft minecraft = Minecraft.getInstance();
@@ -52,7 +53,7 @@ public class CameraAngleMakerEditorCameraRenderer {
         Matrix4f matrix = poseStack.last().pose();
 
         CameraView preview = cameraAngleEditor.getPreviewCamera();
-        for (CameraView cameraView : cameraAngleEditor.getCameraAngle().getCameras()) {
+        for (CameraView cameraView : cameraAngleEditor.getCameraViews()) {
             boolean isPreview = cameraView == preview;
             float red = isPreview ? 1.0F : 0.2F;
             float green = isPreview ? 0.6F : 0.8F;
@@ -78,11 +79,11 @@ public class CameraAngleMakerEditorCameraRenderer {
     }
 
     private static void renderNameTags(
-            PoseStack poseStack, ClientCameraAngleMakerEditor editor, Vec3 cameraPos, Minecraft minecraft) {
+            PoseStack poseStack, ClientCameraAngleMakerEditorMaker editor, Vec3 cameraPos, Minecraft minecraft) {
         Font font = minecraft.font;
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
 
-        for (CameraView cameraView : editor.getCameraAngle().getCameras()) {
+        for (CameraView cameraView : editor.getCameraViews()) {
             Vec3 position = cameraView.getPosition();
             poseStack.pushPose();
             poseStack.translate(position.x - cameraPos.x, position.y - cameraPos.y + 0.6, position.z - cameraPos.z);

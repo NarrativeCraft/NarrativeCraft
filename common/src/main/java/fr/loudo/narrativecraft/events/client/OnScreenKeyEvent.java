@@ -24,28 +24,30 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 
 public class OnScreenKeyEvent {
 
     public static void onCharTyped(CharacterEvent event) {
-        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+        EditorMaker editorMaker =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
             cutsceneEditor.charTyped(event);
-        } else if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.charTyped(event);
         }
     }
 
     public static void onKeyPressed(KeyEvent event) {
-        Editor editor = ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editor instanceof ClientCutsceneMakerEditor cutsceneEditor) {
+        EditorMaker editorMaker =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
             cutsceneEditor.keyPressed(event);
-        } else if (editor instanceof ClientCameraAngleMakerEditor cameraAngleEditor) {
+        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.keyPressed(event);
         }
     }

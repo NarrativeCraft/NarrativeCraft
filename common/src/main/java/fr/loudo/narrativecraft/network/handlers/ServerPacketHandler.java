@@ -24,19 +24,14 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.editors.Editor;
-import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditor;
-import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
-import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
-import fr.loudo.narrativecraft.narrative.cameraangle.TemplateReference;
-import fr.loudo.narrativecraft.narrative.cameraangle.TemplateSourceType;
+import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
@@ -46,8 +41,6 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
 import fr.loudo.narrativecraft.network.cutscene.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -84,7 +77,7 @@ public class ServerPacketHandler {
         Cutscene cutscene = scene.getCutsceneManager().getById(packet.getCutsceneId());
         if (cutscene == null) return;
 
-        CutsceneMakerEditor editor = new CutsceneMakerEditor(cutscene, session);
+        CutsceneMakerEditorMaker editor = new CutsceneMakerEditorMaker(cutscene, session);
         session.setEditor(editor);
         editor.init();
         editor.start();
@@ -99,7 +92,7 @@ public class ServerPacketHandler {
     public static void cutsceneControl(C2SCutsceneControl packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
-        CutsceneMakerEditor editor = sessionManager.getEditor(player, CutsceneMakerEditor.class);
+        CutsceneMakerEditorMaker editor = sessionManager.getEditor(player, CutsceneMakerEditorMaker.class);
         if (editor == null) return;
 
         switch (packet.state()) {
@@ -137,8 +130,9 @@ public class ServerPacketHandler {
     }
 
     public static void playHeadUpdate(BiCutscenePlayHeadPacket packet, Player player) {
-        CutsceneMakerEditor editor =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager().getEditor(player, CutsceneMakerEditor.class);
+        CutsceneMakerEditorMaker editor = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getEditor(player, CutsceneMakerEditorMaker.class);
         if (editor == null) return;
 
         editor.moveTo(packet.tick());
@@ -154,7 +148,7 @@ public class ServerPacketHandler {
         CameraAngle cameraAngle = scene.getCameraAngleManager().getById(packet.getCameraAngleId());
         if (cameraAngle == null) return;
 
-        CameraAngleMakerEditor editor = new CameraAngleMakerEditor(cameraAngle, session);
+        CameraAngleMakerEditorMaker editor = new CameraAngleMakerEditorMaker(cameraAngle, session);
         session.setEditor(editor);
         editor.init();
 
@@ -166,7 +160,7 @@ public class ServerPacketHandler {
     public static void cameraAngleControl(C2SCameraAngleControl packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
-        CameraAngleMakerEditor editor = sessionManager.getEditor(player, CameraAngleMakerEditor.class);
+        CameraAngleMakerEditorMaker editor = sessionManager.getEditor(player, CameraAngleMakerEditorMaker.class);
         if (editor == null) return;
 
         if (packet.state() == C2SCameraAngleControl.State.QUIT) {
@@ -207,9 +201,9 @@ public class ServerPacketHandler {
         CameraAngle cameraAngle = scene.getCameraAngleManager().getById(packet.cameraAngleId());
         if (cameraAngle == null) return;
 
-        CameraAngleMakerEditor editor = NarrativeCraftMod.getInstance()
+        CameraAngleMakerEditorMaker editor = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()
-                .getEditor(player, CameraAngleMakerEditor.class);
+                .getEditor(player, CameraAngleMakerEditorMaker.class);
         if (editor == null) return;
 
         editor.removePlacement(packet.placementId());
@@ -223,9 +217,9 @@ public class ServerPacketHandler {
         CameraAngle cameraAngle = scene.getCameraAngleManager().getById(packet.cameraAngleId());
         if (cameraAngle == null) return;
 
-        CameraAngleMakerEditor editor = NarrativeCraftMod.getInstance()
+        CameraAngleMakerEditorMaker editor = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()
-                .getEditor(player, CameraAngleMakerEditor.class);
+                .getEditor(player, CameraAngleMakerEditorMaker.class);
         if (editor == null) return;
 
         TemplateSourceType sourceType;
@@ -236,7 +230,16 @@ public class ServerPacketHandler {
         }
 
         TemplateReference reference = new TemplateReference(packet.templateReferenceId(), sourceType, packet.refId());
+        editor.getTemplateReferences().add(reference);
         editor.spawnTemplateReference(reference);
+    }
+
+    public static void cameraAngleTeleportToTemplate(C2SCameraAngleTeleportToTemplate packet, Player player) {
+        CameraAngleMakerEditorMaker editor = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getEditor(player, CameraAngleMakerEditorMaker.class);
+        if (editor == null) return;
+        editor.teleportPlayerToTemplate(packet.refId());
     }
 
     public static void cameraAngleRemoveTemplateReference(C2SCameraAngleRemoveTemplateReference packet, Player player) {
@@ -247,9 +250,9 @@ public class ServerPacketHandler {
         CameraAngle cameraAngle = scene.getCameraAngleManager().getById(packet.cameraAngleId());
         if (cameraAngle == null) return;
 
-        CameraAngleMakerEditor editor = NarrativeCraftMod.getInstance()
+        CameraAngleMakerEditorMaker editor = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()
-                .getEditor(player, CameraAngleMakerEditor.class);
+                .getEditor(player, CameraAngleMakerEditorMaker.class);
         if (editor == null) return;
 
         editor.removeTemplateReference(packet.templateReferenceId());
@@ -265,8 +268,8 @@ public class ServerPacketHandler {
 
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
-        Editor editor = playerSession.getEditor();
-        if (!(editor instanceof CameraAngleMakerEditor cameraAngleMakerEditor)) return;
+        EditorMaker editorMaker = playerSession.getEditor();
+        if (!(editorMaker instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditor)) return;
 
         UUID characterId = packet.characterId();
         Vec3 position = player.position();

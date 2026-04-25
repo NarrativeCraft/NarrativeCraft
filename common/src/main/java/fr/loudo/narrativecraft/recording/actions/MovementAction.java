@@ -77,6 +77,10 @@ public class MovementAction extends AbstractAction {
         headYaw = reader.readFloat();
     }
 
+    public Vec3 getPosition() {
+        return pos;
+    }
+
     @Override
     public String getId() {
         return ID;

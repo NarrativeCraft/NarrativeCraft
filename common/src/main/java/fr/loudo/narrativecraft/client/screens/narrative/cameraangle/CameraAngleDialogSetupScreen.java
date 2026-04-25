@@ -23,9 +23,8 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.cameraangle;
 
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryPickerScreen;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
@@ -46,12 +45,12 @@ public class CameraAngleDialogSetupScreen extends Screen {
     private static final int ACTION_EDIT_WIDTH = 36;
     private static final int ACTION_DELETE_WIDTH = 16;
 
-    private final ClientCameraAngleMakerEditor editor;
+    private final ClientCameraAngleMakerEditorMaker editor;
     private final Screen lastScreen;
     private int selectedCameraIndex = 0;
     private int setupPage = 1;
 
-    public CameraAngleDialogSetupScreen(ClientCameraAngleMakerEditor editor, Screen lastScreen) {
+    public CameraAngleDialogSetupScreen(ClientCameraAngleMakerEditorMaker editor, Screen lastScreen) {
         super(Component.literal("Dialog Setups"));
         this.editor = editor;
         this.lastScreen = lastScreen;
@@ -59,8 +58,7 @@ public class CameraAngleDialogSetupScreen extends Screen {
 
     @Override
     protected void init() {
-        CameraAngle cameraAngle = editor.getCameraAngle();
-        List<CameraView> cameras = cameraAngle.getCameras();
+        List<CameraView> cameras = editor.getCameraViews();
         int centerX = this.width / 2;
 
         if (selectedCameraIndex >= cameras.size()) {
@@ -184,14 +182,14 @@ public class CameraAngleDialogSetupScreen extends Screen {
     }
 
     private List<CharacterPlacement> buildAvailablePlacements(CameraView cameraView) {
-        return editor.getCameraAngle().getCharacterPlacements().stream()
+        return editor.getCharacterPlacements().stream()
                 .filter(placement -> cameraView.getDialogSetups().stream()
                         .noneMatch(setup -> setup.getCharacterPlacementId().equals(placement.getId())))
                 .toList();
     }
 
     private String resolveCharacterName(CameraViewDialogSetup setup) {
-        for (CharacterPlacement placement : editor.getCameraAngle().getCharacterPlacements()) {
+        for (CharacterPlacement placement : editor.getCharacterPlacements()) {
             if (placement.getId().equals(setup.getCharacterPlacementId())) {
                 return placement.getCharacterStory().getName();
             }

@@ -24,8 +24,8 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
@@ -87,28 +87,28 @@ public class ClientPacketHandler {
     }
 
     public static void loadCutsceneEditorData(S2CCutsceneEditorData packet) {
-        ClientCutsceneMakerEditor cutsceneMakerEditor =
+        ClientCutsceneMakerEditorMaker cutsceneMakerEditor =
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
-        if (!(cutsceneMakerEditor instanceof ClientCutsceneMakerEditor editor)) return;
+        if (!(cutsceneMakerEditor instanceof ClientCutsceneMakerEditorMaker editor)) return;
         editor.loadLayers(packet.layersJson());
     }
 
     public static void loadCameraAngleEditorData(S2CCameraAngleEditorData packet) {
-        ClientCameraAngleMakerEditor editor =
+        ClientCameraAngleMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor == null) return;
         editor.loadData(packet.dataJson());
     }
 
     public static void addCameraAngleCharacter(S2CCameraAngleCharacterCaptured packet) {
-        ClientCameraAngleMakerEditor editor =
+        ClientCameraAngleMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor == null) return;
         editor.addCharacterPlacementFromJson(packet.placementJson());
     }
 
     public static void onPlacementEntitySpawned(S2CCameraAnglePlacementEntitySpawned packet) {
-        ClientCameraAngleMakerEditor editor =
+        ClientCameraAngleMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor == null) return;
         editor.registerPlacementEntityId(packet.placementId(), packet.entityId());
@@ -148,7 +148,7 @@ public class ClientPacketHandler {
     public static void updatePlayHeadCutscene(BiCutscenePlayHeadPacket packet) {
 
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (!(session.getEditor() instanceof ClientCutsceneMakerEditor editor)) return;
+        if (!(session.getEditor() instanceof ClientCutsceneMakerEditorMaker editor)) return;
 
         CutsceneMakerEditorPlayHead playHead = editor.getPlayHead();
         float ratio = (float) packet.tick() / editor.getTotalTick();

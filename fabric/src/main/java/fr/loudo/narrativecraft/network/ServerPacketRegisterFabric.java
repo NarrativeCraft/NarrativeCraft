@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleControl;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
@@ -49,5 +50,7 @@ public class ServerPacketRegisterFabric {
                 .register(C2SCameraAngleCaptureCharacter.TYPE, C2SCameraAngleCaptureCharacter.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay()
                 .register(C2SCameraAngleRemovePlacement.TYPE, C2SCameraAngleRemovePlacement.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay()
+                .register(C2SCameraAngleTeleportToTemplate.TYPE, C2SCameraAngleTeleportToTemplate.STREAM_CODEC);
     }
 }

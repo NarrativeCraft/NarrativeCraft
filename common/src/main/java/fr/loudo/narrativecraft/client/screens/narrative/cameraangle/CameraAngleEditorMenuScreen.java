@@ -23,8 +23,10 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.cameraangle;
 
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -49,14 +51,14 @@ public class CameraAngleEditorMenuScreen extends Screen {
     private static final int MAX_PER_PAGE = 6;
     private static final int LIST_START_Y = 60;
 
-    private final ClientCameraAngleMakerEditor editor;
+    private final ClientCameraAngleMakerEditorMaker editor;
     private final Screen lastScreen;
     private Tab tab = Tab.CAMERAS;
     private int camerasPage = 1;
     private int entitiesPage = 1;
     private int templatesPage = 1;
 
-    public CameraAngleEditorMenuScreen(ClientCameraAngleMakerEditor editor, Screen lastScreen) {
+    public CameraAngleEditorMenuScreen(ClientCameraAngleMakerEditorMaker editor, Screen lastScreen) {
         super(Component.literal("Camera Angle Menu"));
         this.editor = editor;
         this.lastScreen = lastScreen;
@@ -129,6 +131,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
                             rowY,
                             Component.literal(placement.getCharacterStory().getName() + " "
                                     + placement.getCharacterStory().getCharacterType()),
+                            () -> editor.teleportPlayerToPlacement(placement.getPosition()),
                             () -> {
                                 editor.removeCharacterPlacement(placement);
                                 rebuild();
@@ -153,6 +156,10 @@ public class CameraAngleEditorMenuScreen extends Screen {
                             rowY,
                             Component.literal(template.sourceType() + " " + shortId(template.refId())),
                             () -> {
+                                Services.PACKET.sendToServer(new C2SCameraAngleTeleportToTemplate(template.refId()));
+                                minecraft.setScreen(null);
+                            },
+                            () -> {
                                 editor.removeTemplateReference(template);
                                 rebuild();
                             }));
@@ -170,10 +177,11 @@ public class CameraAngleEditorMenuScreen extends Screen {
     }
 
     private void addCameraRow(int x, int y, CameraView cameraView) {
-        Button nameLabel = Button.builder(Component.literal(cameraView.getName()), b -> {})
+        Button nameLabel = Button.builder(Component.literal(cameraView.getName()), b -> {
+                    editor.teleportPlayerToPlacement(cameraView.getPosition());
+                })
                 .bounds(x, y, NAME_WIDTH, ROW_HEIGHT)
                 .build();
-        nameLabel.active = false;
         addRenderableWidget(nameLabel);
 
         int previewX = x + NAME_WIDTH + ROW_GAP;
@@ -201,11 +209,10 @@ public class CameraAngleEditorMenuScreen extends Screen {
         addRenderableWidget(deleteButton);
     }
 
-    private void addEntityRow(int x, int y, Component label, Runnable onDelete) {
-        Button nameLabel = Button.builder(label, b -> {})
+    private void addEntityRow(int x, int y, Component label, Runnable onClick, Runnable onDelete) {
+        Button nameLabel = Button.builder(label, b -> onClick.run())
                 .bounds(x, y, NAME_WIDTH, ROW_HEIGHT)
                 .build();
-        nameLabel.active = false;
         addRenderableWidget(nameLabel);
 
         Button deleteButton = Button.builder(Component.literal("✖"), b -> onDelete.run())

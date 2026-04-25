@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.session;
 
-import fr.loudo.narrativecraft.editors.Editor;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 
@@ -31,7 +31,7 @@ public class AbstractPlayerSession {
 
     private Chapter chapter;
     private Scene scene;
-    private Editor editor;
+    private EditorMaker editorMaker;
 
     public AbstractPlayerSession(Chapter chapter, Scene scene) {
         this.chapter = chapter;
@@ -68,11 +68,11 @@ public class AbstractPlayerSession {
         this.scene = scene;
     }
 
-    public Editor getEditor() {
-        return editor;
+    public EditorMaker getEditor() {
+        return editorMaker;
     }
 
-    public void setEditor(Editor editor) {
-        this.editor = editor;
+    public void setEditor(EditorMaker editorMaker) {
+        this.editorMaker = editorMaker;
     }
 }

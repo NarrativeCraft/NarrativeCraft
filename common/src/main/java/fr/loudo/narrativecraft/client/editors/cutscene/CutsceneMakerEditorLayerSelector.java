@@ -42,7 +42,7 @@ public class CutsceneMakerEditorLayerSelector {
     private static final List<ICutsceneLayerType> LAYER_TYPES =
             NarrativeCraftMod.getInstance().getCutsceneLayerRegistry().getTypes();
 
-    private final ClientCutsceneMakerEditor cutsceneEditor;
+    private final ClientCutsceneMakerEditorMaker cutsceneEditor;
     private final List<LayerSelectionButton> layerButtons = new ArrayList<>();
     private final int width;
     private final int maxHeight;
@@ -54,7 +54,7 @@ public class CutsceneMakerEditorLayerSelector {
     private boolean visible;
 
     public CutsceneMakerEditorLayerSelector(
-            ClientCutsceneMakerEditor cutsceneEditor, int width, int maxHeight, int color) {
+            ClientCutsceneMakerEditorMaker cutsceneEditor, int width, int maxHeight, int color) {
         this.cutsceneEditor = cutsceneEditor;
         this.width = width;
         this.maxHeight = maxHeight;
@@ -145,7 +145,7 @@ public class CutsceneMakerEditorLayerSelector {
         this.y = y;
     }
 
-    public ClientCutsceneMakerEditor getCutsceneEditor() {
+    public ClientCutsceneMakerEditorMaker getCutsceneEditor() {
         return cutsceneEditor;
     }
 

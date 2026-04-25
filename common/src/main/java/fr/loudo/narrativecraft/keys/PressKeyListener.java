@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.keys;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor;
+import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -42,8 +42,8 @@ public class PressKeyListener {
             minecraft.setScreen(screen);
         }
 
-        if (ModKeys.HIDE_CUTSCENE_MAKER_HUD.consumeClick()) {
-            ClientCutsceneMakerEditor editor =
+        if (ModKeys.HIDE_EDITOR_MAKER_HUD.consumeClick()) {
+            ClientCutsceneMakerEditorMaker editor =
                     ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
             if (editor == null) return;
 
@@ -51,7 +51,7 @@ public class PressKeyListener {
         }
 
         if (ModKeys.TOGGLE_CAMERA_ROLL.consumeClick()) {
-            ClientCutsceneMakerEditor editor =
+            ClientCutsceneMakerEditorMaker editor =
                     ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
             if (editor == null) return;
 
