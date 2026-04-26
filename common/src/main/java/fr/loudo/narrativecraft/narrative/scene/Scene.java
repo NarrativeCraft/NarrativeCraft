@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneManager;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionManager;
 import fr.loudo.narrativecraft.narrative.subscene.SubsceneManager;
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ public class Scene extends NarrativeEntry<ScenePayload> {
     private final SubsceneManager subsceneManager = new SubsceneManager();
     private final CutsceneManager cutsceneManager = new CutsceneManager();
     private final CameraAngleManager cameraAngleManager = new CameraAngleManager();
+    private final InteractionManager interactionManager = new InteractionManager();
     private final NpcManager npcManager = new NpcManager();
 
     private int rank;
@@ -82,6 +84,10 @@ public class Scene extends NarrativeEntry<ScenePayload> {
 
     public CameraAngleManager getCameraAngleManager() {
         return cameraAngleManager;
+    }
+
+    public InteractionManager getInteractionManager() {
+        return interactionManager;
     }
 
     public NpcManager getNpcManager() {

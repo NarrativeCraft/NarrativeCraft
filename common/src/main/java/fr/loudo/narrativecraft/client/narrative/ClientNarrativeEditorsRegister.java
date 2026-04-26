@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterEditor;
 import fr.loudo.narrativecraft.client.narrative.character.ClientCharacterEditor;
 import fr.loudo.narrativecraft.client.narrative.character.ClientNpcEditor;
 import fr.loudo.narrativecraft.client.narrative.cutscene.ClientCutsceneEditor;
+import fr.loudo.narrativecraft.client.narrative.interaction.ClientInteractionEditor;
 import fr.loudo.narrativecraft.client.narrative.scene.ClientSceneEditor;
 import fr.loudo.narrativecraft.client.narrative.subscene.ClientSubsceneEditor;
 import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
@@ -36,6 +37,7 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraAnglePayload;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryPayload;
 import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionPayload;
 import fr.loudo.narrativecraft.narrative.npc.NpcPayload;
 import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
@@ -50,6 +52,8 @@ public class ClientNarrativeEditorsRegister {
         ClientNarrativeEntryEditorRegistry.getInstance().register(CutscenePayload.class, new ClientCutsceneEditor());
         ClientNarrativeEntryEditorRegistry.getInstance()
                 .register(CameraAnglePayload.class, new ClientCameraAngleEditor());
+        ClientNarrativeEntryEditorRegistry.getInstance()
+                .register(InteractionPayload.class, new ClientInteractionEditor());
         ClientNarrativeEntryEditorRegistry.getInstance()
                 .register(CharacterStoryPayload.class, new ClientCharacterEditor());
         ClientNarrativeEntryEditorRegistry.getInstance().register(NpcPayload.class, new ClientNpcEditor());

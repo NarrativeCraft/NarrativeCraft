@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.CameraAngleMakerEditorCameraRenderer;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorCameraRenderer;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPathRenderer;
+import fr.loudo.narrativecraft.client.editors.interaction.InteractionMakerEditorRenderer;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import java.util.List;
@@ -49,6 +50,7 @@ public class OnRenderWorldEvent {
         CutsceneMakerEditorPathRenderer.render(poseStack, deltaTracker);
         CutsceneMakerEditorCameraRenderer.render(poseStack, deltaTracker);
         CameraAngleMakerEditorCameraRenderer.render(poseStack, deltaTracker);
+        InteractionMakerEditorRenderer.render(poseStack, deltaTracker);
 
         renderDialog3D(poseStack, deltaTracker);
 

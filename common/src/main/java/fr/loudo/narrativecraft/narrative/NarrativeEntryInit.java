@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
@@ -59,6 +60,7 @@ public class NarrativeEntryInit {
         subscenes();
         cutscenes();
         cameraAngles();
+        interactions();
     }
 
     private static void chapters() {
@@ -141,6 +143,19 @@ public class NarrativeEntryInit {
         }
     }
 
+    private static void interactions() {
+        List<DeserializationResult<Interaction>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Interaction.class);
+        for (DeserializationResult<Interaction> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Interaction interaction = deserializationResult.entry();
+            interaction.getScene().getInteractionManager().add(interaction);
+        }
+    }
+
     private static void npcs() {
         List<DeserializationResult<Npc>> deserializationResults =
                 NarrativeCraftFileRegistry.getInstance().deserialize(Npc.class);
@@ -198,6 +213,10 @@ public class NarrativeEntryInit {
                 for (CameraAngle cameraAngle : scene.getCameraAngleManager().getList()) {
                     Services.PACKET.sendToPlayer(
                             player, BiSyncNarrativeEntryPacket.add(cameraAngle.getId(), cameraAngle.toPayload()));
+                }
+                for (Interaction interaction : scene.getInteractionManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(interaction.getId(), interaction.toPayload()));
                 }
             }
         }

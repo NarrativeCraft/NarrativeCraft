@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntity
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class ClientPacketRegisterFabric {
@@ -48,5 +49,7 @@ public class ClientPacketRegisterFabric {
                 .register(S2CCameraAngleCharacterCaptured.TYPE, S2CCameraAngleCharacterCaptured.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CCameraAnglePlacementEntitySpawned.TYPE, S2CCameraAnglePlacementEntitySpawned.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay()
+                .register(S2CInteractionEditorData.TYPE, S2CInteractionEditorData.STREAM_CODEC);
     }
 }

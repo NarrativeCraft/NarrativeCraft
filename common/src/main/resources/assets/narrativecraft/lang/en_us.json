@@ -45,6 +45,7 @@
 
   "narrativecraft.screen.confirm.title": "Confirm",
   "narrativecraft.screen.confirm.delete": "Are you sure you want to delete %s?",
+  "narrativecraft.screen.confirm.message": "Are you sure you want to delete %s?",
   "narrativecraft.screen.confirm.save": "Do you want to save before leaving?",
 
   "narrativecraft.screen.camera_angle_editor.add_camera": "Add camera",
@@ -103,5 +104,22 @@
   "narrativecraft.cutscene.save.failed": "Cutscene save failed",
 
   "narrativecraft.camera_angle.save.success": "Camera angle saved",
-  "narrativecraft.camera_angle.save.failed": "Camera angle save failed"
+  "narrativecraft.camera_angle.save.failed": "Camera angle save failed",
+
+  "narrativecraft.interaction": "Interaction",
+  "narrativecraft.interaction.save.success": "Interaction saved",
+  "narrativecraft.interaction.save.failed": "Interaction save failed",
+
+  "narrativecraft.screen.interaction.maker.title": "Interaction Maker",
+  "narrativecraft.screen.interaction.zones": "Zones",
+  "narrativecraft.screen.interaction.points": "Points",
+  "narrativecraft.screen.interaction.add_zone": "Add zone...",
+  "narrativecraft.screen.interaction.add_point": "Add point...",
+  "narrativecraft.screen.interaction.stitch_name": "Stitch name",
+  "narrativecraft.screen.interaction.preview": "Preview",
+  "narrativecraft.screen.interaction.place_corners": "Place corners",
+  "narrativecraft.screen.interaction.max_distance": "Max distance",
+  "narrativecraft.screen.interaction.use_aim_radius": "Use aim radius",
+  "narrativecraft.screen.interaction.aim_radius": "Aim radius",
+  "narrativecraft.screen.interaction.reset_position": "Reset position to current"
 }

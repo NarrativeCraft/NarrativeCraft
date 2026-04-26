@@ -21,26 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.client;
+package fr.loudo.narrativecraft.client.screens.narrative.interaction;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.minecraft.resources.Identifier;
+import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.interaction.Interaction;
+import java.util.List;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
-public class OnHudRenderEventFabric implements IFabricEventRegister {
-    @Override
-    public void register() {
-        HudElementRegistry.addLast(
-                Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_hud"),
-                OnHudRender::cutsceneHudRender);
-        HudElementRegistry.addLast(
-                Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_hud"),
-                OnHudRender::cameraAngleHudRender);
-        HudElementRegistry.addLast(
-                Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "interaction_hud"),
-                OnHudRender::interactionHudRender);
-        HudElementRegistry.addLast(
-                Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_hud"), OnHudRender::dialogHudRender);
+public class InteractionEntryListScreen extends NarrativeEntryListScreen<Interaction> {
+
+    public InteractionEntryListScreen(
+            Component title,
+            List<Interaction> entries,
+            Screen lastScreen,
+            NarrativeEntry<?> parentEntry,
+            String breadCrumb) {
+        super(title, entries, lastScreen, Interaction.class, parentEntry, breadCrumb);
     }
 }

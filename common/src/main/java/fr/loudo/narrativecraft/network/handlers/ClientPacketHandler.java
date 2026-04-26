@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
+import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
@@ -44,6 +45,7 @@ import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntity
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
@@ -112,6 +114,13 @@ public class ClientPacketHandler {
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor == null) return;
         editor.registerPlacementEntityId(packet.placementId(), packet.entityId());
+    }
+
+    public static void loadInteractionEditorData(S2CInteractionEditorData packet) {
+        ClientInteractionMakerEditorMaker editor =
+                ClientNarrativeCraftMod.getInstance().getInteractionMakerEditor();
+        if (editor == null) return;
+        editor.loadData(packet.getDataJson());
     }
 
     public static void handleDialogTest(S2CDialogTest packet) {

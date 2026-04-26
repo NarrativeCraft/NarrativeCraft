@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.editors.interaction.InteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
@@ -37,11 +38,17 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
+import fr.loudo.narrativecraft.narrative.interaction.Interaction;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.*;
+import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
+import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -256,6 +263,49 @@ public class ServerPacketHandler {
         if (editor == null) return;
 
         editor.removeTemplateReference(packet.templateReferenceId());
+    }
+
+    public static void interactionEnter(C2SInteractionEnter packet, Player player) {
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession session = sessionManager.getByPlayer(player);
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
+        if (scene == null) return;
+        Interaction interaction = scene.getInteractionManager().getById(packet.getInteractionId());
+        if (interaction == null) return;
+
+        InteractionMakerEditorMaker editor = new InteractionMakerEditorMaker(interaction, session);
+        session.setEditor(editor);
+        editor.init();
+
+        String dataJson = InteractionSerializer.serializeData(interaction);
+        Services.PACKET.sendToPlayer(
+                (ServerPlayer) player, new S2CInteractionEditorData(interaction.getId(), dataJson));
+    }
+
+    public static void interactionSave(C2SInteractionSave packet, Player player) {
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
+        if (scene == null) return;
+        Interaction interaction = scene.getInteractionManager().getById(packet.getInteractionId());
+        if (interaction == null) return;
+
+        InteractionDeserializer.deserializeInto(packet.getDataJson(), interaction);
+        int result = NarrativeCraftFileRegistry.getInstance().edit(interaction);
+
+        if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player,
+                    new S2CToastMessage(
+                            Translation.message("interaction"), Translation.message("interaction.save.success")));
+        } else {
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player,
+                    new S2CToastMessage(
+                            Translation.message("interaction"), Translation.message("interaction.save.failed")));
+        }
     }
 
     public static void cameraAngleCaptureCharacter(C2SCameraAngleCaptureCharacter packet, Player player) {

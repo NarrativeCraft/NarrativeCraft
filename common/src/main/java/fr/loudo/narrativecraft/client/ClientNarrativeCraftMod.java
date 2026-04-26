@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client;
 
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegister;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
@@ -66,6 +67,12 @@ public class ClientNarrativeCraftMod {
         EditorMaker editorMaker = getPlayerSession().getEditor();
         if (!(editorMaker instanceof ClientCameraAngleMakerEditorMaker)) return null;
         return (ClientCameraAngleMakerEditorMaker) editorMaker;
+    }
+
+    public ClientInteractionMakerEditorMaker getInteractionMakerEditor() {
+        EditorMaker editorMaker = getPlayerSession().getEditor();
+        if (!(editorMaker instanceof ClientInteractionMakerEditorMaker)) return null;
+        return (ClientInteractionMakerEditorMaker) editorMaker;
     }
 
     public static ClientNarrativeCraftMod getInstance() {

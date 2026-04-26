@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.narrative.chapter.ClientChapterNarrativeUI
 import fr.loudo.narrativecraft.client.narrative.character.ClientCharacterNarrativeUIAction;
 import fr.loudo.narrativecraft.client.narrative.character.ClientNpcNarrativeUIAction;
 import fr.loudo.narrativecraft.client.narrative.cutscene.ClientCutsceneNarrativeUIAction;
+import fr.loudo.narrativecraft.client.narrative.interaction.ClientInteractionNarrativeUIAction;
 import fr.loudo.narrativecraft.client.narrative.scene.ClientSceneNarrativeUIAction;
 import fr.loudo.narrativecraft.client.narrative.subscene.ClientSubsceneNarrativeUIAction;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
@@ -36,6 +37,7 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
@@ -50,6 +52,8 @@ public class ClientNarrativeUIActionRegister {
         ClientNarrativeUIActionRegistry.getInstance().register(Cutscene.class, new ClientCutsceneNarrativeUIAction());
         ClientNarrativeUIActionRegistry.getInstance()
                 .register(CameraAngle.class, new ClientCameraAngleNarrativeUIAction());
+        ClientNarrativeUIActionRegistry.getInstance()
+                .register(Interaction.class, new ClientInteractionNarrativeUIAction());
         ClientNarrativeUIActionRegistry.getInstance()
                 .register(CharacterStory.class, new ClientCharacterNarrativeUIAction());
         ClientNarrativeUIActionRegistry.getInstance().register(Npc.class, new ClientNpcNarrativeUIAction());

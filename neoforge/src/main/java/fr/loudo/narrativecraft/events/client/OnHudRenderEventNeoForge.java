@@ -44,6 +44,7 @@ public class OnHudRenderEventNeoForge {
 
         OnHudRender.cutsceneHudRender(graphics, deltaTracker);
         OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
+        OnHudRender.interactionHudRender(graphics, deltaTracker);
         OnHudRender.dialogHudRender(graphics, deltaTracker);
     }
 }

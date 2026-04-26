@@ -48,6 +48,9 @@ import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
+import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
+import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -99,6 +102,10 @@ public class OnPacketRegisterEventNeoForge {
                 S2CCameraAnglePlacementEntitySpawned.TYPE,
                 S2CCameraAnglePlacementEntitySpawned.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::onPlacementEntitySpawned);
+        registrar.playToClient(
+                S2CInteractionEditorData.TYPE,
+                S2CInteractionEditorData.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::loadInteractionEditorData);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
@@ -143,5 +150,11 @@ public class OnPacketRegisterEventNeoForge {
                 C2SCameraAngleTeleportToTemplate.TYPE,
                 C2SCameraAngleTeleportToTemplate.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::cameraAngleTeleportToTemplate);
+        registrar.playToServer(
+                C2SInteractionEnter.TYPE,
+                C2SInteractionEnter.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::interactionEnter);
+        registrar.playToServer(
+                C2SInteractionSave.TYPE, C2SInteractionSave.STREAM_CODEC, ServerPacketHandlerNeoForge::interactionSave);
     }
 }

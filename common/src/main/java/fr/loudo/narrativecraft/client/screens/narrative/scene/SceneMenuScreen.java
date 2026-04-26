@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.client.screens.narrative.animation.AnimationEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cutscene.CutsceneEntryListScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.interaction.InteractionEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.subscene.SubsceneEntryListScreen;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -94,7 +95,18 @@ public class SceneMenuScreen extends Screen {
                             scene.getName(),
                             Translation.message("cutscene").getString())));
         });
-        labels.put(Translation.message("screen.scene_menu.interactions"), () -> {});
+        labels.put(Translation.message("screen.scene_menu.interactions"), () -> {
+            minecraft.setScreen(new InteractionEntryListScreen(
+                    Translation.message("interaction"),
+                    scene.getInteractionManager().getList(),
+                    this,
+                    scene,
+                    String.format(
+                            "%s;%s;%s",
+                            scene.getChapter().getName(),
+                            scene.getName(),
+                            Translation.message("interaction").getString())));
+        });
         labels.put(Translation.message("screen.scene_menu.npc"), () -> {
             minecraft.setScreen(new NarrativeEntryListScreen<>(
                     Translation.message("npc"),
