@@ -48,6 +48,9 @@ import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
+import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
+import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
+import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
@@ -106,6 +109,12 @@ public class OnPacketRegisterEventNeoForge {
                 S2CInteractionEditorData.TYPE,
                 S2CInteractionEditorData.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::loadInteractionEditorData);
+        registrar.playToClient(
+                S2CRunInkAction.TYPE, S2CRunInkAction.STREAM_CODEC, ClientPacketHandlerNeoForge::runInkAction);
+        registrar.playToClient(
+                S2CStopAllInkActions.TYPE,
+                S2CStopAllInkActions.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::stopAllInkActions);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
@@ -156,5 +165,9 @@ public class OnPacketRegisterEventNeoForge {
                 ServerPacketHandlerNeoForge::interactionEnter);
         registrar.playToServer(
                 C2SInteractionSave.TYPE, C2SInteractionSave.STREAM_CODEC, ServerPacketHandlerNeoForge::interactionSave);
+        registrar.playToServer(
+                C2SInkActionFinished.TYPE,
+                C2SInkActionFinished.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::inkActionFinished);
     }
 }

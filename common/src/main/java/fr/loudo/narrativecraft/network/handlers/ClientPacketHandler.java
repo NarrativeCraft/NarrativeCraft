@@ -23,6 +23,9 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
@@ -35,6 +38,7 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
@@ -45,6 +49,7 @@ import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntity
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
+import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
@@ -165,5 +170,29 @@ public class ClientPacketHandler {
         if (ratio == 1.0f) {
             editor.getControl().pause();
         }
+    }
+
+    public static void runInkAction(S2CRunInkAction packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+
+        InkAction action = InkTagDispatcherImpl.getInstance().instantiate(packet.keyword());
+        if (action == null) return;
+
+        ParsedCommand cmd = ParsedCommand.fromJson(packet.parsedArgsJson());
+        action.setInstanceId(packet.instanceId());
+
+        var validationResult = action.validate(cmd, session.getScene());
+        if (validationResult.isError()) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Client failed to validate Ink action '{}': {}", packet.keyword(), validationResult.errorMessage());
+            return;
+        }
+
+        action.execute(null); // PlayerSession is null on client, actions must not use it
+        session.addClientInkAction(action);
+    }
+
+    public static void stopAllInkActions() {
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().stopAllClientInkActions();
     }
 }

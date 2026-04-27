@@ -23,13 +23,17 @@
 
 package fr.loudo.narrativecraft.events.client;
 
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.PressKeyListener;
+import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
+import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
+import java.util.Iterator;
 import net.minecraft.client.Minecraft;
 
 public class OnClientTickEvent {
@@ -44,6 +48,22 @@ public class OnClientTickEvent {
         EditorMaker editorMaker = session.getEditor();
         if (editorMaker != null) {
             editorMaker.tick();
+        }
+
+        tickClientInkActions(session);
+    }
+
+    private static void tickClientInkActions(ClientPlayerSession session) {
+        Iterator<InkAction> iterator = session.getActiveClientInkActions().iterator();
+        while (iterator.hasNext()) {
+            InkAction action = iterator.next();
+            action.tick();
+            if (!action.isRunning()) {
+                iterator.remove();
+                if (action.isBlocking()) {
+                    Services.PACKET.sendToServer(new C2SInkActionFinished(action.getInstanceId()));
+                }
+            }
         }
     }
 }

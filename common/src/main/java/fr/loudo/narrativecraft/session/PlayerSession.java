@@ -23,15 +23,21 @@
 
 package fr.loudo.narrativecraft.session;
 
+import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 
-public class PlayerSession extends AbstractPlayerSession {
+public class PlayerSession extends AbstractPlayerSession implements IPlayerSession {
 
     private final ServerPlayer player;
     private GameType lastGameType;
+
+    @Nullable
+    private InkTagHandler inkTagHandler;
 
     public PlayerSession(ServerPlayer player, Chapter chapter, Scene scene) {
         super(chapter, scene);
@@ -58,5 +64,14 @@ public class PlayerSession extends AbstractPlayerSession {
 
     public void setLastGameType(GameType lastGameType) {
         this.lastGameType = lastGameType;
+    }
+
+    @Nullable
+    public InkTagHandler getInkTagHandler() {
+        return inkTagHandler;
+    }
+
+    public void setInkTagHandler(@Nullable InkTagHandler inkTagHandler) {
+        this.inkTagHandler = inkTagHandler;
     }
 }

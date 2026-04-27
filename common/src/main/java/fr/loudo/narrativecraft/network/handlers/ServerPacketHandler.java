@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
@@ -46,6 +47,7 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.*;
+import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
@@ -282,6 +284,15 @@ public class ServerPacketHandler {
         String dataJson = InteractionSerializer.serializeData(interaction);
         Services.PACKET.sendToPlayer(
                 (ServerPlayer) player, new S2CInteractionEditorData(interaction.getId(), dataJson));
+    }
+
+    public static void inkActionFinished(C2SInkActionFinished packet, Player player) {
+        PlayerSession session =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        InkTagHandler handler = session.getInkTagHandler();
+        if (handler != null) {
+            handler.onClientActionFinished(packet.instanceId());
+        }
     }
 
     public static void interactionSave(C2SInteractionSave packet, Player player) {

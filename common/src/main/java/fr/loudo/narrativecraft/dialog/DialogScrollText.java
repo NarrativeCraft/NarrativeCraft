@@ -285,7 +285,7 @@ public class DialogScrollText {
 
                 if (effectName.equals("wait")) {
                     // Insert an invisible pause marker at this exact position.
-                    // The letters that follow are NOT tagged with "wait" — they scroll normally.
+                    // The letters that follow are NOT tagged with "wait", they scroll normally.
                     letters.add(new LetterEntry("", "wait", params));
                 } else {
                     currentEffect = effectName;

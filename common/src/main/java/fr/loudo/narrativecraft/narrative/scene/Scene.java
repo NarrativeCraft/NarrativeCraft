@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.scene;
 
+import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.managers.AnimationManager;
 import fr.loudo.narrativecraft.managers.NpcManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
@@ -33,7 +34,7 @@ import fr.loudo.narrativecraft.narrative.interaction.InteractionManager;
 import fr.loudo.narrativecraft.narrative.subscene.SubsceneManager;
 import java.util.UUID;
 
-public class Scene extends NarrativeEntry<ScenePayload> {
+public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
 
     private final Chapter chapter;
     private final AnimationManager animationManager = new AnimationManager();

@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
 import fr.loudo.narrativecraft.narrative.events.EventBus;
+import fr.loudo.narrativecraft.narrative.inkTag.InkActionRegister;
 import fr.loudo.narrativecraft.playback.PlaybackManager;
 import fr.loudo.narrativecraft.recording.actions.ActionRegister;
 import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
@@ -77,6 +78,7 @@ public class NarrativeCraftMod {
         ActionRegister.register(getInstance().getActionRegistry());
         CutsceneLayerRegister.register(getInstance().getCutsceneLayerRegistry());
         TextEffectRegister.register(getInstance().getTextEffectRegistry());
+        InkActionRegister.register();
     }
 
     public ChapterManager getChapterManager() {
