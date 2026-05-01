@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft;
 
+import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.api.APISetup;
 import fr.loudo.narrativecraft.dialog.DialogPresetManager;
 import fr.loudo.narrativecraft.dialog.effects.TextEffectRegister;
@@ -39,6 +40,7 @@ import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
 import fr.loudo.narrativecraft.narrative.events.EventBus;
 import fr.loudo.narrativecraft.narrative.inkTag.InkActionRegister;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.playback.PlaybackManager;
 import fr.loudo.narrativecraft.recording.actions.ActionRegister;
 import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
@@ -65,6 +67,8 @@ public class NarrativeCraftMod {
     private final TextEffectRegistry textEffectRegistry = new TextEffectRegistry();
     private final DialogPresetManager dialogPresetManager = new DialogPresetManager();
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
+    private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
+    private Story story;
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
 
@@ -127,6 +131,18 @@ public class NarrativeCraftMod {
 
     public List<DeserializationResult<?>> getCorruptedDeserialization() {
         return corruptedDeserialization;
+    }
+
+    public InkTagDispatcherImpl getInkTagDispatcher() {
+        return inkTagDispatcher;
+    }
+
+    public Story getStory() {
+        return story;
+    }
+
+    public void setStory(Story story) {
+        this.story = story;
     }
 
     public void setServer(MinecraftServer server) {

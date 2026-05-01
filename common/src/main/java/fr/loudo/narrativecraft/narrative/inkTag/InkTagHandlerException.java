@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag;
 
-/** Thrown when an Ink tag cannot be validated or executed. */
 public class InkTagHandlerException extends Exception {
 
     public InkTagHandlerException(String message) {

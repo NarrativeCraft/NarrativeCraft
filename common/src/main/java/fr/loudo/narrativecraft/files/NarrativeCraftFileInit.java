@@ -27,13 +27,13 @@ import java.io.File;
 
 public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
 
-    private static final String BUILD_DIRECTORY_NAME = "build";
-    private static final String CHAPTERS_DIRECTORY_NAME = "chapters";
-    private static final String CHARACTERS_DIRECTORY_NAME = "characters";
-    private static final String SAVES_DIRECTORY_NAME = "saves";
-    private static final String MAIN_INK_NAME = "main" + EXTENSION_SCRIPT_FILE;
-    private static final String VARS_INK_NAME = "variables" + EXTENSION_SCRIPT_FILE;
-    private static final String FUNCTIONS_INK_NAME = "functions" + EXTENSION_SCRIPT_FILE;
+    public static final String BUILD_DIRECTORY_NAME = "build";
+    public static final String CHAPTERS_DIRECTORY_NAME = "chapters";
+    public static final String CHARACTERS_DIRECTORY_NAME = "characters";
+    public static final String SAVES_DIRECTORY_NAME = "saves";
+    public static final String MAIN_INK_NAME = "main" + EXTENSION_SCRIPT_FILE;
+    public static final String VARS_INK_NAME = "variables" + EXTENSION_SCRIPT_FILE;
+    public static final String FUNCTIONS_INK_NAME = "functions" + EXTENSION_SCRIPT_FILE;
 
     private File rootDirectory;
     private File mainDirectory;

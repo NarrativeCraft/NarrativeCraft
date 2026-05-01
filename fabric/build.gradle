@@ -7,6 +7,7 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     include(implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}")
+    include(implementation "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}")
     include(implementation project(':api'))
 }
 

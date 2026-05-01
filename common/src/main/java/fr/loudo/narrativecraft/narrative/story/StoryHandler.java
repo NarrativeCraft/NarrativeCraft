@@ -21,25 +21,19 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.narrative.story;
 
-import fr.loudo.narrativecraft.commands.*;
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.platform.Services;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import com.bladecoder.ink.runtime.Story;
 
-public class OnCommandRegisterEventFabric implements IFabricEventRegister {
+public class StoryHandler {
 
-    @Override
-    public void register() {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
-            RecordCommand.register(commandDispatcher);
-            PlayerSessionCommand.register(commandDispatcher);
-            PlaybackCommand.register(commandDispatcher);
-            StoryCommand.register(commandDispatcher);
-            if (Services.PLATFORM.isDevelopmentEnvironment()) {
-                DialogTestCommand.register(commandDispatcher);
-            }
-        });
+    private final Story story;
+
+    public StoryHandler(Story story) {
+        this.story = story;
+    }
+
+    public Story getStory() {
+        return story;
     }
 }

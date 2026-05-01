@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.files.narrrative.chapter;
 import com.google.gson.Gson;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.files.InkFileGenerator;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
@@ -61,6 +62,8 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
             return OPERATION_FAILED;
         }
 
+        InkFileGenerator.generateChapterInkFile(entry);
+        InkFileGenerator.regenerateMainInk();
         return OPERATION_SUCCESS;
     }
 
@@ -122,6 +125,14 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
                 gson.toJson(entry, writer);
             }
 
+            if (oldChapter != null) {
+                if (oldChapter.getChapterIndex() != entry.getChapterIndex()) {
+                    InkFileGenerator.renameChapterInkFile(
+                            chapterDirectory, oldChapter.getChapterIndex(), entry.getChapterIndex());
+                }
+                InkFileGenerator.regenerateMainInk();
+            }
+
         } catch (Exception e) {
             NarrativeCraftMod.LOGGER.error("Failed to write chapter data {}", entry.formattedName(), e);
             return OPERATION_FAILED;
@@ -164,6 +175,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
                 }
             }
 
+            InkFileGenerator.regenerateMainInk();
             return OPERATION_SUCCESS;
         } catch (Exception e) {
             NarrativeCraftMod.LOGGER.error("Failed to delete chapter {}", entry.formattedName(), e);
@@ -247,6 +259,7 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault impleme
         }
 
         Files.move(oldFolder.toPath(), newFolder.toPath());
+        InkFileGenerator.renameChapterInkFile(newFolder, currentIndex, targetIndex);
 
         NarrativeEntryEditorRegistry.getInstance().edit(chapterToShift.getId(), chapterToShift.toPayload(), null);
 

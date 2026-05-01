@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.Side;
@@ -43,17 +44,17 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Manages the server-side queue of Ink tags and drives their sequential execution.
  *
- * <h3>Blocking model</h3>
+ * <h2>Blocking model</h2>
  * <p>When an action returns {@link InkActionResult#block()} (server side) or declares
  * {@link InkAction#isBlocking()} (client side), the queue pauses. Each server tick,
  * {@link #tick()} detects when the blocking action finishes and resumes draining.
  *
- * <h3>Client-side actions</h3>
+ * <h2>Client-side actions</h2>
  * <p>For actions with {@link Side#CLIENT}, the server sends a {@link S2CRunInkAction}
  * packet. If the action is blocking, a {@link ClientActionStub} holds the blocking slot
  * until a {@link fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished} ack arrives.
  *
- * <h3>Lifecycle integration</h3>
+ * <h2>Lifecycle integration</h2>
  * <p>Create one instance per story session. Pass a {@link Lifecycle} to react to errors
  * and to advance the story when all tags are drained. Wire {@link #tick()} to
  * {@link fr.loudo.narrativecraft.events.server.OnServerTickEvent}.
@@ -76,14 +77,13 @@ public final class InkTagHandler {
 
     private final PlayerSession playerSession;
     private final Lifecycle lifecycle;
-    private final InkTagDispatcherImpl dispatcher = InkTagDispatcherImpl.getInstance();
+    private final InkTagDispatcherImpl dispatcher =
+            NarrativeCraftMod.getInstance().getInkTagDispatcher();
 
     private final Deque<String> pendingTags = new ArrayDeque<>();
 
-    /** Server-side actions that are still running and need a tick each game tick. */
     private final List<InkAction> runningServerActions = new ArrayList<>();
 
-    /** Current action blocking the queue, or {@code null} when the queue can drain. */
     private InkAction blockingAction = null;
 
     /** Maps instanceId → stub so the ack from the client can release the right blocking slot. */
@@ -93,10 +93,6 @@ public final class InkTagHandler {
         this.playerSession = playerSession;
         this.lifecycle = lifecycle;
     }
-
-    // -------------------------------------------------------------------------
-    // Public API
-    // -------------------------------------------------------------------------
 
     /**
      * Appends tags to the queue and attempts to drain immediately.
@@ -150,10 +146,6 @@ public final class InkTagHandler {
 
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopAllInkActions());
     }
-
-    // -------------------------------------------------------------------------
-    // Internal
-    // -------------------------------------------------------------------------
 
     /**
      * Iterates the tag queue, dispatching and executing each tag in order.
@@ -216,7 +208,6 @@ public final class InkTagHandler {
             return result;
         }
 
-        // CLIENT-side: send to the client with the pre-parsed command payload
         boolean blocking = action.isBlocking();
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(),

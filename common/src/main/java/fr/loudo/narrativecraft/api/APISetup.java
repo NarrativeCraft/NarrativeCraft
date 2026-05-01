@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.api;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 
 public class APISetup {
 
@@ -36,7 +35,7 @@ public class APISetup {
         api.setCutsceneLayerRegistry(mod.getCutsceneLayerRegistry());
         api.setTextEffectRegistry(mod.getTextEffectRegistry());
         api.setEventBus(NarrativeCraftMod.EVENT_BUS);
-        api.setInkTagDispatcher(InkTagDispatcherImpl.getInstance());
+        api.setInkTagDispatcher(mod.getInkTagDispatcher());
         api.setModId(NarrativeCraftMod.MOD_ID);
     }
 }

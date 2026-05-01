@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.AnimationInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.BorderInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.CameraAngleInkAction;
@@ -47,7 +48,7 @@ public final class InkActionRegister {
     private InkActionRegister() {}
 
     public static void register() {
-        InkTagDispatcherImpl dispatcher = InkTagDispatcherImpl.getInstance();
+        InkTagDispatcherImpl dispatcher = NarrativeCraftMod.getInstance().getInkTagDispatcher();
 
         dispatcher.register(CooldownInkAction.class, CooldownInkAction::new);
         dispatcher.register(WeatherInkAction.class, WeatherInkAction::new);

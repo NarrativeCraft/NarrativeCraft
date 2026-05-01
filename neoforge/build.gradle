@@ -10,6 +10,7 @@ dependencies {
         }
     }
     implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}"
+    implementation "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}"
     implementation project(':api')
 }
 

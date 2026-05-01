@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.files.narrrative.scene;
 import com.google.gson.Gson;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.files.InkFileGenerator;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
@@ -41,6 +42,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<Scene> {
 
@@ -84,7 +86,12 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             return OPERATION_FAILED;
         }
 
-        return edit(entry);
+        int result = edit(entry);
+        if (result == OPERATION_SUCCESS) {
+            InkFileGenerator.generateSceneInkFile(entry);
+            InkFileGenerator.regenerateMainInk();
+        }
+        return result;
     }
 
     @Override
@@ -147,6 +154,22 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
                 gson.toJson(entry, writer);
             }
 
+            if (oldScene != null) {
+                if (!oldScene.getName()
+                        .toLowerCase(Locale.ROOT)
+                        .equals(entry.getName().toLowerCase(Locale.ROOT))) {
+                    // After the directory move, the old ink file is inside the new scene directory
+                    File sceneDir = NarrativeCraftFileUtil.getSceneFolder(entry);
+                    File oldInkFile = new File(
+                            sceneDir,
+                            oldScene.getName().toLowerCase(Locale.ROOT)
+                                    + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE);
+                    if (oldInkFile.exists()) oldInkFile.delete();
+                    InkFileGenerator.generateSceneInkFile(entry);
+                }
+                InkFileGenerator.regenerateMainInk();
+            }
+
         } catch (Exception e) {
             NarrativeCraftMod.LOGGER.error("Failed to write scene data {}", entry.formattedName(), e);
             return OPERATION_FAILED;
@@ -186,6 +209,7 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
                 }
             }
 
+            InkFileGenerator.regenerateMainInk();
             return OPERATION_SUCCESS;
         } catch (Exception e) {
             NarrativeCraftMod.LOGGER.error("Failed to delete scene {}", entry.formattedName(), e);

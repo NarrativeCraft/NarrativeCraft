@@ -156,7 +156,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                     minecraft.setScreen(this);
                 },
                 Translation.message("screen.confirm.title"),
-                Translation.message("screen.confirm.message", item.getName()));
+                Translation.message("screen.confirm.delete", item.getName()));
 
         Button deleteButton = Button.builder(Component.literal("✖"), b -> minecraft.setScreen(confirmScreen))
                 .bounds(x, y, 20, 20)

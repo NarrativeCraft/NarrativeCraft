@@ -120,6 +120,6 @@ public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
 
     @Override
     public String toFileName() {
-        return chapter.getChapterIndex() + "_" + rank + "_" + name.toLowerCase();
+        return chapter.getChapterIndex() + "_" + rank + "_" + name.toLowerCase().replace(' ', '_');
     }
 }

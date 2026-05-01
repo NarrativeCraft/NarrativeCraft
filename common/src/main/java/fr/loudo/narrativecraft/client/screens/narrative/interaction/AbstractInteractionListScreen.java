@@ -119,7 +119,7 @@ public abstract class AbstractInteractionListScreen<T> extends Screen {
                     rebuild();
                 },
                 Translation.message("screen.confirm.title"),
-                Translation.message("screen.confirm.message", name));
+                Translation.message("screen.confirm.delete", name));
         minecraft.setScreen(confirmScreen);
     }
 

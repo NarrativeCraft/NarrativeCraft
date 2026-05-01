@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.api.inkAction.syntax;
 
-/** The supported value types for Ink action arguments. */
 public enum ArgType {
     STRING,
     INT,

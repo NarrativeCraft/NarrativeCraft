@@ -24,6 +24,7 @@
   "narrativecraft.scene_rank": "Rank",
   "narrativecraft.roll": "Roll",
   "narrativecraft.fov": "FOV",
+  "narrativecraft.line": "Line",
 
   "narrativecraft.screen.scene_menu.animations": "Animations",
   "narrativecraft.screen.scene_menu.camera_angles": "Camera angles",
@@ -45,7 +46,6 @@
 
   "narrativecraft.screen.confirm.title": "Confirm",
   "narrativecraft.screen.confirm.delete": "Are you sure you want to delete %s?",
-  "narrativecraft.screen.confirm.message": "Are you sure you want to delete %s?",
   "narrativecraft.screen.confirm.save": "Do you want to save before leaving?",
 
   "narrativecraft.screen.camera_angle_editor.add_camera": "Add camera",
@@ -121,5 +121,10 @@
   "narrativecraft.screen.interaction.max_distance": "Max distance",
   "narrativecraft.screen.interaction.use_aim_radius": "Use aim radius",
   "narrativecraft.screen.interaction.aim_radius": "Aim radius",
-  "narrativecraft.screen.interaction.reset_position": "Reset position to current"
+  "narrativecraft.screen.interaction.reset_position": "Reset position to current",
+
+  "narrativecraft.story.no_main_file": "main.ink does not exists!",
+  "narrativecraft.story.compiling": "Compiling...",
+  "narrativecraft.story.compiled": "Your story has compiled successfully!",
+  "narrativecraft.story.error_compilation": "The compilation returned %s errors."
 }

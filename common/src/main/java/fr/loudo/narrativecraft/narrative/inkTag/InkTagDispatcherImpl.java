@@ -53,17 +53,11 @@ import javax.annotation.Nullable;
  */
 public final class InkTagDispatcherImpl implements InkTagDispatcher {
 
-    private static final InkTagDispatcherImpl INSTANCE = new InkTagDispatcherImpl();
-
-    public static InkTagDispatcherImpl getInstance() {
-        return INSTANCE;
-    }
-
     private final Map<String, Entry> registrations = new LinkedHashMap<>();
 
     private record Entry(CommandSpec spec, Supplier<InkAction> factory) {}
 
-    private InkTagDispatcherImpl() {}
+    public InkTagDispatcherImpl() {}
 
     /**
      * Registers an {@link InkAction} class by reading its {@link InkCommand} annotation.
@@ -122,8 +116,7 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
         InkAction action = entry.factory().get();
         var validationResult = action.validate(cmd, scene);
         if (validationResult.isError()) {
-            throw new InkTagHandlerException(
-                    "Tag '" + keyword + "' validation failed: " + validationResult.errorMessage());
+            throw new InkTagHandlerException(validationResult.errorMessage());
         }
 
         return new DispatchResult(action, cmd);

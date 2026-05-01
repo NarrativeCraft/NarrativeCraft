@@ -38,7 +38,6 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
@@ -175,7 +174,7 @@ public class ClientPacketHandler {
     public static void runInkAction(S2CRunInkAction packet) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
-        InkAction action = InkTagDispatcherImpl.getInstance().instantiate(packet.keyword());
+        InkAction action = NarrativeCraftMod.getInstance().getInkTagDispatcher().instantiate(packet.keyword());
         if (action == null) return;
 
         ParsedCommand cmd = ParsedCommand.fromJson(packet.parsedArgsJson());
