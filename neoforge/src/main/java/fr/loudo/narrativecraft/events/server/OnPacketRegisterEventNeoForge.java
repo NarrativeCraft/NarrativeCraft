@@ -40,9 +40,10 @@ import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTempl
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
+import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
@@ -54,6 +55,10 @@ import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.S2CShowChoices;
+import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -106,6 +111,8 @@ public class OnPacketRegisterEventNeoForge {
                 S2CCameraAnglePlacementEntitySpawned.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::onPlacementEntitySpawned);
         registrar.playToClient(
+                S2CEnterCameraView.TYPE, S2CEnterCameraView.STREAM_CODEC, ClientPacketHandlerNeoForge::enterCameraView);
+        registrar.playToClient(
                 S2CInteractionEditorData.TYPE,
                 S2CInteractionEditorData.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::loadInteractionEditorData);
@@ -115,11 +122,18 @@ public class OnPacketRegisterEventNeoForge {
                 S2CStopAllInkActions.TYPE,
                 S2CStopAllInkActions.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::stopAllInkActions);
+        registrar.playToClient(
+                S2CShowDialogue.TYPE, S2CShowDialogue.STREAM_CODEC, ClientPacketHandlerNeoForge::showDialogue);
+        registrar.playToClient(
+                S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC, ClientPacketHandlerNeoForge::showChoices);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
-        registrar.playToServer(
-                C2SCutsceneEnter.TYPE, C2SCutsceneEnter.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneState);
+        registrar.playBidirectional(
+                BiCutsceneEnter.TYPE,
+                BiCutsceneEnter.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cutsceneState,
+                ClientPacketHandlerNeoForge::cutsceneState);
         registrar.playToServer(
                 C2SCutsceneControl.TYPE, C2SCutsceneControl.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneControl);
         registrar.playToServer(
@@ -169,5 +183,11 @@ public class OnPacketRegisterEventNeoForge {
                 C2SInkActionFinished.TYPE,
                 C2SInkActionFinished.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::inkActionFinished);
+        registrar.playToServer(
+                C2SDialogueFinished.TYPE,
+                C2SDialogueFinished.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::dialogueFinished);
+        registrar.playToServer(
+                C2SChoiceSelected.TYPE, C2SChoiceSelected.STREAM_CODEC, ServerPacketHandlerNeoForge::choiceSelected);
     }
 }

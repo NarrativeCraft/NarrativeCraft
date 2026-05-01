@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.editors;
 
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
+
 public interface EditorMaker {
 
     void init();
@@ -30,4 +32,6 @@ public interface EditorMaker {
     void tick();
 
     void teleportToEditorOrigin();
+
+    NarrativeEnvironment getEnvironment();
 }

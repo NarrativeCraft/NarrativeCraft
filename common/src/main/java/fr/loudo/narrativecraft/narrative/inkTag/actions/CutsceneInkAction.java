@@ -30,6 +30,17 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.playback.Playback;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.Translation;
 
 @InkCommand(
         keyword = "cutscene",
@@ -38,22 +49,45 @@ import fr.loudo.narrativecraft.api.session.IPlayerSession;
         side = Side.SERVER)
 public class CutsceneInkAction extends InkAction {
 
+    private Cutscene cutscene;
+    private CutsceneMakerEditorMaker editorMaker;
+
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        // TODO: resolve cutscene from scene.getCutsceneManager() when story infra is available
         blocking = true;
+        String cutsceneName = cmd.getString("cutsceneName");
+        cutscene = ((Scene) scene).getCutsceneManager().getByName(cutsceneName);
+        if (cutscene == null) {
+            return InkActionResult.error(Translation.message(
+                            NOT_EXISTS_KEY, Translation.message("cutscene").getString(), cutsceneName)
+                    .getString());
+        }
         return InkActionResult.ok();
     }
 
     @Override
     public void tick() {
-        // TODO: track controller.finishedCutscene() → isRunning = false
+        if (editorMaker.isFinished()) {
+            isRunning = false;
+        }
     }
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: create CutsceneController and start session when available
-        isRunning = false;
-        return InkActionResult.ignored();
+        editorMaker = new CutsceneMakerEditorMaker(cutscene, (PlayerSession) playerSession);
+        ((PlayerSession) playerSession).setEditor(editorMaker);
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(), new BiCutsceneEnter(cutscene, NarrativeEnvironment.PRODUCTION));
+        editorMaker.init();
+        editorMaker.start();
+        StoryHandler storyHandler = ((PlayerSession) playerSession).getStoryHandler();
+        if (storyHandler != null) {
+            for (Playback playback : editorMaker.getPlaybacks()) {
+                CharacterStory characterStory =
+                        (CharacterStory) playback.getAnimation().getCharacterStory();
+                storyHandler.registerEntity(characterStory, playback.getMasterEntity());
+            }
+        }
+        return InkActionResult.block();
     }
 }

@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
@@ -101,6 +102,11 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         }
         if (position == null) return;
         player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
+    }
+
+    @Override
+    public NarrativeEnvironment getEnvironment() {
+        return NarrativeEnvironment.DEVELOPMENT;
     }
 
     public void tick() {

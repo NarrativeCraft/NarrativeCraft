@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.widgets.RollSliderWidget;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
@@ -84,6 +85,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     private final CutsceneEditorPlayback playback;
     private final RollSliderWidget rollWidget = new RollSliderWidget();
     private final CutsceneMakerEditorShortcuts shortcuts = new CutsceneMakerEditorShortcuts(this);
+    private final NarrativeEnvironment environment;
 
     private final List<Keyframe> selectedKeyframes = new ArrayList<>();
     private KeyframeMenu<?> openMenu;
@@ -101,7 +103,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     private float scrollbarDragStartViewTick = 0f;
     private boolean renderingHud = true;
 
-    public ClientCutsceneMakerEditorMaker(Cutscene cutscene) {
+    public ClientCutsceneMakerEditorMaker(Cutscene cutscene, NarrativeEnvironment environment) {
         this.cutscene = cutscene;
         this.control = new CutsceneMakerEditorControl(15, 15);
         this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getMaxTick());
@@ -109,6 +111,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
             playback.pause();
             setPreviewRoll(0.0f);
         });
+        this.environment = environment;
     }
 
     public void init() {
@@ -144,6 +147,11 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         totalTick = cutscene.getMaxTick();
         zoomFactor = getMinZoomFactor();
         viewStartTick = 0f;
+
+        if (environment == NarrativeEnvironment.PRODUCTION) {
+            control.play();
+            playback.play(0);
+        }
     }
 
     public void tick() {}
@@ -185,6 +193,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     private void renderLayers(GuiGraphicsExtractor graphics, DeltaTracker delta, int mouseX, int mouseY) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         int screenHeight = mc.getWindow().getGuiScaledHeight();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int layerStartY = getStartLayerY();
@@ -249,6 +258,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
             int rulerY,
             int timelineWidth,
             float visibleTicks) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (totalTick <= 0 || timelineWidth <= 0 || visibleTicks <= 0) return;
 
         int rulerEndY = rulerY + RULER_HEIGHT;
@@ -295,6 +305,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     private void renderScrollbar(GuiGraphicsExtractor graphics, int screenHeight, int timelineWidth) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         float visibleTicks = getVisibleTicks();
         if (visibleTicks >= totalTick) return;
 
@@ -406,7 +417,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         playback.tick(deltaTracker);
 
-        if (!renderingHud) return;
+        if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
 
         int[] mousePos = UtilsClient.getScaledMousePos();
         int addLayerY = getStartLayerY() - ADD_NEW_LAYER_BUTTON_OFFSET;
@@ -444,14 +455,14 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void charTyped(CharacterEvent event) {
-        if (!renderingHud) return;
+        if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (openMenu != null && openMenu.isVisible()) {
             openMenu.charTyped(event);
         }
     }
 
     public void keyPressed(KeyEvent event) {
-        if (!renderingHud) return;
+        if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         // Shortcuts are handled first; they consume the event if matched
         if (shortcuts.handleKeyPressed(event)) return;
         if (openMenu != null && openMenu.isVisible()) {
@@ -460,7 +471,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
-        if (!renderingHud) return;
+        if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
 
         if (rollWidget.mouseClicked(mouseButtonEvent)) return;
@@ -572,7 +583,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void mouseReleased(MouseButtonEvent mouseButtonEvent) {
-        if (!renderingHud) return;
+        if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         rollWidget.mouseReleased();
         playHead.setDragging(false);
         if (draggingOriginalTicks != null) {
@@ -583,7 +594,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
-        if (!renderingHud) return;
+        if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (rollWidget.mouseDragged(mouseButtonEvent.y())) return;
         if (scrollbarDragging) {
             float dragDeltaPixels = (float) mouseButtonEvent.x() - scrollbarDragStartMouseX;
@@ -677,5 +688,9 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
     public List<Keyframe> getSelectedKeyframes() {
         return selectedKeyframes;
+    }
+
+    public NarrativeEnvironment getEnvironment() {
+        return environment;
     }
 }

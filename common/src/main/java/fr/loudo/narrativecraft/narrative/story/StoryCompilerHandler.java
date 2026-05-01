@@ -50,6 +50,10 @@ import net.minecraft.network.chat.MutableComponent;
 
 public class StoryCompilerHandler {
 
+    public static String compileToJson() throws Exception {
+        return compile().toJson();
+    }
+
     public static Story compile() throws IOException {
         File mainInkFile = InkFileGenerator.getMainFile();
         String mainContent = Files.readString(mainInkFile.toPath());

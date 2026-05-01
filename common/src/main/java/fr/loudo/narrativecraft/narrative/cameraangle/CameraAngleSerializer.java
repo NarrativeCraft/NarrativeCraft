@@ -84,7 +84,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
         return references;
     }
 
-    static JsonObject serializeCamera(CameraView cameraView) {
+    public static JsonObject serializeCamera(CameraView cameraView) {
         JsonObject json = new JsonObject();
         json.addProperty("name", cameraView.getName());
         json.addProperty("x", cameraView.getPosition().x);
@@ -110,7 +110,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
         return json;
     }
 
-    static JsonObject serializeDialogData(DialogData data) {
+    public static JsonObject serializeDialogData(DialogData data) {
         JsonObject json = new JsonObject();
         json.addProperty("offsetX", data.getOffsetX());
         json.addProperty("offsetY", data.getOffsetY());

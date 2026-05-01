@@ -30,11 +30,14 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.PressKeyListener;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
 import java.util.Iterator;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 
 public class OnClientTickEvent {
 
@@ -50,7 +53,24 @@ public class OnClientTickEvent {
             editorMaker.tick();
         }
 
+        tickNarrativeCamera(minecraft, session);
         tickClientInkActions(session);
+    }
+
+    private static void tickNarrativeCamera(Minecraft minecraft, ClientPlayerSession session) {
+        CameraView narrativeCameraView = session.getNarrativeCameraView();
+        if (narrativeCameraView == null || minecraft.player == null) return;
+        LocalPlayer player = minecraft.player;
+        player.setPos(narrativeCameraView.getPosition().subtract(0, player.getEyeHeight(), 0));
+        player.setXRot((float) narrativeCameraView.getRotation().x);
+        player.setYRot((float) narrativeCameraView.getRotation().y);
+        player.setYHeadRot((float) narrativeCameraView.getRotation().y);
+        player.connection.send(new ServerboundMovePlayerPacket.PosRot(
+                narrativeCameraView.getPosition(),
+                (float) narrativeCameraView.getRotation().x,
+                (float) narrativeCameraView.getRotation().y,
+                player.onGround(),
+                false));
     }
 
     private static void tickClientInkActions(ClientPlayerSession session) {

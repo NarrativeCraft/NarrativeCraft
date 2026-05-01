@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
-import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -67,9 +67,9 @@ public class OnServerTickEvent {
                 cameraAngleMakerEditor.tick();
             }
 
-            InkTagHandler inkTagHandler = playerSession.getInkTagHandler();
-            if (inkTagHandler != null) {
-                inkTagHandler.tick();
+            StoryHandler storyHandler = playerSession.getStoryHandler();
+            if (storyHandler != null) {
+                storyHandler.tick();
             }
         }
     }

@@ -42,6 +42,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
     private final List<InkAction> activeClientInkActions = new ArrayList<>();
     private CameraView cameraView;
+    private CameraView narrativeCameraView;
 
     public ClientPlayerSession() {
         super(null, null);
@@ -85,6 +86,14 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public void setCameraView(CameraView cameraView) {
         this.cameraView = cameraView;
+    }
+
+    public CameraView getNarrativeCameraView() {
+        return narrativeCameraView;
+    }
+
+    public void setNarrativeCameraView(CameraView narrativeCameraView) {
+        this.narrativeCameraView = narrativeCameraView;
     }
 
     public List<InkAction> getActiveClientInkActions() {

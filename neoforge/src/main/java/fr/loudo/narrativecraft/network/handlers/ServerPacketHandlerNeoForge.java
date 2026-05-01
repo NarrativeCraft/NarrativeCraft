@@ -32,13 +32,15 @@ import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
+import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ServerPacketHandlerNeoForge {
@@ -49,7 +51,7 @@ public class ServerPacketHandlerNeoForge {
         });
     }
 
-    public static void cutsceneState(C2SCutsceneEnter packet, IPayloadContext context) {
+    public static void cutsceneState(BiCutsceneEnter packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ServerPacketHandler.cutsceneState(packet, context.player());
         });
@@ -117,5 +119,13 @@ public class ServerPacketHandlerNeoForge {
 
     public static void inkActionFinished(C2SInkActionFinished packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.inkActionFinished(packet, context.player()));
+    }
+
+    public static void dialogueFinished(C2SDialogueFinished packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.dialogueFinished(packet, context.player()));
+    }
+
+    public static void choiceSelected(C2SChoiceSelected packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.choiceSelected(packet, context.player()));
     }
 }

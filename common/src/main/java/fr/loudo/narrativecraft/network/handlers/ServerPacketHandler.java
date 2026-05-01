@@ -37,12 +37,11 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
-import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
@@ -51,6 +50,8 @@ import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -76,7 +77,7 @@ public class ServerPacketHandler {
         }
     }
 
-    public static void cutsceneState(C2SCutsceneEnter packet, Player player) {
+    public static void cutsceneState(BiCutsceneEnter packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
@@ -86,16 +87,10 @@ public class ServerPacketHandler {
         Cutscene cutscene = scene.getCutsceneManager().getById(packet.getCutsceneId());
         if (cutscene == null) return;
 
-        CutsceneMakerEditorMaker editor = new CutsceneMakerEditorMaker(cutscene, session);
+        CutsceneMakerEditorMaker editor = new CutsceneMakerEditorMaker(cutscene, session, packet.getEnvironment());
         session.setEditor(editor);
         editor.init();
         editor.start();
-
-        if (cutscene.getEditorLayers() != null && !cutscene.getEditorLayers().isEmpty()) {
-            String layersJson = CutsceneSerializer.serializeLayers(cutscene.getEditorLayers());
-            Services.PACKET.sendToPlayer(
-                    (ServerPlayer) player, new S2CCutsceneEditorData(cutscene.getId(), layersJson));
-        }
     }
 
     public static void cutsceneControl(C2SCutsceneControl packet, Player player) {
@@ -289,9 +284,27 @@ public class ServerPacketHandler {
     public static void inkActionFinished(C2SInkActionFinished packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
-        InkTagHandler handler = session.getInkTagHandler();
-        if (handler != null) {
-            handler.onClientActionFinished(packet.instanceId());
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler != null) {
+            storyHandler.getInkTagHandler().onClientActionFinished(packet.instanceId());
+        }
+    }
+
+    public static void dialogueFinished(C2SDialogueFinished packet, Player player) {
+        PlayerSession session =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler != null) {
+            storyHandler.onDialogueAck();
+        }
+    }
+
+    public static void choiceSelected(C2SChoiceSelected packet, Player player) {
+        PlayerSession session =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler != null) {
+            storyHandler.onChoiceSelected(packet.index());
         }
     }
 

@@ -31,12 +31,16 @@ import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
+import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.S2CShowChoices;
+import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
@@ -103,6 +107,10 @@ public class ClientPacketHandlerNeoForge {
         });
     }
 
+    public static void enterCameraView(S2CEnterCameraView packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.enterCameraView(packet));
+    }
+
     public static void loadInteractionEditorData(S2CInteractionEditorData packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.loadInteractionEditorData(packet));
     }
@@ -113,5 +121,17 @@ public class ClientPacketHandlerNeoForge {
 
     public static void stopAllInkActions(S2CStopAllInkActions packet, IPayloadContext context) {
         context.enqueueWork(ClientPacketHandler::stopAllInkActions);
+    }
+
+    public static void showDialogue(S2CShowDialogue packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.showDialogue(packet));
+    }
+
+    public static void showChoices(S2CShowChoices packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.showChoices(packet));
+    }
+
+    public static void cutsceneState(BiCutsceneEnter packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.cutsceneState(packet));
     }
 }

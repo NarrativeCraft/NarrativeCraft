@@ -29,10 +29,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-/**
- * Sent from server to client to stop all running client-side Ink actions immediately.
- * Triggered when the story ends, the scene changes, or the player logs out.
- */
 public record S2CStopAllInkActions() implements CustomPacketPayload {
 
     public static final Type<S2CStopAllInkActions> TYPE =

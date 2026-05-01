@@ -30,11 +30,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-/**
- * Sent from client to server when a blocking {@link fr.loudo.narrativecraft.api.inkAction.Side#CLIENT}
- * action finishes. The server uses the {@code instanceId} to release the corresponding
- * stub that was pausing the tag queue.
- */
 public record C2SInkActionFinished(long instanceId) implements CustomPacketPayload {
 
     public static final Type<C2SInkActionFinished> TYPE =

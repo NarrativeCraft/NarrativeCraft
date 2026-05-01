@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.editors.interaction;
 
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
@@ -55,6 +56,11 @@ public class InteractionMakerEditorMaker implements EditorMaker {
         Vec3 position = resolveOrigin();
         if (position == null) return;
         player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
+    }
+
+    @Override
+    public NarrativeEnvironment getEnvironment() {
+        return NarrativeEnvironment.DEVELOPMENT;
     }
 
     private Vec3 resolveOrigin() {

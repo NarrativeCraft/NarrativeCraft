@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft;
 
-import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.api.APISetup;
 import fr.loudo.narrativecraft.dialog.DialogPresetManager;
 import fr.loudo.narrativecraft.dialog.effects.TextEffectRegister;
@@ -68,7 +67,7 @@ public class NarrativeCraftMod {
     private final DialogPresetManager dialogPresetManager = new DialogPresetManager();
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
     private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
-    private Story story;
+    private String compiledStoryJson;
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
 
@@ -137,12 +136,12 @@ public class NarrativeCraftMod {
         return inkTagDispatcher;
     }
 
-    public Story getStory() {
-        return story;
+    public String getCompiledStoryJson() {
+        return compiledStoryJson;
     }
 
-    public void setStory(Story story) {
-        this.story = story;
+    public void setCompiledStoryJson(String compiledStoryJson) {
+        this.compiledStoryJson = compiledStoryJson;
     }
 
     public void setServer(MinecraftServer server) {

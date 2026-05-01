@@ -23,11 +23,12 @@
 
 package fr.loudo.narrativecraft.narrative.chapter;
 
+import fr.loudo.narrativecraft.api.narrative.chapter.IChapter;
 import fr.loudo.narrativecraft.managers.SceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.UUID;
 
-public class Chapter extends NarrativeEntry<ChapterPayload> {
+public class Chapter extends NarrativeEntry<ChapterPayload> implements IChapter {
 
     private int chapterIndex;
     private final SceneManager sceneManager = new SceneManager();

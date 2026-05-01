@@ -21,16 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.narrative.scene;
+package fr.loudo.narrativecraft.api.narrative.chapter;
 
-import fr.loudo.narrativecraft.api.narrative.chapter.IChapter;
 import java.util.UUID;
 
-public interface IScene {
-
+public interface IChapter {
     UUID getId();
-
-    IChapter getChapter();
 
     String getName();
 }

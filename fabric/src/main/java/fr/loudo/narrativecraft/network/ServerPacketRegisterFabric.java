@@ -29,19 +29,21 @@ import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
+import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class ServerPacketRegisterFabric {
 
     public static void register() {
-        PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneEnter.TYPE, C2SCutsceneEnter.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BiCutsceneEnter.TYPE, BiCutsceneEnter.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneControl.TYPE, C2SCutsceneControl.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneSave.TYPE, C2SCutsceneSave.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay()
@@ -58,5 +60,7 @@ public class ServerPacketRegisterFabric {
         PayloadTypeRegistry.serverboundPlay().register(C2SInteractionEnter.TYPE, C2SInteractionEnter.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SInteractionSave.TYPE, C2SInteractionSave.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SInkActionFinished.TYPE, C2SInkActionFinished.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SDialogueFinished.TYPE, C2SDialogueFinished.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SChoiceSelected.TYPE, C2SChoiceSelected.STREAM_CODEC);
     }
 }

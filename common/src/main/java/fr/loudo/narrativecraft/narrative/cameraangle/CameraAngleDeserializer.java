@@ -99,7 +99,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
         }
     }
 
-    private static CameraView deserializeCamera(JsonObject json) {
+    public static CameraView deserializeCamera(JsonObject json) {
         if (!json.has("name") || !json.has("x")) return null;
 
         String name = json.get("name").getAsString();
@@ -131,7 +131,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
         return new CameraViewDialogSetup(id, characterPlacementId, dialogData);
     }
 
-    static DialogData deserializeDialogData(JsonObject json) {
+    public static DialogData deserializeDialogData(JsonObject json) {
         DialogData data = new DialogData();
         if (json.has("offsetX")) data.setOffsetX(json.get("offsetX").getAsFloat());
         if (json.has("offsetY")) data.setOffsetY(json.get("offsetY").getAsFloat());

@@ -31,12 +31,16 @@ import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
+import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.S2CShowChoices;
+import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
@@ -44,6 +48,9 @@ public class ClientPacketHandlerFabric {
     public static void handle() {
         ClientPlayNetworking.registerGlobalReceiver(BiSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
             ClientPacketHandler.narrativeEntry(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(BiCutsceneEnter.TYPE, (packet, context) -> {
+            ClientPacketHandler.cutsceneState(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CNarrativeDataClear.TYPE, (packet, context) -> {
             ClientPacketHandler.clearNarrativeData();
@@ -75,6 +82,9 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CCameraAnglePlacementEntitySpawned.TYPE, (packet, context) -> {
             ClientPacketHandler.onPlacementEntitySpawned(packet);
         });
+        ClientPlayNetworking.registerGlobalReceiver(S2CEnterCameraView.TYPE, (packet, context) -> {
+            ClientPacketHandler.enterCameraView(packet);
+        });
         ClientPlayNetworking.registerGlobalReceiver(S2CInteractionEditorData.TYPE, (packet, context) -> {
             ClientPacketHandler.loadInteractionEditorData(packet);
         });
@@ -83,6 +93,12 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CStopAllInkActions.TYPE, (packet, context) -> {
             ClientPacketHandler.stopAllInkActions();
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CShowDialogue.TYPE, (packet, context) -> {
+            ClientPacketHandler.showDialogue(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CShowChoices.TYPE, (packet, context) -> {
+            ClientPacketHandler.showChoices(packet);
         });
     }
 }

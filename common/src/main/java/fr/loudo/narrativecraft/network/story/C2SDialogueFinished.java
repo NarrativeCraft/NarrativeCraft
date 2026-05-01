@@ -21,34 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.managers.PlayerSessionManager;
-import fr.loudo.narrativecraft.managers.RecordingManager;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.recording.Recording;
-import fr.loudo.narrativecraft.session.PlayerSession;
-import net.minecraft.server.level.ServerPlayer;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class OnPlayerLeaveEvent {
+public record C2SDialogueFinished() implements CustomPacketPayload {
 
-    public static void onPlayerLeave(ServerPlayer player) {
-        PlayerSessionManager playerSessionManager =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager();
-        PlayerSession playerSession = playerSessionManager.getByPlayer(player);
+    public static final Type<C2SDialogueFinished> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialogue_finished"));
 
-        StoryHandler storyHandler = playerSession.getStoryHandler();
-        if (storyHandler != null) {
-            storyHandler.stop();
-            playerSession.setStoryHandler(null);
-        }
+    public static final StreamCodec<ByteBuf, C2SDialogueFinished> STREAM_CODEC =
+            StreamCodec.unit(new C2SDialogueFinished());
 
-        playerSessionManager.remove(playerSession);
-
-        RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        recordingManager.remove(recording);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

@@ -23,20 +23,23 @@
 
 package fr.loudo.narrativecraft.commands;
 
-import com.bladecoder.ink.runtime.Story;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
-
-import java.util.List;
 
 public class StoryCommand {
 
@@ -46,17 +49,28 @@ public class StoryCommand {
                         .then(Commands.literal("reload")
                                 .requires(commandSourceStack ->
                                         commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
-                                .executes(StoryCommand::reload))));
+                                .executes(StoryCommand::reload))
+                        .then(Commands.literal("play")
+                                .requires(commandSourceStack ->
+                                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                                .executes(ctx -> {
+                                    ServerPlayer player = ctx.getSource().getPlayerOrException();
+                                    return playFor(ctx, player);
+                                })
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(ctx -> {
+                                            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+                                            return playFor(ctx, target);
+                                        })))));
     }
 
     private static int reload(CommandContext<CommandSourceStack> context) {
-
         context.getSource()
                 .sendSystemMessage(Translation.message("story.compiling").withStyle(ChatFormatting.YELLOW));
 
-        Story story;
+        String compiledJson;
         try {
-            story = StoryCompilerHandler.compile();
+            compiledJson = StoryCompilerHandler.compileToJson();
         } catch (Exception e) {
             context.getSource().sendSystemMessage(Component.empty());
             NarrativeCraftMod.LOGGER.error("Failed to compile story", e);
@@ -75,14 +89,50 @@ public class StoryCommand {
                                     Component.literal(String.valueOf(tagErrors.size()))
                                             .withStyle(ChatFormatting.GOLD))
                             .withStyle(ChatFormatting.RED));
-
             return 0;
         }
 
-        NarrativeCraftMod.getInstance().setStory(story);
+        NarrativeCraftMod.getInstance().setCompiledStoryJson(compiledJson);
         context.getSource()
                 .sendSuccess(() -> Translation.message("story.compiled").withStyle(ChatFormatting.GREEN), false);
 
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int playFor(CommandContext<CommandSourceStack> context, ServerPlayer target) {
+        String compiledJson = NarrativeCraftMod.getInstance().getCompiledStoryJson();
+        if (compiledJson == null) {
+            context.getSource()
+                    .sendFailure(Component.literal("Story not compiled. Run /nc story reload first.")
+                            .withStyle(ChatFormatting.RED));
+            return 0;
+        }
+
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession session = sessionManager.getByPlayer(target);
+
+        StoryHandler existing = session.getStoryHandler();
+        if (existing != null) {
+            existing.stop();
+        }
+
+        try {
+            StoryHandler storyHandler = new StoryHandler(session, compiledJson);
+            session.setStoryHandler(storyHandler);
+            storyHandler.start();
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Failed to start story for player {}", target.getName().getString(), e);
+            context.getSource().sendFailure(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
+            return 0;
+        }
+
+        context.getSource()
+                .sendSuccess(
+                        () -> Component.literal(
+                                        "Story started for " + target.getName().getString())
+                                .withStyle(ChatFormatting.GREEN),
+                        false);
         return Command.SINGLE_SUCCESS;
     }
 }

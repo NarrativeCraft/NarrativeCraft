@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.ModKeys;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.network.cameraangle.*;
@@ -159,6 +160,11 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     @Override
     public void teleportToEditorOrigin() {}
+
+    @Override
+    public NarrativeEnvironment getEnvironment() {
+        return NarrativeEnvironment.DEVELOPMENT;
+    }
 
     public void loadData(String json) {
         CameraAngleDeserializer.deserializeInto(json, cameraAngle);

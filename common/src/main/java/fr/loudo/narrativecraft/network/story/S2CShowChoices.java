@@ -21,34 +21,26 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.managers.PlayerSessionManager;
-import fr.loudo.narrativecraft.managers.RecordingManager;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.recording.Recording;
-import fr.loudo.narrativecraft.session.PlayerSession;
-import net.minecraft.server.level.ServerPlayer;
+import io.netty.buffer.ByteBuf;
+import java.util.List;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class OnPlayerLeaveEvent {
+public record S2CShowChoices(List<String> texts) implements CustomPacketPayload {
 
-    public static void onPlayerLeave(ServerPlayer player) {
-        PlayerSessionManager playerSessionManager =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager();
-        PlayerSession playerSession = playerSessionManager.getByPlayer(player);
+    public static final Type<S2CShowChoices> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "show_choices"));
 
-        StoryHandler storyHandler = playerSession.getStoryHandler();
-        if (storyHandler != null) {
-            storyHandler.stop();
-            playerSession.setStoryHandler(null);
-        }
+    public static final StreamCodec<ByteBuf, S2CShowChoices> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()), S2CShowChoices::texts, S2CShowChoices::new);
 
-        playerSessionManager.remove(playerSession);
-
-        RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        recordingManager.remove(recording);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

@@ -21,16 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.narrative.scene;
+package fr.loudo.narrativecraft.narrative;
 
-import fr.loudo.narrativecraft.api.narrative.chapter.IChapter;
-import java.util.UUID;
-
-public interface IScene {
-
-    UUID getId();
-
-    IChapter getChapter();
-
-    String getName();
+public enum NarrativeEnvironment {
+    PRODUCTION,
+    DEVELOPMENT
 }

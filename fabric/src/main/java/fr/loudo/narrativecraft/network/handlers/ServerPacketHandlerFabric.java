@@ -30,13 +30,15 @@ import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
+import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 public class ServerPacketHandlerFabric {
@@ -45,7 +47,7 @@ public class ServerPacketHandlerFabric {
         ServerPlayNetworking.registerGlobalReceiver(BiSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
             ServerPacketHandler.narrativeEntry(packet, context.player());
         });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCutsceneEnter.TYPE, (packet, context) -> {
+        ServerPlayNetworking.registerGlobalReceiver(BiCutsceneEnter.TYPE, (packet, context) -> {
             ServerPacketHandler.cutsceneState(packet, context.player());
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SCutsceneControl.TYPE, (packet, context) -> {
@@ -83,6 +85,12 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SInkActionFinished.TYPE, (packet, context) -> {
             ServerPacketHandler.inkActionFinished(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SDialogueFinished.TYPE, (packet, context) -> {
+            ServerPacketHandler.dialogueFinished(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SChoiceSelected.TYPE, (packet, context) -> {
+            ServerPacketHandler.choiceSelected(packet, context.player());
         });
     }
 }

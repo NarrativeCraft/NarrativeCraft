@@ -42,6 +42,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
  */
 public abstract class InkAction {
 
+    public static final String NOT_EXISTS_KEY = "story.validation_error.not_exists";
+
     /** Unique id assigned by the dispatcher before the action enters the queue. */
     protected long instanceId;
 
@@ -57,22 +59,14 @@ public abstract class InkAction {
     protected int tick;
     protected int totalTick;
 
-    /** Called every server or client tick while the action is running. */
     public void tick() {}
 
-    /** Called every frame on the rendering thread. */
     public void partialTick(float partialTick) {}
 
-    /** Called by the rendering pipeline (2D HUD). */
     public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {}
 
-    /** Called by the rendering pipeline (3D world). */
     public void render(PoseStack poseStack, float partialTick) {}
 
-    /**
-     * Called when the story or scene is forcefully stopped.
-     * Override to release resources and ensure {@code isRunning} is set to {@code false}.
-     */
     public void stop() {
         isRunning = false;
     }

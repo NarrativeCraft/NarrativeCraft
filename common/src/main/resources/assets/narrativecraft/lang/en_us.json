@@ -126,5 +126,7 @@
   "narrativecraft.story.no_main_file": "main.ink does not exists!",
   "narrativecraft.story.compiling": "Compiling...",
   "narrativecraft.story.compiled": "Your story has compiled successfully!",
-  "narrativecraft.story.error_compilation": "The compilation returned %s errors."
+  "narrativecraft.story.error_compilation": "The compilation returned %s errors.",
+
+  "narrativecraft.story.validation_error.not_exists": "%s %s does not exists in this scene."
 }

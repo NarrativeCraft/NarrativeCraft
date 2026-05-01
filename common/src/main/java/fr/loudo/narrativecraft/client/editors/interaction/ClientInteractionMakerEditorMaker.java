@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.screens.narrative.interaction.InteractionP
 import fr.loudo.narrativecraft.client.screens.narrative.interaction.InteractionZoneListScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
@@ -111,6 +112,11 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
 
     @Override
     public void teleportToEditorOrigin() {}
+
+    @Override
+    public NarrativeEnvironment getEnvironment() {
+        return NarrativeEnvironment.DEVELOPMENT;
+    }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         int[] mousePos = UtilsClient.getScaledMousePos();

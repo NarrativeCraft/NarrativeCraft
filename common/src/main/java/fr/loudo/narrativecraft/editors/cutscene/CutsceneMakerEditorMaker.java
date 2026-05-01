@@ -27,10 +27,13 @@ import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
+import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -50,10 +53,17 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     private int totalTick;
     private int currentTick;
     private boolean playing;
+    private NarrativeEnvironment environment;
 
     public CutsceneMakerEditorMaker(Cutscene cutscene, PlayerSession playerSession) {
         this.cutscene = cutscene;
         this.playerSession = playerSession;
+        this.environment = NarrativeEnvironment.DEVELOPMENT;
+    }
+
+    public CutsceneMakerEditorMaker(Cutscene cutscene, PlayerSession playerSession, NarrativeEnvironment environment) {
+        this(cutscene, playerSession);
+        this.environment = environment;
     }
 
     public void tick() {
@@ -82,6 +92,12 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         playerSession.changeGameMode(GameType.SPECTATOR);
         totalTick = cutscene.getMaxTick();
         teleportToEditorOrigin();
+
+        if (cutscene.getEditorLayers() != null && !cutscene.getEditorLayers().isEmpty()) {
+            String layersJson = CutsceneSerializer.serializeLayers(cutscene.getEditorLayers());
+            Services.PACKET.sendToPlayer(
+                    playerSession.getPlayer(), new S2CCutsceneEditorData(cutscene.getId(), layersJson));
+        }
     }
 
     public void teleportToEditorOrigin() {
@@ -105,6 +121,11 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         if (position != null) {
             player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
         }
+    }
+
+    @Override
+    public NarrativeEnvironment getEnvironment() {
+        return environment;
     }
 
     public void start() {
@@ -148,6 +169,10 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         for (Playback playback : playbacks) {
             playback.play();
         }
+    }
+
+    public boolean isFinished() {
+        return currentTick >= totalTick;
     }
 
     public void pause() {

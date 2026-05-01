@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.mixin;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.screens.ClearScreen;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.Screen;
@@ -47,7 +48,7 @@ public abstract class MinecraftMixin {
         if (chatMethod != ChatComponent.ChatMethod.MESSAGE) return;
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker == null) return;
+        if (editorMaker == null || editorMaker.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;
 
         ClearScreen screen = new ClearScreen();
         setScreen(screen);

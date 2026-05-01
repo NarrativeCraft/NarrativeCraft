@@ -21,34 +21,38 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.managers.PlayerSessionManager;
-import fr.loudo.narrativecraft.managers.RecordingManager;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.recording.Recording;
-import fr.loudo.narrativecraft.session.PlayerSession;
-import net.minecraft.server.level.ServerPlayer;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class OnPlayerLeaveEvent {
+public record S2CShowDialogue(String speaker, String text, float autoSkipSeconds, int entityId, String dialogDataJson)
+        implements CustomPacketPayload {
 
-    public static void onPlayerLeave(ServerPlayer player) {
-        PlayerSessionManager playerSessionManager =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager();
-        PlayerSession playerSession = playerSessionManager.getByPlayer(player);
+    public static final int NO_ENTITY = -1;
 
-        StoryHandler storyHandler = playerSession.getStoryHandler();
-        if (storyHandler != null) {
-            storyHandler.stop();
-            playerSession.setStoryHandler(null);
-        }
+    public static final Type<S2CShowDialogue> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "show_dialogue"));
 
-        playerSessionManager.remove(playerSession);
+    public static final StreamCodec<ByteBuf, S2CShowDialogue> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8,
+            S2CShowDialogue::speaker,
+            ByteBufCodecs.STRING_UTF8,
+            S2CShowDialogue::text,
+            ByteBufCodecs.FLOAT,
+            S2CShowDialogue::autoSkipSeconds,
+            ByteBufCodecs.INT,
+            S2CShowDialogue::entityId,
+            ByteBufCodecs.STRING_UTF8,
+            S2CShowDialogue::dialogDataJson,
+            S2CShowDialogue::new);
 
-        RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        recordingManager.remove(recording);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

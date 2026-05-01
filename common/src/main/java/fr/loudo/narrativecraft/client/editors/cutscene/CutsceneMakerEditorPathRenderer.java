@@ -28,6 +28,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -44,7 +45,7 @@ public class CutsceneMakerEditorPathRenderer {
         Minecraft mc = Minecraft.getInstance();
         ClientCutsceneMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
-        if (editor == null) return;
+        if (editor == null || editor.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;
 
         if (editor.getPlayback().isPlaying()) return;
         Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();

@@ -30,16 +30,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-/**
- * Sent from server to client to execute an {@link fr.loudo.narrativecraft.api.inkAction.InkAction}
- * with {@link fr.loudo.narrativecraft.api.inkAction.Side#CLIENT}.
- *
- * <p>The {@code parsedArgsJson} field carries a serialised {@link fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand}
- * (see {@code ParsedCommand.toJson()}) so the client does not need to re-parse the syntax.
- *
- * <p>If {@code blocking} is {@code true}, the client must send back a
- * {@link C2SInkActionFinished} when the action completes.
- */
 public record S2CRunInkAction(long instanceId, String keyword, String parsedArgsJson, boolean blocking)
         implements CustomPacketPayload {
 

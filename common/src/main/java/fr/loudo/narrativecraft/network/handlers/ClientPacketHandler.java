@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
@@ -32,12 +34,16 @@ import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
@@ -45,15 +51,25 @@ import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
+import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.S2CShowChoices;
+import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundChangeGameModePacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.GameType;
 
 public class ClientPacketHandler {
 
@@ -65,6 +81,22 @@ public class ClientPacketHandler {
             case EDIT -> ClientNarrativeEntryEditorRegistry.getInstance().edit(packet.entryId(), packet.entry());
             case DELETE -> ClientNarrativeEntryEditorRegistry.getInstance().delete(packet.entryId(), packet.entry());
         }
+    }
+
+    public static void cutsceneState(BiCutsceneEnter packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        Chapter chapter =
+                ClientNarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
+        if (scene == null) return;
+        Cutscene cutscene = scene.getCutsceneManager().getById(packet.getCutsceneId());
+        if (cutscene == null) return;
+
+        ClientCutsceneMakerEditorMaker cutsceneEditor =
+                new ClientCutsceneMakerEditorMaker(cutscene, packet.getEnvironment());
+        cutsceneEditor.init();
+        session.setEditor(cutsceneEditor);
     }
 
     public static void clearNarrativeData() {
@@ -187,11 +219,98 @@ public class ClientPacketHandler {
             return;
         }
 
-        action.execute(null); // PlayerSession is null on client, actions must not use it
+        action.execute(session);
         session.addClientInkAction(action);
     }
 
     public static void stopAllInkActions() {
         ClientNarrativeCraftMod.getInstance().getPlayerSession().stopAllClientInkActions();
+    }
+
+    public static void enterCameraView(S2CEnterCameraView packet) {
+        if (MINECRAFT.player == null) return;
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+
+        JsonObject json = JsonParser.parseString(packet.cameraViewJson()).getAsJsonObject();
+        CameraView cameraView = CameraAngleDeserializer.deserializeCamera(json);
+        if (cameraView == null) return;
+
+        LocalPlayer player = MINECRAFT.player;
+        player.connection.send(new ServerboundChangeGameModePacket(GameType.SPECTATOR));
+        session.setNarrativeCameraView(cameraView);
+        player.setPos(cameraView.getPosition().subtract(0, player.getEyeHeight(), 0));
+        player.setXRot((float) cameraView.getRotation().x);
+        player.setYRot((float) cameraView.getRotation().y);
+        player.setYHeadRot((float) cameraView.getRotation().y);
+        player.connection.send(new ServerboundMovePlayerPacket.PosRot(
+                cameraView.getPosition(),
+                (float) cameraView.getRotation().x,
+                (float) cameraView.getRotation().y,
+                player.onGround(),
+                false));
+    }
+
+    public static void showDialogue(S2CShowDialogue packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+
+        DialogData resolvedData = resolveDialogData(packet.dialogDataJson());
+
+        if (packet.entityId() != S2CShowDialogue.NO_ENTITY && MINECRAFT.level != null) {
+            Entity entity = MINECRAFT.level.getEntity(packet.entityId());
+            if (entity != null) {
+                DialogData data = resolvedData != null ? resolvedData : defaultDialogData3D();
+                DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
+                renderer.onStopped(() -> {
+                    session.removeDialog3D(renderer);
+                    Services.PACKET.sendToServer(new C2SDialogueFinished());
+                });
+                if (packet.autoSkipSeconds() > 0f) {
+                    renderer.autoSkipAt(packet.autoSkipSeconds());
+                }
+                renderer.start(packet.text());
+                session.addDialog3D(renderer);
+                return;
+            }
+        }
+
+        DialogData data = resolvedData != null ? resolvedData : defaultDialogData2D();
+        DialogRenderer2D renderer = new DialogRenderer2D(data);
+        renderer.onStopped(() -> {
+            session.removeDialog2D(renderer);
+            Services.PACKET.sendToServer(new C2SDialogueFinished());
+        });
+        if (packet.autoSkipSeconds() > 0f) {
+            renderer.autoSkipAt(packet.autoSkipSeconds());
+        }
+        renderer.start(packet.text());
+        session.addDialog2D(renderer);
+    }
+
+    private static DialogData resolveDialogData(String dialogDataJson) {
+        if (dialogDataJson == null || dialogDataJson.isEmpty()) return null;
+        try {
+            JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
+            return CameraAngleDeserializer.deserializeDialogData(json);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static DialogData defaultDialogData3D() {
+        DialogData data = new DialogData();
+        data.setPaddingY(7);
+        data.setPaddingX(5);
+        return data;
+    }
+
+    private static DialogData defaultDialogData2D() {
+        DialogData data = new DialogData();
+        data.setScale(2f);
+        data.setWidth(200f);
+        return data;
+    }
+
+    public static void showChoices(S2CShowChoices packet) {
+        MINECRAFT.setScreen(new ChoiceScreen(packet.texts()));
     }
 }

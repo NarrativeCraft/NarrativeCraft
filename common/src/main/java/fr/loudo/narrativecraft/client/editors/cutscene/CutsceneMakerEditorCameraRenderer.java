@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.client.editors.rendering.CameraWireframeRenderer;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -43,7 +44,7 @@ public class CutsceneMakerEditorCameraRenderer {
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         if (editor == null) return;
 
-        if (editor.getPlayback().isPlaying()) return;
+        if (editor.getPlayback().isPlaying() || editor.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;
         Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
         VertexConsumer vertexConsumer = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
         Matrix4f matrix4f = poseStack.last().pose();

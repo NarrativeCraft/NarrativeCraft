@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -30,24 +31,77 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogPresetManager;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
+import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import java.util.UUID;
 
 @InkCommand(
         keyword = "camera",
         description = "Transitions the camera to a pre-configured angle defined in the scene editor.",
         syntax = "camera <parentName:string> <childName:string>",
-        side = Side.CLIENT)
+        side = Side.SERVER)
 public class CameraAngleInkAction extends InkAction {
+
+    private CameraAngle cameraAngle;
+    private CameraView cameraView;
 
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        // TODO: resolve CameraAngle and keyframe from scene.getCameraAngleManager()
+        String parentName = cmd.getString("parentName");
+        String childName = cmd.getString("childName");
+
+        Scene concreteScene = (Scene) scene;
+        cameraAngle = concreteScene.getCameraAngleManager().getByName(parentName);
+        if (cameraAngle == null) {
+            return InkActionResult.error(NOT_EXISTS_KEY);
+        }
+        cameraView = cameraAngle.getCameraByName(childName);
+        if (cameraView == null) {
+            return InkActionResult.error(NOT_EXISTS_KEY);
+        }
         return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: start CameraAngleController session when available
+        PlayerSession session = (PlayerSession) playerSession;
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler != null) {
+            registerDialogData(storyHandler);
+        }
+        String cameraViewJson =
+                CameraAngleSerializer.serializeCamera(cameraView).toString();
+        Services.PACKET.sendToPlayer(session.getPlayer(), new S2CEnterCameraView(cameraViewJson));
         isRunning = false;
-        return InkActionResult.ignored();
+        return InkActionResult.ok();
+    }
+
+    private void registerDialogData(StoryHandler storyHandler) {
+        DialogPresetManager presetManager = NarrativeCraftMod.getInstance().getDialogPresetManager();
+        for (CameraViewDialogSetup setup : cameraView.getDialogSetups()) {
+            CharacterPlacement placement = findPlacementById(setup.getCharacterPlacementId());
+            if (placement == null) continue;
+            if (!(placement.getCharacterStory() instanceof CharacterStory character)) continue;
+            DialogData resolved = presetManager.resolve(character.getDialogPresetName(), setup.getDialogData());
+            storyHandler.registerDialogDataForCharacter(character, resolved);
+        }
+    }
+
+    private CharacterPlacement findPlacementById(UUID placementId) {
+        for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
+            if (placement.getId().equals(placementId)) return placement;
+        }
+        return null;
     }
 }

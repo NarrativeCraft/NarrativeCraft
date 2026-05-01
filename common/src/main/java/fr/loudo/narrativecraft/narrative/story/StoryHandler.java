@@ -23,17 +23,222 @@
 
 package fr.loudo.narrativecraft.narrative.story;
 
+import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.network.S2CPlayerSession;
+import fr.loudo.narrativecraft.network.story.S2CShowChoices;
+import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
+import net.minecraft.world.entity.Entity;
 
-public class StoryHandler {
+public final class StoryHandler implements InkTagHandler.Lifecycle {
 
+    private static final Pattern SPEAKER_PATTERN = Pattern.compile("^(\\w+)\\s*:\\s*(.+)$", Pattern.DOTALL);
+
+    private final PlayerSession playerSession;
     private final Story story;
+    private final InkTagHandler inkTagHandler;
+    private final Map<String, List<Entity>> characterEntities = new HashMap<>();
+    private final Map<String, DialogData> characterDialogData = new HashMap<>();
 
-    public StoryHandler(Story story) {
-        this.story = story;
+    @Nullable
+    private String pendingDialogueText;
+
+    private boolean ended = false;
+
+    public StoryHandler(PlayerSession playerSession, String compiledStoryJson) throws Exception {
+        this.playerSession = playerSession;
+        this.story = new Story(compiledStoryJson);
+        this.inkTagHandler = new InkTagHandler(playerSession, this);
+    }
+
+    public void start() throws Exception {
+        Chapter firstChapter =
+                NarrativeCraftMod.getInstance().getChapterManager().get(0);
+        Scene firstScene = firstChapter.getSceneManager().get(0);
+        playerSession.setChapter(firstChapter);
+        playerSession.setScene(firstScene);
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(), new S2CPlayerSession(firstChapter.getId(), firstScene.getId()));
+        advance();
+    }
+
+    public void start(String knotPath) throws Exception {
+        story.choosePathString(knotPath);
+        advance();
+    }
+
+    public void tick() {
+        inkTagHandler.tick();
+    }
+
+    public void stop() {
+        ended = true;
+        pendingDialogueText = null;
+        inkTagHandler.stopAll();
+    }
+
+    public void onChoiceSelected(int index) {
+        if (ended) return;
+        try {
+            story.chooseChoiceIndex(index);
+            advance();
+        } catch (Exception exception) {
+            onError(new InkTagHandlerException(exception.getMessage()));
+        }
+    }
+
+    public void onDialogueAck() {
+        if (!ended) advance();
+    }
+
+    @Override
+    public void onTagsDrained() {
+        if (pendingDialogueText != null) {
+            String text = pendingDialogueText;
+            pendingDialogueText = null;
+            sendDialogue(text);
+            return;
+        }
+        advance();
+    }
+
+    @Override
+    public void onError(InkTagHandlerException exception) {
+        NarrativeCraftMod.LOGGER.error(
+                "Story error for player {}: {}",
+                playerSession.getPlayer().getName().getString(),
+                exception);
+        stop();
     }
 
     public Story getStory() {
         return story;
+    }
+
+    public InkTagHandler getInkTagHandler() {
+        return inkTagHandler;
+    }
+
+    public PlayerSession getPlayerSession() {
+        return playerSession;
+    }
+
+    public boolean isEnded() {
+        return ended;
+    }
+
+    private void advance() {
+        if (ended) return;
+        try {
+            while (story.canContinue()) {
+                String text = story.Continue().stripTrailing();
+                List<String> tags = story.getCurrentTags();
+
+                if (!tags.isEmpty()) {
+                    if (!text.isEmpty()) {
+                        pendingDialogueText = text;
+                    }
+                    inkTagHandler.enqueue(tags);
+                    return;
+                }
+
+                if (!text.isEmpty()) {
+                    sendDialogue(text);
+                    return;
+                }
+            }
+
+            List<Choice> choices = story.getCurrentChoices();
+            if (!choices.isEmpty()) {
+                sendChoices(choices);
+                return;
+            }
+
+            finish();
+        } catch (Exception exception) {
+            onError(new InkTagHandlerException(exception.getMessage()));
+        }
+    }
+
+    private void sendDialogue(String text) {
+        String[] parts = parseSpeaker(text);
+        String speaker = parts[0];
+        String dialogueText = parts[1];
+        int entityId = S2CShowDialogue.NO_ENTITY;
+        if (!speaker.isEmpty()) {
+            List<Entity> entities = characterEntities.get(speaker.toLowerCase());
+            if (entities != null && !entities.isEmpty()) {
+                entityId = entities.get(0).getId();
+            }
+        }
+        DialogData dialogData = characterDialogData.get(speaker.toLowerCase());
+        String dialogDataJson = dialogData != null
+                ? CameraAngleSerializer.serializeDialogData(dialogData).toString()
+                : "";
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(),
+                new S2CShowDialogue(speaker.toLowerCase(), dialogueText, 0f, entityId, dialogDataJson));
+    }
+
+    public void registerEntity(CharacterStory characterStory, Entity entity) {
+        characterEntities
+                .computeIfAbsent(characterStory.getName().toLowerCase(), k -> new ArrayList<>())
+                .add(entity);
+    }
+
+    public void unregisterEntity(CharacterStory characterStory, Entity entity) {
+        List<Entity> entities = characterEntities.get(characterStory.getName().toLowerCase());
+        if (entities != null) {
+            entities.remove(entity);
+        }
+    }
+
+    public void registerDialogDataForCharacter(CharacterStory characterStory, DialogData data) {
+        characterDialogData.putIfAbsent(characterStory.getName(), data);
+    }
+
+    public void unregisterDialogDataForCharacter(CharacterStory characterStory) {
+        characterDialogData.remove(characterStory.getName());
+    }
+
+    private void sendChoices(List<Choice> choices) {
+        List<String> texts = choices.stream().map(Choice::getText).toList();
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CShowChoices(texts));
+    }
+
+    private void finish() {
+        ended = true;
+        NarrativeCraftMod.LOGGER.info(
+                "Story finished for player {}.",
+                playerSession.getPlayer().getName().getString());
+    }
+
+    private static String[] parseSpeaker(String text) {
+        Matcher matcher = SPEAKER_PATTERN.matcher(text.trim());
+        if (matcher.matches()) {
+            return new String[] {matcher.group(1), matcher.group(2).trim()};
+        }
+        return new String[] {"", text};
+    }
+
+    public Map<String, List<Entity>> getCharacterEntities() {
+        return characterEntities;
     }
 }

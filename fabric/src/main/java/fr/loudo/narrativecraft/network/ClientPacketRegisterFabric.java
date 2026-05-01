@@ -26,12 +26,15 @@ package fr.loudo.narrativecraft.network;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
+import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.S2CShowChoices;
+import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class ClientPacketRegisterFabric {
@@ -51,9 +54,12 @@ public class ClientPacketRegisterFabric {
                 .register(S2CCameraAngleCharacterCaptured.TYPE, S2CCameraAngleCharacterCaptured.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CCameraAnglePlacementEntitySpawned.TYPE, S2CCameraAnglePlacementEntitySpawned.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CEnterCameraView.TYPE, S2CEnterCameraView.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CInteractionEditorData.TYPE, S2CInteractionEditorData.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CRunInkAction.TYPE, S2CRunInkAction.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CStopAllInkActions.TYPE, S2CStopAllInkActions.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CShowDialogue.TYPE, S2CShowDialogue.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC);
     }
 }

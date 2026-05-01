@@ -112,6 +112,8 @@ public class InkFileGenerator {
         }
 
         StringBuilder sb = new StringBuilder();
+        sb.append("INCLUDE ").append(NarrativeCraftFileInit.VARS_INK_NAME).append("\n");
+        sb.append("INCLUDE ").append(NarrativeCraftFileInit.FUNCTIONS_INK_NAME).append("\n");
         for (String include : includes) {
             sb.append("INCLUDE ").append(include).append("\n");
         }

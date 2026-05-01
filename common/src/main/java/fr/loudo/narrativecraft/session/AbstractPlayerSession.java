@@ -23,11 +23,13 @@
 
 package fr.loudo.narrativecraft.session;
 
+import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import net.minecraft.server.level.ServerPlayer;
 
-public class AbstractPlayerSession {
+public class AbstractPlayerSession implements IPlayerSession {
 
     private Chapter chapter;
     private Scene scene;
@@ -74,5 +76,10 @@ public class AbstractPlayerSession {
 
     public void setEditor(EditorMaker editorMaker) {
         this.editorMaker = editorMaker;
+    }
+
+    @Override
+    public ServerPlayer getPlayer() {
+        return null;
     }
 }
