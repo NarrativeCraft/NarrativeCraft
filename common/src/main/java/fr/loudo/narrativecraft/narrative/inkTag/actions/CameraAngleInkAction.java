@@ -33,14 +33,13 @@ import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogPresetManager;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
-import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
+import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
+import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -80,9 +79,13 @@ public class CameraAngleInkAction extends InkAction {
         if (storyHandler != null) {
             registerDialogData(storyHandler);
         }
-        String cameraViewJson =
-                CameraAngleSerializer.serializeCamera(cameraView).toString();
-        Services.PACKET.sendToPlayer(session.getPlayer(), new S2CEnterCameraView(cameraViewJson));
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(), new BiCameraAngleEnter(cameraAngle, NarrativeEnvironment.PRODUCTION));
+        CameraAngleMakerEditorMaker editor =
+                new CameraAngleMakerEditorMaker(cameraAngle, session, NarrativeEnvironment.PRODUCTION);
+        session.setEditor(editor);
+        editor.init();
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CEnterCameraView(cameraView.getId()));
         isRunning = false;
         return InkActionResult.ok();
     }

@@ -29,18 +29,7 @@ import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleControl;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleEnter;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
-import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
@@ -143,10 +132,11 @@ public class OnPacketRegisterEventNeoForge {
                 BiCutscenePlayHeadPacket.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::playHeadUpdate,
                 ClientPacketHandlerNeoForge::updatePlayHeadCutscene);
-        registrar.playToServer(
-                C2SCameraAngleEnter.TYPE,
-                C2SCameraAngleEnter.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::cameraAngleEnter);
+        registrar.playBidirectional(
+                BiCameraAngleEnter.TYPE,
+                BiCameraAngleEnter.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleEnter,
+                ClientPacketHandlerNeoForge::cameraAngleEnter);
         registrar.playToServer(
                 C2SCameraAngleControl.TYPE,
                 C2SCameraAngleControl.STREAM_CODEC,

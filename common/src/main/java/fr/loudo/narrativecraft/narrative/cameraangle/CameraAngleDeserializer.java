@@ -102,6 +102,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
     public static CameraView deserializeCamera(JsonObject json) {
         if (!json.has("name") || !json.has("x")) return null;
 
+        UUID id = json.has("id") ? UUID.fromString(json.get("id").getAsString()) : UUID.randomUUID();
         String name = json.get("name").getAsString();
         double x = json.get("x").getAsDouble();
         double y = json.get("y").getAsDouble();
@@ -111,7 +112,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
         double roll = json.has("roll") ? json.get("roll").getAsDouble() : 0.0;
         float fov = json.has("fov") ? json.get("fov").getAsFloat() : 70f;
 
-        CameraView cameraView = new CameraView(name, new Vec3(x, y, z), new Vec3(xRot, yRot, roll), fov);
+        CameraView cameraView = new CameraView(id, name, new Vec3(x, y, z), new Vec3(xRot, yRot, roll), fov);
         if (json.has("dialogSetups")) {
             for (JsonElement element : json.getAsJsonArray("dialogSetups")) {
                 CameraViewDialogSetup setup = deserializeDialogSetup(element.getAsJsonObject());

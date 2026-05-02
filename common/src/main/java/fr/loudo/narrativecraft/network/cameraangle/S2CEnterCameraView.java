@@ -25,18 +25,19 @@ package fr.loudo.narrativecraft.network.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CEnterCameraView(String cameraViewJson) implements CustomPacketPayload {
+public record S2CEnterCameraView(UUID cameraViewId) implements CustomPacketPayload {
 
     public static final Type<S2CEnterCameraView> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "enter_camera_view"));
 
-    public static final StreamCodec<ByteBuf, S2CEnterCameraView> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, S2CEnterCameraView::cameraViewJson, S2CEnterCameraView::new);
+    public static final StreamCodec<ByteBuf, S2CEnterCameraView> STREAM_CODEC =
+            StreamCodec.composite(UUIDUtil.STREAM_CODEC, S2CEnterCameraView::cameraViewId, S2CEnterCameraView::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

@@ -211,11 +211,11 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     }
 
     public void registerDialogDataForCharacter(CharacterStory characterStory, DialogData data) {
-        characterDialogData.putIfAbsent(characterStory.getName(), data);
+        characterDialogData.putIfAbsent(characterStory.getName().toLowerCase(), data);
     }
 
     public void unregisterDialogDataForCharacter(CharacterStory characterStory) {
-        characterDialogData.remove(characterStory.getName());
+        characterDialogData.remove(characterStory.getName().toLowerCase());
     }
 
     private void sendChoices(List<Choice> choices) {

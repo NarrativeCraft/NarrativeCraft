@@ -142,7 +142,7 @@ public class ServerPacketHandler {
         editor.moveTo(packet.tick());
     }
 
-    public static void cameraAngleEnter(C2SCameraAngleEnter packet, Player player) {
+    public static void cameraAngleEnter(BiCameraAngleEnter packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
@@ -155,10 +155,6 @@ public class ServerPacketHandler {
         CameraAngleMakerEditorMaker editor = new CameraAngleMakerEditorMaker(cameraAngle, session);
         session.setEditor(editor);
         editor.init();
-
-        String dataJson = CameraAngleSerializer.serializeData(cameraAngle);
-        Services.PACKET.sendToPlayer(
-                (ServerPlayer) player, new S2CCameraAngleEditorData(cameraAngle.getId(), dataJson));
     }
 
     public static void cameraAngleControl(C2SCameraAngleControl packet, Player player) {

@@ -25,21 +25,32 @@ package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import net.minecraft.world.phys.Vec3;
 
 public class CameraView {
 
+    private final UUID id;
     private String name;
     private Vec3 position;
     private Vec3 rotation;
     private float fov;
     private final List<CameraViewDialogSetup> dialogSetups = new ArrayList<>();
 
-    public CameraView(String name, Vec3 position, Vec3 rotation, float fov) {
+    public CameraView(UUID id, String name, Vec3 position, Vec3 rotation, float fov) {
+        this.id = id;
         this.name = name;
         this.position = position;
         this.rotation = rotation;
         this.fov = fov;
+    }
+
+    public CameraView(String name, Vec3 position, Vec3 rotation, float fov) {
+        this(UUID.randomUUID(), name, position, rotation, fov);
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public String getName() {

@@ -27,7 +27,10 @@ import com.mojang.blaze3d.platform.Window;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.phys.Vec3;
 
 public class UtilsClient {
 
@@ -49,5 +52,15 @@ public class UtilsClient {
 
     public static void sendToast(Component title, Component message) {
         minecraft.getToastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
+    }
+
+    public static void teleportPlayerTo(Vec3 position, Vec3 rotation) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        player.setPos(position.subtract(0, player.getEyeHeight(), 0));
+        player.setXRot((float) rotation.x);
+        player.setYRot((float) rotation.y);
+        player.setYHeadRot((float) rotation.y);
+        player.connection.send(new ServerboundMovePlayerPacket.PosRot(
+                position, (float) rotation.x, (float) rotation.y, player.onGround(), false));
     }
 }

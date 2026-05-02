@@ -23,10 +23,8 @@
 
 package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
-import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.network.cameraangle.*;
+import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
@@ -40,6 +38,8 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 public class ClientPacketRegisterFabric {
 
     public static void register() {
+        PayloadTypeRegistry.clientboundPlay().register(BiCutsceneEnter.TYPE, BiCutsceneEnter.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(BiCameraAngleEnter.TYPE, BiCameraAngleEnter.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);

@@ -24,43 +24,50 @@
 package fr.loudo.narrativecraft.network.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public class C2SCameraAngleEnter implements CustomPacketPayload {
+public class BiCameraAngleEnter implements CustomPacketPayload {
 
     private final UUID chapterId;
     private final UUID sceneId;
     private final UUID cameraAngleId;
+    private final NarrativeEnvironment environment;
 
-    public C2SCameraAngleEnter(CameraAngle cameraAngle) {
+    public BiCameraAngleEnter(CameraAngle cameraAngle, NarrativeEnvironment environment) {
         this.chapterId = cameraAngle.getScene().getChapter().getId();
         this.sceneId = cameraAngle.getScene().getId();
         this.cameraAngleId = cameraAngle.getId();
+        this.environment = environment;
     }
 
-    public C2SCameraAngleEnter(UUID chapterId, UUID sceneId, UUID cameraAngleId) {
+    public BiCameraAngleEnter(UUID chapterId, UUID sceneId, UUID cameraAngleId, NarrativeEnvironment environment) {
         this.chapterId = chapterId;
         this.sceneId = sceneId;
         this.cameraAngleId = cameraAngleId;
+        this.environment = environment;
     }
 
-    public static final Type<C2SCameraAngleEnter> TYPE =
+    public static final Type<BiCameraAngleEnter> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_enter"));
 
-    public static final StreamCodec<ByteBuf, C2SCameraAngleEnter> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, BiCameraAngleEnter> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleEnter::getChapterId,
+            BiCameraAngleEnter::getChapterId,
             UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleEnter::getSceneId,
+            BiCameraAngleEnter::getSceneId,
             UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleEnter::getCameraAngleId,
-            C2SCameraAngleEnter::new);
+            BiCameraAngleEnter::getCameraAngleId,
+            ByteBufCodecs.idMapper(i -> NarrativeEnvironment.values()[i], NarrativeEnvironment::ordinal),
+            BiCameraAngleEnter::getEnvironment,
+            BiCameraAngleEnter::new);
 
     public UUID getChapterId() {
         return chapterId;
@@ -72,6 +79,10 @@ public class C2SCameraAngleEnter implements CustomPacketPayload {
 
     public UUID getCameraAngleId() {
         return cameraAngleId;
+    }
+
+    public NarrativeEnvironment getEnvironment() {
+        return environment;
     }
 
     @Override

@@ -24,10 +24,10 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleControl;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
@@ -75,7 +75,7 @@ public class ServerPacketHandlerNeoForge {
         });
     }
 
-    public static void cameraAngleEnter(C2SCameraAngleEnter packet, IPayloadContext context) {
+    public static void cameraAngleEnter(BiCameraAngleEnter packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.cameraAngleEnter(packet, context.player()));
     }
 

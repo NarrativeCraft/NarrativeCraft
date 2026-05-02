@@ -74,6 +74,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     private final List<Button> buttons = new ArrayList<>();
     private final RollSliderWidget rollWidget = new RollSliderWidget();
     private final FovSliderWidget fovWidget = new FovSliderWidget();
+    private final NarrativeEnvironment environment;
 
     public enum PreviewMode {
         CAMERA,
@@ -95,6 +96,12 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     public ClientCameraAngleMakerEditorMaker(CameraAngle cameraAngle) {
         this.cameraAngle = cameraAngle;
+        this.environment = NarrativeEnvironment.DEVELOPMENT;
+    }
+
+    public ClientCameraAngleMakerEditorMaker(CameraAngle cameraAngle, NarrativeEnvironment environment) {
+        this.cameraAngle = cameraAngle;
+        this.environment = environment;
     }
 
     public void init() {
@@ -447,6 +454,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (previewCameraView != null) {
             previewCameraView.setRoll(rollWidget.getValue());
             previewCameraView.setFov(fovWidget.getValue());
@@ -513,6 +521,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (!renderingHud || !clearScreenOpened()) return;
         if (advancedPanel.mouseClicked(event)) {
             dialogPreviewPanel.unfocusAll();
@@ -542,6 +551,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void mouseReleased(MouseButtonEvent event) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (!renderingHud || !clearScreenOpened()) return;
         rollWidget.mouseReleased();
         fovWidget.mouseReleased();
@@ -549,6 +559,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (!renderingHud || !clearScreenOpened()) return;
         if (previewMode == PreviewMode.DIALOG) {
             if (dialogPreviewPanel.mouseDragged(event.y())) return;
@@ -562,6 +573,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void keyPressed(KeyEvent event) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (previewMode == PreviewMode.DIALOG) {
             dialogPreviewPanel.keyPressed(event);
             if (dialogPreviewPanel.isAnyBoxFocused()) return;
@@ -588,6 +600,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void charTyped(CharacterEvent event) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (previewMode == PreviewMode.DIALOG) {
             dialogPreviewPanel.charTyped(event);
         }

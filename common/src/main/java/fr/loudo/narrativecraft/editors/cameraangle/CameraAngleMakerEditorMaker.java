@@ -30,16 +30,13 @@ import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
-import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
-import fr.loudo.narrativecraft.narrative.cameraangle.TemplateReference;
+import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.RecordingData;
@@ -72,10 +69,19 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     private final Map<UUID, List<UUID>> placementsByTemplateReference = new HashMap<>();
     private final CameraAngle cameraAngle;
     private final PlayerSession playerSession;
+    private final NarrativeEnvironment environment;
 
     public CameraAngleMakerEditorMaker(CameraAngle cameraAngle, PlayerSession playerSession) {
         this.cameraAngle = cameraAngle;
         this.playerSession = playerSession;
+        this.environment = NarrativeEnvironment.DEVELOPMENT;
+    }
+
+    public CameraAngleMakerEditorMaker(
+            CameraAngle cameraAngle, PlayerSession playerSession, NarrativeEnvironment environment) {
+        this.cameraAngle = cameraAngle;
+        this.playerSession = playerSession;
+        this.environment = environment;
     }
 
     public void init() {
@@ -89,6 +95,9 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             }
         }
         teleportToEditorOrigin();
+        String dataJson = CameraAngleSerializer.serializeData(cameraAngle);
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(), new S2CCameraAngleEditorData(cameraAngle.getId(), dataJson));
     }
 
     public void teleportToEditorOrigin() {
@@ -133,6 +142,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void spawnEntity(CharacterPlacement characterPlacement) {
+        if (characterPlacement.isTemplate() && environment != NarrativeEnvironment.DEVELOPMENT) return;
         ICharacterStory characterStory = characterPlacement.getCharacterStory();
         ServerPlayer player = playerSession.getPlayer();
         ServerLevel level = player.level();
@@ -381,17 +391,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         return templateReferences;
     }
 
-    private static final class SingleEntityContext implements IPlaybackContext {
-        private final Entity entity;
-
-        SingleEntityContext(Entity entity) {
-            this.entity = entity;
-        }
-
-        @Override
-        public Entity getEntity() {
-            return entity;
-        }
+    private record SingleEntityContext(Entity getEntity) implements IPlaybackContext {
 
         @Override
         public int getRecordingId() {

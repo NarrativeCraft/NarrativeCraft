@@ -39,7 +39,9 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -48,10 +50,7 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
-import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
@@ -63,13 +62,10 @@ import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.protocol.game.ServerboundChangeGameModePacket;
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.GameType;
+
+import java.util.ArrayList;
 
 public class ClientPacketHandler {
 
@@ -231,23 +227,16 @@ public class ClientPacketHandler {
         if (MINECRAFT.player == null) return;
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
-        JsonObject json = JsonParser.parseString(packet.cameraViewJson()).getAsJsonObject();
-        CameraView cameraView = CameraAngleDeserializer.deserializeCamera(json);
+        EditorMaker editor = session.getEditor();
+        if (!(editor instanceof ClientCameraAngleMakerEditorMaker clientAngleMaker)) return;
+
+        CameraView cameraView = clientAngleMaker.getCameraViews().stream()
+                .filter(c -> c.getId().equals(packet.cameraViewId()))
+                .findFirst()
+                .orElse(null);
         if (cameraView == null) return;
 
-        LocalPlayer player = MINECRAFT.player;
-        player.connection.send(new ServerboundChangeGameModePacket(GameType.SPECTATOR));
-        session.setNarrativeCameraView(cameraView);
-        player.setPos(cameraView.getPosition().subtract(0, player.getEyeHeight(), 0));
-        player.setXRot((float) cameraView.getRotation().x);
-        player.setYRot((float) cameraView.getRotation().y);
-        player.setYHeadRot((float) cameraView.getRotation().y);
-        player.connection.send(new ServerboundMovePlayerPacket.PosRot(
-                cameraView.getPosition(),
-                (float) cameraView.getRotation().x,
-                (float) cameraView.getRotation().y,
-                player.onGround(),
-                false));
+        clientAngleMaker.enterPreview(cameraView);
     }
 
     public static void showDialogue(S2CShowDialogue packet) {
@@ -312,5 +301,22 @@ public class ClientPacketHandler {
 
     public static void showChoices(S2CShowChoices packet) {
         MINECRAFT.setScreen(new ChoiceScreen(packet.texts()));
+    }
+
+    public static void cameraAngleEnter(BiCameraAngleEnter packet) {
+        Chapter chapter =
+                ClientNarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
+        if (scene == null) return;
+        CameraAngle cameraAngle = scene.getCameraAngleManager().getById(packet.getCameraAngleId());
+        if (cameraAngle == null) return;
+
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        ClientCameraAngleMakerEditorMaker cameraAngleEditor =
+                new ClientCameraAngleMakerEditorMaker(cameraAngle, packet.getEnvironment());
+        cameraAngleEditor.init();
+        session.setEditor(cameraAngleEditor);
+        Minecraft.getInstance().setScreen(null);
     }
 }

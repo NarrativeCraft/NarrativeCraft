@@ -86,6 +86,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
 
     public static JsonObject serializeCamera(CameraView cameraView) {
         JsonObject json = new JsonObject();
+        json.addProperty("id", cameraView.getId().toString());
         json.addProperty("name", cameraView.getName());
         json.addProperty("x", cameraView.getPosition().x);
         json.addProperty("y", cameraView.getPosition().y);

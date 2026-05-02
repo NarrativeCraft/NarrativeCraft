@@ -28,10 +28,7 @@ import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
-import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
@@ -133,5 +130,9 @@ public class ClientPacketHandlerNeoForge {
 
     public static void cutsceneState(BiCutsceneEnter packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.cutsceneState(packet));
+    }
+
+    public static void cameraAngleEnter(BiCameraAngleEnter packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.cameraAngleEnter(packet));
     }
 }
