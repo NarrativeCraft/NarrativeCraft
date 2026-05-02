@@ -81,6 +81,14 @@ public class MovementAction extends AbstractAction {
         return pos;
     }
 
+    public float getPitch() {
+        return pitch;
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
     @Override
     public String getId() {
         return ID;

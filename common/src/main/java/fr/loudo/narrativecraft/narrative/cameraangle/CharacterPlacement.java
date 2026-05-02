@@ -36,18 +36,33 @@ public class CharacterPlacement {
     private Vec3 position;
     private Vec3 rotation;
     private final List<ItemStack> items;
+    private final boolean isTemplate;
+    private final UUID templateReferenceId;
 
     public CharacterPlacement(
-            UUID id, ICharacterStory characterStory, Vec3 position, Vec3 rotation, List<ItemStack> items) {
+            UUID id,
+            ICharacterStory characterStory,
+            Vec3 position,
+            Vec3 rotation,
+            List<ItemStack> items,
+            boolean isTemplate,
+            UUID templateReferenceId) {
         this.id = id;
         this.characterStory = characterStory;
         this.position = position;
         this.rotation = rotation;
         this.items = items;
+        this.isTemplate = isTemplate;
+        this.templateReferenceId = templateReferenceId;
+    }
+
+    public CharacterPlacement(
+            UUID id, ICharacterStory characterStory, Vec3 position, Vec3 rotation, List<ItemStack> items) {
+        this(id, characterStory, position, rotation, items, false, null);
     }
 
     public CharacterPlacement(ICharacterStory characterStory, Vec3 position, Vec3 rotation, List<ItemStack> items) {
-        this(UUID.randomUUID(), characterStory, position, rotation, items);
+        this(UUID.randomUUID(), characterStory, position, rotation, items, false, null);
     }
 
     public UUID getId() {
@@ -76,5 +91,13 @@ public class CharacterPlacement {
 
     public List<ItemStack> getItems() {
         return items;
+    }
+
+    public boolean isTemplate() {
+        return isTemplate;
+    }
+
+    public UUID getTemplateReferenceId() {
+        return templateReferenceId;
     }
 }

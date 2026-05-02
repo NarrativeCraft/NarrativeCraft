@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
 import fr.loudo.narrativecraft.narrative.cameraangle.TemplateReference;
@@ -38,6 +39,7 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.RecordingData;
@@ -67,7 +69,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
     private final List<Entity> characterEntities = new ArrayList<>();
     private final List<TemplateReference> templateReferences = new ArrayList<>();
-    private final Map<UUID, List<Entity>> entitiesByTemplateReference = new HashMap<>();
+    private final Map<UUID, List<UUID>> placementsByTemplateReference = new HashMap<>();
     private final CameraAngle cameraAngle;
     private final PlayerSession playerSession;
 
@@ -80,9 +82,11 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         playerSession.changeGameMode(GameType.SPECTATOR);
         for (CharacterPlacement characterPlacement : cameraAngle.getCharacterPlacements()) {
             spawnEntity(characterPlacement);
-        }
-        for (TemplateReference reference : cameraAngle.getTemplateReferences()) {
-            spawnTemplateReference(reference);
+            if (characterPlacement.isTemplate() && characterPlacement.getTemplateReferenceId() != null) {
+                placementsByTemplateReference
+                        .computeIfAbsent(characterPlacement.getTemplateReferenceId(), k -> new ArrayList<>())
+                        .add(characterPlacement.getId());
+            }
         }
         teleportToEditorOrigin();
     }
@@ -118,10 +122,6 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             if (player.getId() == playerSession.getPlayer().getId()) continue;
             characterEntities.forEach(
                     entity -> player.connection.send(new ClientboundRemoveEntitiesPacket(entity.getId())));
-            entitiesByTemplateReference
-                    .values()
-                    .forEach(list -> list.forEach(
-                            entity -> player.connection.send(new ClientboundRemoveEntitiesPacket(entity.getId()))));
         }
     }
 
@@ -129,9 +129,6 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         playerSession.changeGameMode(playerSession.getLastGameType());
         for (Entity entity : characterEntities) {
             entity.remove(Entity.RemovalReason.DISCARDED);
-        }
-        for (List<Entity> list : entitiesByTemplateReference.values()) {
-            list.forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED));
         }
     }
 
@@ -169,13 +166,19 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void spawnTemplateReference(TemplateReference reference) {
-        List<Animation> animations = resolveAnimations(reference);
-        List<Entity> spawned = new ArrayList<>();
-        for (Animation animation : animations) {
-            Entity entity = spawnFromAnimation(animation);
-            if (entity != null) spawned.add(entity);
+        ServerPlayer player = playerSession.getPlayer();
+        List<UUID> createdIds = new ArrayList<>();
+        for (Animation animation : resolveAnimations(reference)) {
+            CharacterPlacement placement = createPlacementFromAnimation(animation, reference.id());
+            if (placement == null) continue;
+            cameraAngle.getCharacterPlacements().add(placement);
+            spawnTemplateEntity(placement, animation);
+            createdIds.add(placement.getId());
+            String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
+            Services.PACKET.sendToPlayer(
+                    player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placementJson));
         }
-        entitiesByTemplateReference.put(reference.id(), spawned);
+        placementsByTemplateReference.put(reference.id(), createdIds);
     }
 
     private List<Animation> resolveAnimations(TemplateReference reference) {
@@ -201,7 +204,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         };
     }
 
-    private Entity spawnFromAnimation(Animation animation) {
+    private CharacterPlacement createPlacementFromAnimation(Animation animation, UUID templateReferenceId) {
         if (!animation.initialize()) return null;
         ICharacterStory characterStory = animation.getCharacterStory();
         if (characterStory == null) return null;
@@ -215,8 +218,21 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         MovementAction lastMovement = findLastAction(mainData, MovementAction.class);
         if (lastMovement == null) return null;
 
-        EntityByteAction lastEntityByte = findLastAction(mainData, EntityByteAction.class);
-        ChangeItemAction lastItemChange = findLastAction(mainData, ChangeItemAction.class);
+        Vec3 position = lastMovement.getPosition();
+        Vec3 rotation = new Vec3(lastMovement.getPitch(), lastMovement.getYaw(), 0.0);
+
+        return new CharacterPlacement(
+                UUID.randomUUID(), characterStory, position, rotation, new ArrayList<>(), true, templateReferenceId);
+    }
+
+    private void spawnTemplateEntity(CharacterPlacement placement, Animation animation) {
+        if (!animation.initialize()) return;
+        ICharacterStory characterStory = placement.getCharacterStory();
+
+        RecordingData mainData = animation.getRecordingDataList().stream()
+                .filter(data -> data.getRecordingId() == 0)
+                .findFirst()
+                .orElse(null);
 
         ServerPlayer player = playerSession.getPlayer();
         ServerLevel level = player.level();
@@ -226,23 +242,35 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), characterStory.getName()), true);
         } else {
             entity = characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
-            if (entity == null) return null;
-            CompoundTag initialNbt = mainData.getInitialNbt();
-            if (initialNbt != null && !initialNbt.isEmpty()) {
-                entity.load(TagValueInput.create(ProblemReporter.DISCARDING, entity.registryAccess(), initialNbt));
-                entity.setUUID(UUID.randomUUID());
+            if (entity == null) return;
+            if (mainData != null) {
+                CompoundTag initialNbt = mainData.getInitialNbt();
+                if (initialNbt != null && !initialNbt.isEmpty()) {
+                    entity.load(TagValueInput.create(ProblemReporter.DISCARDING, entity.registryAccess(), initialNbt));
+                    entity.setUUID(UUID.randomUUID());
+                }
             }
         }
 
-        IPlaybackContext context = new SingleEntityContext(entity);
-        lastMovement.execute(context, null);
-        if (lastEntityByte != null) lastEntityByte.execute(context, null);
-        if (lastItemChange != null) lastItemChange.execute(context, null);
+        entity.setPos(placement.getPosition());
+        entity.setXRot((float) placement.getRotation().x);
+        entity.setYRot((float) placement.getRotation().y);
+        entity.setYHeadRot((float) placement.getRotation().y);
+
+        if (mainData != null) {
+            IPlaybackContext context = new SingleEntityContext(entity);
+            EntityByteAction lastEntityByte = findLastAction(mainData, EntityByteAction.class);
+            ChangeItemAction lastItemChange = findLastAction(mainData, ChangeItemAction.class);
+            if (lastEntityByte != null) lastEntityByte.execute(context, null);
+            if (lastItemChange != null) lastItemChange.execute(context, null);
+        }
 
         addEntityToWorld(entity, player, level, characterStory);
-
         entity.entityTags().add(ENTITY_TAG);
-        return entity;
+        characterPlacements.add(placement);
+        characterEntities.add(entity);
+        Services.PACKET.sendToPlayer(
+                player, new S2CCameraAnglePlacementEntitySpawned(placement.getId(), entity.getId()));
     }
 
     private <T extends AbstractAction> T findLastAction(RecordingData data, Class<T> type) {
@@ -278,22 +306,20 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void teleportPlayerToTemplate(UUID refId) {
-        TemplateReference reference = templateReferences.stream()
+        TemplateReference reference = cameraAngle.getTemplateReferences().stream()
                 .filter(ref -> ref.refId().equals(refId))
                 .findFirst()
                 .orElse(null);
         if (reference == null) return;
-        List<Animation> animations = resolveAnimations(reference);
-        for (Animation animation : animations) {
-            if (!animation.initialize()) continue;
-            RecordingData mainData = animation.getRecordingDataList().stream()
-                    .filter(data -> data.getRecordingId() == 0)
+        List<UUID> placementIds = placementsByTemplateReference.get(reference.id());
+        if (placementIds == null || placementIds.isEmpty()) return;
+        for (UUID placementId : placementIds) {
+            CharacterPlacement placement = characterPlacements.stream()
+                    .filter(p -> p.getId().equals(placementId))
                     .findFirst()
                     .orElse(null);
-            if (mainData == null) continue;
-            MovementAction lastMovement = findLastAction(mainData, MovementAction.class);
-            if (lastMovement == null) continue;
-            Vec3 position = lastMovement.getPosition();
+            if (placement == null) continue;
+            Vec3 position = placement.getPosition();
             ServerPlayer player = playerSession.getPlayer();
             player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
             return;
@@ -313,18 +339,17 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void removeTemplateReference(UUID templateReferenceId) {
-        List<Entity> toRemove = entitiesByTemplateReference.remove(templateReferenceId);
-        if (toRemove != null) {
-            toRemove.forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED));
-            characterEntities.removeAll(toRemove);
+        List<UUID> placementIds = placementsByTemplateReference.remove(templateReferenceId);
+        if (placementIds != null) {
+            for (UUID placementId : new ArrayList<>(placementIds)) {
+                removePlacement(placementId);
+            }
         }
         cameraAngle.getTemplateReferences().removeIf(ref -> ref.id().equals(templateReferenceId));
     }
 
     public List<Entity> getEntities() {
-        List<Entity> all = new ArrayList<>(characterEntities);
-        entitiesByTemplateReference.values().forEach(all::addAll);
-        return all;
+        return new ArrayList<>(characterEntities);
     }
 
     public Entity getEntityForPlacement(UUID placementId) {

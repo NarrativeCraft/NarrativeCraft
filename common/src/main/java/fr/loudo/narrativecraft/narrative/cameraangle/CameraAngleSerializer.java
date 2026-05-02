@@ -147,6 +147,13 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
         json.addProperty("xRot", placement.getRotation().x);
         json.addProperty("yRot", placement.getRotation().y);
         json.addProperty("roll", placement.getRotation().z);
+        if (placement.isTemplate()) {
+            json.addProperty("isTemplate", true);
+            if (placement.getTemplateReferenceId() != null)
+                json.addProperty(
+                        "templateReferenceId",
+                        placement.getTemplateReferenceId().toString());
+        }
 
         JsonArray items = new JsonArray();
         for (ItemStack stack : placement.getItems()) {

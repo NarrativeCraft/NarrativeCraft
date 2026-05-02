@@ -228,12 +228,27 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     public void removeCharacterPlacement(CharacterPlacement placement) {
         characterPlacements.remove(placement);
+        removeDialogSetupsForPlacement(placement.getId());
         Services.PACKET.sendToServer(new C2SCameraAngleRemovePlacement(cameraAngle, placement.getId()));
     }
 
     public void removeTemplateReference(TemplateReference reference) {
+        List<CharacterPlacement> toRemove = characterPlacements.stream()
+                .filter(p -> reference.id().equals(p.getTemplateReferenceId()))
+                .toList();
+        for (CharacterPlacement placement : toRemove) {
+            removeDialogSetupsForPlacement(placement.getId());
+        }
+        characterPlacements.removeAll(toRemove);
         templateReferences.remove(reference);
         Services.PACKET.sendToServer(new C2SCameraAngleRemoveTemplateReference(cameraAngle, reference.id()));
+    }
+
+    private void removeDialogSetupsForPlacement(UUID placementId) {
+        for (CameraView cameraView : cameraViews) {
+            cameraView.getDialogSetups().removeIf(setup -> setup.getCharacterPlacementId()
+                    .equals(placementId));
+        }
     }
 
     private void openCharacterPicker() {

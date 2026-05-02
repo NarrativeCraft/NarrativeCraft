@@ -198,7 +198,19 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
             return null;
         }
 
-        return new CharacterPlacement(id, characterStory, new Vec3(x, y, z), new Vec3(xRot, yRot, roll), items);
+        boolean isTemplate = json.has("isTemplate") && json.get("isTemplate").getAsBoolean();
+        UUID templateReferenceId = json.has("templateReferenceId")
+                ? UUID.fromString(json.get("templateReferenceId").getAsString())
+                : null;
+
+        return new CharacterPlacement(
+                id,
+                characterStory,
+                new Vec3(x, y, z),
+                new Vec3(xRot, yRot, roll),
+                items,
+                isTemplate,
+                templateReferenceId);
     }
 
     private static ItemStack deserializeItemStack(String nbtString) {

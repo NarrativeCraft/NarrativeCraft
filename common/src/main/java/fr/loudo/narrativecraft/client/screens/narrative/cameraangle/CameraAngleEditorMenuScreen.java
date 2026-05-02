@@ -25,15 +25,17 @@ package fr.loudo.narrativecraft.client.screens.narrative.cameraangle;
 
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
+import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.util.List;
-import java.util.function.BiConsumer;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class CameraAngleEditorMenuScreen extends Screen {
 
@@ -113,8 +115,11 @@ public class CameraAngleEditorMenuScreen extends Screen {
                     (rowY, camera) -> addCameraRow(rowX, rowY, camera));
         } else if (tab == Tab.CHARACTERS) {
             int rowX = centerX - (NAME_WIDTH + ACTION_SMALL_WIDTH + ROW_GAP) / 2;
+            List<CharacterPlacement> nonTemplatePlacements = editor.getCharacterPlacements().stream()
+                    .filter(p -> !p.isTemplate())
+                    .toList();
             renderPagedList(
-                    editor.getCharacterPlacements(),
+                    nonTemplatePlacements,
                     entitiesPage,
                     centerX,
                     paginationY,
