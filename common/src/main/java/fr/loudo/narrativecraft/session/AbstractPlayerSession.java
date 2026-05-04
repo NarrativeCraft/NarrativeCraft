@@ -48,6 +48,7 @@ public class AbstractPlayerSession implements IPlayerSession {
     public void clear() {
         chapter = null;
         scene = null;
+        editorMaker = null;
     }
 
     public boolean sessionSet() {

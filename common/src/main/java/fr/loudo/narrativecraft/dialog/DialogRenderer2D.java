@@ -84,9 +84,12 @@ public class DialogRenderer2D extends DialogRenderer {
 
         // Recompute layout
         layout.compute(data, scrollText, mc.font);
+        checkAndApplyPendingResize();
 
-        float totalWidth = layout.getTotalWidth() * data.getScale();
-        float totalHeight = layout.getTotalHeight() * data.getScale();
+        boolean resizing = animator.getState() == DialogAnimator.State.RESIZING;
+        float totalWidth = (resizing ? animator.getResizeWidth(partialTick) : layout.getTotalWidth()) * data.getScale();
+        float totalHeight =
+                (resizing ? animator.getResizeHeight(partialTick) : layout.getTotalHeight()) * data.getScale();
 
         // Anchor position
         float[] origin = computeAnchorOrigin(screenWidth, screenHeight, totalWidth, totalHeight);

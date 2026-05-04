@@ -64,7 +64,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     public static final String ENTITY_TAG = "nc_camera_angle";
 
     private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
-    private final List<Entity> characterEntities = new ArrayList<>();
+    private final Map<UUID, Entity> characterEntities = new HashMap<>();
     private final List<TemplateReference> templateReferences = new ArrayList<>();
     private final Map<UUID, List<UUID>> placementsByTemplateReference = new HashMap<>();
     private final CameraAngle cameraAngle;
@@ -104,7 +104,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         ServerPlayer player = playerSession.getPlayer();
         Vec3 position = null;
         if (!characterEntities.isEmpty()) {
-            Entity entity = characterEntities.get(0);
+            Entity entity = characterEntities.values().stream().findFirst().orElse(null);
             position = entity.position();
         } else {
             List<CameraView> cameraViews = cameraAngle.getCameras();
@@ -129,14 +129,15 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     public void hideEntitiesForOthers() {
         for (ServerPlayer player : playerSession.getPlayer().level().players()) {
             if (player.getId() == playerSession.getPlayer().getId()) continue;
-            characterEntities.forEach(
-                    entity -> player.connection.send(new ClientboundRemoveEntitiesPacket(entity.getId())));
+            characterEntities
+                    .values()
+                    .forEach(entity -> player.connection.send(new ClientboundRemoveEntitiesPacket(entity.getId())));
         }
     }
 
     public void stop() {
         playerSession.changeGameMode(playerSession.getLastGameType());
-        for (Entity entity : characterEntities) {
+        for (Entity entity : characterEntities.values()) {
             entity.remove(Entity.RemovalReason.DISCARDED);
         }
     }
@@ -170,7 +171,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
 
         entity.entityTags().add(ENTITY_TAG);
         characterPlacements.add(characterPlacement);
-        characterEntities.add(entity);
+        characterEntities.put(characterPlacement.getId(), entity);
         Services.PACKET.sendToPlayer(
                 player, new S2CCameraAnglePlacementEntitySpawned(characterPlacement.getId(), entity.getId()));
     }
@@ -278,7 +279,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         addEntityToWorld(entity, player, level, characterStory);
         entity.entityTags().add(ENTITY_TAG);
         characterPlacements.add(placement);
-        characterEntities.add(entity);
+        characterEntities.put(placement.getId(), entity);
         Services.PACKET.sendToPlayer(
                 player, new S2CCameraAnglePlacementEntitySpawned(placement.getId(), entity.getId()));
     }
@@ -337,15 +338,12 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void removePlacement(UUID placementId) {
-        for (int i = 0; i < characterPlacements.size(); i++) {
-            if (characterPlacements.get(i).getId().equals(placementId)) {
-                characterEntities.get(i).remove(Entity.RemovalReason.DISCARDED);
-                characterEntities.remove(i);
-                characterPlacements.remove(i);
-                cameraAngle.getCharacterPlacements().removeIf(p -> p.getId().equals(placementId));
-                return;
-            }
+        Entity entity = characterEntities.remove(placementId);
+        if (entity != null) {
+            entity.remove(Entity.RemovalReason.DISCARDED);
         }
+        characterPlacements.removeIf(p -> p.getId().equals(placementId));
+        cameraAngle.getCharacterPlacements().removeIf(p -> p.getId().equals(placementId));
     }
 
     public void removeTemplateReference(UUID templateReferenceId) {
@@ -359,16 +357,11 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public List<Entity> getEntities() {
-        return new ArrayList<>(characterEntities);
+        return new ArrayList<>(characterEntities.values());
     }
 
     public Entity getEntityForPlacement(UUID placementId) {
-        for (int i = 0; i < characterPlacements.size(); i++) {
-            if (characterPlacements.get(i).getId().equals(placementId)) {
-                return characterEntities.get(i);
-            }
-        }
-        return null;
+        return characterEntities.get(placementId);
     }
 
     public CameraAngle getCameraAngle() {
@@ -384,7 +377,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public List<Entity> getCharacterEntities() {
-        return characterEntities;
+        return new ArrayList<>(characterEntities.values());
     }
 
     public List<TemplateReference> getTemplateReferences() {

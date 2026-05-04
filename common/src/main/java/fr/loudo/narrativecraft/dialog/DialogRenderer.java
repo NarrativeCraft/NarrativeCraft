@@ -28,15 +28,19 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 
 public abstract class DialogRenderer {
 
-    protected final DialogData data;
     protected final DialogLayout layout = new DialogLayout();
     protected final DialogAnimator animator = new DialogAnimator();
     protected final DialogScrollText scrollText = new DialogScrollText();
+    protected DialogData data;
 
     private Runnable onStoppedCallback;
     private Runnable onAutoSkippedCallback;
     private int autoSkipTicks = -1;
     private int currentTick = 0;
+
+    private boolean pendingResize = false;
+    private float resizeFromWidth;
+    private float resizeFromHeight;
 
     private static final float SKIP_APPEAR_TICKS = 10f;
     private float skipProgress = 0f;
@@ -59,8 +63,18 @@ public abstract class DialogRenderer {
     }
 
     public void update(String newText) {
+        resizeFromWidth = layout.getTotalWidth();
+        resizeFromHeight = layout.getTotalHeight();
         scrollText.setText(newText);
-        animator.startResize(layout.getTotalWidth(), layout.getTotalHeight(), 0, 0);
+        skipProgress = 0f;
+        previousSkipProgress = 0f;
+        pendingResize = true;
+    }
+
+    protected void checkAndApplyPendingResize() {
+        if (!pendingResize) return;
+        pendingResize = false;
+        animator.startResize(resizeFromWidth, resizeFromHeight, layout.getTotalWidth(), layout.getTotalHeight());
     }
 
     public void stop() {
@@ -101,6 +115,18 @@ public abstract class DialogRenderer {
         return (float) Interpolation.applyEasing(EasingType.EASE_OUT, t);
     }
 
+    public boolean isTextFinished() {
+        return scrollText.isFinished();
+    }
+
+    public void forceFinishText() {
+        scrollText.forceFinish();
+    }
+
+    public boolean isAnimating() {
+        return animator.isResizing() || animator.isStopping() || animator.isStarting();
+    }
+
     public void onStopped(Runnable callback) {
         this.onStoppedCallback = callback;
     }
@@ -115,6 +141,10 @@ public abstract class DialogRenderer {
 
     public DialogData getData() {
         return data;
+    }
+
+    public void setData(DialogData data) {
+        this.data = data;
     }
 
     public DialogLayout getLayout() {

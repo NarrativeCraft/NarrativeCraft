@@ -36,8 +36,10 @@ import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
@@ -126,6 +128,14 @@ public class ClientPacketHandlerNeoForge {
 
     public static void showChoices(S2CShowChoices packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.showChoices(packet));
+    }
+
+    public static void stopStory(S2CStopStory packet, IPayloadContext context) {
+        context.enqueueWork(ClientPacketHandler::stopStory);
+    }
+
+    public static void dialogStop(S2CDialogStop packet, IPayloadContext context) {
+        context.enqueueWork(ClientPacketHandler::dialogStop);
     }
 
     public static void cutsceneState(BiCutsceneEnter packet, IPayloadContext context) {

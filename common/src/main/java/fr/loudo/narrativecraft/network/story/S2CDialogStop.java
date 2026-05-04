@@ -21,37 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
+package fr.loudo.narrativecraft.network.story;
 
-public final class Interpolation {
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-    private Interpolation() {}
+public record S2CDialogStop() implements CustomPacketPayload {
 
-    public static double applyEasing(EasingType type, double t) {
-        return switch (type) {
-            case LINEAR -> t;
-            case EASE_IN -> t * t * t;
-            case EASE_OUT -> 1.0 - Math.pow(1.0 - t, 3.0);
-            case SMOOTH -> t * t * t * (t * (6 * t - 15) + 10);
-        };
-    }
+    public static final Type<S2CDialogStop> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_stop"));
 
-    public static double lerp(double a, double b, double t) {
-        return a + (b - a) * t;
-    }
+    public static final StreamCodec<ByteBuf, S2CDialogStop> STREAM_CODEC = StreamCodec.unit(new S2CDialogStop());
 
-    public static double lerpAngle(double fromDeg, double toDeg, double t) {
-        double diff = ((toDeg - fromDeg + 540.0) % 360.0) - 180.0;
-        return fromDeg + diff * t;
-    }
-
-    public static double catmullRom(double p0, double p1, double p2, double p3, double t) {
-        double t2 = t * t;
-        double t3 = t2 * t;
-        return 0.5
-                * ((2.0 * p1)
-                        + (-p0 + p2) * t
-                        + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2
-                        + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

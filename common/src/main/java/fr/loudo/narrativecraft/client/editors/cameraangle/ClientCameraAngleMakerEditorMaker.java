@@ -170,7 +170,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     @Override
     public NarrativeEnvironment getEnvironment() {
-        return NarrativeEnvironment.DEVELOPMENT;
+        return environment;
     }
 
     public void loadData(String json) {
@@ -326,16 +326,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         this.previewCameraView = cameraView;
         minecraft.player.connection.send(new ServerboundChangeGameModePacket(GameType.SPECTATOR));
         playerSession.setCameraView(cameraView);
-        Vec3 position = cameraView.getPosition();
-        Vec3 rotation = cameraView.getRotation();
-        LocalPlayer player = minecraft.player;
-        player.setPos(position);
-        player.setXRot((float) rotation.x);
-        player.setYRot((float) rotation.y);
-        player.setYHeadRot((float) rotation.y);
-        player.connection.send(new ServerboundMovePlayerPacket.PosRot(
-                position, (float) rotation.x, (float) rotation.y, player.onGround(), false));
-
+        UtilsClient.teleportPlayerTo(cameraView.getPosition(), cameraView.getRotation());
         rollWidget.setValue(cameraView.getRoll());
         rollWidget.setVisible(true);
         fovWidget.setValue(cameraView.getFov());

@@ -5,6 +5,7 @@
   "narrativecraft.key.hide_editor_maker_hud": "Hide Cutscene Maker HUD",
   "narrativecraft.key.toogle_dialog_mode_camera_angle": "Toggle Dialog Mode Camera Angle",
   "narrativecraft.key.toggle_camera_roll": "Toggle Camera Roll",
+  "narrativecraft.key.dialog_advance": "Advance Dialog",
 
   "narrativecraft.chapter": "Chapter",
   "narrativecraft.chapter_index": "Chapter Index",
@@ -127,6 +128,10 @@
   "narrativecraft.story.compiling": "Compiling...",
   "narrativecraft.story.compiled": "Your story has compiled successfully!",
   "narrativecraft.story.error_compilation": "The compilation returned %s errors.",
+  "narrativecraft.story.not_compiled": "Story not compiled. Run /nc story reload first.",
+  "narrativecraft.story.started": "Story started for %s.",
+  "narrativecraft.story.not_running": "No story is running for %s.",
+  "narrativecraft.story.stopped": "Story stopped for %s.",
 
   "narrativecraft.story.validation_error.not_exists": "%s %s does not exists in this scene."
 }

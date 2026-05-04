@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.dialog;
 
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
@@ -132,8 +134,16 @@ public class DialogAnimator {
         return resizeFromHeight + (resizeToHeight - resizeFromHeight) * t;
     }
 
+    public boolean isStopping() {
+        return state == State.STOPPING;
+    }
+
     public boolean isStopped() {
         return state == State.STOPPED;
+    }
+
+    public boolean isStarting() {
+        return state == State.STARTING;
     }
 
     public boolean isRunning() {
@@ -141,7 +151,11 @@ public class DialogAnimator {
     }
 
     public boolean isTextScrollAllowed() {
-        return state == State.RUNNING || state == State.RESIZING;
+        return state == State.RUNNING;
+    }
+
+    public boolean isResizing() {
+        return state == State.RESIZING;
     }
 
     public State getState() {
@@ -157,6 +171,6 @@ public class DialogAnimator {
     }
 
     private float smoothStep(float t) {
-        return t * t * (3f - 2f * t);
+        return (float) Interpolation.applyEasing(EasingType.SMOOTH, t);
     }
 }

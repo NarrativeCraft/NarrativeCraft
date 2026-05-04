@@ -26,11 +26,14 @@ package fr.loudo.narrativecraft.events.client;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.keys.PressKeyListener;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,6 +54,19 @@ public class OnClientTickEvent {
         }
 
         tickClientInkActions(session);
+
+        DialogRenderer dialogRenderer = session.getMainDialog();
+        if (dialogRenderer != null) {
+            if (ModKeys.DIALOG_ADVANCE.consumeClick()) {
+                if (dialogRenderer.isAnimating()) return;
+                if (!dialogRenderer.isTextFinished()) {
+                    dialogRenderer.forceFinishText();
+                    return;
+                }
+
+                Services.PACKET.sendToServer(new C2SDialogueFinished());
+            }
+        }
     }
 
     private static void tickClientInkActions(ClientPlayerSession session) {

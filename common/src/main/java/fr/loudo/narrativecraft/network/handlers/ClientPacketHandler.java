@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegist
 import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -223,6 +224,24 @@ public class ClientPacketHandler {
         ClientNarrativeCraftMod.getInstance().getPlayerSession().stopAllClientInkActions();
     }
 
+    public static void stopStory() {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        new ArrayList<>(session.getActiveDialog2DRenderers()).forEach(session::removeDialog2D);
+        new ArrayList<>(session.getActiveDialog3DRenderers()).forEach(session::removeDialog3D);
+        session.setMainDialog(null);
+        session.setCameraView(null);
+        session.setEditor(null);
+    }
+
+    public static void dialogStop() {
+
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        DialogRenderer dialogRenderer = session.getMainDialog();
+        if (dialogRenderer == null) return;
+
+        dialogRenderer.stop();
+    }
+
     public static void enterCameraView(S2CEnterCameraView packet) {
         if (MINECRAFT.player == null) return;
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
@@ -244,18 +263,26 @@ public class ClientPacketHandler {
 
         DialogData resolvedData = resolveDialogData(packet.dialogDataJson());
 
+        if (session.getMainDialog() != null) {
+            DialogRenderer dialogRenderer = session.getMainDialog();
+            dialogRenderer.setData(resolvedData);
+            dialogRenderer.update(packet.text());
+            return;
+        }
+
         if (packet.entityId() != S2CShowDialogue.NO_ENTITY && MINECRAFT.level != null) {
             Entity entity = MINECRAFT.level.getEntity(packet.entityId());
             if (entity != null) {
                 DialogData data = resolvedData != null ? resolvedData : defaultDialogData3D();
                 DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
+                session.setMainDialog(renderer);
                 renderer.onStopped(() -> {
                     session.removeDialog3D(renderer);
+                    if (renderer.equals(session.getMainDialog())) {
+                        session.setMainDialog(null);
+                    }
                     Services.PACKET.sendToServer(new C2SDialogueFinished());
                 });
-                if (packet.autoSkipSeconds() > 0f) {
-                    renderer.autoSkipAt(packet.autoSkipSeconds());
-                }
                 renderer.start(packet.text());
                 session.addDialog3D(renderer);
                 return;
@@ -264,13 +291,14 @@ public class ClientPacketHandler {
 
         DialogData data = resolvedData != null ? resolvedData : defaultDialogData2D();
         DialogRenderer2D renderer = new DialogRenderer2D(data);
+        session.setMainDialog(renderer);
         renderer.onStopped(() -> {
             session.removeDialog2D(renderer);
+            if (renderer.equals(session.getMainDialog())) {
+                session.setMainDialog(null);
+            }
             Services.PACKET.sendToServer(new C2SDialogueFinished());
         });
-        if (packet.autoSkipSeconds() > 0f) {
-            renderer.autoSkipAt(packet.autoSkipSeconds());
-        }
         renderer.start(packet.text());
         session.addDialog2D(renderer);
     }

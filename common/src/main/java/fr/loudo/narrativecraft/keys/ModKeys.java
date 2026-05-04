@@ -44,6 +44,8 @@ public class ModKeys {
             registerKey("narrativecraft.key.toogle_dialog_mode_camera_angle", InputConstants.KEY_G);
     public static final KeyMapping TOGGLE_CAMERA_ROLL =
             registerKey("narrativecraft.key.toggle_camera_roll", InputConstants.KEY_R);
+    public static final KeyMapping DIALOG_ADVANCE =
+            registerKey("narrativecraft.key.dialog_advance", InputConstants.KEY_RETURN);
 
     private static KeyMapping registerKey(String translationKey, int code) {
         KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);

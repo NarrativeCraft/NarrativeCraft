@@ -82,9 +82,11 @@ public class DialogRenderer3D extends DialogRenderer {
 
         // Recompute layout
         layout.compute(data, scrollText, Minecraft.getInstance().font);
+        checkAndApplyPendingResize();
 
-        float totalWidth = layout.getTotalWidth();
-        float totalHeight = layout.getTotalHeight();
+        boolean resizing = animator.getState() == DialogAnimator.State.RESIZING;
+        float totalWidth = resizing ? animator.getResizeWidth(partialTick) : layout.getTotalWidth();
+        float totalHeight = resizing ? animator.getResizeHeight(partialTick) : layout.getTotalHeight();
 
         poseStack.pushPose();
 

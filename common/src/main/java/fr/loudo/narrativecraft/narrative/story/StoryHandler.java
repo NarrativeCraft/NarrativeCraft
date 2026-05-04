@@ -29,13 +29,15 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
+import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
@@ -56,6 +58,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     private final InkTagHandler inkTagHandler;
     private final Map<String, List<Entity>> characterEntities = new HashMap<>();
     private final Map<String, DialogData> characterDialogData = new HashMap<>();
+    private String lastCharacterSpoke = "";
+    private Snapshot snapshot;
 
     @Nullable
     private String pendingDialogueText;
@@ -92,6 +96,11 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         ended = true;
         pendingDialogueText = null;
         inkTagHandler.stopAll();
+        characterEntities.forEach((s, entities) -> {
+            entities.forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED));
+        });
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopStory());
+        playerSession.clear();
     }
 
     public void onChoiceSelected(int index) {
@@ -148,8 +157,29 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         if (ended) return;
         try {
             while (story.canContinue()) {
-                String text = story.Continue().stripTrailing();
-                List<String> tags = story.getCurrentTags();
+                String text;
+                List<String> tags;
+
+                if (snapshot != null) {
+                    text = snapshot.text;
+                    tags = snapshot.tags;
+                } else {
+                    text = story.Continue().stripTrailing();
+                    tags = story.getCurrentTags();
+                }
+
+                // If the speaker is not the same as last speaker, stop dialog client-side FIRST before advance the
+                // story.
+                String speaker = parseSpeaker(text)[0];
+                if (!lastCharacterSpoke.isEmpty()
+                        && !lastCharacterSpoke.equalsIgnoreCase(speaker)
+                        && snapshot == null) {
+                    pendingDialogueText = text; // buffer B's text avant de return
+                    Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+                    snapshot = new Snapshot(text, tags);
+                    return;
+                }
+                snapshot = null;
 
                 if (!tags.isEmpty()) {
                     if (!text.isEmpty()) {
@@ -163,6 +193,15 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
                     sendDialogue(text);
                     return;
                 }
+            }
+
+            // Execute last tags before ending story
+            if (snapshot != null) {
+                List<String> tags = snapshot.tags;
+                snapshot = null;
+                pendingDialogueText = null;
+                inkTagHandler.enqueue(tags);
+                return;
             }
 
             List<Choice> choices = story.getCurrentChoices();
@@ -194,27 +233,28 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
                 : "";
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(),
-                new S2CShowDialogue(speaker.toLowerCase(), dialogueText, 0f, entityId, dialogDataJson));
+                new S2CShowDialogue(speaker.toLowerCase(), dialogueText, entityId, dialogDataJson));
+        lastCharacterSpoke = speaker;
     }
 
-    public void registerEntity(CharacterStory characterStory, Entity entity) {
+    public void registerEntity(ICharacterStory characterStory, Entity entity) {
         characterEntities
                 .computeIfAbsent(characterStory.getName().toLowerCase(), k -> new ArrayList<>())
                 .add(entity);
     }
 
-    public void unregisterEntity(CharacterStory characterStory, Entity entity) {
+    public void unregisterEntity(ICharacterStory characterStory, Entity entity) {
         List<Entity> entities = characterEntities.get(characterStory.getName().toLowerCase());
         if (entities != null) {
             entities.remove(entity);
         }
     }
 
-    public void registerDialogDataForCharacter(CharacterStory characterStory, DialogData data) {
-        characterDialogData.putIfAbsent(characterStory.getName().toLowerCase(), data);
+    public void registerDialogDataForCharacter(ICharacterStory characterStory, DialogData data) {
+        characterDialogData.put(characterStory.getName().toLowerCase(), data);
     }
 
-    public void unregisterDialogDataForCharacter(CharacterStory characterStory) {
+    public void unregisterDialogDataForCharacter(ICharacterStory characterStory) {
         characterDialogData.remove(characterStory.getName().toLowerCase());
     }
 
@@ -241,4 +281,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     public Map<String, List<Entity>> getCharacterEntities() {
         return characterEntities;
     }
+
+    record Snapshot(String text, List<String> tags) {}
 }

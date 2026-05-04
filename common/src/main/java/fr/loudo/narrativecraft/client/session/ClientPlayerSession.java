@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.session;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
+import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
@@ -42,6 +43,8 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
     private final List<InkAction> activeClientInkActions = new ArrayList<>();
     private CameraView cameraView;
+    private DialogRenderer mainDialog;
+    private boolean stopNextDialog;
 
     public ClientPlayerSession() {
         super(null, null);
@@ -98,5 +101,21 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     public void stopAllClientInkActions() {
         new ArrayList<>(activeClientInkActions).forEach(InkAction::stop);
         activeClientInkActions.clear();
+    }
+
+    public DialogRenderer getMainDialog() {
+        return mainDialog;
+    }
+
+    public void setMainDialog(DialogRenderer mainDialog) {
+        this.mainDialog = mainDialog;
+    }
+
+    public boolean isStopNextDialog() {
+        return stopNextDialog;
+    }
+
+    public void setStopNextDialog(boolean stopNextDialog) {
+        this.stopNextDialog = stopNextDialog;
     }
 }

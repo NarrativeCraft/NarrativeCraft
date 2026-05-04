@@ -33,9 +33,13 @@ import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogPresetManager;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
-import fr.loudo.narrativecraft.narrative.cameraangle.*;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
+import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
@@ -44,6 +48,7 @@ import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.UUID;
+import net.minecraft.world.entity.Entity;
 
 @InkCommand(
         keyword = "camera",
@@ -79,12 +84,28 @@ public class CameraAngleInkAction extends InkAction {
         if (storyHandler != null) {
             registerDialogData(storyHandler);
         }
-        Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(), new BiCameraAngleEnter(cameraAngle, NarrativeEnvironment.PRODUCTION));
-        CameraAngleMakerEditorMaker editor =
-                new CameraAngleMakerEditorMaker(cameraAngle, session, NarrativeEnvironment.PRODUCTION);
-        session.setEditor(editor);
-        editor.init();
+        EditorMaker editorMaker = session.getEditor();
+        boolean enterEditorMaker = editorMaker == null;
+        if (editorMaker instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditorMaker) {
+            enterEditorMaker =
+                    !cameraAngleMakerEditorMaker.getCameraAngle().getId().equals(cameraAngle.getId());
+        }
+        if (enterEditorMaker) {
+            Services.PACKET.sendToPlayer(
+                    playerSession.getPlayer(), new BiCameraAngleEnter(cameraAngle, NarrativeEnvironment.PRODUCTION));
+            CameraAngleMakerEditorMaker editor =
+                    new CameraAngleMakerEditorMaker(cameraAngle, session, NarrativeEnvironment.PRODUCTION);
+            session.setEditor(editor);
+            editor.init();
+            if (storyHandler != null) {
+                for (CharacterPlacement characterPlacement : editor.getCharacterPlacements()) {
+                    Entity entity = editor.getEntityForPlacement(characterPlacement.getId());
+                    if (entity == null) continue;
+                    if (!(characterPlacement.getCharacterStory() instanceof CharacterStory character)) continue;
+                    storyHandler.registerEntity(character, entity);
+                }
+            }
+        }
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CEnterCameraView(cameraView.getId()));
         isRunning = false;
         return InkActionResult.ok();

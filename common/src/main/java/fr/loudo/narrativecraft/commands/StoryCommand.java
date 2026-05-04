@@ -61,6 +61,18 @@ public class StoryCommand {
                                         .executes(ctx -> {
                                             ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
                                             return playFor(ctx, target);
+                                        })))
+                        .then(Commands.literal("stop")
+                                .requires(commandSourceStack ->
+                                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                                .executes(ctx -> {
+                                    ServerPlayer player = ctx.getSource().getPlayerOrException();
+                                    return stopFor(ctx, player);
+                                })
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(ctx -> {
+                                            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+                                            return stopFor(ctx, target);
                                         })))));
     }
 
@@ -103,8 +115,7 @@ public class StoryCommand {
         String compiledJson = NarrativeCraftMod.getInstance().getCompiledStoryJson();
         if (compiledJson == null) {
             context.getSource()
-                    .sendFailure(Component.literal("Story not compiled. Run /nc story reload first.")
-                            .withStyle(ChatFormatting.RED));
+                    .sendFailure(Translation.message("story.not_compiled").withStyle(ChatFormatting.RED));
             return 0;
         }
 
@@ -129,8 +140,30 @@ public class StoryCommand {
 
         context.getSource()
                 .sendSuccess(
-                        () -> Component.literal(
-                                        "Story started for " + target.getName().getString())
+                        () -> Translation.message("story.started", target.getName())
+                                .withStyle(ChatFormatting.GREEN),
+                        false);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int stopFor(CommandContext<CommandSourceStack> context, ServerPlayer target) {
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession session = sessionManager.getByPlayer(target);
+
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler == null) {
+            context.getSource()
+                    .sendFailure(Translation.message("story.not_running", target.getName())
+                            .withStyle(ChatFormatting.RED));
+            return 0;
+        }
+
+        storyHandler.stop();
+        session.setStoryHandler(null);
+
+        context.getSource()
+                .sendSuccess(
+                        () -> Translation.message("story.stopped", target.getName())
                                 .withStyle(ChatFormatting.GREEN),
                         false);
         return Command.SINGLE_SUCCESS;

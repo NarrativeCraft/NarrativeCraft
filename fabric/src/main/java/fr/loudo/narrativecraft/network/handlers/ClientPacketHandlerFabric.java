@@ -36,8 +36,10 @@ import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
@@ -96,6 +98,12 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CShowChoices.TYPE, (packet, context) -> {
             ClientPacketHandler.showChoices(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CStopStory.TYPE, (packet, context) -> {
+            ClientPacketHandler.stopStory();
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CDialogStop.TYPE, (packet, context) -> {
+            ClientPacketHandler.dialogStop();
         });
         ClientPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (packet, context) -> {
             ClientPacketHandler.cameraAngleEnter(packet);

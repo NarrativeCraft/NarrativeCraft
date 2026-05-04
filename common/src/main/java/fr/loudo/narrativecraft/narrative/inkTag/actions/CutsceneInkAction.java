@@ -32,7 +32,7 @@ import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
@@ -83,8 +83,7 @@ public class CutsceneInkAction extends InkAction {
         StoryHandler storyHandler = ((PlayerSession) playerSession).getStoryHandler();
         if (storyHandler != null) {
             for (Playback playback : editorMaker.getPlaybacks()) {
-                CharacterStory characterStory =
-                        (CharacterStory) playback.getAnimation().getCharacterStory();
+                ICharacterStory characterStory = playback.getAnimation().getCharacterStory();
                 storyHandler.registerEntity(characterStory, playback.getMasterEntity());
             }
         }

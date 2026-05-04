@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -30,6 +31,15 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.playback.Playback;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.Translation;
+import javax.annotation.Nullable;
+import net.minecraft.world.entity.Entity;
 
 @InkCommand(
         keyword = "animation",
@@ -39,22 +49,113 @@ import fr.loudo.narrativecraft.api.session.IPlayerSession;
         side = Side.SERVER)
 public class AnimationInkAction extends InkAction {
 
+    private String action;
+    private Animation animation;
+    private Playback playback;
+    private boolean loop;
+    private boolean unique;
+
+    @Nullable
+    private StoryHandler storyHandler;
+
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        // TODO: resolve animation from scene.getAnimationManager() when story infra is available
-        if (cmd.flag("block")) blocking = true;
+        action = cmd.getString("action");
+        if (!action.equals("play") && !action.equals("stop")) {
+            return InkActionResult.error("Unknown animation action '" + action + "' (expected 'play' or 'stop')");
+        }
+        String animationName = cmd.getString("animationName");
+        animation = ((Scene) scene).getAnimationManager().getByName(animationName);
+        if (animation == null) {
+            return InkActionResult.error(Translation.message(
+                            NOT_EXISTS_KEY, Translation.message("animation").getString(), animationName)
+                    .getString());
+        }
+        if (action.equals("play")) {
+            loop = cmd.getBoolean("loop");
+            unique = cmd.getBoolean("unique");
+            if (cmd.flag("block")) blocking = true;
+        }
         return InkActionResult.ok();
     }
 
     @Override
     public void tick() {
-        // TODO: track playback.hasEnded() → isRunning = false
+        if (playback == null || !playback.isEnded()) return;
+
+        if (loop) {
+            ICharacterStory characterStory = animation.getCharacterStory();
+            if (storyHandler != null && characterStory != null) {
+                Entity oldMasterEntity = playback.getMasterEntity();
+                if (oldMasterEntity != null) {
+                    storyHandler.unregisterEntity(characterStory, oldMasterEntity);
+                }
+            }
+            playback.stopAndKill();
+            playback.setKillOnEnd(false);
+            playback.start();
+            NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
+            if (storyHandler != null && characterStory != null) {
+                Entity newMasterEntity = playback.getMasterEntity();
+                if (newMasterEntity != null) {
+                    storyHandler.registerEntity(characterStory, newMasterEntity);
+                }
+            }
+        } else {
+            isRunning = false;
+        }
     }
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: start/stop animation playback when Playback and StoryHandler are available
+        PlayerSession session = (PlayerSession) playerSession;
+        storyHandler = session.getStoryHandler();
+
+        if (action.equals("stop")) {
+            stopRunningPlayback();
+            isRunning = false;
+            return InkActionResult.ok();
+        }
+
+        if (!animation.initialize()) {
+            isRunning = false;
+            return InkActionResult.error("Failed to load animation data: " + animation.getName());
+        }
+
+        playback = new Playback(animation, session.getPlayer());
+        if (unique && !loop) {
+            playback.setKillOnEnd(true);
+        }
+        playback.start();
+        NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
+
+        ICharacterStory characterStory = animation.getCharacterStory();
+        if (storyHandler != null && characterStory != null) {
+            Entity masterEntity = playback.getMasterEntity();
+            if (masterEntity != null) {
+                storyHandler.registerEntity(characterStory, masterEntity);
+            }
+        }
+
+        if (blocking) {
+            return InkActionResult.block();
+        }
         isRunning = false;
-        return InkActionResult.ignored();
+        return InkActionResult.ok();
+    }
+
+    private void stopRunningPlayback() {
+        for (Playback running :
+                NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
+            if (running.getAnimation().equals(animation)) {
+                if (unique) {
+                    running.stopAndKill();
+                } else {
+                    running.stop();
+                }
+                NarrativeCraftMod.getInstance().getPlaybackManager().remove(running);
+                return;
+            }
+        }
     }
 }

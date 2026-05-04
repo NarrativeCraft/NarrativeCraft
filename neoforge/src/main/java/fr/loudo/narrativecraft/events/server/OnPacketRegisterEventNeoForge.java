@@ -46,8 +46,10 @@ import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -115,6 +117,8 @@ public class OnPacketRegisterEventNeoForge {
                 S2CShowDialogue.TYPE, S2CShowDialogue.STREAM_CODEC, ClientPacketHandlerNeoForge::showDialogue);
         registrar.playToClient(
                 S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC, ClientPacketHandlerNeoForge::showChoices);
+        registrar.playToClient(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC, ClientPacketHandlerNeoForge::stopStory);
+        registrar.playToClient(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC, ClientPacketHandlerNeoForge::dialogStop);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {

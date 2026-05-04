@@ -73,7 +73,7 @@ public class SceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Scene
         }
 
         Scene scene = chapter.getSceneManager().getByName(getName());
-        if (scene != null) {
+        if (scene != null && scene.getRank() == sceneRank) {
             sendToastError(
                     Translation.message("error"),
                     Translation.message(
