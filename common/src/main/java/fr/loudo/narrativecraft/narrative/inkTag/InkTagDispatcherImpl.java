@@ -146,8 +146,7 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
      *   <li>{@code \S+}                 → regular whitespace-delimited token</li>
      * </ol>
      */
-    private static final Pattern TOKEN_PATTERN =
-            Pattern.compile("(\\w+):\"([^\"]*)\"|\"([^\"]*)\"|([\\S]+)");
+    private static final Pattern TOKEN_PATTERN = Pattern.compile("(\\w+):\"([^\"]*)\"|\"([^\"]*)\"|([\\S]+)");
 
     /** Splits a raw tag into tokens, treating double-quoted spans as single tokens. */
     private static List<String> tokenize(String rawTag) {

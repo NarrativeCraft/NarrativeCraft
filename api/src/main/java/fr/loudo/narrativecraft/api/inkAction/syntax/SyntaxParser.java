@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
 public final class SyntaxParser {
 
     private static final Pattern REQUIRED_ARG = Pattern.compile("<(\\w+):(\\w+)>");
+    private static final Pattern OPTIONAL_POSITIONAL_ARG = Pattern.compile("\\((\\w+):(\\w+)\\)");
     private static final Pattern OPTIONAL_ARG = Pattern.compile("\\[(\\w+):(\\w+)(?:=([^\\]]*))?]");
     private static final Pattern FLAG = Pattern.compile("\\[--(\\w+)]");
 
@@ -60,6 +61,7 @@ public final class SyntaxParser {
      */
     public static CommandSpec parse(String keyword, String syntax) {
         List<ArgDef> positionalArgs = new ArrayList<>();
+        List<ArgDef> optionalPositionalArgs = new ArrayList<>();
         Map<String, NamedArgDef> namedArgs = new LinkedHashMap<>();
         Map<String, FlagDef> flags = new LinkedHashMap<>();
 
@@ -73,6 +75,14 @@ public final class SyntaxParser {
                 String name = requiredMatcher.group(1);
                 ArgType type = parseType(token, requiredMatcher.group(2));
                 positionalArgs.add(new ArgDef(name, type));
+                continue;
+            }
+
+            Matcher optionalPositionalMatcher = OPTIONAL_POSITIONAL_ARG.matcher(token);
+            if (optionalPositionalMatcher.matches()) {
+                String name = optionalPositionalMatcher.group(1);
+                ArgType type = parseType(token, optionalPositionalMatcher.group(2));
+                optionalPositionalArgs.add(new ArgDef(name, type));
                 continue;
             }
 
@@ -93,10 +103,10 @@ public final class SyntaxParser {
             }
 
             throw new IllegalArgumentException("Invalid syntax token '" + token + "' in syntax for '" + keyword + "'. "
-                    + "Expected one of: <name:type>, [name:type=default], [--flag].");
+                    + "Expected one of: <name:type>, (name:type), [name:type=default], [--flag].");
         }
 
-        return new CommandSpec(keyword, positionalArgs, namedArgs, flags);
+        return new CommandSpec(keyword, positionalArgs, optionalPositionalArgs, namedArgs, flags);
     }
 
     private static ArgType parseType(String fullToken, String typeToken) {

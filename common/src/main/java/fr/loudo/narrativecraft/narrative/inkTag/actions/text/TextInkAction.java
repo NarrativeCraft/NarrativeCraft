@@ -35,18 +35,19 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.utils.FadeState;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
+import javax.annotation.Nullable;
+import java.util.List;
+
 @InkCommand(
         keyword = "text",
         description = "Creates, moves, edits, or removes a named text overlay displayed on the client HUD.",
-        syntax = "text <id:string> <action:string> [value1:string] [value2:string] [value3:string] [--block]",
+        syntax = "text <id:string> <action:string> (param1:string) (param2:string) (param3:string) [--block]",
         side = Side.CLIENT)
 public class TextInkAction extends InkAction {
 
@@ -156,9 +157,9 @@ public class TextInkAction extends InkAction {
         textId = cmd.getString("id").toLowerCase();
         action = cmd.getString("action").toLowerCase();
 
-        String value1 = cmd.getString("value1");
-        String value2 = cmd.getString("value2");
-        String value3 = cmd.getString("value3");
+        String value1 = cmd.getString("param1");
+        String value2 = cmd.getString("param2");
+        String value3 = cmd.getString("param3");
 
         switch (action) {
             case "create" -> {

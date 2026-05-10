@@ -43,16 +43,19 @@ public final class CommandSpec {
 
     private final String keyword;
     private final List<ArgDef> positionalArgs;
+    private final List<ArgDef> optionalPositionalArgs;
     private final Map<String, NamedArgDef> namedArgs;
     private final Map<String, FlagDef> flags;
 
     CommandSpec(
             String keyword,
             List<ArgDef> positionalArgs,
+            List<ArgDef> optionalPositionalArgs,
             Map<String, NamedArgDef> namedArgs,
             Map<String, FlagDef> flags) {
         this.keyword = keyword;
         this.positionalArgs = positionalArgs;
+        this.optionalPositionalArgs = optionalPositionalArgs;
         this.namedArgs = namedArgs;
         this.flags = flags;
     }
@@ -67,6 +70,7 @@ public final class CommandSpec {
         Set<String> activeFlags = new HashSet<>();
 
         int positionalIndex = 0;
+        int optionalPositionalIndex = 0;
 
         for (String token : tokens) {
             if (token.startsWith("--")) {
@@ -89,12 +93,17 @@ public final class CommandSpec {
                 args.put(name, def.type().parse(rawValue));
 
             } else {
-                if (positionalIndex >= positionalArgs.size()) {
+                if (positionalIndex < positionalArgs.size()) {
+                    ArgDef def = positionalArgs.get(positionalIndex++);
+                    args.put(def.name(), def.type().parse(token));
+                } else if (optionalPositionalIndex < optionalPositionalArgs.size()) {
+                    ArgDef def = optionalPositionalArgs.get(optionalPositionalIndex++);
+                    args.put(def.name(), def.type().parse(token));
+                } else {
                     throw new IllegalArgumentException("Too many positional arguments for tag '" + keyword + "'. "
-                            + "Expected " + positionalArgs.size() + ".");
+                            + "Expected at most "
+                            + (positionalArgs.size() + optionalPositionalArgs.size()) + ".");
                 }
-                ArgDef def = positionalArgs.get(positionalIndex++);
-                args.put(def.name(), def.type().parse(token));
             }
         }
 
