@@ -138,7 +138,16 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
         return entry.factory().get();
     }
 
-    private static final Pattern TOKEN_PATTERN = Pattern.compile("\"([^\"]+)\"|(\\S+)");
+    /**
+     * Matches three token forms, in priority order:
+     * <ol>
+     *   <li>{@code name:"quoted value"} → named arg whose value may contain spaces</li>
+     *   <li>{@code "quoted value"}      → standalone positional value with spaces</li>
+     *   <li>{@code \S+}                 → regular whitespace-delimited token</li>
+     * </ol>
+     */
+    private static final Pattern TOKEN_PATTERN =
+            Pattern.compile("(\\w+):\"([^\"]*)\"|\"([^\"]*)\"|([\\S]+)");
 
     /** Splits a raw tag into tokens, treating double-quoted spans as single tokens. */
     private static List<String> tokenize(String rawTag) {
@@ -147,7 +156,13 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
         List<String> tokens = new ArrayList<>();
         Matcher matcher = TOKEN_PATTERN.matcher(trimmed);
         while (matcher.find()) {
-            tokens.add(matcher.group(1) != null ? matcher.group(1) : matcher.group(2));
+            if (matcher.group(1) != null) {
+                tokens.add(matcher.group(1) + ":" + matcher.group(2));
+            } else if (matcher.group(3) != null) {
+                tokens.add(matcher.group(3));
+            } else {
+                tokens.add(matcher.group(4));
+            }
         }
         return List.copyOf(tokens);
     }
