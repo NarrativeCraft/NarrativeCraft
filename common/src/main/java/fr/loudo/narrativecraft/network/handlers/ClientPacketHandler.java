@@ -63,10 +63,9 @@ import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
-
-import java.util.ArrayList;
 
 public class ClientPacketHandler {
 

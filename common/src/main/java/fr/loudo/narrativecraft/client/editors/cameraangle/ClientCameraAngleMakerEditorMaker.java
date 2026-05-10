@@ -122,11 +122,6 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                 .tooltip(Tooltip.create(Translation.message("screen.camera_angle_editor.open_menu")))
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
-        buttons.add(Button.builder(Component.literal("\uE207"), b -> openDialogSetupScreen())
-                .tooltip(Tooltip.create(Translation.message("screen.camera_angle_editor.dialog_setups")))
-                .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
-                .build());
-
         buttons.add(Button.builder(Component.literal("✖"), b -> openQuitConfirm())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
@@ -178,6 +173,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         characterPlacements.addAll(cameraAngle.getCharacterPlacements());
         templateReferences.addAll(cameraAngle.getTemplateReferences());
         cameraViews.addAll(cameraAngle.getCameras());
+        syncDialogSetups();
     }
 
     public void addCharacterPlacementFromJson(String placementJson) {
@@ -185,6 +181,19 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                 CameraAngleDeserializer.deserializeCharacterPlacementFromJson(placementJson, cameraAngle.getScene());
         if (placement != null) {
             characterPlacements.add(placement);
+            syncDialogSetups();
+        }
+    }
+
+    private void syncDialogSetups() {
+        for (CameraView cameraView : cameraViews) {
+            for (CharacterPlacement placement : characterPlacements) {
+                boolean hasSetup = cameraView.getDialogSetups().stream()
+                        .anyMatch(setup -> setup.getCharacterPlacementId().equals(placement.getId()));
+                if (!hasSetup) {
+                    cameraView.getDialogSetups().add(new CameraViewDialogSetup(placement.getId()));
+                }
+            }
         }
     }
 
@@ -212,6 +221,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         Vec3 rotation = new Vec3(minecraft.player.getXRot(), minecraft.player.getYRot(), 0.0);
         float fov = minecraft.options.fov().get();
         cameraViews.add(new CameraView(name, position, rotation, fov));
+        syncDialogSetups();
     }
 
     public void renameCamera(CameraView cameraView, String newName) {
@@ -417,10 +427,6 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         advancedPanel.setVisible(false);
     }
 
-    private void openDialogSetupScreen() {
-        minecraft.setScreen(new CameraAngleDialogSetupScreen(this, minecraft.screen));
-    }
-
     private void editCameraPosition() {
         editingCameraViewPosition = true;
         minecraft.setScreen(null);
@@ -456,12 +462,12 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
 
-        Button quitButton = buttons.get(5);
-        Button saveButton = buttons.get(6);
-        Button leavePreviewButton = buttons.get(7);
-        Button editPositionButton = buttons.get(8);
-        Button acceptPositionButton = buttons.get(9);
-        Button stopPositionButton = buttons.get(10);
+        Button quitButton = buttons.get(4);
+        Button saveButton = buttons.get(5);
+        Button leavePreviewButton = buttons.get(6);
+        Button editPositionButton = buttons.get(7);
+        Button acceptPositionButton = buttons.get(8);
+        Button stopPositionButton = buttons.get(9);
 
         quitButton.setPosition(5, 5);
         saveButton.setPosition(quitButton.getX() + quitButton.getWidth() + 5, 5);
@@ -469,10 +475,10 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         boolean inPreview = previewCameraView != null;
 
         if (!inPreview) {
-            int totalWidth = 5 * BUTTON_WIDTH + 4 * BUTTON_GAP;
+            int totalWidth = 4 * BUTTON_WIDTH + 3 * BUTTON_GAP;
             int startX = screenWidth / 2 - totalWidth / 2;
             int y = screenHeight - BUTTON_HEIGHT - 30;
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 4; i++) {
                 Button b = buttons.get(i);
                 b.setPosition(startX + i * (BUTTON_WIDTH + BUTTON_GAP), y);
                 b.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
@@ -524,20 +530,20 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         boolean inPreview = previewCameraView != null;
 
         if (!inPreview) {
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < 6; i++) {
                 buttons.get(i).mouseClicked(event, isDoubleClick);
             }
         } else if (!editingCameraViewPosition) {
+            buttons.get(6).mouseClicked(event, isDoubleClick);
             buttons.get(7).mouseClicked(event, isDoubleClick);
-            buttons.get(8).mouseClicked(event, isDoubleClick);
             if (previewMode == PreviewMode.DIALOG) {
                 if (dialogPreviewPanel.mouseClicked(event)) {
                     advancedPanel.unfocusAll();
                 }
             }
         } else {
+            buttons.get(8).mouseClicked(event, isDoubleClick);
             buttons.get(9).mouseClicked(event, isDoubleClick);
-            buttons.get(10).mouseClicked(event, isDoubleClick);
         }
     }
 

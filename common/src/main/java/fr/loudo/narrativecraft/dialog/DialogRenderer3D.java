@@ -105,7 +105,9 @@ public class DialogRenderer3D extends DialogRenderer {
         poseStack.translate(anchorX, anchorY, 0);
 
         renderBackground(poseStack, bufferSource, totalWidth, totalHeight, opacity);
-        renderText(poseStack, bufferSource, partialTick);
+        if (!isAnimating()) {
+            renderText(poseStack, bufferSource, partialTick);
+        }
 
         if (data.isTailVisible()) {
             // Translate tail to the anchor corner (the corner closest to the entity head)

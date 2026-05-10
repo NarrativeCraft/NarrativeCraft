@@ -38,7 +38,8 @@ public class DialogAnimator {
         STOPPED
     }
 
-    private static final float TRANSITION_TICKS = 8f;
+    private static final float TRANSITION_TICKS = 4f;
+    private static final float RESIZE_TICKS = 8f;
 
     private State state = State.STOPPED;
     private float animationProgress = 0f;
@@ -74,7 +75,7 @@ public class DialogAnimator {
                 }
             }
             case RESIZING -> {
-                resizeProgress += 1f / TRANSITION_TICKS;
+                resizeProgress += 1f / RESIZE_TICKS;
                 if (resizeProgress >= 1f) {
                     resizeProgress = 1f;
                     state = State.RUNNING;

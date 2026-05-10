@@ -28,7 +28,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 
 @Mod(NarrativeCraftMod.MOD_ID)
 public class OnServerBreakBlockEventNeoForge {
@@ -37,7 +37,7 @@ public class OnServerBreakBlockEventNeoForge {
         NeoForge.EVENT_BUS.addListener(OnServerBreakBlockEventNeoForge::onBreakBlock);
     }
 
-    private static void onBreakBlock(BlockEvent.BreakEvent event) {
+    private static void onBreakBlock(BreakBlockEvent event) {
         if (event.getPlayer() instanceof ServerPlayer player) {
             OnServerBreakBlockEvent.onBreakEvent(event.getState(), event.getPos(), player);
         }
