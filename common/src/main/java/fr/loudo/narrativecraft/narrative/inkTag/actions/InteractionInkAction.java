@@ -30,6 +30,9 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.narrative.interaction.Interaction;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.utils.Translation;
 
 @InkCommand(
         keyword = "interaction",
@@ -38,9 +41,22 @@ import fr.loudo.narrativecraft.api.session.IPlayerSession;
         side = Side.SERVER)
 public class InteractionInkAction extends InkAction {
 
+    private String action;
+    private Interaction interaction;
+
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        // TODO: resolve interaction from scene.getInteractionManager() when story infra is available
+        action = cmd.getString("action");
+        if (!action.equals("summon") && !action.equals("remove")) {
+            return InkActionResult.error("Unknown interaction action '" + action + "' (expected 'summon' or 'remove')");
+        }
+        String interactionName = cmd.getString("interactionName");
+        interaction = ((Scene) scene).getInteractionManager().getByName(interactionName);
+        if (interaction == null) {
+            return InkActionResult.error(Translation.message(
+                            NOT_EXISTS_KEY, Translation.message("interaction").getString(), interactionName)
+                    .getString());
+        }
         return InkActionResult.ok();
     }
 

@@ -39,12 +39,11 @@ import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 @InkCommand(
         keyword = "subscene",

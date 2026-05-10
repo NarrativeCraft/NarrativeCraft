@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -30,35 +32,115 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 
 @InkCommand(
         keyword = "time",
-        description = "Smoothly transitions the in-game day time from one value to another, with optional easing.",
+        description = "Changes the in-game day time instantly or transitions smoothly from one value to another.",
         syntax =
                 "time <action:string> <from:string> [to:string] [for:float=0] [unit:string=seconds] [easing:string=smooth]",
-        side = Side.CLIENT)
+        side = Side.SERVER)
 public class ChangeDayTimeInkAction extends InkAction {
 
-    @Override
-    public void tick() {
-        // TODO: advance segmentTick and compute interpolated time when Easing is available
-    }
-
-    @Override
-    public void partialTick(float partialTick) {
-        // TODO: interpolate day-time tick value via Easing
-    }
+    private String action;
+    private long fromTick;
+    private long toTick;
+    private EasingType easingType;
+    private ServerLevel level;
 
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        // TODO: parse action (set/add), resolve named day times, compute totalTick when Easing is available
+        action = cmd.getString("action");
+        if (!action.equals("set") && !action.equals("add")) {
+            return InkActionResult.error("Unknown time action '" + action + "' (expected 'set' or 'add')");
+        }
+
+        fromTick = parseDayTime(cmd.getString("from"));
+        if (fromTick == -1) {
+            return InkActionResult.error("Invalid time value '" + cmd.getString("from") + "'");
+        }
+
+        if (action.equals("add")) {
+            return InkActionResult.ok();
+        }
+
+        String toStr = cmd.getString("to");
+        float forDuration = cmd.getFloat("for");
+
+        if (toStr == null || toStr.isEmpty() || forDuration == 0) {
+            toTick = fromTick;
+            return InkActionResult.ok();
+        }
+
+        toTick = parseDayTime(toStr);
+        if (toTick == -1) {
+            return InkActionResult.error("Invalid time value '" + toStr + "'");
+        }
+
+        String unit = cmd.getString("unit");
+        double forSeconds =
+                switch (unit) {
+                    case "minutes" -> forDuration * 60.0;
+                    case "hours" -> forDuration * 3600.0;
+                    default -> forDuration;
+                };
+        totalTick = (int) (forSeconds * 20.0);
+
+        String easingStr = cmd.getString("easing");
+        try {
+            easingType = EasingType.valueOf(easingStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return InkActionResult.error("Invalid easing '" + easingStr + "'");
+        }
+
         return InkActionResult.ok();
     }
 
     @Override
+    public void tick() {
+        if (!isRunning || level == null || totalTick == 0) return;
+        tick++;
+        double t = Mth.clamp((double) tick / totalTick, 0.0, 1.0);
+        t = Interpolation.applyEasing(easingType, t);
+        // level.setDayTime((long) Interpolation.lerp(fromTick, toTick, t));
+        if (tick >= totalTick) {
+            isRunning = false;
+        }
+    }
+
+    @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: apply day-time change when implementation is complete
-        isRunning = false;
-        return InkActionResult.ignored();
+        level = playerSession.getPlayer().level();
+
+        if (action.equals("add")) {
+            // level.setDayTime(level.getDayTime() + fromTick);
+            isRunning = false;
+            return InkActionResult.ok();
+        }
+
+        if (totalTick == 0) {
+            // level.setDayTime(fromTick);
+            isRunning = false;
+            return InkActionResult.ok();
+        }
+
+        return InkActionResult.ok();
+    }
+
+    private static long parseDayTime(String dayTime) {
+        return switch (dayTime) {
+            case "day" -> 1000L;
+            case "noon" -> 6000L;
+            case "night" -> 13000L;
+            case "midnight" -> 18000L;
+            default -> {
+                try {
+                    yield Long.parseLong(dayTime);
+                } catch (NumberFormatException e) {
+                    yield -1L;
+                }
+            }
+        };
     }
 }

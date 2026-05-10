@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.events.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.CameraAngleMakerEditorCameraRenderer;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorCameraRenderer;
@@ -53,6 +54,7 @@ public class OnRenderWorldEvent {
         InteractionMakerEditorRenderer.render(poseStack, deltaTracker);
 
         renderDialog3D(poseStack, deltaTracker);
+        renderClientInkActions(poseStack, deltaTracker);
 
         modelViewStack.popMatrix();
     }
@@ -68,6 +70,13 @@ public class OnRenderWorldEvent {
 
         for (DialogRenderer3D dialog : dialogs) {
             dialog.render(poseStack, bufferSource, partialTick);
+        }
+    }
+
+    private static void renderClientInkActions(PoseStack poseStack, DeltaTracker deltaTracker) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        for (InkAction action : session.getActiveClientInkActions()) {
+            action.render(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
         }
     }
 }

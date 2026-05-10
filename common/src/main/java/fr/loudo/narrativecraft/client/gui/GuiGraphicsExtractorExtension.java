@@ -72,6 +72,20 @@ public record GuiGraphicsExtractorExtension(GuiGraphicsExtractor graphics) {
                         getScreenRectangle()));
     }
 
+    public void fill(float x0, float y0, float x1, float y1, int col) {
+        this.getGuiRenderState()
+                .addGuiElement(new Fill2dGui(
+                        RenderPipelines.GUI,
+                        TextureSetup.noTexture(),
+                        new Matrix3x2f(graphics.pose()),
+                        x0,
+                        y0,
+                        x1,
+                        y1,
+                        col,
+                        getScreenRectangle()));
+    }
+
     private GuiRenderState getGuiRenderState() {
         return ((GuiGraphicsExtractorAccessor) graphics).getGuiRenderState();
     }

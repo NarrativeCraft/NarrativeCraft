@@ -85,8 +85,14 @@ public class ShakeScreenInkAction extends InkAction {
         }
     }
 
+    /**
+     * Empty to not be called twice
+     * @see #shakeScreen(PoseStack, float)
+     */
     @Override
-    public void render(PoseStack poseStack, float partialTick) {
+    public void render(PoseStack poseStack, float partialTick) {}
+
+    public void shakeScreen(PoseStack poseStack, float partialTick) {
         float interpolatedX = Mth.lerp(partialTick, lastOffsetX, currentOffsetX);
         float interpolatedY = Mth.lerp(partialTick, lastOffsetY, currentOffsetY);
         poseStack.translate(interpolatedX, interpolatedY, 0);

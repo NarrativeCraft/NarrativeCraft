@@ -46,5 +46,6 @@ public class OnHudRenderEventNeoForge {
         OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
         OnHudRender.interactionHudRender(graphics, deltaTracker);
         OnHudRender.dialogHudRender(graphics, deltaTracker);
+        OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
     }
 }

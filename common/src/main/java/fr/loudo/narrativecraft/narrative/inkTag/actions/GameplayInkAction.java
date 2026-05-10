@@ -45,8 +45,7 @@ public class GameplayInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: teleport player to main character position, stop story/dialog/camera when StoryHandler is available
-        isRunning = false;
-        return InkActionResult.ignored();
+        // TODO: implemenent
+        return InkActionResult.ok();
     }
 }

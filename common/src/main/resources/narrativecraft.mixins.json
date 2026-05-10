@@ -15,6 +15,7 @@
   ],
   "client": [
     "CameraMixin",
+    "GameRendererMixin",
     "GuiTextRenderStateMixin",
     "MinecraftMixin",
     "accessor.GuiGraphicsExtractorAccessor"

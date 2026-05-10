@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.events.client;
 
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
@@ -65,6 +66,13 @@ public class OnHudRender {
         List<DialogRenderer2D> dialogs = session.getActiveDialog2DRenderers();
         for (DialogRenderer2D dialog : dialogs) {
             dialog.render(graphics, deltaTracker);
+        }
+    }
+
+    public static void clientInkActionsHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        for (InkAction action : session.getActiveClientInkActions()) {
+            action.render(graphics, deltaTracker.getGameTimeDeltaPartialTick(true));
         }
     }
 }

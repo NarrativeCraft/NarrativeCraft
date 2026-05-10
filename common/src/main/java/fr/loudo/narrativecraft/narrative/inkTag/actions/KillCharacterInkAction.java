@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -30,6 +31,12 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.world.entity.Entity;
 
 @InkCommand(
         keyword = "kill",
@@ -38,16 +45,41 @@ import fr.loudo.narrativecraft.api.session.IPlayerSession;
         side = Side.SERVER)
 public class KillCharacterInkAction extends InkAction {
 
+    private ICharacterStory character;
+
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        // TODO: resolve character via CharacterManager / NpcManager when StoryHandler is available
+        String characterName = cmd.getString("characterName");
+        character = NarrativeCraftMod.getInstance().getCharacterManager().getByName(characterName);
+        if (character == null && scene != null) {
+            character = ((Scene) scene).getNpcManager().getByName(characterName);
+        }
+        if (character == null) {
+            return InkActionResult.error(Translation.message(
+                            NOT_EXISTS_KEY, Translation.message("character").getString(), characterName)
+                    .getString());
+        }
         return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: call storyHandler.killCharacter() when StoryHandler is available
+        StoryHandler storyHandler = ((PlayerSession) playerSession).getStoryHandler();
+        if (storyHandler == null) {
+            isRunning = false;
+            return InkActionResult.ignored();
+        }
+        if (!storyHandler.characterInStory(character)) {
+            isRunning = false;
+            return InkActionResult.ignored();
+        }
+        Entity entity =
+                storyHandler.getCharacterEntities().get(character.getName().toLowerCase());
+        if (entity != null) {
+            storyHandler.unregisterEntity(character, entity);
+            entity.remove(Entity.RemovalReason.KILLED);
+        }
         isRunning = false;
-        return InkActionResult.ignored();
+        return InkActionResult.ok();
     }
 }
