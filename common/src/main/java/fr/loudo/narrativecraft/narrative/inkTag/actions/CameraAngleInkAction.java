@@ -89,6 +89,11 @@ public class CameraAngleInkAction extends InkAction {
         if (editorMaker instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditorMaker) {
             enterEditorMaker =
                     !cameraAngleMakerEditorMaker.getCameraAngle().getId().equals(cameraAngle.getId());
+        } else {
+            if (editorMaker != null) {
+                editorMaker.stop();
+                enterEditorMaker = true;
+            }
         }
         if (enterEditorMaker) {
             Services.PACKET.sendToPlayer(

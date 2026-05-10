@@ -41,6 +41,7 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.world.entity.Entity;
 
 @InkCommand(
         keyword = "cutscene",
@@ -74,13 +75,26 @@ public class CutsceneInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        editorMaker = new CutsceneMakerEditorMaker(cutscene, (PlayerSession) playerSession);
+        editorMaker =
+                new CutsceneMakerEditorMaker(cutscene, (PlayerSession) playerSession, NarrativeEnvironment.PRODUCTION);
         ((PlayerSession) playerSession).setEditor(editorMaker);
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(), new BiCutsceneEnter(cutscene, NarrativeEnvironment.PRODUCTION));
-        editorMaker.init();
-        editorMaker.start();
         StoryHandler storyHandler = ((PlayerSession) playerSession).getStoryHandler();
+        editorMaker.init();
+
+        // Re-use entity of a character if spawn animation point is close to current entity
+        if (storyHandler != null) {
+            for (Playback playback : editorMaker.getPlaybacks()) {
+                Entity entity = storyHandler.getEntityFromCharacter(
+                        playback.getAnimation().getCharacterStory());
+                if (entity == null) continue;
+                if (playback.getFirstPosition().distanceTo(entity.position()) <= 5.0) {
+                    playback.setMasterEntity(entity);
+                }
+            }
+        }
+        editorMaker.start();
         if (storyHandler != null) {
             for (Playback playback : editorMaker.getPlaybacks()) {
                 ICharacterStory characterStory = playback.getAnimation().getCharacterStory();

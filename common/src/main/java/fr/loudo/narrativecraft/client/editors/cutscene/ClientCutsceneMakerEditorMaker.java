@@ -154,6 +154,9 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
+    public void stop() {}
+
     public void tick() {}
 
     @Override

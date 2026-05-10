@@ -63,9 +63,10 @@ import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
+
+import java.util.ArrayList;
 
 public class ClientPacketHandler {
 
@@ -225,11 +226,7 @@ public class ClientPacketHandler {
 
     public static void stopStory() {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        new ArrayList<>(session.getActiveDialog2DRenderers()).forEach(session::removeDialog2D);
-        new ArrayList<>(session.getActiveDialog3DRenderers()).forEach(session::removeDialog3D);
-        session.setMainDialog(null);
-        session.setCameraView(null);
-        session.setEditor(null);
+        session.clear();
     }
 
     public static void dialogStop() {

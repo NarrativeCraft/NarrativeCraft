@@ -82,6 +82,10 @@ public class Playback implements IPlaybackSession {
         return contexts.getFirst().getEntity();
     }
 
+    public void setMasterEntity(Entity entity) {
+        contexts.getFirst().setEntity(entity);
+    }
+
     public void start(Collection<ServerPlayer> targetedPlayers) {
         this.targetedPlayers.addAll(targetedPlayers);
         start();

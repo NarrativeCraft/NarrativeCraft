@@ -66,6 +66,17 @@ public class ClientPlayerSession extends AbstractPlayerSession {
         return Collections.unmodifiableList(activeDialog3DRenderers);
     }
 
+    @Override
+    public void clear() {
+        super.clear();
+        new ArrayList<>(activeDialog2DRenderers).forEach(this::removeDialog2D);
+        new ArrayList<>(activeDialog3DRenderers).forEach(this::removeDialog3D);
+        cutsceneDataSession.reset();
+        mainDialog = null;
+        cameraView = null;
+        stopNextDialog = false;
+    }
+
     public void addDialog2D(DialogRenderer2D renderer) {
         activeDialog2DRenderers.add(renderer);
     }

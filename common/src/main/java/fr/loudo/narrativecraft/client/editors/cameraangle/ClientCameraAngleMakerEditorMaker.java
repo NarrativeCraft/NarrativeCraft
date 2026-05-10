@@ -29,7 +29,10 @@ import fr.loudo.narrativecraft.client.editors.widgets.CameraViewDialogSetupAdvan
 import fr.loudo.narrativecraft.client.editors.widgets.FovSliderWidget;
 import fr.loudo.narrativecraft.client.editors.widgets.RollSliderWidget;
 import fr.loudo.narrativecraft.client.screens.ClearScreen;
-import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.*;
+import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleCameraNameScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleCharacterPickerScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleEditorMenuScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleTemplatePickerScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -42,7 +45,6 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.*;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -59,6 +61,8 @@ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
@@ -143,6 +147,9 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
     }
+
+    @Override
+    public void stop() {}
 
     public void tick() {
         if (previewCameraView != null && !editingCameraViewPosition) {

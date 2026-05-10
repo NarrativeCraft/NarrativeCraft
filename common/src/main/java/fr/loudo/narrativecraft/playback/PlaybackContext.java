@@ -283,4 +283,8 @@ public class PlaybackContext implements IPlaybackContext {
     public Entity getEntity() {
         return entity;
     }
+
+    public void setEntity(Entity entity) {
+        this.entity = entity;
+    }
 }

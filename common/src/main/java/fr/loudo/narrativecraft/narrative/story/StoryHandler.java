@@ -40,14 +40,13 @@ import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import net.minecraft.world.entity.Entity;
-
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
+import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
@@ -245,6 +244,14 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     public void unregisterEntity(ICharacterStory characterStory, Entity entity) {
         characterEntities.remove(characterStory.getName().toLowerCase(), entity);
+    }
+
+    public Entity getEntityFromCharacter(ICharacterStory characterStory) {
+        return characterEntities.get(characterStory.getName());
+    }
+
+    public boolean characterInStory(ICharacterStory characterStory) {
+        return characterEntities.get(characterStory.getName()) != null;
     }
 
     public void registerDialogDataForCharacter(ICharacterStory characterStory, DialogData data) {

@@ -29,6 +29,8 @@ public interface EditorMaker {
 
     void init();
 
+    void stop();
+
     void tick();
 
     void teleportToEditorOrigin();

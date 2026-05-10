@@ -37,12 +37,13 @@ import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CutsceneMakerEditorMaker implements EditorMaker {
 
@@ -135,10 +136,16 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void stop() {
-        for (Playback playback : playbacks) {
-            playback.stopAndKill();
+        if (environment == NarrativeEnvironment.PRODUCTION) {
+            for (Playback playback : playbacks) {
+                playback.stop();
+            }
+        } else {
+            for (Playback playback : playbacks) {
+                playback.stopAndKill();
+            }
+            playerSession.changeGameMode(playerSession.getLastGameType());
         }
-        playerSession.changeGameMode(playerSession.getLastGameType());
     }
 
     public void moveTo(int tick) {

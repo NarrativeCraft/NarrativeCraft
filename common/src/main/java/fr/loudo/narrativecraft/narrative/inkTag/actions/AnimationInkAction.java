@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import javax.annotation.Nullable;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 @InkCommand(
         keyword = "animation",
@@ -84,12 +85,20 @@ public class AnimationInkAction extends InkAction {
         if (playback == null || !playback.isEnded()) return;
 
         if (loop) {
+
+            Entity oldMasterEntity = playback.getMasterEntity();
+            Vec3 firstPosition = playback.getFirstPosition();
+
+            // If entity is close to spawn point, just move it
+            if (oldMasterEntity.position().distanceTo(firstPosition) <= 5.0) {
+                playback.moveTo(0);
+                return;
+            }
+
+            // If not, the entity will respawn
             ICharacterStory characterStory = animation.getCharacterStory();
             if (storyHandler != null && characterStory != null) {
-                Entity oldMasterEntity = playback.getMasterEntity();
-                if (oldMasterEntity != null) {
-                    storyHandler.unregisterEntity(characterStory, oldMasterEntity);
-                }
+                storyHandler.unregisterEntity(characterStory, oldMasterEntity);
             }
             playback.stopAndKill();
             playback.setKillOnEnd(false);
