@@ -54,6 +54,10 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
 
         ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
 
+        if (character.getMainCharacterAttribute().isMainCharacter()) {
+            demotePreviousMainCharacter(entryId);
+        }
+
         int result = NarrativeCraftFileRegistry.getInstance().create(character);
         if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
             characterManager.add(character);
@@ -69,6 +73,13 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
         if (oldCharacter == null) return;
 
         CharacterStory newCharacter = buildFromPayload(entryId, payload);
+        MainCharacterAttribute newAttribute = newCharacter.getMainCharacterAttribute();
+
+        if (newAttribute.isMainCharacter()
+                && !oldCharacter.getMainCharacterAttribute().isMainCharacter()) {
+            demotePreviousMainCharacter(entryId);
+        }
+
         int result = NarrativeCraftFileRegistry.getInstance().edit(newCharacter);
 
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
@@ -85,6 +96,7 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
             oldCharacter.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        oldCharacter.setMainCharacterAttribute(newAttribute);
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }
@@ -104,6 +116,18 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
         }
     }
 
+    private void demotePreviousMainCharacter(UUID excludeId) {
+        for (CharacterStory character : characterManager.getList()) {
+            if (!character.getId().equals(excludeId)
+                    && character.getMainCharacterAttribute().isMainCharacter()) {
+                character.getMainCharacterAttribute().setMainCharacter(false);
+                NarrativeCraftFileRegistry.getInstance().edit(character);
+                UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(character.getId(), character.toPayload()));
+                break;
+            }
+        }
+    }
+
     private CharacterStory buildFromPayload(UUID entryId, CharacterStoryPayload payload) {
         CharacterStory character = new CharacterStory(entryId, payload.getName(), payload.getDescription());
         character.setDialogPresetName(payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
@@ -111,6 +135,7 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
             character.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        character.setMainCharacterAttribute(new MainCharacterAttribute(payload.getMainCharacterAttribute()));
         return character;
     }
 

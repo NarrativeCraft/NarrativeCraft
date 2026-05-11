@@ -28,10 +28,9 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.platform.Services;
+import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
-
-import javax.annotation.Nullable;
 
 public class PlayerSession extends AbstractPlayerSession {
 

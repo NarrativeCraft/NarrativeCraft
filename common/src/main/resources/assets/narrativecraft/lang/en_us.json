@@ -26,6 +26,8 @@
   "narrativecraft.roll": "Roll",
   "narrativecraft.fov": "FOV",
   "narrativecraft.line": "Line",
+  "narrativecraft.yes": "Yes",
+  "narrativecraft.no": "No",
 
   "narrativecraft.screen.scene_menu.animations": "Animations",
   "narrativecraft.screen.scene_menu.camera_angles": "Camera angles",
@@ -60,6 +62,10 @@
   "narrativecraft.screen.camera_angle_editor.menu.entities": "Entities",
   "narrativecraft.screen.camera_angle_editor.menu.templates": "Templates",
   "narrativecraft.screen.camera_angle_editor.menu.preview": "Preview",
+
+  "narrativecraft.screen.character.is_main_character": "Main Character: %s",
+  "narrativecraft.screen.character.skin": "Skin: %s",
+  "narrativecraft.screen.character.main_character_settings": "Main Character Settings",
 
   "narrativecraft.screen.entity_type_picker": "Select Entity Type",
   "narrativecraft.screen.animation_character_picker": "Select Character",

@@ -24,22 +24,41 @@
 package fr.loudo.narrativecraft.client.screens.narrative.character;
 
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
+import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 
 public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<CharacterStory> {
 
+    private MainCharacterAttribute mainCharacterAttribute;
+
     public CharacterEntryEditScreen(Screen lastScreen) {
         super(lastScreen);
+        this.mainCharacterAttribute = new MainCharacterAttribute();
     }
 
     public CharacterEntryEditScreen(CharacterStory entry, Screen lastScreen) {
         super(entry, lastScreen);
+        this.mainCharacterAttribute = new MainCharacterAttribute(entry.getMainCharacterAttribute());
+    }
+
+    @Override
+    protected void addCustomFields() {
+        super.addCustomFields();
+        Button mainCharacterSettingsButton = Button.builder(
+                        Translation.message("screen.character.main_character_settings"),
+                        b -> minecraft.setScreen(new MainCharacterAttributeScreen(this, mainCharacterAttribute)))
+                .size(GLOBAL_WIDTH, 20)
+                .build();
+        addElementToWidgetsList(mainCharacterSettingsButton);
     }
 
     @Override
     protected CharacterStory createInstance() {
         CharacterStory character = new CharacterStory(getName(), getDescription());
         character.setEntityType(selectedEntityType);
+        character.setMainCharacterAttribute(mainCharacterAttribute);
         return character;
     }
 }

@@ -27,10 +27,20 @@ import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
 public class CharacterManager extends NarrativeManager<CharacterStory> {
+
+    @Override
+    public List<CharacterStory> getList() {
+        List<CharacterStory> sorted = new ArrayList<>(list);
+        sorted.sort(Comparator.comparingInt(c -> c.getMainCharacterAttribute().isMainCharacter() ? 0 : 1));
+        return sorted;
+    }
 
     /**
      * Retrieve a global character or a npc if you have a scene by his id.

@@ -65,6 +65,7 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
             oldCharacter.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        oldCharacter.setMainCharacterAttribute(payload.getMainCharacterAttribute());
         UtilsClient.reloadListScreen();
     }
 
@@ -82,6 +83,7 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
             character.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        character.setMainCharacterAttribute(payload.getMainCharacterAttribute());
         return character;
     }
 

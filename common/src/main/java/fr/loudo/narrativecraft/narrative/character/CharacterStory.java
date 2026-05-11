@@ -35,6 +35,7 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
     private String dialogPresetName;
     private EntityType<?> entityType = EntityType.PLAYER;
     private PlayerModelType modelType;
+    private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
 
     public CharacterStory(String name, String description) {
         super(name, description);
@@ -72,16 +73,25 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
         return characterType;
     }
 
+    public MainCharacterAttribute getMainCharacterAttribute() {
+        return mainCharacterAttribute;
+    }
+
+    public void setMainCharacterAttribute(MainCharacterAttribute mainCharacterAttribute) {
+        this.mainCharacterAttribute = mainCharacterAttribute;
+    }
+
     @Override
     public CharacterStoryPayload toPayload() {
         String modelTypeName = modelType != null ? modelType.name() : "";
         String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
-        return new CharacterStoryPayload(name, description, dialogPresetName, modelTypeName, entityTypeId);
+        return new CharacterStoryPayload(
+                name, description, dialogPresetName, modelTypeName, entityTypeId, mainCharacterAttribute);
     }
 
     @Override
     public String formattedName() {
-        return name;
+        return mainCharacterAttribute.isMainCharacter() ? "[M] " + name : name;
     }
 
     @Override

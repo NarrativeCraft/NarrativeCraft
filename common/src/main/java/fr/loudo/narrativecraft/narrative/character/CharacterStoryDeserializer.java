@@ -68,6 +68,20 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
 
         applySharedCharacterFields(jsonObject, character);
 
+        MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
+        if (jsonObject.has("mainCharacter")) {
+            mainCharacterAttribute.setMainCharacter(
+                    jsonObject.get("mainCharacter").getAsBoolean());
+        }
+        if (jsonObject.has("skinMode")) {
+            try {
+                mainCharacterAttribute.setSkin(MainCharacterAttribute.SkinMode.valueOf(
+                        jsonObject.get("skinMode").getAsString()));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        character.setMainCharacterAttribute(mainCharacterAttribute);
+
         return character;
     }
 }

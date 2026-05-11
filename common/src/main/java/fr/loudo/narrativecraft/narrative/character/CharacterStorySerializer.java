@@ -48,6 +48,8 @@ public class CharacterStorySerializer implements JsonSerializer<CharacterStory> 
         JsonObject json = new JsonObject();
         serializeSharedCharacterFields(json, src);
         json.addProperty("description", src.getDescription());
+        json.addProperty("mainCharacter", src.getMainCharacterAttribute().isMainCharacter());
+        json.addProperty("skinMode", src.getMainCharacterAttribute().getSkin().name());
         return json;
     }
 }
