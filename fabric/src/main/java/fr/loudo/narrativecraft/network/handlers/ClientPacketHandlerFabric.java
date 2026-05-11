@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
@@ -35,6 +36,7 @@ import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
@@ -107,6 +109,12 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (packet, context) -> {
             ClientPacketHandler.cameraAngleEnter(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CStopEditorMaker.TYPE, (packet, context) -> {
+            ClientPacketHandler.stopEditorMaker(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(BiInteractionEnter.TYPE, (packet, context) -> {
+            ClientPacketHandler.interactionEnter(packet);
         });
     }
 }

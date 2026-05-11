@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
@@ -65,5 +66,7 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay().register(S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CStopEditorMaker.TYPE, S2CStopEditorMaker.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);
     }
 }

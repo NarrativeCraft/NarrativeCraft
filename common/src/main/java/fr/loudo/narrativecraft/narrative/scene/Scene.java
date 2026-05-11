@@ -63,6 +63,10 @@ public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
         this.rank = rank;
     }
 
+    public String knotName() {
+        return "chapter_" + chapter.getChapterIndex() + "_" + name.toLowerCase().replace(' ', '_');
+    }
+
     public int getChapterIndex() {
         return chapter.getChapterIndex();
     }

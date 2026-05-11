@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.platform.Services;
@@ -145,6 +146,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
             }
             playerSession.changeGameMode(playerSession.getLastGameType());
         }
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopEditorMaker());
     }
 
     public void moveTo(int tick) {

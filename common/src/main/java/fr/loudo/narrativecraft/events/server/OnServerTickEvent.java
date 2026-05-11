@@ -25,8 +25,6 @@ package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.EditorMaker;
-import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
-import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.Recording;
@@ -61,10 +59,8 @@ public class OnServerTickEvent {
 
         for (PlayerSession playerSession : instance.getPlayerSessionManager().getList()) {
             EditorMaker editorMaker = playerSession.getEditor();
-            if (editorMaker instanceof CutsceneMakerEditorMaker cutsceneMakerEditor) {
-                cutsceneMakerEditor.tick();
-            } else if (editorMaker instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditor) {
-                cameraAngleMakerEditor.tick();
+            if (editorMaker != null) {
+                editorMaker.tick();
             }
 
             StoryHandler storyHandler = playerSession.getStoryHandler();

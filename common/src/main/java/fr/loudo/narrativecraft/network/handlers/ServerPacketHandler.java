@@ -47,7 +47,7 @@ import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.*;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
@@ -258,7 +258,7 @@ public class ServerPacketHandler {
         editor.removeTemplateReference(packet.templateReferenceId());
     }
 
-    public static void interactionEnter(C2SInteractionEnter packet, Player player) {
+    public static void interactionEnter(BiInteractionEnter packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());

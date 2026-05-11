@@ -30,8 +30,16 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.editors.interaction.InteractionMakerEditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 
 @InkCommand(
@@ -47,8 +55,8 @@ public class InteractionInkAction extends InkAction {
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
         action = cmd.getString("action");
-        if (!action.equals("summon") && !action.equals("remove")) {
-            return InkActionResult.error("Unknown interaction action '" + action + "' (expected 'summon' or 'remove')");
+        if (!action.equals("start") && !action.equals("remove")) {
+            return InkActionResult.error("Unknown interaction action '" + action + "' (expected 'start' or 'remove')");
         }
         String interactionName = cmd.getString("interactionName");
         interaction = ((Scene) scene).getInteractionManager().getByName(interactionName);
@@ -62,7 +70,28 @@ public class InteractionInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: summon/remove InteractionController when available
+        PlayerSession session = (PlayerSession) playerSession;
+        EditorMaker lastEditorMaker = session.getEditor();
+        if (action.equals("start")) {
+            if (lastEditorMaker != null) {
+                lastEditorMaker.stop();
+            }
+            Services.PACKET.sendToPlayer(
+                    session.getPlayer(), new BiInteractionEnter(interaction, NarrativeEnvironment.PRODUCTION));
+            InteractionMakerEditorMaker editorMaker =
+                    new InteractionMakerEditorMaker(interaction, session, NarrativeEnvironment.PRODUCTION);
+            session.setEditor(editorMaker);
+            editorMaker.init();
+            String dataJson = InteractionSerializer.serializeData(interaction);
+            Services.PACKET.sendToPlayer(
+                    session.getPlayer(), new S2CInteractionEditorData(interaction.getId(), dataJson));
+        } else if (action.equals("remove")) {
+            if (lastEditorMaker instanceof InteractionMakerEditorMaker) {
+                lastEditorMaker.stop();
+                ((PlayerSession) playerSession).setEditor(null);
+            }
+        }
+
         isRunning = false;
         return InkActionResult.ignored();
     }

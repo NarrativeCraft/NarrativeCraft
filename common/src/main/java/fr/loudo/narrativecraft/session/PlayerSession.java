@@ -26,9 +26,12 @@ package fr.loudo.narrativecraft.session;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import javax.annotation.Nullable;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
+import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
+
+import javax.annotation.Nullable;
 
 public class PlayerSession extends AbstractPlayerSession {
 
@@ -41,6 +44,12 @@ public class PlayerSession extends AbstractPlayerSession {
     public PlayerSession(ServerPlayer player, Chapter chapter, Scene scene) {
         super(chapter, scene);
         this.player = player;
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        Services.PACKET.sendToPlayer(player, new S2CStopEditorMaker());
     }
 
     public PlayerSession(ServerPlayer player) {

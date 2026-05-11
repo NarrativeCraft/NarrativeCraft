@@ -28,18 +28,33 @@ import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class InteractionMakerEditorMaker implements EditorMaker {
 
     private final Interaction interaction;
     private final PlayerSession playerSession;
+    private final NarrativeEnvironment environment;
+    private UUID insideZoneId = null;
 
     public InteractionMakerEditorMaker(Interaction interaction, PlayerSession playerSession) {
         this.interaction = interaction;
         this.playerSession = playerSession;
+        this.environment = NarrativeEnvironment.DEVELOPMENT;
+    }
+
+    public InteractionMakerEditorMaker(
+            Interaction interaction, PlayerSession playerSession, NarrativeEnvironment environment) {
+        this.interaction = interaction;
+        this.playerSession = playerSession;
+        this.environment = environment;
     }
 
     @Override
@@ -48,7 +63,24 @@ public class InteractionMakerEditorMaker implements EditorMaker {
     }
 
     @Override
-    public void tick() {}
+    public void tick() {
+        if (environment != NarrativeEnvironment.PRODUCTION) return;
+
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler == null) return;
+
+        for (InteractionZone zone : interaction.getZones()) {
+            boolean isInside = new AABB(zone.getCorner1(), zone.getCorner2())
+                    .contains(playerSession.getPlayer().position());
+            if (isInside && insideZoneId == null) {
+                storyHandler.playStitch(zone.getStitchName());
+                insideZoneId = zone.getId();
+            }
+            return;
+        }
+
+        insideZoneId = null;
+    }
 
     @Override
     public void teleportToEditorOrigin() {
@@ -60,7 +92,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
 
     @Override
     public NarrativeEnvironment getEnvironment() {
-        return NarrativeEnvironment.DEVELOPMENT;
+        return environment;
     }
 
     private Vec3 resolveOrigin() {
@@ -74,7 +106,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
     }
 
     public void stop() {
-        playerSession.setEditor(null);
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopEditorMaker());
     }
 
     public Interaction getInteraction() {

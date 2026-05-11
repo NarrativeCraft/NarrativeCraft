@@ -71,8 +71,15 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     private Screen cornerPlacementReturnScreen = null;
     private Vec3 tempCorner1 = null;
     private Vec3 tempCorner2 = null;
+    private NarrativeEnvironment environment;
 
     public ClientInteractionMakerEditorMaker(Interaction interaction) {
+        this.interaction = interaction;
+        this.environment = NarrativeEnvironment.DEVELOPMENT;
+    }
+
+    public ClientInteractionMakerEditorMaker(Interaction interaction, NarrativeEnvironment environment) {
+        this.environment = environment;
         this.interaction = interaction;
     }
 
@@ -118,10 +125,11 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
 
     @Override
     public NarrativeEnvironment getEnvironment() {
-        return NarrativeEnvironment.DEVELOPMENT;
+        return environment;
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
@@ -169,7 +177,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     }
 
     public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
-        if (!clearScreenOpened()) return;
+        if (!clearScreenOpened() || environment != NarrativeEnvironment.DEVELOPMENT) return;
         List<Button> activeButtons = inCornerPlacementMode ? cornerPlacementButtons : buttons;
         for (Button button : activeButtons) {
             if (button.mouseClicked(event, isDoubleClick)) return;

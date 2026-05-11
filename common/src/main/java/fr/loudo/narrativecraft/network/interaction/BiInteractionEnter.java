@@ -24,43 +24,50 @@
 package fr.loudo.narrativecraft.network.interaction;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public class C2SInteractionEnter implements CustomPacketPayload {
+public class BiInteractionEnter implements CustomPacketPayload {
 
     private final UUID chapterId;
     private final UUID sceneId;
     private final UUID interactionId;
+    private final NarrativeEnvironment environment;
 
-    public C2SInteractionEnter(Interaction interaction) {
+    public BiInteractionEnter(Interaction interaction, NarrativeEnvironment environment) {
         this.chapterId = interaction.getScene().getChapter().getId();
         this.sceneId = interaction.getScene().getId();
         this.interactionId = interaction.getId();
+        this.environment = environment;
     }
 
-    public C2SInteractionEnter(UUID chapterId, UUID sceneId, UUID interactionId) {
+    public BiInteractionEnter(UUID chapterId, UUID sceneId, UUID interactionId, NarrativeEnvironment environment) {
         this.chapterId = chapterId;
         this.sceneId = sceneId;
         this.interactionId = interactionId;
+        this.environment = environment;
     }
 
-    public static final Type<C2SInteractionEnter> TYPE =
+    public static final Type<BiInteractionEnter> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "interaction_enter"));
 
-    public static final StreamCodec<ByteBuf, C2SInteractionEnter> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, BiInteractionEnter> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            C2SInteractionEnter::getChapterId,
+            BiInteractionEnter::getChapterId,
             UUIDUtil.STREAM_CODEC,
-            C2SInteractionEnter::getSceneId,
+            BiInteractionEnter::getSceneId,
             UUIDUtil.STREAM_CODEC,
-            C2SInteractionEnter::getInteractionId,
-            C2SInteractionEnter::new);
+            BiInteractionEnter::getInteractionId,
+            ByteBufCodecs.idMapper(i -> NarrativeEnvironment.values()[i], NarrativeEnvironment::ordinal),
+            BiInteractionEnter::getEnvironment,
+            BiInteractionEnter::new);
 
     public UUID getChapterId() {
         return chapterId;
@@ -72,6 +79,10 @@ public class C2SInteractionEnter implements CustomPacketPayload {
 
     public UUID getInteractionId() {
         return interactionId;
+    }
+
+    public NarrativeEnvironment getEnvironment() {
+        return environment;
     }
 
     @Override

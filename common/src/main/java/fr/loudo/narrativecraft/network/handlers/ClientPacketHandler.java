@@ -47,9 +47,11 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
@@ -57,6 +59,7 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
@@ -340,6 +343,31 @@ public class ClientPacketHandler {
                 new ClientCameraAngleMakerEditorMaker(cameraAngle, packet.getEnvironment());
         cameraAngleEditor.init();
         session.setEditor(cameraAngleEditor);
+        Minecraft.getInstance().setScreen(null);
+    }
+
+    public static void stopEditorMaker(S2CStopEditorMaker packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        EditorMaker editor = session.getEditor();
+        if (editor == null) return;
+        editor.stop();
+        session.setEditor(null);
+    }
+
+    public static void interactionEnter(BiInteractionEnter packet) {
+        Chapter chapter =
+                ClientNarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
+        if (scene == null) return;
+        Interaction interaction = scene.getInteractionManager().getById(packet.getInteractionId());
+        if (interaction == null) return;
+
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        ClientInteractionMakerEditorMaker interactionEditor =
+                new ClientInteractionMakerEditorMaker(interaction, packet.getEnvironment());
+        interactionEditor.init();
+        session.setEditor(interactionEditor);
         Minecraft.getInstance().setScreen(null);
     }
 }

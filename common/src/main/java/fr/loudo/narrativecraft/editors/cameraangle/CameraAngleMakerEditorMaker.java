@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
@@ -136,10 +137,12 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void stop() {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         playerSession.changeGameMode(playerSession.getLastGameType());
         for (Entity entity : characterEntities.values()) {
             entity.remove(Entity.RemovalReason.DISCARDED);
         }
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopEditorMaker());
     }
 
     public void spawnEntity(CharacterPlacement characterPlacement) {

@@ -30,9 +30,10 @@ import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.interaction.InteractionEntryEditScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -51,7 +52,7 @@ public class ClientInteractionNarrativeUIAction implements ClientNarrativeUIActi
 
     @Override
     public void customClickAction(Interaction entry) {
-        Services.PACKET.sendToServer(new C2SInteractionEnter(entry));
+        Services.PACKET.sendToServer(new BiInteractionEnter(entry, NarrativeEnvironment.DEVELOPMENT));
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         ClientInteractionMakerEditorMaker interactionEditor = new ClientInteractionMakerEditorMaker(entry);
         interactionEditor.init();

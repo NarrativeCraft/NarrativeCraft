@@ -138,6 +138,20 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         stop();
     }
 
+    public void playStitch(String stitchName) {
+        String stitch = String.format("%s.%s", playerSession.getScene().knotName(), stitchName.toLowerCase());
+        try {
+            story.choosePathString(stitch);
+            advance();
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Story error for player {}: {}",
+                    playerSession.getPlayer().getName().getString(),
+                    e);
+            stop();
+        }
+    }
+
     public Story getStory() {
         return story;
     }
@@ -273,6 +287,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         NarrativeCraftMod.LOGGER.info(
                 "Story finished for player {}.",
                 playerSession.getPlayer().getName().getString());
+        playerSession.clear();
     }
 
     private static String[] parseSpeaker(String text) {

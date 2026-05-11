@@ -37,7 +37,7 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
@@ -109,7 +109,7 @@ public class ServerPacketHandlerNeoForge {
         context.enqueueWork(() -> ServerPacketHandler.cameraAngleTeleportToTemplate(packet, context.player()));
     }
 
-    public static void interactionEnter(C2SInteractionEnter packet, IPayloadContext context) {
+    public static void interactionEnter(BiInteractionEnter packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.interactionEnter(packet, context.player()));
     }
 

@@ -34,7 +34,7 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
@@ -57,7 +57,7 @@ public class ServerPacketRegisterFabric {
                 .register(C2SCameraAngleRemovePlacement.TYPE, C2SCameraAngleRemovePlacement.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay()
                 .register(C2SCameraAngleTeleportToTemplate.TYPE, C2SCameraAngleTeleportToTemplate.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SInteractionEnter.TYPE, C2SInteractionEnter.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SInteractionSave.TYPE, C2SInteractionSave.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SInkActionFinished.TYPE, C2SInkActionFinished.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SDialogueFinished.TYPE, C2SDialogueFinished.STREAM_CODEC);

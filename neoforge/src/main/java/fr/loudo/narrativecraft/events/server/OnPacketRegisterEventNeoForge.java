@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
@@ -41,7 +42,7 @@ import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionEnter;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
@@ -119,6 +120,8 @@ public class OnPacketRegisterEventNeoForge {
                 S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC, ClientPacketHandlerNeoForge::showChoices);
         registrar.playToClient(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC, ClientPacketHandlerNeoForge::stopStory);
         registrar.playToClient(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC, ClientPacketHandlerNeoForge::dialogStop);
+        registrar.playToClient(
+                S2CStopEditorMaker.TYPE, S2CStopEditorMaker.STREAM_CODEC, ClientPacketHandlerNeoForge::stopEditorMaker);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
@@ -167,10 +170,11 @@ public class OnPacketRegisterEventNeoForge {
                 C2SCameraAngleTeleportToTemplate.TYPE,
                 C2SCameraAngleTeleportToTemplate.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::cameraAngleTeleportToTemplate);
-        registrar.playToServer(
-                C2SInteractionEnter.TYPE,
-                C2SInteractionEnter.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::interactionEnter);
+        registrar.playBidirectional(
+                BiInteractionEnter.TYPE,
+                BiInteractionEnter.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::interactionEnter,
+                ClientPacketHandlerNeoForge::interactionEnter);
         registrar.playToServer(
                 C2SInteractionSave.TYPE, C2SInteractionSave.STREAM_CODEC, ServerPacketHandlerNeoForge::interactionSave);
         registrar.playToServer(
