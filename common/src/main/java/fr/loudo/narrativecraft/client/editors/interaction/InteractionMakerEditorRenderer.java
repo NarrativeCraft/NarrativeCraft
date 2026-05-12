@@ -82,7 +82,8 @@ public class InteractionMakerEditorRenderer {
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
 
         for (InteractionPoint point : interaction.getPoints()) {
-            if (point.getPosition() == null) continue;
+            Vec3 pointPosition = resolvePointPosition(point, interactionEditor);
+            if (pointPosition == null) continue;
             float renderScale;
             if (isDev) {
                 renderScale = POINT_SPRITE_SCALE;
@@ -96,7 +97,7 @@ public class InteractionMakerEditorRenderer {
                 renderScale = (float) Interpolation.lerp(0, POINT_SPRITE_SCALE, easedT);
             }
             if (renderScale > 0.001f) {
-                drawPointSprite(poseStack, bufferSource, cameraPosition, point.getPosition(), minecraft, renderScale);
+                drawPointSprite(poseStack, bufferSource, cameraPosition, pointPosition, minecraft, renderScale);
             }
         }
 
@@ -110,12 +111,13 @@ public class InteractionMakerEditorRenderer {
 
         if (isDev) {
             for (InteractionPoint point : interaction.getPoints()) {
-                if (point.getPosition() == null) continue;
+                Vec3 pointPosition = resolvePointPosition(point, interactionEditor);
+                if (pointPosition == null) continue;
                 drawNameTag(
                         poseStack,
                         bufferSource,
                         cameraPosition,
-                        point.getPosition(),
+                        pointPosition,
                         0.35,
                         0.025f,
                         point.getName(),
@@ -129,6 +131,13 @@ public class InteractionMakerEditorRenderer {
 
     private static boolean isPointConditionMet(InteractionPoint point, LocalPlayer player) {
         return point.isConditionMet(player);
+    }
+
+    private static Vec3 resolvePointPosition(InteractionPoint point, ClientInteractionMakerEditorMaker editor) {
+        if (editor.isInPointPlacementMode() && point == editor.getPointBeingPlaced()) {
+            return editor.getTempPointPosition();
+        }
+        return point.getPosition();
     }
 
     private static Vec3[] resolveZoneCorners(InteractionZone zone, ClientInteractionMakerEditorMaker editor) {

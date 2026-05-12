@@ -30,17 +30,12 @@ import fr.loudo.narrativecraft.client.screens.narrative.interaction.InteractionZ
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
-import fr.loudo.narrativecraft.narrative.interaction.Interaction;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
+import fr.loudo.narrativecraft.narrative.interaction.*;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -51,6 +46,9 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientInteractionMakerEditorMaker implements EditorMaker {
 
@@ -65,12 +63,19 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     private final Interaction interaction;
     private final List<Button> buttons = new ArrayList<>();
     private final List<Button> cornerPlacementButtons = new ArrayList<>();
+    private final List<Button> pointPlacementButtons = new ArrayList<>();
 
     private boolean inCornerPlacementMode = false;
     private InteractionZone zoneBeingEdited = null;
     private Screen cornerPlacementReturnScreen = null;
     private Vec3 tempCorner1 = null;
     private Vec3 tempCorner2 = null;
+
+    private boolean inPointPlacementMode = false;
+    private InteractionPoint pointBeingPlaced = null;
+    private Screen pointPlacementReturnScreen = null;
+    private Vec3 tempPointPosition = null;
+
     private NarrativeEnvironment environment;
 
     public ClientInteractionMakerEditorMaker(Interaction interaction) {
@@ -110,6 +115,17 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
         cornerPlacementButtons.add(Button.builder(Component.literal(CustomFont.SAVE), b -> saveCornersAndExit())
+                .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build());
+
+        pointPlacementButtons.clear();
+        pointPlacementButtons.add(Button.builder(Component.literal("+"), b -> placePoint())
+                .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build());
+        pointPlacementButtons.add(Button.builder(Component.literal("✖"), b -> cancelPointAndExit())
+                .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build());
+        pointPlacementButtons.add(Button.builder(Component.literal(CustomFont.SAVE), b -> savePointAndExit())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
     }
@@ -154,6 +170,22 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
             place2Button.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
             cancelButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
             saveButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
+        } else if (inPointPlacementMode) {
+            int totalWidth = BUTTON_WIDTH * 3 + BUTTON_GAP * 2;
+            int startX = screenWidth / 2 - totalWidth / 2;
+            int bottomY = screenHeight - BUTTON_HEIGHT - 30;
+
+            Button placeButton = pointPlacementButtons.get(0);
+            Button cancelButton = pointPlacementButtons.get(1);
+            Button saveButton = pointPlacementButtons.get(2);
+
+            placeButton.setPosition(startX, bottomY);
+            cancelButton.setPosition(startX + BUTTON_WIDTH + BUTTON_GAP, bottomY);
+            saveButton.setPosition(startX + (BUTTON_WIDTH + BUTTON_GAP) * 2, bottomY);
+
+            placeButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
+            cancelButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
+            saveButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
         } else {
             Button quitButton = buttons.get(0);
             Button saveButton = buttons.get(1);
@@ -178,7 +210,14 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
 
     public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
         if (!clearScreenOpened() || environment != NarrativeEnvironment.DEVELOPMENT) return;
-        List<Button> activeButtons = inCornerPlacementMode ? cornerPlacementButtons : buttons;
+        List<Button> activeButtons;
+        if (inCornerPlacementMode) {
+            activeButtons = cornerPlacementButtons;
+        } else if (inPointPlacementMode) {
+            activeButtons = pointPlacementButtons;
+        } else {
+            activeButtons = buttons;
+        }
         for (Button button : activeButtons) {
             if (button.mouseClicked(event, isDoubleClick)) return;
         }
@@ -256,6 +295,42 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         }
     }
 
+    public void enterPointPlacementMode(InteractionPoint point, Screen returnScreen) {
+        this.pointBeingPlaced = point;
+        this.pointPlacementReturnScreen = returnScreen;
+        this.tempPointPosition = point.getPosition();
+        this.inPointPlacementMode = true;
+        minecraft.setScreen(null);
+    }
+
+    private void placePoint() {
+        LocalPlayer player = minecraft.player;
+        if (player == null) return;
+        tempPointPosition = player.position().add(0, player.getEyeHeight(), 0);
+    }
+
+    private void savePointAndExit() {
+        if (pointBeingPlaced != null) {
+            pointBeingPlaced.setPosition(tempPointPosition);
+        }
+        exitPointPlacementMode();
+    }
+
+    private void cancelPointAndExit() {
+        exitPointPlacementMode();
+    }
+
+    private void exitPointPlacementMode() {
+        this.inPointPlacementMode = false;
+        Screen returnTo = pointPlacementReturnScreen;
+        this.pointBeingPlaced = null;
+        this.pointPlacementReturnScreen = null;
+        this.tempPointPosition = null;
+        if (returnTo != null) {
+            minecraft.setScreen(returnTo);
+        }
+    }
+
     public void loadData(String json) {
         InteractionDeserializer.deserializeInto(json, interaction);
     }
@@ -283,5 +358,17 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
 
     public Vec3 getTempCorner2() {
         return tempCorner2;
+    }
+
+    public boolean isInPointPlacementMode() {
+        return inPointPlacementMode;
+    }
+
+    public InteractionPoint getPointBeingPlaced() {
+        return pointBeingPlaced;
+    }
+
+    public Vec3 getTempPointPosition() {
+        return tempPointPosition;
     }
 }

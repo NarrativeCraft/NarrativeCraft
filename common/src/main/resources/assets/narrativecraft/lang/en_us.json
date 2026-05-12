@@ -129,6 +129,7 @@
   "narrativecraft.screen.interaction.use_aim_radius": "Use aim radius",
   "narrativecraft.screen.interaction.aim_radius": "Aim radius",
   "narrativecraft.screen.interaction.reset_position": "Reset position to current",
+  "narrativecraft.screen.interaction.place_point": "Place point",
 
   "narrativecraft.story.no_main_file": "main.ink does not exists!",
   "narrativecraft.story.compiling": "Compiling...",

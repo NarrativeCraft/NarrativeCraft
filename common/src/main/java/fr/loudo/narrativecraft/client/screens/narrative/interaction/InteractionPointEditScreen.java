@@ -26,11 +26,11 @@ package fr.loudo.narrativecraft.client.screens.narrative.interaction;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.Locale;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
 public class InteractionPointEditScreen extends Screen {
@@ -99,7 +99,7 @@ public class InteractionPointEditScreen extends Screen {
         addRenderableWidget(maxDistanceLabel);
         y += 12;
         maxDistanceBox = new EditBox(this.font, x, y, FIELD_WIDTH / 2 - 2, FIELD_HEIGHT, Component.empty());
-        maxDistanceBox.setValue(String.format("%.1f", point.getMaxDistance()));
+        maxDistanceBox.setValue(String.format(Locale.ENGLISH, "%.1f", point.getMaxDistance()));
         addRenderableWidget(maxDistanceBox);
         y += FIELD_HEIGHT + GAP;
 
@@ -123,16 +123,18 @@ public class InteractionPointEditScreen extends Screen {
             addRenderableWidget(aimRadiusLabel);
             y += 12;
             aimRadiusBox = new EditBox(this.font, x, y, FIELD_WIDTH / 2 - 2, FIELD_HEIGHT, Component.empty());
-            aimRadiusBox.setValue(String.format("%.1f", point.getAimRadius()));
+            aimRadiusBox.setValue(String.format(Locale.ENGLISH, "%.1f", point.getAimRadius()));
             addRenderableWidget(aimRadiusBox);
             y += FIELD_HEIGHT + GAP;
         }
 
-        Button resetPositionButton = Button.builder(
-                        Translation.message("screen.interaction.reset_position"), b -> resetPosition())
+        Button placePointButton = Button.builder(Translation.message("screen.interaction.place_point"), b -> {
+                    applyCurrentValues();
+                    editor.enterPointPlacementMode(point, this);
+                })
                 .bounds(x, y, FIELD_WIDTH, FIELD_HEIGHT)
                 .build();
-        addRenderableWidget(resetPositionButton);
+        addRenderableWidget(placePointButton);
         y += FIELD_HEIGHT + GAP;
 
         Button previewButton = Button.builder(Translation.message("screen.interaction.preview"), b -> {
@@ -154,37 +156,40 @@ public class InteractionPointEditScreen extends Screen {
         addRenderableWidget(closeButton);
     }
 
-    private void resetPosition() {
-        LocalPlayer player = minecraft.player;
-        if (player == null) return;
-        point.setPosition(player.position());
-        minecraft.setScreen(lastScreen);
-    }
-
-    private void saveAndClose() {
-        String name = nameBox.getValue().trim();
-        if (!name.isEmpty()) point.setName(name);
-        point.setStitchName(stitchNameBox.getValue().trim());
-        point.setUseAimRadius(useAimRadius);
-
-        try {
-            double maxDistance = Double.parseDouble(maxDistanceBox.getValue().trim());
-            point.setMaxDistance(Math.max(1.0, Math.min(32.0, maxDistance)));
-        } catch (NumberFormatException ignored) {
+    private void applyCurrentValues() {
+        if (nameBox != null) {
+            String name = nameBox.getValue().trim();
+            if (!name.isEmpty()) point.setName(name);
         }
-
-        if (useAimRadius && aimRadiusBox != null) {
+        if (stitchNameBox != null) {
+            point.setStitchName(stitchNameBox.getValue().trim());
+        }
+        point.setUseAimRadius(useAimRadius);
+        if (maxDistanceBox != null) {
             try {
-                double aimRadius = Double.parseDouble(aimRadiusBox.getValue().trim());
+                double maxDistance =
+                        Double.parseDouble(maxDistanceBox.getValue().trim().replace(',', '.'));
+                point.setMaxDistance(Math.max(1.0, Math.min(32.0, maxDistance)));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        if (aimRadiusBox != null) {
+            try {
+                double aimRadius =
+                        Double.parseDouble(aimRadiusBox.getValue().trim().replace(',', '.'));
                 point.setAimRadius(Math.max(0.1, Math.min(5.0, aimRadius)));
             } catch (NumberFormatException ignored) {
             }
         }
+    }
 
+    private void saveAndClose() {
+        applyCurrentValues();
         minecraft.setScreen(lastScreen);
     }
 
     private void rebuild() {
+        applyCurrentValues();
         this.clearWidgets();
         this.init();
     }
