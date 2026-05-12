@@ -45,6 +45,7 @@ public class InteractionZoneEditScreen extends Screen {
 
     private EditBox nameBox;
     private EditBox stitchNameBox;
+    private boolean oneTime;
 
     public InteractionZoneEditScreen(
             ClientInteractionMakerEditorMaker editor, InteractionZone zone, Screen lastScreen) {
@@ -52,6 +53,7 @@ public class InteractionZoneEditScreen extends Screen {
         this.editor = editor;
         this.zone = zone;
         this.lastScreen = lastScreen;
+        this.oneTime = zone.isOneTime();
     }
 
     @Override
@@ -99,6 +101,19 @@ public class InteractionZoneEditScreen extends Screen {
         addRenderableWidget(placeCornersButton);
         y += FIELD_HEIGHT + GAP;
 
+        Button oneTimeClickButton = Button.builder(
+                        Component.literal(Translation.message("screen.interaction.one_time_click")
+                                        .getString() + ": "
+                                + Translation.message(oneTime ? "yes" : "no").getString()),
+                        b -> {
+                            oneTime = !oneTime;
+                            rebuild();
+                        })
+                .bounds(x, y, FIELD_WIDTH, FIELD_HEIGHT)
+                .build();
+        addRenderableWidget(oneTimeClickButton);
+        y += FIELD_HEIGHT + GAP;
+
         Button saveButton = Button.builder(Translation.message("send"), b -> saveAndClose())
                 .bounds(x, y, FIELD_WIDTH / 2 - 2, FIELD_HEIGHT)
                 .build();
@@ -110,10 +125,17 @@ public class InteractionZoneEditScreen extends Screen {
         addRenderableWidget(closeButton);
     }
 
+    private void rebuild() {
+        applyNameAndStitch();
+        clearWidgets();
+        init();
+    }
+
     private void applyNameAndStitch() {
         String name = nameBox.getValue().trim();
         if (!name.isEmpty()) zone.setName(name);
         zone.setStitchName(stitchNameBox.getValue().trim());
+        zone.setOneTime(oneTime);
     }
 
     private void saveAndClose() {

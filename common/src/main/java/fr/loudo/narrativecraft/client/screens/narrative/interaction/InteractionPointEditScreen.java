@@ -26,13 +26,12 @@ package fr.loudo.narrativecraft.client.screens.narrative.interaction;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.Locale;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import java.util.Locale;
 
 public class InteractionPointEditScreen extends Screen {
 
@@ -49,6 +48,8 @@ public class InteractionPointEditScreen extends Screen {
     private EditBox maxDistanceBox;
     private EditBox aimRadiusBox;
     private boolean useAimRadius;
+    private boolean neverShow;
+    private boolean oneTimeClick;
 
     public InteractionPointEditScreen(
             ClientInteractionMakerEditorMaker editor, InteractionPoint point, Screen lastScreen) {
@@ -57,6 +58,8 @@ public class InteractionPointEditScreen extends Screen {
         this.point = point;
         this.lastScreen = lastScreen;
         this.useAimRadius = point.isUseAimRadius();
+        this.neverShow = point.isNeverShow();
+        this.oneTimeClick = point.isOneTimeClick();
     }
 
     @Override
@@ -70,6 +73,7 @@ public class InteractionPointEditScreen extends Screen {
                 + (FIELD_HEIGHT + GAP)
                 + (FIELD_HEIGHT + GAP)
                 + (useAimRadius ? 12 + (FIELD_HEIGHT + GAP) : 0)
+                + (FIELD_HEIGHT + GAP)
                 + (FIELD_HEIGHT + GAP)
                 + (FIELD_HEIGHT + GAP)
                 + FIELD_HEIGHT;
@@ -129,6 +133,35 @@ public class InteractionPointEditScreen extends Screen {
             y += FIELD_HEIGHT + GAP;
         }
 
+        Button neverShowButton = Button.builder(
+                        Component.literal(Translation.message("screen.interaction.never_show")
+                                        .getString()
+                                + ": "
+                                + Translation.message(neverShow ? "yes" : "no").getString()),
+                        b -> {
+                            neverShow = !neverShow;
+                            rebuild();
+                        })
+                .bounds(x, y, FIELD_WIDTH, FIELD_HEIGHT)
+                .build();
+        addRenderableWidget(neverShowButton);
+        y += FIELD_HEIGHT + GAP;
+
+        Button oneTimeClickButton = Button.builder(
+                        Component.literal(Translation.message("screen.interaction.one_time_click")
+                                        .getString()
+                                + ": "
+                                + Translation.message(oneTimeClick ? "yes" : "no")
+                                        .getString()),
+                        b -> {
+                            oneTimeClick = !oneTimeClick;
+                            rebuild();
+                        })
+                .bounds(x, y, FIELD_WIDTH, FIELD_HEIGHT)
+                .build();
+        addRenderableWidget(oneTimeClickButton);
+        y += FIELD_HEIGHT + GAP;
+
         Button placePointButton = Button.builder(Translation.message("screen.interaction.place_point"), b -> {
                     applyCurrentValues();
                     editor.enterPointPlacementMode(point, this);
@@ -158,6 +191,8 @@ public class InteractionPointEditScreen extends Screen {
             point.setStitchName(stitchNameBox.getValue().trim());
         }
         point.setUseAimRadius(useAimRadius);
+        point.setNeverShow(neverShow);
+        point.setOneTimeClick(oneTimeClick);
         if (maxDistanceBox != null) {
             try {
                 double maxDistance =

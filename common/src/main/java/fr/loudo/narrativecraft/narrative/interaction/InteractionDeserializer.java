@@ -23,11 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -99,8 +95,9 @@ public class InteractionDeserializer extends NarrativeDeserializer<Interaction> 
                 json.get("x2").getAsDouble(),
                 json.get("y2").getAsDouble(),
                 json.get("z2").getAsDouble());
+        boolean oneTime = json.has("oneTime") && json.get("oneTime").getAsBoolean();
 
-        return new InteractionZone(id, name, stitchName, corner1, corner2);
+        return new InteractionZone(id, name, stitchName, corner1, corner2, oneTime);
     }
 
     private static InteractionPoint deserializePoint(JsonObject json) {
@@ -119,7 +116,10 @@ public class InteractionDeserializer extends NarrativeDeserializer<Interaction> 
                 !json.has("useAimRadius") || json.get("useAimRadius").getAsBoolean();
         double aimRadius =
                 json.has("aimRadius") ? json.get("aimRadius").getAsDouble() : InteractionPoint.DEFAULT_AIM_RADIUS;
+        boolean neverShow = json.has("neverShow") && json.get("neverShow").getAsBoolean();
+        boolean oneTimeClick = json.has("oneTime") && json.get("oneTime").getAsBoolean();
 
-        return new InteractionPoint(id, name, stitchName, position, maxDistance, useAimRadius, aimRadius);
+        return new InteractionPoint(
+                id, name, stitchName, position, maxDistance, useAimRadius, aimRadius, neverShow, oneTimeClick);
     }
 }

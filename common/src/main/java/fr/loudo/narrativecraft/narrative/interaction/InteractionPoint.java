@@ -39,6 +39,8 @@ public class InteractionPoint {
     private double maxDistance;
     private boolean useAimRadius;
     private double aimRadius;
+    private boolean neverShow;
+    private boolean oneTimeClick;
 
     public InteractionPoint(
             UUID id,
@@ -47,7 +49,9 @@ public class InteractionPoint {
             Vec3 position,
             double maxDistance,
             boolean useAimRadius,
-            double aimRadius) {
+            double aimRadius,
+            boolean neverShow,
+            boolean oneTimeClick) {
         this.id = id;
         this.name = name;
         this.stitchName = stitchName;
@@ -55,10 +59,21 @@ public class InteractionPoint {
         this.maxDistance = maxDistance;
         this.useAimRadius = useAimRadius;
         this.aimRadius = aimRadius;
+        this.neverShow = neverShow;
+        this.oneTimeClick = oneTimeClick;
     }
 
     public InteractionPoint(String name, String stitchName, Vec3 position) {
-        this(UUID.randomUUID(), name, stitchName, position, DEFAULT_MAX_DISTANCE, true, DEFAULT_AIM_RADIUS);
+        this(
+                UUID.randomUUID(),
+                name,
+                stitchName,
+                position,
+                DEFAULT_MAX_DISTANCE,
+                true,
+                DEFAULT_AIM_RADIUS,
+                false,
+                false);
     }
 
     public UUID getId() {
@@ -111,6 +126,22 @@ public class InteractionPoint {
 
     public void setAimRadius(double aimRadius) {
         this.aimRadius = aimRadius;
+    }
+
+    public boolean isNeverShow() {
+        return neverShow;
+    }
+
+    public void setNeverShow(boolean neverShow) {
+        this.neverShow = neverShow;
+    }
+
+    public boolean isOneTimeClick() {
+        return oneTimeClick;
+    }
+
+    public void setOneTimeClick(boolean oneTimeClick) {
+        this.oneTimeClick = oneTimeClick;
     }
 
     public boolean isConditionMet(Player player) {

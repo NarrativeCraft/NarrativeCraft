@@ -23,9 +23,10 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
-import java.util.UUID;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.UUID;
 
 public class InteractionZone {
 
@@ -34,17 +35,19 @@ public class InteractionZone {
     private String stitchName;
     private Vec3 corner1;
     private Vec3 corner2;
+    private boolean oneTime;
 
-    public InteractionZone(UUID id, String name, String stitchName, Vec3 corner1, Vec3 corner2) {
+    public InteractionZone(UUID id, String name, String stitchName, Vec3 corner1, Vec3 corner2, boolean oneTime) {
         this.id = id;
         this.name = name;
         this.stitchName = stitchName;
         this.corner1 = corner1;
         this.corner2 = corner2;
+        this.oneTime = oneTime;
     }
 
     public InteractionZone(String name, String stitchName, Vec3 corner1, Vec3 corner2) {
-        this(UUID.randomUUID(), name, stitchName, corner1, corner2);
+        this(UUID.randomUUID(), name, stitchName, corner1, corner2, false);
     }
 
     public AABB toAABB() {
@@ -89,5 +92,13 @@ public class InteractionZone {
 
     public void setCorner2(Vec3 corner2) {
         this.corner2 = corner2;
+    }
+
+    public boolean isOneTime() {
+        return oneTime;
+    }
+
+    public void setOneTime(boolean oneTime) {
+        this.oneTime = oneTime;
     }
 }

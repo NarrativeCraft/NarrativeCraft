@@ -25,18 +25,27 @@ package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record C2SPlayStitchStory(String stitchName) implements CustomPacketPayload {
+public record C2SPlayStitchStory(String stitchName, UUID interactionId, boolean oneTime)
+        implements CustomPacketPayload {
 
     public static final Type<C2SPlayStitchStory> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_stitch_story"));
 
-    public static final StreamCodec<ByteBuf, C2SPlayStitchStory> STREAM_CODEC =
-            ByteBufCodecs.STRING_UTF8.map(C2SPlayStitchStory::new, C2SPlayStitchStory::stitchName);
+    public static final StreamCodec<ByteBuf, C2SPlayStitchStory> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8,
+            C2SPlayStitchStory::stitchName,
+            UUIDUtil.STREAM_CODEC,
+            C2SPlayStitchStory::interactionId,
+            ByteBufCodecs.BOOL,
+            C2SPlayStitchStory::oneTime,
+            C2SPlayStitchStory::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

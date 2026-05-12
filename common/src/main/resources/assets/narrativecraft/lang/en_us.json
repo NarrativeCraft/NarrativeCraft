@@ -130,6 +130,8 @@
   "narrativecraft.screen.interaction.aim_radius": "Aim radius",
   "narrativecraft.screen.interaction.reset_position": "Reset position to current",
   "narrativecraft.screen.interaction.place_point": "Place point",
+  "narrativecraft.screen.interaction.never_show": "Never show",
+  "narrativecraft.screen.interaction.one_time_click": "One time click",
 
   "narrativecraft.story.no_main_file": "main.ink does not exists!",
   "narrativecraft.story.compiling": "Compiling...",

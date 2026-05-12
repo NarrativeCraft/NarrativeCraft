@@ -79,6 +79,7 @@ public class InteractionSerializer implements JsonSerializer<Interaction> {
         json.addProperty("x2", zone.getCorner2().x);
         json.addProperty("y2", zone.getCorner2().y);
         json.addProperty("z2", zone.getCorner2().z);
+        json.addProperty("oneTime", zone.isOneTime());
         return json;
     }
 
@@ -93,6 +94,8 @@ public class InteractionSerializer implements JsonSerializer<Interaction> {
         json.addProperty("maxDistance", point.getMaxDistance());
         json.addProperty("useAimRadius", point.isUseAimRadius());
         json.addProperty("aimRadius", point.getAimRadius());
+        json.addProperty("neverShow", point.isNeverShow());
+        json.addProperty("oneTime", point.isOneTimeClick());
         return json;
     }
 }

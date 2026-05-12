@@ -34,7 +34,10 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.AbstractPlayerSession;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class ClientPlayerSession extends AbstractPlayerSession {
 
@@ -42,6 +45,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     private final List<DialogRenderer2D> activeDialog2DRenderers = new ArrayList<>();
     private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
     private final List<InkAction> activeClientInkActions = new ArrayList<>();
+    private final Set<UUID> clickedInteractionPointIds = new HashSet<>();
     private CameraView cameraView;
     private DialogRenderer mainDialog;
     private boolean stopNextDialog;
@@ -72,9 +76,18 @@ public class ClientPlayerSession extends AbstractPlayerSession {
         new ArrayList<>(activeDialog2DRenderers).forEach(this::removeDialog2D);
         new ArrayList<>(activeDialog3DRenderers).forEach(this::removeDialog3D);
         cutsceneDataSession.reset();
+        clickedInteractionPointIds.clear();
         mainDialog = null;
         cameraView = null;
         stopNextDialog = false;
+    }
+
+    public boolean hasClickedInteractionPoint(UUID pointId) {
+        return clickedInteractionPointIds.contains(pointId);
+    }
+
+    public void addClickedInteractionPoint(UUID pointId) {
+        clickedInteractionPointIds.add(pointId);
     }
 
     public void addDialog2D(DialogRenderer2D renderer) {

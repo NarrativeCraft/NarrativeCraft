@@ -36,6 +36,10 @@ import net.minecraft.client.player.LocalPlayer;
 public class OnPressButtonEvent {
 
     public static void pressButton(int button) {
+        handleInteractionPoints(button);
+    }
+
+    private static void handleInteractionPoints(int button) {
         if (button != 0 && button != 1) return;
         if (!Minecraft.getInstance().mouseHandler.isMouseGrabbed()) return;
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
@@ -44,8 +48,11 @@ public class OnPressButtonEvent {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         for (InteractionPoint point : interactionEditor.getInteraction().getPoints()) {
+            if (point.isOneTimeClick() && session.hasClickedInteractionPoint(point.getId())) continue;
             if (point.isConditionMet(player)) {
-                Services.PACKET.sendToServer(new C2SPlayStitchStory(point.getStitchName()));
+                if (point.isOneTimeClick()) session.addClickedInteractionPoint(point.getId());
+                Services.PACKET.sendToServer(
+                        new C2SPlayStitchStory(point.getStitchName(), point.getId(), point.isOneTimeClick()));
                 return;
             }
         }

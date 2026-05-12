@@ -29,14 +29,12 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -49,6 +47,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class InteractionMakerEditorRenderer {
 
@@ -80,6 +82,8 @@ public class InteractionMakerEditorRenderer {
         minecraft.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
 
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
+        ClientPlayerSession clientSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
         for (InteractionPoint point : interaction.getPoints()) {
             Vec3 pointPosition = resolvePointPosition(point, interactionEditor);
@@ -88,6 +92,11 @@ public class InteractionMakerEditorRenderer {
             if (isDev) {
                 renderScale = POINT_SPRITE_SCALE;
             } else {
+                if (point.isNeverShow()
+                        || (point.isOneTimeClick() && clientSession.hasClickedInteractionPoint(point.getId()))) {
+                    pointAnimT.remove(point.getId());
+                    continue;
+                }
                 boolean conditionMet = isPointConditionMet(point, minecraft.player);
                 float currentT = pointAnimT.getOrDefault(point.getId(), 0f);
                 float step = POINT_ANIMATION_SPEED * deltaSeconds;
