@@ -37,6 +37,7 @@ public class OnPressButtonEvent {
 
     public static void pressButton(int button) {
         if (button != 0 && button != 1) return;
+        if (!Minecraft.getInstance().mouseHandler.isMouseGrabbed()) return;
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (!(session.getEditor() instanceof ClientInteractionMakerEditorMaker interactionEditor)) return;
         if (interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT) return;
