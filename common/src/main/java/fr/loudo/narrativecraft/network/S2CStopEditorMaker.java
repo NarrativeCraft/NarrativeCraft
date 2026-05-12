@@ -33,6 +33,8 @@ public class S2CStopEditorMaker implements CustomPacketPayload {
 
     public static final S2CStopEditorMaker INSTANCE = new S2CStopEditorMaker();
 
+    private S2CStopEditorMaker() {}
+
     public static final Type<S2CStopEditorMaker> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "stop_editor_maker"));
 

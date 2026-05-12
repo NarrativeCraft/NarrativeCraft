@@ -146,7 +146,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
             }
             playerSession.changeGameMode(playerSession.getLastGameType());
         }
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopEditorMaker());
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), S2CStopEditorMaker.INSTANCE);
     }
 
     public void moveTo(int tick) {

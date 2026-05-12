@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class ServerPacketRegisterFabric {
@@ -62,5 +63,6 @@ public class ServerPacketRegisterFabric {
         PayloadTypeRegistry.serverboundPlay().register(C2SInkActionFinished.TYPE, C2SInkActionFinished.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SDialogueFinished.TYPE, C2SDialogueFinished.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SChoiceSelected.TYPE, C2SChoiceSelected.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SPlayStitchStory.TYPE, C2SPlayStitchStory.STREAM_CODEC);
     }
 }

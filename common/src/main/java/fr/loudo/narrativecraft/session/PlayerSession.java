@@ -36,6 +36,7 @@ public class PlayerSession extends AbstractPlayerSession {
 
     private final ServerPlayer player;
     private GameType lastGameType;
+    private boolean gameplayMode;
 
     @Nullable
     private StoryHandler storyHandler;
@@ -48,7 +49,7 @@ public class PlayerSession extends AbstractPlayerSession {
     @Override
     public void clear() {
         super.clear();
-        Services.PACKET.sendToPlayer(player, new S2CStopEditorMaker());
+        Services.PACKET.sendToPlayer(player, S2CStopEditorMaker.INSTANCE);
     }
 
     public PlayerSession(ServerPlayer player) {
@@ -80,5 +81,13 @@ public class PlayerSession extends AbstractPlayerSession {
 
     public void setStoryHandler(@Nullable StoryHandler storyHandler) {
         this.storyHandler = storyHandler;
+    }
+
+    public boolean isGameplayMode() {
+        return gameplayMode;
+    }
+
+    public void setGameplayMode(boolean gameplayMode) {
+        this.gameplayMode = gameplayMode;
     }
 }

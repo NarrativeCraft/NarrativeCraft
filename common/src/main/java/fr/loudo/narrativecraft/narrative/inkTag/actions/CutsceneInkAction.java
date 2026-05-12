@@ -101,6 +101,7 @@ public class CutsceneInkAction extends InkAction {
                 storyHandler.registerEntity(characterStory, playback.getMasterEntity());
             }
         }
+        playerSession.setGameplayMode(false);
         return InkActionResult.block();
     }
 }

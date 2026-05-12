@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.interaction;
 
 import java.util.UUID;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 public class InteractionPoint {
@@ -110,5 +111,19 @@ public class InteractionPoint {
 
     public void setAimRadius(double aimRadius) {
         this.aimRadius = aimRadius;
+    }
+
+    public boolean isConditionMet(Player player) {
+        if (player == null || position == null) return false;
+        double distance = player.position().distanceTo(position);
+        if (distance > maxDistance) return false;
+        if (!useAimRadius) return true;
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 lookDir = player.getLookAngle();
+        Vec3 toPoint = position.subtract(eyePos);
+        double projection = toPoint.dot(lookDir);
+        if (projection <= 0) return false;
+        Vec3 perpendicular = toPoint.subtract(lookDir.scale(projection));
+        return perpendicular.length() <= aimRadius;
     }
 }

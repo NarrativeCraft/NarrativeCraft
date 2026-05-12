@@ -83,4 +83,12 @@ public class AbstractPlayerSession implements IPlayerSession {
     public ServerPlayer getPlayer() {
         return null;
     }
+
+    @Override
+    public boolean isGameplayMode() {
+        return false;
+    }
+
+    @Override
+    public void setGameplayMode(boolean gameplayMode) {}
 }

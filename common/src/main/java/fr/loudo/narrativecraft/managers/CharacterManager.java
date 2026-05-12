@@ -55,4 +55,11 @@ public class CharacterManager extends NarrativeManager<CharacterStory> {
         }
         return characterStory;
     }
+
+    public CharacterStory getMainCharacter() {
+        for (CharacterStory characterStory : list) {
+            if (characterStory.getMainCharacterAttribute().isMainCharacter()) return characterStory;
+        }
+        return null;
+    }
 }

@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -30,6 +31,14 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.editors.interaction.InteractionMakerEditorMaker;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
 
 @InkCommand(
         keyword = "gameplay",
@@ -45,7 +54,36 @@ public class GameplayInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: implemenent
+        PlayerSession currentSession = (PlayerSession) playerSession;
+        StoryHandler storyHandler = currentSession.getStoryHandler();
+        if (storyHandler == null) return InkActionResult.ignored();
+
+        EditorMaker editorMaker = currentSession.getEditor();
+        if (!(editorMaker instanceof InteractionMakerEditorMaker)) {
+            editorMaker.stop();
+        }
+        currentSession.setGameplayMode(true);
+        Entity mainCharacterEntity = storyHandler.getMainCharacterEntity();
+        CharacterStory mainCharacter =
+                NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
+
+        playerSession.getPlayer().setGameMode(GameType.ADVENTURE);
+        if (mainCharacterEntity == null) return InkActionResult.ok();
+
+        storyHandler.unregisterEntity(mainCharacter);
+        Vec3 entityPosition = mainCharacterEntity.position();
+        playerSession
+                .getPlayer()
+                .connection
+                .teleport(
+                        entityPosition.x,
+                        entityPosition.y,
+                        entityPosition.z,
+                        mainCharacterEntity.getYRot(),
+                        mainCharacterEntity.getXRot());
+        mainCharacterEntity.remove(Entity.RemovalReason.KILLED);
+
+        isRunning = false;
         return InkActionResult.ok();
     }
 }

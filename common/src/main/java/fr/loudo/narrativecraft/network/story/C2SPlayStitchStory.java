@@ -21,15 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.session;
+package fr.loudo.narrativecraft.network.story;
 
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public interface IPlayerSession {
+public record C2SPlayStitchStory(String stitchName) implements CustomPacketPayload {
 
-    ServerPlayer getPlayer();
+    public static final Type<C2SPlayStitchStory> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_stitch_story"));
 
-    boolean isGameplayMode();
+    public static final StreamCodec<ByteBuf, C2SPlayStitchStory> STREAM_CODEC =
+            ByteBufCodecs.STRING_UTF8.map(C2SPlayStitchStory::new, C2SPlayStitchStory::stitchName);
 
-    void setGameplayMode(boolean gameplayMode);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

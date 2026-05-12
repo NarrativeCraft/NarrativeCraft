@@ -27,8 +27,10 @@ import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
@@ -235,21 +237,35 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         String[] parts = parseSpeaker(text);
         String speaker = parts[0];
         String dialogueText = parts[1];
-        int entityId = S2CShowDialogue.NO_ENTITY;
-        if (!speaker.isEmpty()) {
-            Entity entity = characterEntities.get(speaker.toLowerCase());
-            if (entity != null) {
-                entityId = entity.getId();
+        if (!text.isEmpty()) {
+            int entityId = S2CShowDialogue.NO_ENTITY;
+            if (!speaker.isEmpty()) {
+                Entity entity = characterEntities.get(speaker.toLowerCase());
+                if (entity != null) {
+                    entityId = entity.getId();
+                }
+            }
+            DialogData dialogData = characterDialogData.get(speaker.toLowerCase());
+            String dialogDataJson = dialogData != null
+                    ? CameraAngleSerializer.serializeDialogData(dialogData).toString()
+                    : "";
+            Services.PACKET.sendToPlayer(
+                    playerSession.getPlayer(),
+                    new S2CShowDialogue(speaker.toLowerCase(), dialogueText, entityId, dialogDataJson));
+        }
+        lastCharacterSpoke = speaker;
+    }
+
+    public Entity getMainCharacterEntity() {
+        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        CharacterStory mainCharacter = characterManager.getMainCharacter();
+        if (mainCharacter == null) return null;
+        for (String name : characterEntities.keySet()) {
+            if (name.equals(mainCharacter.getName().toLowerCase())) {
+                return characterEntities.get(name);
             }
         }
-        DialogData dialogData = characterDialogData.get(speaker.toLowerCase());
-        String dialogDataJson = dialogData != null
-                ? CameraAngleSerializer.serializeDialogData(dialogData).toString()
-                : "";
-        Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(),
-                new S2CShowDialogue(speaker.toLowerCase(), dialogueText, entityId, dialogDataJson));
-        lastCharacterSpoke = speaker;
+        return null;
     }
 
     public void registerEntity(ICharacterStory characterStory, Entity entity) {
@@ -258,6 +274,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     public void unregisterEntity(ICharacterStory characterStory, Entity entity) {
         characterEntities.remove(characterStory.getName().toLowerCase(), entity);
+    }
+
+    public void unregisterEntity(ICharacterStory characterStory) {
+        characterEntities.remove(characterStory.getName().toLowerCase());
     }
 
     public Entity getEntityFromCharacter(ICharacterStory characterStory) {
@@ -282,6 +302,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     }
 
     private void finish() {
+        if (playerSession.isGameplayMode()) return;
         ended = true;
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
         NarrativeCraftMod.LOGGER.info(
@@ -300,6 +321,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     public Map<String, Entity> getCharacterEntities() {
         return characterEntities;
+    }
+
+    public void setLastCharacterSpoke(String lastCharacterSpoke) {
+        this.lastCharacterSpoke = lastCharacterSpoke;
     }
 
     record Snapshot(String text, List<String> tags) {}

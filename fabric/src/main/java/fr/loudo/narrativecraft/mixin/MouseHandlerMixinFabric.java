@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import fr.loudo.narrativecraft.events.client.OnPressButtonEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseDragEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseScrollEvent;
@@ -30,6 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,6 +46,11 @@ public abstract class MouseHandlerMixinFabric {
     @Shadow
     @Final
     private Minecraft minecraft;
+
+    @Inject(method = "onButton", at = @At("RETURN"))
+    private void narrativecraft$onButtonPress(long handle, MouseButtonInfo rawButtonInfo, int action, CallbackInfo ci) {
+        OnPressButtonEvent.pressButton(action);
+    }
 
     @Redirect(
             method = "onButton",

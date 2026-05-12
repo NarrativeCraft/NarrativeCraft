@@ -59,7 +59,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
 
     @Override
     public void init() {
-        teleportToEditorOrigin();
+        if (environment == NarrativeEnvironment.DEVELOPMENT) teleportToEditorOrigin();
     }
 
     @Override
@@ -106,7 +106,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
     }
 
     public void stop() {
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopEditorMaker());
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), S2CStopEditorMaker.INSTANCE);
     }
 
     public Interaction getInteraction() {

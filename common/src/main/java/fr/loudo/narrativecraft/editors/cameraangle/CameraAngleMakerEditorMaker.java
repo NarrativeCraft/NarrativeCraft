@@ -137,12 +137,13 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void stop() {
-        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
-        playerSession.changeGameMode(playerSession.getLastGameType());
-        for (Entity entity : characterEntities.values()) {
-            entity.remove(Entity.RemovalReason.DISCARDED);
+        if (environment == NarrativeEnvironment.DEVELOPMENT) {
+            playerSession.changeGameMode(playerSession.getLastGameType());
+            for (Entity entity : characterEntities.values()) {
+                entity.remove(Entity.RemovalReason.DISCARDED);
+            }
         }
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopEditorMaker());
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), S2CStopEditorMaker.INSTANCE);
     }
 
     public void spawnEntity(CharacterPlacement characterPlacement) {

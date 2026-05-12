@@ -47,6 +47,7 @@ import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
@@ -187,5 +188,7 @@ public class OnPacketRegisterEventNeoForge {
                 ServerPacketHandlerNeoForge::dialogueFinished);
         registrar.playToServer(
                 C2SChoiceSelected.TYPE, C2SChoiceSelected.STREAM_CODEC, ServerPacketHandlerNeoForge::choiceSelected);
+        registrar.playToServer(
+                C2SPlayStitchStory.TYPE, C2SPlayStitchStory.STREAM_CODEC, ServerPacketHandlerNeoForge::playStitch);
     }
 }

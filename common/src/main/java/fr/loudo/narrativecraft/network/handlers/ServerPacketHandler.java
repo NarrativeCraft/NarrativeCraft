@@ -52,6 +52,7 @@ import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -301,6 +302,15 @@ public class ServerPacketHandler {
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler != null) {
             storyHandler.onChoiceSelected(packet.index());
+        }
+    }
+
+    public static void playStitch(C2SPlayStitchStory packet, Player player) {
+        PlayerSession session =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler != null) {
+            storyHandler.playStitch(packet.stitchName());
         }
     }
 

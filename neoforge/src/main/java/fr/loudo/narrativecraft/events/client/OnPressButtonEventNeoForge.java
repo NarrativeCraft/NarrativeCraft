@@ -21,15 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.session;
+package fr.loudo.narrativecraft.events.client;
 
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
-public interface IPlayerSession {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnPressButtonEventNeoForge {
 
-    ServerPlayer getPlayer();
+    public OnPressButtonEventNeoForge(IEventBus bus) {
+        NeoForge.EVENT_BUS.addListener(OnPressButtonEventNeoForge::onPressButton);
+    }
 
-    boolean isGameplayMode();
-
-    void setGameplayMode(boolean gameplayMode);
+    private static void onPressButton(InputEvent.MouseButton.Post event) {
+        OnPressButtonEvent.pressButton(event.getButton());
+    }
 }

@@ -148,7 +148,9 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     @Override
-    public void stop() {}
+    public void stop() {
+        playerSession.setCameraView(null);
+    }
 
     public void tick() {
         if (previewCameraView != null && !editingCameraViewPosition) {

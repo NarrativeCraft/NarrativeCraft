@@ -41,6 +41,7 @@ import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ServerPacketHandlerNeoForge {
@@ -127,5 +128,9 @@ public class ServerPacketHandlerNeoForge {
 
     public static void choiceSelected(C2SChoiceSelected packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.choiceSelected(packet, context.player()));
+    }
+
+    public static void playStitch(C2SPlayStitchStory packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.playStitch(packet, context.player()));
     }
 }
