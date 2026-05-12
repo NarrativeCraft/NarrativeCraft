@@ -26,12 +26,13 @@ package fr.loudo.narrativecraft.client.screens.narrative.interaction;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.util.Locale;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
+import java.util.Locale;
 
 public class InteractionPointEditScreen extends Screen {
 
@@ -135,14 +136,6 @@ public class InteractionPointEditScreen extends Screen {
                 .bounds(x, y, FIELD_WIDTH, FIELD_HEIGHT)
                 .build();
         addRenderableWidget(placePointButton);
-        y += FIELD_HEIGHT + GAP;
-
-        Button previewButton = Button.builder(Translation.message("screen.interaction.preview"), b -> {
-                    // TODO: execute stitch preview
-                })
-                .bounds(x, y, FIELD_WIDTH, FIELD_HEIGHT)
-                .build();
-        addRenderableWidget(previewButton);
         y += FIELD_HEIGHT + GAP;
 
         Button saveButton = Button.builder(Translation.message("send"), b -> saveAndClose())

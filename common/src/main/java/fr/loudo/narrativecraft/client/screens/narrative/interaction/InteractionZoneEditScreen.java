@@ -99,14 +99,6 @@ public class InteractionZoneEditScreen extends Screen {
         addRenderableWidget(placeCornersButton);
         y += FIELD_HEIGHT + GAP;
 
-        Button previewButton = Button.builder(Translation.message("screen.interaction.preview"), b -> {
-                    // TODO: execute stitch preview
-                })
-                .bounds(x, y, FIELD_WIDTH, FIELD_HEIGHT)
-                .build();
-        addRenderableWidget(previewButton);
-        y += FIELD_HEIGHT + GAP;
-
         Button saveButton = Button.builder(Translation.message("send"), b -> saveAndClose())
                 .bounds(x, y, FIELD_WIDTH / 2 - 2, FIELD_HEIGHT)
                 .build();
