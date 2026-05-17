@@ -35,6 +35,9 @@ import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -47,10 +50,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class InteractionMakerEditorRenderer {
 

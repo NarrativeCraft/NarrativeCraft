@@ -28,38 +28,82 @@ import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryPickerScreen
 import fr.loudo.narrativecraft.narrative.cameraangle.TemplateSourceType;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import net.minecraft.client.gui.screens.Screen;
+import java.util.stream.Collectors;
 
 public class CameraAngleTemplatePickerScreen
         extends AbstractNarrativeEntryPickerScreen<CameraAngleTemplatePickerScreen.Entry> {
 
+    private static final TemplateSourceType[] CATEGORIES = {
+        TemplateSourceType.ANIMATION, TemplateSourceType.SUBSCENE, TemplateSourceType.CUTSCENE
+    };
+    private static final String[] CATEGORY_KEYS = {
+        "screen.scene_menu.animations", "screen.scene_menu.subscenes", "screen.scene_menu.cutscenes"
+    };
+
+    private final List<Entry> allEntries;
+    private TemplateSourceType selectedCategory = TemplateSourceType.ANIMATION;
+
     public CameraAngleTemplatePickerScreen(Scene scene, Screen lastScreen, Consumer<TemplatePick> onPick) {
         super(
                 Translation.message("screen.camera_angle_editor.add_template"),
-                buildEntries(scene),
+                new ArrayList<>(),
                 lastScreen,
                 entry -> onPick.accept(new TemplatePick(entry.sourceType(), entry.refId())));
+        this.allEntries = buildEntries(scene);
     }
 
     private static List<Entry> buildEntries(Scene scene) {
         List<Entry> entries = new ArrayList<>();
         scene.getAnimationManager()
                 .getList()
-                .forEach(animation -> entries.add(
-                        new Entry(TemplateSourceType.ANIMATION, animation.getId(), "[A] " + animation.getName())));
+                .forEach(animation ->
+                        entries.add(new Entry(TemplateSourceType.ANIMATION, animation.getId(), animation.getName())));
         scene.getSubsceneManager()
                 .getList()
-                .forEach(subscene -> entries.add(
-                        new Entry(TemplateSourceType.SUBSCENE, subscene.getId(), "[S] " + subscene.getName())));
+                .forEach(subscene ->
+                        entries.add(new Entry(TemplateSourceType.SUBSCENE, subscene.getId(), subscene.getName())));
         scene.getCutsceneManager()
                 .getList()
-                .forEach(cutscene -> entries.add(
-                        new Entry(TemplateSourceType.CUTSCENE, cutscene.getId(), "[C] " + cutscene.getName())));
+                .forEach(cutscene ->
+                        entries.add(new Entry(TemplateSourceType.CUTSCENE, cutscene.getId(), cutscene.getName())));
         return entries;
+    }
+
+    @Override
+    protected void init() {
+        this.list = allEntries.stream()
+                .filter(e -> e.sourceType() == selectedCategory)
+                .collect(Collectors.toList());
+        super.init();
+        addCategoryButtons();
+    }
+
+    private void addCategoryButtons() {
+        int catButtonWidth = 70;
+        int catButtonHeight = 20;
+        int spacing = 4;
+        int totalWidth = CATEGORIES.length * catButtonWidth + (CATEGORIES.length - 1) * spacing;
+        int startX = (this.width - totalWidth) / 2;
+
+        for (int i = 0; i < CATEGORIES.length; i++) {
+            final TemplateSourceType category = CATEGORIES[i];
+            Button button = Button.builder(Translation.message(CATEGORY_KEYS[i]), b -> {
+                        selectedCategory = category;
+                        clearWidgets();
+                        init();
+                    })
+                    .bounds(startX + i * (catButtonWidth + spacing), 5, catButtonWidth, catButtonHeight)
+                    .build();
+            button.active = selectedCategory != category;
+            this.addRenderableWidget(button);
+        }
     }
 
     @Override

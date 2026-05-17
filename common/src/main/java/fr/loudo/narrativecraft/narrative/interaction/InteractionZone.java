@@ -23,10 +23,9 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
+import java.util.UUID;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.UUID;
 
 public class InteractionZone {
 
