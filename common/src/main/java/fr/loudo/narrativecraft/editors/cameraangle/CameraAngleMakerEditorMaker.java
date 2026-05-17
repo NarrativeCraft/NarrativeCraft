@@ -27,6 +27,7 @@ import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
@@ -51,6 +52,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
@@ -178,6 +180,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         characterEntities.put(characterPlacement.getId(), entity);
         Services.PACKET.sendToPlayer(
                 player, new S2CCameraAnglePlacementEntitySpawned(characterPlacement.getId(), entity.getId()));
+        setEntityPose(characterPlacement.getId(), characterPlacement.getPose());
     }
 
     public void spawnTemplateReference(TemplateReference reference) {
@@ -286,6 +289,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         characterEntities.put(placement.getId(), entity);
         Services.PACKET.sendToPlayer(
                 player, new S2CCameraAnglePlacementEntitySpawned(placement.getId(), entity.getId()));
+        setEntityPose(placement.getId(), placement.getPose());
     }
 
     private <T extends AbstractAction> T findLastAction(RecordingData data, Class<T> type) {
@@ -382,6 +386,36 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
 
     public List<Entity> getCharacterEntities() {
         return new ArrayList<>(characterEntities.values());
+    }
+
+    public void setEntityPose(UUID placementId, Pose pose) {
+        CharacterPlacement characterPlacement = characterPlacements.stream()
+                .filter(p -> p.getId().equals(placementId))
+                .findFirst()
+                .orElse(null);
+        if (characterPlacement == null) return;
+
+        Entity entity = characterEntities.get(placementId);
+        if (entity == null) return;
+
+        entity.setPose(pose);
+        SynchedEntityData entityData = entity.getEntityData();
+
+        byte currentMask = entityData.get(EntityAccessor.getDATA_SHARED_FLAGS_ID());
+        byte newMask = pose == Pose.CROUCHING ? (byte) (currentMask | 0x02) : (byte) (currentMask & ~0x02);
+        entityData.set(EntityAccessor.getDATA_SHARED_FLAGS_ID(), newMask);
+
+        if (pose == Pose.SHOOTING && entity instanceof LivingEntity livingEntity) {
+            byte currentLivingFlags = entityData.get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS());
+            byte newLivingFlags = 0;
+            if (currentLivingFlags == 0) {
+                if (!livingEntity.getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) newLivingFlags = 3;
+                else if (!livingEntity.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) newLivingFlags = 1;
+            }
+            entityData.set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), newLivingFlags);
+        }
+
+        characterPlacement.setPose(pose);
     }
 
     public List<TemplateReference> getTemplateReferences() {

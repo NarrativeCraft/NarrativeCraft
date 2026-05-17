@@ -406,6 +406,22 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         return minecraft.level.getEntity(entityId);
     }
 
+    public CharacterPlacement getPlacementByEntityId(int entityId) {
+        UUID placementId = placementEntityIds.entrySet().stream()
+                .filter(entry -> entry.getValue() == entityId)
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+
+        if (placementId == null) return null;
+        for (CharacterPlacement characterPlacement : characterPlacements) {
+            if (characterPlacement.getId().equals(placementId)) {
+                return characterPlacement;
+            }
+        }
+        return null;
+    }
+
     public DialogRenderer3D getRendererForSetup(CameraViewDialogSetup setup) {
         int index =
                 previewCameraView != null ? previewCameraView.getDialogSetups().indexOf(setup) : -1;

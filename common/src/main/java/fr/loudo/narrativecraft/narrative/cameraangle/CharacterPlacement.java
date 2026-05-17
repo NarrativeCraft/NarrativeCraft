@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.cameraangle;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
@@ -38,6 +39,7 @@ public class CharacterPlacement {
     private final List<ItemStack> items;
     private final boolean isTemplate;
     private final UUID templateReferenceId;
+    private Pose pose = Pose.STANDING;
 
     public CharacterPlacement(
             UUID id,
@@ -99,5 +101,13 @@ public class CharacterPlacement {
 
     public UUID getTemplateReferenceId() {
         return templateReferenceId;
+    }
+
+    public Pose getPose() {
+        return pose;
+    }
+
+    public void setPose(Pose pose) {
+        this.pose = pose;
     }
 }

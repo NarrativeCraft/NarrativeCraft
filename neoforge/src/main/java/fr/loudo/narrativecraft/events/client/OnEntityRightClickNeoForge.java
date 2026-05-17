@@ -21,28 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.*;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.minecraft.world.InteractionHand;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
-public class ClientFabricEventList {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnEntityRightClickNeoForge {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-        events.add(new OnEntityRightClickFabric());
+    public OnEntityRightClickNeoForge(IEventBus bus) {
+        NeoForge.EVENT_BUS.addListener(OnEntityRightClickNeoForge::onEntityRightClick);
     }
 
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
+    public static void onEntityRightClick(PlayerInteractEvent.EntityInteractSpecific event) {
+        if (event.getLevel().isClientSide() && event.getHand() == InteractionHand.MAIN_HAND) {
+            OnEntityRightClick.entityRightClick(event.getTarget());
         }
     }
 }

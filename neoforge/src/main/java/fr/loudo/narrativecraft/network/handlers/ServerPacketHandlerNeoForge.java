@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleControl;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSetEntityPose;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
@@ -108,6 +109,10 @@ public class ServerPacketHandlerNeoForge {
 
     public static void cameraAngleTeleportToTemplate(C2SCameraAngleTeleportToTemplate packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.cameraAngleTeleportToTemplate(packet, context.player()));
+    }
+
+    public static void cameraAngleSetEntityPose(C2SCameraAngleSetEntityPose packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.cameraAngleSetEntityPose(packet, context.player()));
     }
 
     public static void interactionEnter(BiInteractionEnter packet, IPayloadContext context) {

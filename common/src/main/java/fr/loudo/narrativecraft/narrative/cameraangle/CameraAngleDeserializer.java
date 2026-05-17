@@ -38,6 +38,7 @@ import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
@@ -204,7 +205,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
                 ? UUID.fromString(json.get("templateReferenceId").getAsString())
                 : null;
 
-        return new CharacterPlacement(
+        CharacterPlacement placement = new CharacterPlacement(
                 id,
                 characterStory,
                 new Vec3(x, y, z),
@@ -212,6 +213,15 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
                 items,
                 isTemplate,
                 templateReferenceId);
+
+        if (json.has("pose")) {
+            try {
+                placement.setPose(Pose.valueOf(json.get("pose").getAsString()));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        return placement;
     }
 
     private static ItemStack deserializeItemStack(String nbtString) {

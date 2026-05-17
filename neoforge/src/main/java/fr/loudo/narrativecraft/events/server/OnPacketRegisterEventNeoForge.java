@@ -171,6 +171,10 @@ public class OnPacketRegisterEventNeoForge {
                 C2SCameraAngleTeleportToTemplate.TYPE,
                 C2SCameraAngleTeleportToTemplate.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::cameraAngleTeleportToTemplate);
+        registrar.playToServer(
+                C2SCameraAngleSetEntityPose.TYPE,
+                C2SCameraAngleSetEntityPose.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::cameraAngleSetEntityPose);
         registrar.playBidirectional(
                 BiInteractionEnter.TYPE,
                 BiInteractionEnter.STREAM_CODEC,

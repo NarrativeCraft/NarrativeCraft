@@ -21,28 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.*;
-import java.util.ArrayList;
-import java.util.List;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.minecraft.world.InteractionResult;
 
-public class ClientFabricEventList {
-
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-        events.add(new OnEntityRightClickFabric());
-    }
-
+public class OnEntityRightClickFabric implements IFabricEventRegister {
+    @Override
     public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+        UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
+            OnEntityRightClick.entityRightClick(entity);
+            return InteractionResult.PASS;
+        });
     }
 }

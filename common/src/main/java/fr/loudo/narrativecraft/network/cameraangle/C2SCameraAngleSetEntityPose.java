@@ -21,28 +21,32 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.network.cameraangle;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.*;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.Pose;
 
-public class ClientFabricEventList {
+public record C2SCameraAngleSetEntityPose(UUID placementId, Pose pose) implements CustomPacketPayload {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
+    public static final Type<C2SCameraAngleSetEntityPose> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_set_entity_pose"));
 
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnHudRenderEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-        events.add(new OnEntityRightClickFabric());
-    }
+    public static final StreamCodec<ByteBuf, C2SCameraAngleSetEntityPose> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC,
+            C2SCameraAngleSetEntityPose::placementId,
+            ByteBufCodecs.idMapper(i -> Pose.values()[i], Pose::ordinal),
+            C2SCameraAngleSetEntityPose::pose,
+            C2SCameraAngleSetEntityPose::new);
 
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

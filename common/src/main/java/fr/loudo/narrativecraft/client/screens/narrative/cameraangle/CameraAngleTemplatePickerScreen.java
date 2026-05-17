@@ -28,14 +28,13 @@ import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryPickerScreen
 import fr.loudo.narrativecraft.narrative.cameraangle.TemplateSourceType;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 
 public class CameraAngleTemplatePickerScreen
         extends AbstractNarrativeEntryPickerScreen<CameraAngleTemplatePickerScreen.Entry> {

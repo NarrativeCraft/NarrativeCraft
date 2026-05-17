@@ -340,6 +340,14 @@ public class ServerPacketHandler {
         }
     }
 
+    public static void cameraAngleSetEntityPose(C2SCameraAngleSetEntityPose packet, Player player) {
+        CameraAngleMakerEditorMaker editor = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getEditor(player, CameraAngleMakerEditorMaker.class);
+        if (editor == null) return;
+        editor.setEntityPose(packet.placementId(), packet.pose());
+    }
+
     public static void cameraAngleCaptureCharacter(C2SCameraAngleCaptureCharacter packet, Player player) {
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.chapterId());
         if (chapter == null) return;
