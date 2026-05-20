@@ -23,7 +23,11 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
+import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.io.File;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -49,6 +53,20 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
         return dialogPresetName;
     }
 
+    @Override
+    public Scene getScene() {
+        return null;
+    }
+
+    @Override
+    public File getSkinFile() {
+        File charactersFolder = NarrativeCraftFileUtil.getCharactersFolder();
+        File characterFolder = new File(charactersFolder, toFileName());
+        if (!characterFolder.exists()) return null;
+
+        return new File(characterFolder, NarrativeCraftFileDefault.SKIN_CHARACTER_FILE);
+    }
+
     public void setDialogPresetName(String dialogPresetName) {
         this.dialogPresetName = dialogPresetName;
     }
@@ -62,6 +80,9 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
     }
 
     public PlayerModelType getModelType() {
+        if (modelType == null) {
+            return PlayerModelType.WIDE;
+        }
         return modelType;
     }
 

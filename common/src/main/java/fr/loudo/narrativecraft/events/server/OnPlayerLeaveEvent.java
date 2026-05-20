@@ -44,6 +44,7 @@ public class OnPlayerLeaveEvent {
             playerSession.setStoryHandler(null);
         }
 
+        playerSession.clear();
         playerSessionManager.remove(playerSession);
 
         RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();

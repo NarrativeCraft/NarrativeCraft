@@ -31,20 +31,24 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.PlayerModelType;
 
 public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
         extends AbstractNarrativeEntryEditScreen<T> {
 
     protected EntityType<?> selectedEntityType;
+    protected PlayerModelType selectedModelType;
 
     public AbstractCharacterEntryEditScreen(Screen lastScreen) {
         super(lastScreen);
         this.selectedEntityType = EntityType.PLAYER;
+        this.selectedModelType = PlayerModelType.WIDE;
     }
 
     public AbstractCharacterEntryEditScreen(T entry, Screen lastScreen) {
         super(entry, lastScreen);
         this.selectedEntityType = entry.getEntityType();
+        this.selectedModelType = entry.getModelType();
     }
 
     @Override
@@ -58,5 +62,16 @@ public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
                 .size(GLOBAL_WIDTH, 20)
                 .build();
         addElementToWidgetsList(entityTypeButton);
+
+        Button modelTypeButton = Button.builder(
+                        Translation.message("screen.character.model_type", selectedModelType.name()), b -> {
+                            selectedModelType = selectedModelType == PlayerModelType.WIDE
+                                    ? PlayerModelType.SLIM
+                                    : PlayerModelType.WIDE;
+                            b.setMessage(Translation.message("screen.character.model_type", selectedModelType.name()));
+                        })
+                .size(GLOBAL_WIDTH, 20)
+                .build();
+        addElementToWidgetsList(modelTypeButton);
     }
 }

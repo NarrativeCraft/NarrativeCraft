@@ -21,31 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.util.UUID;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public interface ICharacterStory {
+public class S2CClearLoadedSkins implements CustomPacketPayload {
 
-    UUID getId();
+    public static final S2CClearLoadedSkins INSTANCE = new S2CClearLoadedSkins();
 
-    String getName();
+    public static final Type<S2CClearLoadedSkins> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "clear_loaded_skins"));
 
-    String getDescription();
+    public static final StreamCodec<ByteBuf, S2CClearLoadedSkins> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    String getDialogPresetName();
-
-    Scene getScene();
-
-    File getSkinFile();
-
-    EntityType<?> getEntityType();
-
-    PlayerModelType getModelType();
-
-    CharacterType getCharacterType();
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

@@ -36,10 +36,7 @@ import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
-import fr.loudo.narrativecraft.network.story.S2CDialogStop;
-import fr.loudo.narrativecraft.network.story.S2CShowChoices;
-import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
-import fr.loudo.narrativecraft.network.story.S2CStopStory;
+import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.HashMap;
@@ -98,6 +95,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         pendingDialogueText = null;
         inkTagHandler.stopAll();
         characterEntities.forEach((s, entity) -> entity.remove(Entity.RemovalReason.DISCARDED));
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(), new S2CCharacterStoryAction(null, S2CCharacterStoryAction.Action.CLEAR));
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopStory());
         playerSession.clear();
     }

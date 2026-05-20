@@ -92,7 +92,10 @@ public class PlaybackContext implements IPlaybackContext {
 
         if (entityId.equals("minecraft:player")) {
             String name = hasCharacter ? characterStory.getName() : "Somebody";
-            entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), name), true);
+            entity = new FakePlayer(
+                    level,
+                    new GameProfile(playback.getAnimation().getCharacterStory().getId(), name),
+                    true);
             return;
         }
 

@@ -24,10 +24,12 @@
 package fr.loudo.narrativecraft.narrative.npc;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.io.File;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -53,6 +55,15 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
 
     public Scene getScene() {
         return scene;
+    }
+
+    @Override
+    public File getSkinFile() {
+        File npcsFolder = NarrativeCraftFileUtil.getNpcFolder(scene);
+        File npcFolder = new File(npcsFolder, toFileName());
+        if (!npcFolder.exists()) return null;
+
+        return new File(npcFolder, NarrativeCraftFileDefault.SKIN_CHARACTER_FILE);
     }
 
     public String getDialogPresetName() {

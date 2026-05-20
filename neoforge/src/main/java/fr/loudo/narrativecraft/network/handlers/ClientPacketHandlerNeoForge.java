@@ -23,12 +23,7 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
-import fr.loudo.narrativecraft.network.S2CPlayerSession;
-import fr.loudo.narrativecraft.network.S2CScreenClear;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
-import fr.loudo.narrativecraft.network.S2CToastMessage;
+import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
@@ -38,6 +33,7 @@ import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
@@ -154,5 +150,19 @@ public class ClientPacketHandlerNeoForge {
 
     public static void interactionEnter(BiInteractionEnter packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.interactionEnter(packet));
+    }
+
+    public static void characterSkin(S2CCharacterSkin packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.characterSkin(packet);
+        });
+    }
+
+    public static void characterStoryAction(S2CCharacterStoryAction packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.characterStoryAction(packet));
+    }
+
+    public static void clearLoadedSkins(S2CClearLoadedSkins packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.clearLoadedSkins(packet));
     }
 }

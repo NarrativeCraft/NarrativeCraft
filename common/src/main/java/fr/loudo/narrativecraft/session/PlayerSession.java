@@ -28,9 +28,7 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.platform.Services;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
@@ -41,6 +39,7 @@ public class PlayerSession extends AbstractPlayerSession {
     private GameType lastGameType;
     private boolean gameplayMode;
     private final Set<UUID> interactionIds = new HashSet<>();
+    private final List<UUID> characterIdsSkinLoaded = new ArrayList<>();
 
     @Nullable
     private StoryHandler storyHandler;
@@ -54,6 +53,7 @@ public class PlayerSession extends AbstractPlayerSession {
     public void clear() {
         super.clear();
         interactionIds.clear();
+        characterIdsSkinLoaded.clear();
         Services.PACKET.sendToPlayer(player, S2CStopEditorMaker.INSTANCE);
     }
 
@@ -102,5 +102,9 @@ public class PlayerSession extends AbstractPlayerSession {
 
     public void setGameplayMode(boolean gameplayMode) {
         this.gameplayMode = gameplayMode;
+    }
+
+    public List<UUID> getCharacterIdsSkinLoaded() {
+        return characterIdsSkinLoaded;
     }
 }

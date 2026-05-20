@@ -24,12 +24,7 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
-import fr.loudo.narrativecraft.network.S2CPlayerSession;
-import fr.loudo.narrativecraft.network.S2CScreenClear;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
-import fr.loudo.narrativecraft.network.S2CToastMessage;
+import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
@@ -48,6 +43,7 @@ import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
+import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
@@ -122,7 +118,17 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playToClient(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC, ClientPacketHandlerNeoForge::stopStory);
         registrar.playToClient(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC, ClientPacketHandlerNeoForge::dialogStop);
         registrar.playToClient(
+                S2CCharacterStoryAction.TYPE,
+                S2CCharacterStoryAction.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::characterStoryAction);
+        registrar.playToClient(
                 S2CStopEditorMaker.TYPE, S2CStopEditorMaker.STREAM_CODEC, ClientPacketHandlerNeoForge::stopEditorMaker);
+        registrar.playToClient(
+                S2CCharacterSkin.TYPE, S2CCharacterSkin.STREAM_CODEC, ClientPacketHandlerNeoForge::characterSkin);
+        registrar.playToClient(
+                S2CClearLoadedSkins.TYPE,
+                S2CClearLoadedSkins.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::clearLoadedSkins);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {

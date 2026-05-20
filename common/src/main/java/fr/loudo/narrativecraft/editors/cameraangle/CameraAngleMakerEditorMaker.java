@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
+import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.recording.actions.ChangeItemAction;
@@ -47,6 +48,7 @@ import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
+import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -90,6 +92,12 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     public void init() {
         playerSession.changeGameMode(GameType.SPECTATOR);
         for (CharacterPlacement characterPlacement : cameraAngle.getCharacterPlacements()) {
+            Services.PACKET.sendToPlayer(
+                    playerSession.getPlayer(),
+                    new S2CCharacterStoryAction(
+                            characterPlacement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
+            UtilsServer.broadcastCharacterSkin(
+                    playerSession.getPlayer().level().players(), characterPlacement.getCharacterStory());
             spawnEntity(characterPlacement);
             if (characterPlacement.isTemplate() && characterPlacement.getTemplateReferenceId() != null) {
                 placementsByTemplateReference
@@ -146,6 +154,12 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             }
         }
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), S2CStopEditorMaker.INSTANCE);
+        for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
+            Services.PACKET.sendToPlayer(
+                    playerSession.getPlayer(),
+                    new S2CCharacterStoryAction(
+                            placement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.REMOVE));
+        }
     }
 
     public void spawnEntity(CharacterPlacement characterPlacement) {
@@ -155,7 +169,10 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         ServerLevel level = player.level();
         Entity entity;
         if (characterStory.getEntityType() == EntityType.PLAYER) {
-            entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), characterStory.getName()), true);
+            entity = new FakePlayer(
+                    level,
+                    new GameProfile(characterPlacement.getCharacterStory().getId(), characterStory.getName()),
+                    true);
         } else {
             entity = characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
         }
@@ -257,7 +274,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         Entity entity;
 
         if (characterStory.getEntityType() == EntityType.PLAYER) {
-            entity = new FakePlayer(level, new GameProfile(UUID.randomUUID(), characterStory.getName()), true);
+            entity = new FakePlayer(level, new GameProfile(characterStory.getId(), characterStory.getName()), true);
         } else {
             entity = characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
             if (entity == null) return;

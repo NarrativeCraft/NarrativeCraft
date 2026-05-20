@@ -30,18 +30,16 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.AbstractPlayerSession;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class ClientPlayerSession extends AbstractPlayerSession {
 
     private final CutsceneDataSession cutsceneDataSession = new CutsceneDataSession();
+    private final List<ICharacterStory> charactersInWorld = new ArrayList<>();
+    private final List<UUID> loadedCharactersSkin = new ArrayList<>();
     private final List<DialogRenderer2D> activeDialog2DRenderers = new ArrayList<>();
     private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
     private final List<InkAction> activeClientInkActions = new ArrayList<>();
@@ -62,6 +60,10 @@ public class ClientPlayerSession extends AbstractPlayerSession {
         return cutsceneDataSession;
     }
 
+    public List<ICharacterStory> getCharactersInWorld() {
+        return charactersInWorld;
+    }
+
     public List<DialogRenderer2D> getActiveDialog2DRenderers() {
         return Collections.unmodifiableList(activeDialog2DRenderers);
     }
@@ -77,6 +79,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
         new ArrayList<>(activeDialog3DRenderers).forEach(this::removeDialog3D);
         cutsceneDataSession.reset();
         clickedInteractionPointIds.clear();
+        charactersInWorld.clear();
         mainDialog = null;
         cameraView = null;
         stopNextDialog = false;
@@ -141,5 +144,9 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public void setStopNextDialog(boolean stopNextDialog) {
         this.stopNextDialog = stopNextDialog;
+    }
+
+    public List<UUID> getLoadedCharactersSkin() {
+        return loadedCharactersSkin;
     }
 }

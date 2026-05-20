@@ -18,6 +18,7 @@
     "GameRendererMixin",
     "GuiTextRenderStateMixin",
     "MinecraftMixin",
+    "PlayerInfoMixin",
     "accessor.GuiGraphicsExtractorAccessor"
   ],
   "server": [],

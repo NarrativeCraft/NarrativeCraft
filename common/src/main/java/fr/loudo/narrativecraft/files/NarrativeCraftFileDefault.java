@@ -32,6 +32,7 @@ public class NarrativeCraftFileDefault {
     public static final String EXTENSION_SCRIPT_FILE = ".ink";
     public static final String EXTENSION_DATA_FILE = ".json";
     public static final String DATA_FILE_NAME = "data" + EXTENSION_DATA_FILE;
+    public static final String SKIN_CHARACTER_FILE = "skin.png";
     public static final String ANIMATIONS_FOLDER_NAME = "animations";
     public static final String SCENES_FOLDER_NAME = "scenes";
     public static final String SUBSCENES_FOLDER_NAME = "subscenes";

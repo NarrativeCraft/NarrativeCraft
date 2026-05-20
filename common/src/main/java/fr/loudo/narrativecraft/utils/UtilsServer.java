@@ -23,16 +23,22 @@
 
 package fr.loudo.narrativecraft.utils;
 
+import com.google.common.io.Files;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.network.S2CCharacterSkin;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.UUID;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+
+import java.io.File;
+import java.util.List;
+import java.util.UUID;
 
 public class UtilsServer {
 
@@ -69,5 +75,24 @@ public class UtilsServer {
             playerSessionManager.add(playerSession);
         }
         return playerSession;
+    }
+
+    public static void broadcastCharacterSkin(List<ServerPlayer> players, ICharacterStory characterStory) {
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        try {
+            File skinFile = characterStory.getSkinFile();
+            if (skinFile == null || !skinFile.exists()) return;
+            byte[] skinBytes = Files.toByteArray(skinFile);
+            for (ServerPlayer player : players) {
+                PlayerSession playerSession = sessionManager.getByPlayer(player);
+                if (playerSession == null) continue;
+                // cache system, saves bandwidth
+                if (playerSession.getCharacterIdsSkinLoaded().contains(characterStory.getId())) continue;
+                Services.PACKET.sendToPlayer(player, new S2CCharacterSkin(characterStory.getId(), skinBytes));
+                playerSession.getCharacterIdsSkinLoaded().add(characterStory.getId());
+            }
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error("Failed to send character skin of {}", characterStory.getName(), e);
+        }
     }
 }

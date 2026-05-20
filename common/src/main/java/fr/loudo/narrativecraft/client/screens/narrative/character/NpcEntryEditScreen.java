@@ -32,22 +32,26 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.PlayerModelType;
 
 public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
 
     private final Scene scene;
     private EntityType<?> selectedEntityType;
+    private PlayerModelType selectedModelType;
 
     public NpcEntryEditScreen(Scene scene, Screen lastScreen) {
         super(lastScreen);
         this.scene = scene;
         this.selectedEntityType = EntityType.PLAYER;
+        this.selectedModelType = PlayerModelType.WIDE;
     }
 
     public NpcEntryEditScreen(Npc entry, Screen lastScreen) {
         super(entry, lastScreen);
         this.scene = entry.getScene();
         this.selectedEntityType = entry.getEntityType();
+        this.selectedModelType = entry.getModelType() != null ? entry.getModelType() : PlayerModelType.WIDE;
     }
 
     @Override
@@ -66,12 +70,24 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
                 .size(GLOBAL_WIDTH, 20)
                 .build();
         addElementToWidgetsList(entityTypeButton);
+
+        Button modelTypeButton = Button.builder(
+                        Translation.message("screen.character.model_type", selectedModelType.name()), b -> {
+                            selectedModelType = selectedModelType == PlayerModelType.WIDE
+                                    ? PlayerModelType.SLIM
+                                    : PlayerModelType.WIDE;
+                            b.setMessage(Translation.message("screen.character.model_type", selectedModelType.name()));
+                        })
+                .size(GLOBAL_WIDTH, 20)
+                .build();
+        addElementToWidgetsList(modelTypeButton);
     }
 
     @Override
     protected Npc createInstance() {
         Npc npc = new Npc(getName(), scene);
         npc.setEntityType(selectedEntityType);
+        npc.setModelType(selectedModelType);
         return npc;
     }
 }

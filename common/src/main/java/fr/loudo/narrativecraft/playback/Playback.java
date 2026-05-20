@@ -26,8 +26,11 @@ package fr.loudo.narrativecraft.playback;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
+import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -76,6 +79,13 @@ public class Playback implements IPlaybackSession {
         if (forSpecificPlayers()) {
             hideEntitiesToOtherPlayers();
         }
+        for (ServerPlayer player : requester.level().players()) {
+            Services.PACKET.sendToPlayer(
+                    player,
+                    new S2CCharacterStoryAction(
+                            animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
+        }
+        UtilsServer.broadcastCharacterSkin(requester.level().players(), animation.getCharacterStory());
     }
 
     public Entity getMasterEntity() {
@@ -88,6 +98,12 @@ public class Playback implements IPlaybackSession {
 
     public void start(Collection<ServerPlayer> targetedPlayers) {
         this.targetedPlayers.addAll(targetedPlayers);
+        for (ServerPlayer player : targetedPlayers) {
+            Services.PACKET.sendToPlayer(
+                    player,
+                    new S2CCharacterStoryAction(
+                            animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
+        }
         start();
     }
 
@@ -111,6 +127,12 @@ public class Playback implements IPlaybackSession {
         for (PlaybackContext context : contexts) {
             if (killOnEnd) {
                 context.stop();
+                for (ServerPlayer player : requester.level().players()) {
+                    Services.PACKET.sendToPlayer(
+                            player,
+                            new S2CCharacterStoryAction(
+                                    animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.REMOVE));
+                }
             } else {
                 context.pause();
             }

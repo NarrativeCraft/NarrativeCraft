@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.network.handlers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.platform.NativeImage;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
@@ -42,17 +43,16 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.S2CPlayerSession;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
-import fr.loudo.narrativecraft.network.S2CToastMessage;
+import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
@@ -62,13 +62,22 @@ import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ClientPacketHandler {
 
@@ -325,6 +334,20 @@ public class ClientPacketHandler {
         return data;
     }
 
+    public static void characterStoryAction(S2CCharacterStoryAction packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+
+        CharacterManager characterManager =
+                ClientNarrativeCraftMod.getInstance().getCharacterManager();
+        ICharacterStory characterStory = characterManager.resolveCharacter(packet.characterId(), session.getScene());
+        List<ICharacterStory> charactersInWorld = session.getCharactersInWorld();
+        switch (packet.action()) {
+            case ADD -> charactersInWorld.add(characterStory);
+            case REMOVE -> charactersInWorld.remove(characterStory);
+            case CLEAR -> charactersInWorld.clear();
+        }
+    }
+
     public static void showChoices(S2CShowChoices packet) {
         MINECRAFT.setScreen(new ChoiceScreen(packet.texts()));
     }
@@ -369,5 +392,38 @@ public class ClientPacketHandler {
         interactionEditor.init();
         session.setEditor(interactionEditor);
         Minecraft.getInstance().setScreen(null);
+    }
+
+    public static void characterSkin(S2CCharacterSkin packet) {
+        Minecraft minecraft = Minecraft.getInstance();
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+
+        UUID characterId = packet.characterId();
+        try {
+            NativeImage image = NativeImage.read(packet.skinBytes());
+            DynamicTexture texture = new DynamicTexture(characterId::toString, image);
+            minecraft
+                    .getTextureManager()
+                    .register(
+                            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character/" + characterId),
+                            texture);
+            session.getLoadedCharactersSkin().add(characterId);
+        } catch (Exception e) {
+            minecraft.player.sendSystemMessage(
+                    Translation.message("error.register_character_skin", packet.characterId())
+                            .withStyle(ChatFormatting.RED));
+            NarrativeCraftMod.LOGGER.error("Failed to register {} skin!", packet.characterId(), e);
+        }
+    }
+
+    public static void clearLoadedSkins(S2CClearLoadedSkins packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+
+        Minecraft minecraft = Minecraft.getInstance();
+        TextureManager textureManager = minecraft.getTextureManager();
+        for (UUID characterId : session.getLoadedCharactersSkin()) {
+            textureManager.release(
+                    Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character" + characterId));
+        }
     }
 }

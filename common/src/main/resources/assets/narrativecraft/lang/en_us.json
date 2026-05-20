@@ -66,6 +66,7 @@
   "narrativecraft.screen.character.is_main_character": "Main Character: %s",
   "narrativecraft.screen.character.skin": "Skin: %s",
   "narrativecraft.screen.character.main_character_settings": "Main Character Settings",
+  "narrativecraft.screen.character.model_type": "Model Type: %s",
 
   "narrativecraft.screen.entity_type_picker": "Select Entity Type",
   "narrativecraft.screen.animation_character_picker": "Select Character",
@@ -89,6 +90,7 @@
   "narrativecraft.error.playback_entity_null": "Failed to spawn entity %s because it returned null.",
   "narrativecraft.error.animation.initialize": "Failed to load animation %s.",
   "narrativecraft.error.record.no_characters": "You need to have at least one character to save your recording!",
+  "narrativecraft.error.register_character_skin": "Failed to register skin for character %s!",
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",

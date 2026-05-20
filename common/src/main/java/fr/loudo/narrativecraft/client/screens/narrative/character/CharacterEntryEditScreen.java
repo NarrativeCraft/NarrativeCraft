@@ -58,6 +58,7 @@ public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<C
     protected CharacterStory createInstance() {
         CharacterStory character = new CharacterStory(getName(), getDescription());
         character.setEntityType(selectedEntityType);
+        character.setModelType(selectedModelType);
         character.setMainCharacterAttribute(mainCharacterAttribute);
         return character;
     }
