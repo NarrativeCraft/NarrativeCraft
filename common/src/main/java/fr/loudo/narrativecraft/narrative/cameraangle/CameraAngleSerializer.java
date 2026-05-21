@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.cameraangle;
 import com.google.gson.*;
 import com.mojang.serialization.DataResult;
 import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import java.lang.reflect.Type;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -112,30 +113,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
     }
 
     public static JsonObject serializeDialogData(DialogData data) {
-        JsonObject json = new JsonObject();
-        json.addProperty("offsetX", data.getOffsetX());
-        json.addProperty("offsetY", data.getOffsetY());
-        json.addProperty("width", data.getWidth());
-        json.addProperty("paddingX", data.getPaddingX());
-        json.addProperty("paddingY", data.getPaddingY());
-        json.addProperty("scale", data.getScale());
-        json.addProperty("letterSpacing", data.getLetterSpacing());
-        json.addProperty("lineGap", data.getLineGap());
-        json.addProperty("backgroundColor", data.getBackgroundColor());
-        json.addProperty("textColor", data.getTextColor());
-        if (data.getBackgroundImage() != null) {
-            json.addProperty("backgroundImage", data.getBackgroundImage().toString());
-        }
-        json.addProperty("scrollSpeed", data.getScrollSpeed());
-        if (data.getLetterSound() != null) {
-            json.addProperty("letterSound", data.getLetterSound().toString());
-        }
-        json.addProperty("soundMuted", data.isSoundMuted());
-        json.addProperty("tailVisible", data.isTailVisible());
-        json.addProperty("autoSkipEnabled", data.isAutoSkipEnabled());
-        json.addProperty("autoSkipSeconds", data.getAutoSkipSeconds());
-        json.addProperty("textAlignment", data.getTextAlignment().name());
-        return json;
+        return DialogDataIO.serialize(data);
     }
 
     static JsonObject serializeCharacterPlacement(CharacterPlacement placement) {

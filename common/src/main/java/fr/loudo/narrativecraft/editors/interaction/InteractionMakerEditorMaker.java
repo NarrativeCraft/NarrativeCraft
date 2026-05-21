@@ -73,10 +73,10 @@ public class InteractionMakerEditorMaker implements EditorMaker {
             boolean isInside = new AABB(zone.getCorner1(), zone.getCorner2())
                     .contains(playerSession.getPlayer().position());
             if (isInside && insideZoneId == null) {
-                if (zone.isOneTime() && playerSession.hasAlreadyInteracted(zone.getId())) return;
+                if (zone.isOneTime() && storyHandler.hasAlreadyInteracted(zone.getId())) return;
                 storyHandler.playStitch(zone.getStitchName());
                 insideZoneId = zone.getId();
-                if (zone.isOneTime()) playerSession.addInteractionId(zone.getId());
+                if (zone.isOneTime()) storyHandler.addInteractionId(zone.getId());
             }
             return;
         }

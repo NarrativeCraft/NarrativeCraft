@@ -38,7 +38,7 @@ public class OnCommandRegisterEventFabric implements IFabricEventRegister {
             PlaybackCommand.register(commandDispatcher);
             StoryCommand.register(commandDispatcher);
             if (Services.PLATFORM.isDevelopmentEnvironment()) {
-                DialogTestCommand.register(commandDispatcher);
+                TestCommand.register(commandDispatcher);
             }
         });
     }

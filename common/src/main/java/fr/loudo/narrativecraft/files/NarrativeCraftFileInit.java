@@ -79,7 +79,10 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
     }
 
     public File getSavesDirectory() {
-        return savesDirectory;
+        if (savesDirectory.exists()) {
+            return savesDirectory;
+        }
+        return createDirectory(mainDirectory, SAVES_DIRECTORY_NAME);
     }
 
     public File getMainInk() {

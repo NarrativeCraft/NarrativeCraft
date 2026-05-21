@@ -45,5 +45,7 @@ public class OnHudRenderEventFabric implements IFabricEventRegister {
         HudElementRegistry.addLast(
                 Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "ink_action"),
                 OnHudRender::clientInkActionsHudRender);
+        HudElementRegistry.addLast(
+                Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "save_icon"), OnHudRender::saveIconHudRender);
     }
 }

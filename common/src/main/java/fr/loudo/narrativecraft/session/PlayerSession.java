@@ -38,7 +38,6 @@ public class PlayerSession extends AbstractPlayerSession {
     private final ServerPlayer player;
     private GameType lastGameType;
     private boolean gameplayMode;
-    private final Set<UUID> interactionIds = new HashSet<>();
     private final List<UUID> characterIdsSkinLoaded = new ArrayList<>();
 
     @Nullable
@@ -52,17 +51,8 @@ public class PlayerSession extends AbstractPlayerSession {
     @Override
     public void clear() {
         super.clear();
-        interactionIds.clear();
         characterIdsSkinLoaded.clear();
         Services.PACKET.sendToPlayer(player, S2CStopEditorMaker.INSTANCE);
-    }
-
-    public boolean hasAlreadyInteracted(UUID interactionId) {
-        return interactionIds.contains(interactionId);
-    }
-
-    public void addInteractionId(UUID interactionId) {
-        interactionIds.add(interactionId);
     }
 
     public PlayerSession(ServerPlayer player) {

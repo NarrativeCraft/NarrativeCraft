@@ -73,5 +73,6 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CCharacterStoryAction.TYPE, S2CCharacterStoryAction.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CClearLoadedSkins.TYPE, S2CClearLoadedSkins.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CRenderSaveIcon.TYPE, S2CRenderSaveIcon.STREAM_CODEC);
     }
 }

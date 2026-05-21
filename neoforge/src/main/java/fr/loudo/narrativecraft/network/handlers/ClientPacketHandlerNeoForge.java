@@ -165,4 +165,8 @@ public class ClientPacketHandlerNeoForge {
     public static void clearLoadedSkins(S2CClearLoadedSkins packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.clearLoadedSkins(packet));
     }
+
+    public static void renderSaveIcon(S2CRenderSaveIcon packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.renderSaveIcon(packet));
+    }
 }

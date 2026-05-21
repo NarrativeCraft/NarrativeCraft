@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.session;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
+import fr.loudo.narrativecraft.client.narrative.story.StorySaveIconRenderer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
@@ -38,6 +39,7 @@ import java.util.*;
 public class ClientPlayerSession extends AbstractPlayerSession {
 
     private final CutsceneDataSession cutsceneDataSession = new CutsceneDataSession();
+    private final StorySaveIconRenderer saveIconRenderer = new StorySaveIconRenderer();
     private final List<ICharacterStory> charactersInWorld = new ArrayList<>();
     private final List<UUID> loadedCharactersSkin = new ArrayList<>();
     private final List<DialogRenderer2D> activeDialog2DRenderers = new ArrayList<>();
@@ -148,5 +150,9 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public List<UUID> getLoadedCharactersSkin() {
         return loadedCharactersSkin;
+    }
+
+    public StorySaveIconRenderer getSaveIconRenderer() {
+        return saveIconRenderer;
     }
 }

@@ -121,5 +121,8 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CClearLoadedSkins.TYPE, (packet, context) -> {
             ClientPacketHandler.clearLoadedSkins(packet);
         });
+        ClientPlayNetworking.registerGlobalReceiver(S2CRenderSaveIcon.TYPE, (packet, context) -> {
+            ClientPacketHandler.renderSaveIcon(packet);
+        });
     }
 }

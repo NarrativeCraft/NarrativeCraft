@@ -21,30 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.commands.*;
-import fr.loudo.narrativecraft.platform.Services;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnCommandRegisterEventNeoForge {
+public record S2CRenderSaveIcon(double in, double stay, double out) implements CustomPacketPayload {
 
-    public OnCommandRegisterEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(OnCommandRegisterEventNeoForge::registerCommand);
-    }
+    public static final Type<S2CRenderSaveIcon> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "save_icon"));
 
-    private static void registerCommand(RegisterCommandsEvent event) {
-        RecordCommand.register(event.getDispatcher());
-        PlayerSessionCommand.register(event.getDispatcher());
-        PlaybackCommand.register(event.getDispatcher());
-        StoryCommand.register(event.getDispatcher());
-        if (Services.PLATFORM.isDevelopmentEnvironment()) {
-            TestCommand.register(event.getDispatcher());
-        }
+    public static final StreamCodec<ByteBuf, S2CRenderSaveIcon> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.DOUBLE,
+            S2CRenderSaveIcon::in,
+            ByteBufCodecs.DOUBLE,
+            S2CRenderSaveIcon::stay,
+            ByteBufCodecs.DOUBLE,
+            S2CRenderSaveIcon::out,
+            S2CRenderSaveIcon::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

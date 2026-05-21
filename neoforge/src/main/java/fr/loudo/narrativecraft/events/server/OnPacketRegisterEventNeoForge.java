@@ -129,6 +129,8 @@ public class OnPacketRegisterEventNeoForge {
                 S2CClearLoadedSkins.TYPE,
                 S2CClearLoadedSkins.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::clearLoadedSkins);
+        registrar.playToClient(
+                S2CRenderSaveIcon.TYPE, S2CRenderSaveIcon.STREAM_CODEC, ClientPacketHandlerNeoForge::renderSaveIcon);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {

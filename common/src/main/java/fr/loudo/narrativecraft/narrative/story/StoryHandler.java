@@ -34,18 +34,20 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
+import fr.loudo.narrativecraft.narrative.save.SaveFileManager;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
+import fr.loudo.narrativecraft.network.S2CRenderSaveIcon;
 import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
-import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
@@ -56,18 +58,40 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     private final InkTagHandler inkTagHandler;
     private final Map<String, Entity> characterEntities = new HashMap<>();
     private final Map<String, DialogData> characterDialogData = new HashMap<>();
+    private final Set<UUID> interactionIds = new HashSet<>();
     private String lastCharacterSpoke = "";
     private Snapshot snapshot;
-
-    @Nullable
     private String pendingDialogueText;
-
     private boolean ended = false;
 
-    public StoryHandler(PlayerSession playerSession, String compiledStoryJson) throws Exception {
+    public StoryHandler(PlayerSession playerSession) throws Exception {
         this.playerSession = playerSession;
-        this.story = new Story(compiledStoryJson);
+        this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
         this.inkTagHandler = new InkTagHandler(playerSession, this);
+    }
+
+    StoryHandler(
+            PlayerSession playerSession,
+            String storyState,
+            List<String> pendingTags,
+            Map<String, DialogData> characterDialogData,
+            Set<UUID> interactionIds,
+            String lastCharacterSpoke,
+            Snapshot snapshot,
+            String pendingDialogueText,
+            boolean ended)
+            throws Exception {
+        this.playerSession = playerSession;
+        this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
+        this.story.getState().loadJson(storyState);
+        this.inkTagHandler = new InkTagHandler(playerSession, this);
+        this.inkTagHandler.loadPendingTags(pendingTags);
+        this.characterDialogData.putAll(characterDialogData);
+        this.interactionIds.addAll(interactionIds);
+        this.lastCharacterSpoke = lastCharacterSpoke;
+        this.snapshot = snapshot;
+        this.pendingDialogueText = pendingDialogueText;
+        this.ended = ended;
     }
 
     public void start() throws Exception {
@@ -96,7 +120,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         inkTagHandler.stopAll();
         characterEntities.forEach((s, entity) -> entity.remove(Entity.RemovalReason.DISCARDED));
         Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(), new S2CCharacterStoryAction(null, S2CCharacterStoryAction.Action.CLEAR));
+                playerSession.getPlayer(),
+                new S2CCharacterStoryAction(UUID.randomUUID(), S2CCharacterStoryAction.Action.CLEAR));
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopStory());
         playerSession.clear();
     }
@@ -136,6 +161,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
                 "Story error for player {}: {}",
                 playerSession.getPlayer().getName().getString(),
                 exception);
+        playerSession
+                .getPlayer()
+                .sendSystemMessage(Translation.message("error.story").withStyle(ChatFormatting.RED));
         stop();
     }
 
@@ -232,6 +260,12 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         }
     }
 
+    public void save() {
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CRenderSaveIcon(0.9, 3, 0.9));
+        SaveFileManager saveFileManager = NarrativeCraftMod.getInstance().getSaveFileManager();
+        saveFileManager.writeSave(playerSession);
+    }
+
     private void sendDialogue(String text) {
         String[] parts = parseSpeaker(text);
         String speaker = parts[0];
@@ -322,9 +356,37 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         return characterEntities;
     }
 
+    public String getLastCharacterSpoke() {
+        return lastCharacterSpoke;
+    }
+
     public void setLastCharacterSpoke(String lastCharacterSpoke) {
         this.lastCharacterSpoke = lastCharacterSpoke;
     }
 
-    record Snapshot(String text, List<String> tags) {}
+    public Snapshot getSnapshot() {
+        return snapshot;
+    }
+
+    public String getPendingDialogueText() {
+        return pendingDialogueText;
+    }
+
+    public Map<String, DialogData> getCharacterDialogData() {
+        return characterDialogData;
+    }
+
+    public Set<UUID> getInteractionIds() {
+        return interactionIds;
+    }
+
+    public boolean hasAlreadyInteracted(UUID interactionId) {
+        return interactionIds.contains(interactionId);
+    }
+
+    public void addInteractionId(UUID interactionId) {
+        interactionIds.add(interactionId);
+    }
+
+    public record Snapshot(String text, List<String> tags) {}
 }

@@ -47,5 +47,6 @@ public class OnHudRenderEventNeoForge {
         OnHudRender.interactionHudRender(graphics, deltaTracker);
         OnHudRender.dialogHudRender(graphics, deltaTracker);
         OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
+        OnHudRender.saveIconHudRender(graphics, deltaTracker);
     }
 }

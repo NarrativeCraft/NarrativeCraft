@@ -128,7 +128,7 @@ public class StoryCommand {
         }
 
         try {
-            StoryHandler storyHandler = new StoryHandler(session, compiledJson);
+            StoryHandler storyHandler = new StoryHandler(session);
             session.setStoryHandler(storyHandler);
             storyHandler.start();
         } catch (Exception e) {

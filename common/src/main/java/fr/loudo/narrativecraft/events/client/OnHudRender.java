@@ -75,4 +75,9 @@ public class OnHudRender {
             action.render(graphics, deltaTracker.getGameTimeDeltaPartialTick(true));
         }
     }
+
+    public static void saveIconHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        session.getSaveIconRenderer().render(graphics, deltaTracker);
+    }
 }

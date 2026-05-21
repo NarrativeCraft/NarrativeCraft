@@ -24,7 +24,9 @@
 package fr.loudo.narrativecraft.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import fr.loudo.narrativecraft.network.S2CRenderSaveIcon;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.commands.CommandSourceStack;
@@ -32,7 +34,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
-public class DialogTestCommand {
+public class TestCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nctest")
@@ -62,7 +64,32 @@ public class DialogTestCommand {
                             ServerPlayer player = ctx.getSource().getPlayerOrException();
                             Services.PACKET.sendToPlayer(player, new S2CDialogTest("stop", "", 0));
                             return 1;
-                        }))));
+                        })))
+                .then(Commands.literal("saveicon")
+                        .executes(ctx -> sendSaveIcon(ctx.getSource().getPlayerOrException(), 0.2, 0.9, 0.2))
+                        .then(Commands.argument("in", DoubleArgumentType.doubleArg(0))
+                                .executes(ctx -> sendSaveIcon(
+                                        ctx.getSource().getPlayerOrException(),
+                                        DoubleArgumentType.getDouble(ctx, "in"),
+                                        0.9,
+                                        0.2))
+                                .then(Commands.argument("stay", DoubleArgumentType.doubleArg(0))
+                                        .executes(ctx -> sendSaveIcon(
+                                                ctx.getSource().getPlayerOrException(),
+                                                DoubleArgumentType.getDouble(ctx, "in"),
+                                                DoubleArgumentType.getDouble(ctx, "stay"),
+                                                0.2))
+                                        .then(Commands.argument("out", DoubleArgumentType.doubleArg(0))
+                                                .executes(ctx -> sendSaveIcon(
+                                                        ctx.getSource().getPlayerOrException(),
+                                                        DoubleArgumentType.getDouble(ctx, "in"),
+                                                        DoubleArgumentType.getDouble(ctx, "stay"),
+                                                        DoubleArgumentType.getDouble(ctx, "out"))))))));
+    }
+
+    private static int sendSaveIcon(ServerPlayer player, double in, double stay, double out) {
+        Services.PACKET.sendToPlayer(player, new S2CRenderSaveIcon(in, stay, out));
+        return 1;
     }
 
     private static Entity findNearestEntity(ServerPlayer player) {

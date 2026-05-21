@@ -308,10 +308,10 @@ public class ServerPacketHandler {
     public static void playStitch(C2SPlayStitchStory packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
-        if (packet.oneTime() && session.hasAlreadyInteracted(packet.interactionId())) return;
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler != null) {
-            if (packet.oneTime()) session.addInteractionId(packet.interactionId());
+            if (packet.oneTime() && storyHandler.hasAlreadyInteracted(packet.interactionId())) return;
+            if (packet.oneTime()) storyHandler.addInteractionId(packet.interactionId());
             storyHandler.playStitch(packet.stitchName());
         }
     }

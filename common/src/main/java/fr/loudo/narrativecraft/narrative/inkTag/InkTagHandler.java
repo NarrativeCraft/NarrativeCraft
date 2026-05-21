@@ -147,6 +147,14 @@ public final class InkTagHandler {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopAllInkActions());
     }
 
+    public List<String> getPendingTags() {
+        return new ArrayList<>(pendingTags);
+    }
+
+    public void loadPendingTags(List<String> tags) {
+        pendingTags.addAll(tags);
+    }
+
     /**
      * Iterates the tag queue, dispatching and executing each tag in order.
      * Stops as soon as a blocking action is encountered or an error occurs.

@@ -91,6 +91,7 @@
   "narrativecraft.error.animation.initialize": "Failed to load animation %s.",
   "narrativecraft.error.record.no_characters": "You need to have at least one character to save your recording!",
   "narrativecraft.error.register_character_skin": "Failed to register skin for character %s!",
+  "narrativecraft.error.story": "An error occurred on the story!",
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",

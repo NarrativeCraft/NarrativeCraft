@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -30,6 +31,13 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.network.S2CPlayerSession;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.session.PlayerSession;
 
 @InkCommand(
         keyword = "on_enter",
@@ -45,8 +53,39 @@ public class OnEnterInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        // TODO: detect knot change and transition to new chapter/scene when StoryHandler is available
+        PlayerSession session = (PlayerSession) playerSession;
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler == null) return InkActionResult.ignored();
+
+        String currentPath = storyHandler.getStory().getState().getCurrentPathString();
+        if (currentPath == null) return InkActionResult.ignored();
+
+        String knotName = currentPath.split("\\.")[0];
+
+        Chapter chapter = getNewChapter(knotName);
+        if (chapter == null) return InkActionResult.ignored();
+
+        Scene scene = getNewScene(chapter, knotName);
+        if (scene == null) return InkActionResult.ignored();
+
+        session.apply(chapter, scene);
+        Services.PACKET.sendToPlayer(session.getPlayer(), new S2CPlayerSession(chapter.getId(), scene.getId()));
+        storyHandler.save();
         isRunning = false;
-        return InkActionResult.ignored();
+        return InkActionResult.ok();
+    }
+
+    private Chapter getNewChapter(String knotName) {
+        String withoutPrefix = knotName.substring("chapter_".length());
+        int chapterIndex = Integer.parseInt(withoutPrefix.split("_")[0]);
+        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+        return chapterManager.getChapterByIndex(chapterIndex);
+    }
+
+    private Scene getNewScene(Chapter chapter, String knotName) {
+        for (Scene scene : chapter.getSceneManager().getList()) {
+            if (scene.knotName().equals(knotName)) return scene;
+        }
+        return null;
     }
 }
