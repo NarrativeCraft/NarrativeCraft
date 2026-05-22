@@ -46,12 +46,6 @@ public class StoryHandlerSerializer implements JsonSerializer<StoryHandler> {
             throw new RuntimeException(e);
         }
 
-        JsonArray pendingTags = new JsonArray();
-        for (String tag : src.getInkTagHandler().getPendingTags()) {
-            pendingTags.add(tag);
-        }
-        json.add("pendingTags", pendingTags);
-
         JsonObject characterDialogData = new JsonObject();
         for (Map.Entry<String, DialogData> entry : src.getCharacterDialogData().entrySet()) {
             characterDialogData.add(entry.getKey(), DialogDataIO.serialize(entry.getValue()));

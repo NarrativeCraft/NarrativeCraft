@@ -61,15 +61,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class InkTagHandler {
 
-    /**
-     * Callback interface for the entity that owns this handler (typically a StoryHandler).
-     * Keeps {@link InkTagHandler} decoupled from any specific story implementation.
-     */
     public interface Lifecycle {
-        /** Called when all tags in the current batch finished without error. Advance the story here. */
         void onTagsDrained();
 
-        /** Called when a tag fails validation or execution. Stop the story here. */
         void onError(InkTagHandlerException exception);
     }
 
@@ -86,7 +80,6 @@ public final class InkTagHandler {
 
     private InkAction blockingAction = null;
 
-    /** Maps instanceId → stub so the ack from the client can release the right blocking slot. */
     private final Map<Long, ClientActionStub> pendingClientAcks = new HashMap<>();
 
     public InkTagHandler(PlayerSession playerSession, Lifecycle lifecycle) {
@@ -94,19 +87,11 @@ public final class InkTagHandler {
         this.lifecycle = lifecycle;
     }
 
-    /**
-     * Appends tags to the queue and attempts to drain immediately.
-     * Safe to call while a blocking action is active, tags are buffered silently.
-     */
     public void enqueue(List<String> tags) {
         pendingTags.addAll(tags);
         drain();
     }
 
-    /**
-     * Called every server tick. Detects when the blocking action finishes and resumes the queue.
-     * Also ticks all running server-side actions and prunes the ones that finished.
-     */
     public void tick() {
         if (blockingAction != null && !blockingAction.isRunning()) {
             blockingAction = null;
@@ -130,10 +115,6 @@ public final class InkTagHandler {
         }
     }
 
-    /**
-     * Stops everything: clears the queue, cancels all running actions, notifies the client.
-     * Call when the story ends, the scene changes, or the player logs out.
-     */
     public void stopAll() {
         pendingTags.clear();
         blockingAction = null;
@@ -151,15 +132,6 @@ public final class InkTagHandler {
         return new ArrayList<>(pendingTags);
     }
 
-    public void loadPendingTags(List<String> tags) {
-        pendingTags.addAll(tags);
-    }
-
-    /**
-     * Iterates the tag queue, dispatching and executing each tag in order.
-     * Stops as soon as a blocking action is encountered or an error occurs.
-     * Re-entering while blocked is harmless, the guard at the top returns immediately.
-     */
     private void drain() {
         if (blockingAction != null) return;
 

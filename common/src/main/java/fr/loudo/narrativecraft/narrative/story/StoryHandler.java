@@ -42,12 +42,11 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
@@ -73,7 +72,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     StoryHandler(
             PlayerSession playerSession,
             String storyState,
-            List<String> pendingTags,
             Map<String, DialogData> characterDialogData,
             Set<UUID> interactionIds,
             String lastCharacterSpoke,
@@ -85,7 +83,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
         this.story.getState().loadJson(storyState);
         this.inkTagHandler = new InkTagHandler(playerSession, this);
-        this.inkTagHandler.loadPendingTags(pendingTags);
         this.characterDialogData.putAll(characterDialogData);
         this.interactionIds.addAll(interactionIds);
         this.lastCharacterSpoke = lastCharacterSpoke;

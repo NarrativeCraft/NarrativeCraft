@@ -55,13 +55,6 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
 
         String storyState = obj.get("storyState").getAsString();
 
-        List<String> pendingTags = new ArrayList<>();
-        if (obj.has("pendingTags")) {
-            for (JsonElement element : obj.getAsJsonArray("pendingTags")) {
-                pendingTags.add(element.getAsString());
-            }
-        }
-
         Map<String, DialogData> characterDialogData = new HashMap<>();
         if (obj.has("characterDialogData")) {
             JsonObject dialogDataObj = obj.getAsJsonObject("characterDialogData");
@@ -102,7 +95,6 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
             return new StoryHandler(
                     playerSession,
                     storyState,
-                    pendingTags,
                     characterDialogData,
                     interactionIds,
                     lastCharacterSpoke,
