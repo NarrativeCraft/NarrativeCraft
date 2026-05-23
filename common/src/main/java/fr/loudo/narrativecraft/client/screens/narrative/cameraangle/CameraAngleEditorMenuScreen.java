@@ -69,7 +69,8 @@ public class CameraAngleEditorMenuScreen extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        int tabTotalWidth = 3 * 100 + 2 * 10;
+        int totalBtn = editor.getCameraAngle().getScene() != null ? 3 : 2;
+        int tabTotalWidth = totalBtn * 100 + 2 * 10;
         int tabStartX = centerX - tabTotalWidth / 2;
 
         Button camerasTab = Button.builder(
@@ -86,13 +87,15 @@ public class CameraAngleEditorMenuScreen extends Screen {
         entitiesTab.active = tab != Tab.CHARACTERS;
         addRenderableWidget(entitiesTab);
 
-        Button templatesTab = Button.builder(
-                        Translation.message("screen.camera_angle_editor.menu.templates"),
-                        b -> switchTab(Tab.CHARACTER_TEMPLATES))
-                .bounds(tabStartX + 220, 20, 100, ROW_HEIGHT)
-                .build();
-        templatesTab.active = tab != Tab.CHARACTER_TEMPLATES;
-        addRenderableWidget(templatesTab);
+        if (editor.getCameraAngle().getScene() != null) {
+            Button templatesTab = Button.builder(
+                            Translation.message("screen.camera_angle_editor.menu.templates"),
+                            b -> switchTab(Tab.CHARACTER_TEMPLATES))
+                    .bounds(tabStartX + 220, 20, 100, ROW_HEIGHT)
+                    .build();
+            templatesTab.active = tab != Tab.CHARACTER_TEMPLATES;
+            addRenderableWidget(templatesTab);
+        }
 
         int paginationY = LIST_START_Y + MAX_PER_PAGE * (ROW_HEIGHT + ROW_GAP) + 4;
 

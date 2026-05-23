@@ -25,11 +25,13 @@ package fr.loudo.narrativecraft.narrative;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
@@ -39,6 +41,7 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
+import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,6 +53,9 @@ public class NarrativeEntryInit {
         NarrativeCraftMod.getInstance().getChapterManager().clear();
         NarrativeCraftMod.getInstance().getCharacterManager().clear();
         NarrativeCraftMod.getInstance().getCorruptedDeserialization().clear();
+
+        NarrativeCraftFile file = NarrativeCraftMod.getInstance().getFile();
+        NarrativeCraftMod.getInstance().setMainScreenData(file.getMainScreenData());
 
         // Order is important!! e.g. Chapters must be initialized before scenes of chapter can be initialized.
         characters();
@@ -185,6 +191,11 @@ public class NarrativeEntryInit {
 
     public static void sendDataToPlayer(ServerPlayer player) {
         Services.PACKET.sendToPlayer(player, S2CNarrativeDataClear.INSTANCE);
+        CameraAngle mainScreenData = NarrativeCraftMod.getInstance().getMainScreenData();
+        if (mainScreenData != null) {
+            Services.PACKET.sendToPlayer(
+                    player, new S2CMainScreenData(CameraAngleSerializer.serializeData(mainScreenData)));
+        }
         for (CharacterStory character :
                 NarrativeCraftMod.getInstance().getCharacterManager().getList()) {
             Services.PACKET.sendToPlayer(

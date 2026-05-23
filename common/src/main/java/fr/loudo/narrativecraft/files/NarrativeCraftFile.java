@@ -23,11 +23,51 @@
 
 package fr.loudo.narrativecraft.files;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+
 public class NarrativeCraftFile {
 
     private final NarrativeCraftFileInit init = new NarrativeCraftFileInit();
 
     public NarrativeCraftFileInit getInit() {
         return init;
+    }
+
+    public CameraAngle getMainScreenData() {
+        File dataFolder = init.getDataDirectory();
+        File mainScreenDataFile = new File(dataFolder, NarrativeCraftFileInit.MAIN_SCREEN_DATA_NAME);
+        if (mainScreenDataFile.exists()) {
+            try {
+                String data = Files.readString(mainScreenDataFile.toPath());
+                Gson gson = new GsonBuilder()
+                        .registerTypeAdapter(CameraAngle.class, new CameraAngleDeserializer())
+                        .create();
+                return gson.fromJson(data, CameraAngle.class);
+            } catch (java.io.IOException e) {
+                NarrativeCraftMod.LOGGER.error("Failed to init main screen data!", e);
+            }
+        }
+        return new CameraAngle("Main Screen", "Some super secret data...", null);
+    }
+
+    public void saveMainScreenData(CameraAngle mainScreenData) throws IOException {
+        File dataFolder = init.getDataDirectory();
+        File mainScreenDataFile = new File(dataFolder, NarrativeCraftFileInit.MAIN_SCREEN_DATA_NAME);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CameraAngle.class, new CameraAngleSerializer())
+                .create();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(mainScreenDataFile))) {
+            gson.toJson(mainScreenData, writer);
+        }
     }
 }

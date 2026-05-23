@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleControl;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSetEntityPose;
@@ -37,6 +36,9 @@ import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
+import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
@@ -51,7 +53,7 @@ public class ServerPacketRegisterFabric {
         PayloadTypeRegistry.serverboundPlay()
                 .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(BiCameraAngleEnter.TYPE, BiCameraAngleEnter.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SCameraAngleControl.TYPE, C2SCameraAngleControl.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(S2CStopEditorMaker.TYPE, S2CStopEditorMaker.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SCameraAngleSave.TYPE, C2SCameraAngleSave.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay()
                 .register(C2SCameraAngleCaptureCharacter.TYPE, C2SCameraAngleCaptureCharacter.STREAM_CODEC);
@@ -67,5 +69,9 @@ public class ServerPacketRegisterFabric {
         PayloadTypeRegistry.serverboundPlay().register(C2SDialogueFinished.TYPE, C2SDialogueFinished.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SChoiceSelected.TYPE, C2SChoiceSelected.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SPlayStitchStory.TYPE, C2SPlayStitchStory.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BiMainScreenEnter.TYPE, BiMainScreenEnter.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay()
+                .register(C2SMainScreenCaptureCharacter.TYPE, C2SMainScreenCaptureCharacter.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SMainScreenSave.TYPE, C2SMainScreenSave.STREAM_CODEC);
     }
 }

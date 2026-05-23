@@ -61,6 +61,8 @@ import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
+import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
@@ -139,10 +141,10 @@ public class ClientPacketHandler {
     }
 
     public static void loadCameraAngleEditorData(S2CCameraAngleEditorData packet) {
-        ClientCameraAngleMakerEditorMaker editor =
-                ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
-        if (editor == null) return;
-        editor.loadData(packet.dataJson());
+        EditorMaker editor =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (!(editor instanceof ClientCameraAngleMakerEditorMaker editorMaker)) return;
+        editorMaker.loadData(packet.dataJson());
     }
 
     public static void addCameraAngleCharacter(S2CCameraAngleCharacterCaptured packet) {
@@ -340,6 +342,11 @@ public class ClientPacketHandler {
                 ClientNarrativeCraftMod.getInstance().getCharacterManager();
         ICharacterStory characterStory = characterManager.resolveCharacter(packet.characterId(), session.getScene());
         List<ICharacterStory> charactersInWorld = session.getCharactersInWorld();
+        if (packet.action() == S2CCharacterStoryAction.Action.ADD) {
+            for (ICharacterStory characterStory1 : charactersInWorld) {
+                if (characterStory1.getId().equals(packet.characterId())) return;
+            }
+        }
         switch (packet.action()) {
             case ADD -> charactersInWorld.add(characterStory);
             case REMOVE -> charactersInWorld.remove(characterStory);
@@ -431,5 +438,22 @@ public class ClientPacketHandler {
                 .getPlayerSession()
                 .getSaveIconRenderer()
                 .start(packet.in(), packet.stay(), packet.out());
+    }
+
+    public static void receiveMainScreenData(S2CMainScreenData packet) {
+        CameraAngle cameraAngle = new CameraAngle("", "", null);
+        CameraAngleDeserializer.deserializeInto(packet.dataJson(), cameraAngle);
+        ClientNarrativeCraftMod.getInstance().setMainScreenData(cameraAngle);
+    }
+
+    public static void enterMainScreen(BiMainScreenEnter packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        CameraAngle mainScreenData = ClientNarrativeCraftMod.getInstance().getMainScreenData();
+        if (mainScreenData == null) return;
+        ClientCameraAngleMakerEditorMaker cameraAngleEditor =
+                new ClientCameraAngleMakerEditorMaker(mainScreenData, packet.getEnvironment());
+        cameraAngleEditor.init();
+        session.setEditor(cameraAngleEditor);
+        Minecraft.getInstance().setScreen(null);
     }
 }

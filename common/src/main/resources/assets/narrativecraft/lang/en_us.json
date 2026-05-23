@@ -71,6 +71,10 @@
   "narrativecraft.screen.entity_type_picker": "Select Entity Type",
   "narrativecraft.screen.animation_character_picker": "Select Character",
 
+  "narrativecraft.screen.settings.main_screen_maker_editor": "Main Screen Editor",
+
+  "narrativecraft.screen.main_screen.disabled_template": "Disabled on Main Screen Editor",
+
   "narrativecraft.error.delete": "Failed to remove %s %s.",
   "narrativecraft.error.add": "Failed to add %s %s.",
   "narrativecraft.error.already_exists": "%s %s already exists.",

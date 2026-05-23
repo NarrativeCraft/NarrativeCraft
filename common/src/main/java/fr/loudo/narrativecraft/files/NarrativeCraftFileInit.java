@@ -27,19 +27,20 @@ import java.io.File;
 
 public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
 
-    public static final String BUILD_DIRECTORY_NAME = "build";
     public static final String CHAPTERS_DIRECTORY_NAME = "chapters";
     public static final String CHARACTERS_DIRECTORY_NAME = "characters";
+    public static final String DATA_DIRECTORY_NAME = "data";
     public static final String SAVES_DIRECTORY_NAME = "saves";
+    public static final String MAIN_SCREEN_DATA_NAME = "main_screen" + EXTENSION_DATA_FILE;
     public static final String MAIN_INK_NAME = "main" + EXTENSION_SCRIPT_FILE;
     public static final String VARS_INK_NAME = "variables" + EXTENSION_SCRIPT_FILE;
     public static final String FUNCTIONS_INK_NAME = "functions" + EXTENSION_SCRIPT_FILE;
 
     private File rootDirectory;
     private File mainDirectory;
-    private File buildDirectory;
     private File chaptersDirectory;
     private File charactersDirectory;
+    private File dataDirectory;
     private File savesDirectory;
     private File mainInk;
     private File variablesInk;
@@ -49,9 +50,9 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
         this.rootDirectory = rootDirectory;
 
         mainDirectory = createDirectory(rootDirectory, DIRECTORY_NAME);
-        buildDirectory = createDirectory(mainDirectory, BUILD_DIRECTORY_NAME);
         chaptersDirectory = createDirectory(mainDirectory, CHAPTERS_DIRECTORY_NAME);
         charactersDirectory = createDirectory(mainDirectory, CHARACTERS_DIRECTORY_NAME);
+        dataDirectory = createDirectory(mainDirectory, DATA_DIRECTORY_NAME);
         savesDirectory = createDirectory(mainDirectory, SAVES_DIRECTORY_NAME);
         mainInk = createFile(mainDirectory, MAIN_INK_NAME);
         variablesInk = createFile(mainDirectory, VARS_INK_NAME);
@@ -66,10 +67,6 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
         return mainDirectory;
     }
 
-    public File getBuildDirectory() {
-        return buildDirectory;
-    }
-
     public File getChaptersDirectory() {
         return chaptersDirectory;
     }
@@ -78,10 +75,11 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
         return charactersDirectory;
     }
 
+    public File getDataDirectory() {
+        return createDirectory(mainDirectory, DATA_DIRECTORY_NAME);
+    }
+
     public File getSavesDirectory() {
-        if (savesDirectory.exists()) {
-            return savesDirectory;
-        }
         return createDirectory(mainDirectory, SAVES_DIRECTORY_NAME);
     }
 

@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.events.EventBus;
 import fr.loudo.narrativecraft.narrative.inkTag.InkActionRegister;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
@@ -69,6 +70,8 @@ public class NarrativeCraftMod {
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
     private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
     private final SaveFileManager saveFileManager = new SaveFileManager();
+    private CameraAngle mainScreenData;
+
     private String compiledStoryJson;
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
@@ -128,6 +131,14 @@ public class NarrativeCraftMod {
 
     public MinecraftServer getServer() {
         return server;
+    }
+
+    public CameraAngle getMainScreenData() {
+        return mainScreenData;
+    }
+
+    public void setMainScreenData(CameraAngle mainScreenData) {
+        this.mainScreenData = mainScreenData;
     }
 
     public List<DeserializationResult<?>> getCorruptedDeserialization() {

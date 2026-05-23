@@ -49,11 +49,15 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
             throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
 
-        if (!obj.has("sceneId") || !obj.has("chapterId")) return null;
-
         UUID id = parseId(obj);
         String name = parseName(obj);
         String description = parseDescription(obj);
+        if (!obj.has("sceneId") || !obj.has("chapterId")) {
+            CameraAngle cameraAngle = new CameraAngle(id, name, description, null);
+            deserializeInto(obj, cameraAngle);
+            return cameraAngle;
+        }
+
         UUID sceneId = UUID.fromString(obj.get("sceneId").getAsString());
         UUID chapterId = UUID.fromString(obj.get("chapterId").getAsString());
 

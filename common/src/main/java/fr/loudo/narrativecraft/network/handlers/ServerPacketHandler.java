@@ -40,9 +40,11 @@ import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
+import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.*;
@@ -50,9 +52,13 @@ import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
+import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -158,16 +164,13 @@ public class ServerPacketHandler {
         editor.init();
     }
 
-    public static void cameraAngleControl(C2SCameraAngleControl packet, Player player) {
-        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
-        PlayerSession session = sessionManager.getByPlayer(player);
-        CameraAngleMakerEditorMaker editor = sessionManager.getEditor(player, CameraAngleMakerEditorMaker.class);
+    public static void stopEditorMaker(S2CStopEditorMaker packet, Player player) {
+        PlayerSession session =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        EditorMaker editor = session.getEditor();
         if (editor == null) return;
-
-        if (packet.state() == C2SCameraAngleControl.State.QUIT) {
-            editor.stop();
-            session.setEditor(null);
-        }
+        editor.stop();
+        session.setEditor(null);
     }
 
     public static void cameraAngleSave(C2SCameraAngleSave packet, Player player) {
@@ -341,11 +344,11 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleSetEntityPose(C2SCameraAngleSetEntityPose packet, Player player) {
-        CameraAngleMakerEditorMaker editor = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getEditor(player, CameraAngleMakerEditorMaker.class);
-        if (editor == null) return;
-        editor.setEntityPose(packet.placementId(), packet.pose());
+        PlayerSession session =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        EditorMaker editor = session.getEditor();
+        if (!(editor instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditorMaker)) return;
+        cameraAngleMakerEditorMaker.setEntityPose(packet.placementId(), packet.pose());
     }
 
     public static void cameraAngleCaptureCharacter(C2SCameraAngleCaptureCharacter packet, Player player) {
@@ -360,6 +363,10 @@ public class ServerPacketHandler {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         EditorMaker editorMaker = playerSession.getEditor();
         if (!(editorMaker instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditor)) return;
+
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(),
+                new S2CCharacterStoryAction(packet.characterId(), S2CCharacterStoryAction.Action.ADD));
 
         UUID characterId = packet.characterId();
         Vec3 position = player.position();
@@ -380,5 +387,66 @@ public class ServerPacketHandler {
                 (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placementJson));
 
         cameraAngleMakerEditor.spawnEntity(placement);
+    }
+
+    public static void mainScreenCaptureCharacter(C2SMainScreenCaptureCharacter packet, Player player) {
+        CameraAngle mainScreenAngle = NarrativeCraftMod.getInstance().getMainScreenData();
+        if (mainScreenAngle == null) return;
+
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        EditorMaker editorMaker = playerSession.getEditor();
+        if (!(editorMaker instanceof MainScreenMakerEditor editor)) return;
+
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(),
+                new S2CCharacterStoryAction(packet.characterId(), S2CCharacterStoryAction.Action.ADD));
+
+        ICharacterStory characterStory =
+                NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(packet.characterId(), null);
+        if (characterStory == null) return;
+
+        Vec3 position = player.position();
+        Vec3 rotation = new Vec3(player.getXRot(), player.getYRot(), 0.0);
+
+        List<ItemStack> items = new ArrayList<>();
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            ItemStack stack = player.getItemBySlot(slot);
+            if (!stack.isEmpty()) items.add(stack.copy());
+        }
+
+        CharacterPlacement placement = new CharacterPlacement(characterStory, position, rotation, items);
+        String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
+        Services.PACKET.sendToPlayer(
+                (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(mainScreenAngle.getId(), placementJson));
+
+        editor.spawnEntity(placement);
+    }
+
+    public static void mainScreenSave(C2SMainScreenSave packet, Player player) {
+        CameraAngle mainScreenData = NarrativeCraftMod.getInstance().getMainScreenData();
+        CameraAngleDeserializer.deserializeInto(packet.dataJson(), mainScreenData);
+        try {
+            NarrativeCraftMod.getInstance().getFile().saveMainScreenData(mainScreenData);
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player,
+                    new S2CToastMessage(
+                            Translation.message("camera_angle"), Translation.message("camera_angle.save.success")));
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error("Failed to save main screen data!", e);
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player,
+                    new S2CToastMessage(
+                            Translation.message("camera_angle"), Translation.message("camera_angle.save.failed")));
+        }
+    }
+
+    public static void enterMainScreen(BiMainScreenEnter packet, Player player) {
+        CameraAngle mainScreenAngle = NarrativeCraftMod.getInstance().getFile().getMainScreenData();
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        MainScreenMakerEditor editor = new MainScreenMakerEditor(mainScreenAngle, playerSession, packet.environment());
+        playerSession.setEditor(editor);
+        editor.init();
     }
 }

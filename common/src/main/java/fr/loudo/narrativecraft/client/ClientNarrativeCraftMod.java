@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 
 public class ClientNarrativeCraftMod {
     private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
@@ -39,6 +40,7 @@ public class ClientNarrativeCraftMod {
     private final ChapterManager chapterManager = new ChapterManager();
     private final CharacterManager characterManager = new CharacterManager();
     private final ClientPlayerSession playerSession = new ClientPlayerSession();
+    private CameraAngle mainScreenData;
 
     public static void commonInit() {
         ClientNarrativeEditorsRegister.register();
@@ -55,6 +57,14 @@ public class ClientNarrativeCraftMod {
 
     public ClientPlayerSession getPlayerSession() {
         return playerSession;
+    }
+
+    public CameraAngle getMainScreenData() {
+        return mainScreenData;
+    }
+
+    public void setMainScreenData(CameraAngle mainScreenData) {
+        this.mainScreenData = mainScreenData;
     }
 
     public ClientCutsceneMakerEditorMaker getCutsceneMakerEditor() {

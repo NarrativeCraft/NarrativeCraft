@@ -21,22 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.cameraangle;
+package fr.loudo.narrativecraft.network.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CCameraAngleEditorData(String dataJson) implements CustomPacketPayload {
+public record BiMainScreenEnter(NarrativeEnvironment environment) implements CustomPacketPayload {
 
-    public static final Type<S2CCameraAngleEditorData> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_editor_data"));
+    public static final Type<BiMainScreenEnter> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_enter"));
 
-    public static final StreamCodec<ByteBuf, S2CCameraAngleEditorData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, S2CCameraAngleEditorData::dataJson, S2CCameraAngleEditorData::new);
+    public static final StreamCodec<ByteBuf, BiMainScreenEnter> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.idMapper(i -> NarrativeEnvironment.values()[i], NarrativeEnvironment::ordinal),
+            BiMainScreenEnter::environment,
+            BiMainScreenEnter::new);
+
+    public NarrativeEnvironment getEnvironment() {
+        return environment;
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

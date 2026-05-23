@@ -21,25 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.cameraangle;
+package fr.loudo.narrativecraft.narrative.mainScreen;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.session.PlayerSession;
 
-public record S2CCameraAngleEditorData(String dataJson) implements CustomPacketPayload {
+public class MainScreenMakerEditor extends CameraAngleMakerEditorMaker {
+    public MainScreenMakerEditor(CameraAngle cameraAngle, PlayerSession playerSession) {
+        super(cameraAngle, playerSession);
+    }
 
-    public static final Type<S2CCameraAngleEditorData> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_editor_data"));
-
-    public static final StreamCodec<ByteBuf, S2CCameraAngleEditorData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, S2CCameraAngleEditorData::dataJson, S2CCameraAngleEditorData::new);
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public MainScreenMakerEditor(
+            CameraAngle cameraAngle, PlayerSession playerSession, NarrativeEnvironment environment) {
+        super(cameraAngle, playerSession, environment);
     }
 }

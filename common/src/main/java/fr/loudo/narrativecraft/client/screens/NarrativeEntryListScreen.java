@@ -30,12 +30,14 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
+import java.util.List;
 
 public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends PaginationsItemsScreen<E> {
 
@@ -113,6 +115,12 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                     .build();
             this.addRenderableWidget(charactersButton);
         }
+        Button settingsButton = Button.builder(Component.literal(CustomFont.SETTINGS), b -> {
+                    minecraft.setScreen(new NarrativeSettingsScreen(this));
+                })
+                .bounds(10, 35, 20, 20)
+                .build();
+        this.addRenderableWidget(settingsButton);
 
         if (!breadCrumb.isEmpty()) {
             addRenderableWidget(new BreadcrumbWidget(20, this.height / 2, breadCrumb, this.font));

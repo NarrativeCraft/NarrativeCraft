@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.cameraangle;
+package fr.loudo.narrativecraft.network.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
@@ -30,20 +30,16 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record C2SCameraAngleControl(State state) implements CustomPacketPayload {
+public record S2CMainScreenData(String dataJson) implements CustomPacketPayload {
 
-    public static final Type<C2SCameraAngleControl> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_control"));
+    public static final Type<S2CMainScreenData> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_data"));
 
-    public static final StreamCodec<ByteBuf, C2SCameraAngleControl> STREAM_CODEC =
-            ByteBufCodecs.BYTE.map(b -> new C2SCameraAngleControl(State.values()[b]), p -> (byte) p.state.ordinal());
+    public static final StreamCodec<ByteBuf, S2CMainScreenData> STREAM_CODEC =
+            StreamCodec.composite(ByteBufCodecs.STRING_UTF8, S2CMainScreenData::dataJson, S2CMainScreenData::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
-    }
-
-    public enum State {
-        QUIT;
     }
 }

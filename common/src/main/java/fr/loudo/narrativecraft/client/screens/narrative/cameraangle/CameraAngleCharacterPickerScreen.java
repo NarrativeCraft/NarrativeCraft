@@ -54,8 +54,10 @@ public class CameraAngleCharacterPickerScreen
                 ClientNarrativeCraftMod.getInstance().getCharacterManager().getList()) {
             entries.add(new Entry(CharacterType.NORMAL, character.getId(), character.getName()));
         }
-        for (Npc npc : scene.getNpcManager().getList()) {
-            entries.add(new Entry(CharacterType.NPC, npc.getId(), npc.getName()));
+        if (scene != null) {
+            for (Npc npc : scene.getNpcManager().getList()) {
+                entries.add(new Entry(CharacterType.NPC, npc.getId(), npc.getName()));
+            }
         }
         return entries;
     }

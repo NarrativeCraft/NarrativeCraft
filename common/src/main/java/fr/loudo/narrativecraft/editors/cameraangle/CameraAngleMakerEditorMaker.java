@@ -49,7 +49,6 @@ import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.UtilsServer;
-import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -63,6 +62,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public class CameraAngleMakerEditorMaker implements EditorMaker {
 
@@ -107,8 +108,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         }
         teleportToEditorOrigin();
         String dataJson = CameraAngleSerializer.serializeData(cameraAngle);
-        Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(), new S2CCameraAngleEditorData(cameraAngle.getId(), dataJson));
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CCameraAngleEditorData(dataJson));
     }
 
     public void teleportToEditorOrigin() {

@@ -39,7 +39,9 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
         JsonObject data = new JsonObject();
         data.add("cameras", serializeCameras(cameraAngle));
         data.add("characterPlacements", serializeCharacterPlacements(cameraAngle));
-        data.add("templateReferences", serializeTemplateReferences(cameraAngle));
+        if (cameraAngle.getScene() != null) {
+            data.add("templateReferences", serializeTemplateReferences(cameraAngle));
+        }
         return new Gson().toJson(data);
     }
 
@@ -53,8 +55,10 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
         json.addProperty("id", src.getId().toString());
         json.addProperty("name", src.getName());
         json.addProperty("description", src.getDescription());
-        json.addProperty("sceneId", src.getScene().getId().toString());
-        json.addProperty("chapterId", src.getScene().getChapter().getId().toString());
+        if (src.getScene() != null) {
+            json.addProperty("sceneId", src.getScene().getId().toString());
+            json.addProperty("chapterId", src.getScene().getChapter().getId().toString());
+        }
         json.add("cameras", serializeCameras(src));
         json.add("characterPlacements", serializeCharacterPlacements(src));
         json.add("templateReferences", serializeTemplateReferences(src));
@@ -64,7 +68,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
     private static JsonArray serializeCameras(CameraAngle cameraAngle) {
         JsonArray cameras = new JsonArray();
         for (CameraView cameraView : cameraAngle.getCameras()) {
-            cameras.add(serializeCamera(cameraView));
+            cameras.add(serializeCamera(cameraView, cameraAngle.getScene() != null));
         }
         return cameras;
     }
@@ -85,7 +89,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
         return references;
     }
 
-    public static JsonObject serializeCamera(CameraView cameraView) {
+    public static JsonObject serializeCamera(CameraView cameraView, boolean withDialogSetup) {
         JsonObject json = new JsonObject();
         json.addProperty("id", cameraView.getId().toString());
         json.addProperty("name", cameraView.getName());
@@ -96,6 +100,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
         json.addProperty("yRot", cameraView.getRotation().y);
         json.addProperty("roll", cameraView.getRotation().z);
         json.addProperty("fov", cameraView.getFov());
+        if (!withDialogSetup) return json;
         JsonArray dialogSetups = new JsonArray();
         for (CameraViewDialogSetup setup : cameraView.getDialogSetups()) {
             dialogSetups.add(serializeDialogSetup(setup));

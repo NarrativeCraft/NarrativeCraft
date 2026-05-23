@@ -40,7 +40,10 @@ import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.cameraangle.*;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -145,6 +148,10 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         buttons.add(Button.builder(Component.literal(CustomFont.UNDO), b -> stopNewCameraPosition())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
+
+        // Make template character button not active if on main screen editor
+        buttons.get(2).active = cameraAngle.getScene() != null;
+        buttons.get(2).setTooltip(Tooltip.create(Translation.message("screen.main_screen.disabled_template")));
     }
 
     @Override
@@ -206,17 +213,21 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     private void openAddCameraScreen() {
-        minecraft.setScreen(new CameraAngleCameraNameScreen(
-                Translation.message("screen.camera_angle_editor.camera_name_prompt"),
-                "",
-                null,
-                this::createCameraFromPlayer,
-                minecraft.screen));
+        if (cameraAngle.getScene() != null) {
+            minecraft.setScreen(new CameraAngleCameraNameScreen(
+                    Translation.message("screen.camera_angle_editor.camera_name_prompt"),
+                    "",
+                    null,
+                    this::createCameraFromPlayer,
+                    minecraft.screen));
+        } else {
+            createCameraFromPlayer("main");
+        }
     }
 
     private void createCameraFromPlayer(String name) {
         if (minecraft.player == null) return;
-        if (cameraAngle.getCameraByName(name) != null) {
+        if (cameraExists(name)) {
             UtilsClient.sendToast(
                     Translation.message("error"),
                     Translation.message(
@@ -230,6 +241,13 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         float fov = minecraft.options.fov().get();
         cameraViews.add(new CameraView(name, position, rotation, fov));
         syncDialogSetups();
+    }
+
+    public boolean cameraExists(String name) {
+        for (CameraView cameraView : cameraViews) {
+            if (cameraView.getName().equalsIgnoreCase(name)) return true;
+        }
+        return false;
     }
 
     public void renameCamera(CameraView cameraView, String newName) {
@@ -278,11 +296,15 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private void openCharacterPicker() {
         minecraft.setScreen(new CameraAngleCharacterPickerScreen(cameraAngle.getScene(), minecraft.screen, pick -> {
-            Services.PACKET.sendToServer(new C2SCameraAngleCaptureCharacter(
-                    cameraAngle.getScene().getChapter().getId(),
-                    cameraAngle.getScene().getId(),
-                    cameraAngle.getId(),
-                    pick.characterId()));
+            if (cameraAngle.getScene() != null) {
+                Services.PACKET.sendToServer(new C2SCameraAngleCaptureCharacter(
+                        cameraAngle.getScene().getChapter().getId(),
+                        cameraAngle.getScene().getId(),
+                        cameraAngle.getId(),
+                        pick.characterId()));
+            } else {
+                Services.PACKET.sendToServer(new C2SMainScreenCaptureCharacter(pick.characterId()));
+            }
         }));
     }
 
@@ -308,7 +330,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                     if (b) {
                         save();
                     }
-                    Services.PACKET.sendToServer(new C2SCameraAngleControl(C2SCameraAngleControl.State.QUIT));
+                    Services.PACKET.sendToServer(S2CStopEditorMaker.INSTANCE);
                     playerSession.setEditor(null);
                     exitPreview();
                     minecraft.setScreen(null);
@@ -329,7 +351,11 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         cameraAngle.getCameras().addAll(cameraViews);
 
         String dataJson = CameraAngleSerializer.serializeData(cameraAngle);
-        Services.PACKET.sendToServer(new C2SCameraAngleSave(cameraAngle, dataJson));
+        if (cameraAngle.getScene() != null) {
+            Services.PACKET.sendToServer(new C2SCameraAngleSave(cameraAngle, dataJson));
+        } else {
+            Services.PACKET.sendToServer(new C2SMainScreenSave(dataJson));
+        }
     }
 
     public void teleportPlayerToPlacement(Vec3 position) {
@@ -608,7 +634,8 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                 && event.key()
                         == ModKeys.TOGGLE_DIALOG_MODE_CAMERA_ANGLE
                                 .getDefaultKey()
-                                .getValue()) {
+                                .getValue()
+                && cameraAngle.getScene() != null) {
             if (previewMode == PreviewMode.CAMERA) {
                 enterDialogMode();
             } else {

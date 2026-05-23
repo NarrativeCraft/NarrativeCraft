@@ -24,9 +24,9 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleControl;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSetEntityPose;
@@ -38,6 +38,9 @@ import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
+import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
@@ -64,8 +67,8 @@ public class ServerPacketHandlerFabric {
         ServerPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (packet, context) -> {
             ServerPacketHandler.cameraAngleEnter(packet, context.player());
         });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleControl.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleControl(packet, context.player());
+        ServerPlayNetworking.registerGlobalReceiver(S2CStopEditorMaker.TYPE, (packet, context) -> {
+            ServerPacketHandler.stopEditorMaker(packet, context.player());
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleSave.TYPE, (packet, context) -> {
             ServerPacketHandler.cameraAngleSave(packet, context.player());
@@ -99,6 +102,15 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SPlayStitchStory.TYPE, (packet, context) -> {
             ServerPacketHandler.playStitch(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(BiMainScreenEnter.TYPE, (packet, context) -> {
+            ServerPacketHandler.enterMainScreen(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SMainScreenCaptureCharacter.TYPE, (packet, context) -> {
+            ServerPacketHandler.mainScreenCaptureCharacter(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SMainScreenSave.TYPE, (packet, context) -> {
+            ServerPacketHandler.mainScreenSave(packet, context.player());
         });
     }
 }

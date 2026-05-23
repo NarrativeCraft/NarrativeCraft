@@ -32,4 +32,5 @@ public class CustomFont {
     public static final String CHARACTER = "\uE204";
     public static final String CHARACTER_TEMPLATE = "\uE205";
     public static final String BURGER_MENU = "\uE206";
+    public static final String SETTINGS = "⚙";
 }
