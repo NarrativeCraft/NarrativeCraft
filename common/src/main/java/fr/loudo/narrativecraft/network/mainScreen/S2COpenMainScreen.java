@@ -21,18 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.mainScreen;
 
-import fr.loudo.narrativecraft.network.story.C2SPlayStory;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class BiPacketRegister {
+public record S2COpenMainScreen(boolean canContinue, boolean finishedStory) implements CustomPacketPayload {
 
-    public static void register() {
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC);
+    public static final Type<S2COpenMainScreen> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "open_main_screen"));
+
+    public static final StreamCodec<ByteBuf, S2COpenMainScreen> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.BOOL,
+            S2COpenMainScreen::canContinue,
+            ByteBufCodecs.BOOL,
+            S2COpenMainScreen::finishedStory,
+            S2COpenMainScreen::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

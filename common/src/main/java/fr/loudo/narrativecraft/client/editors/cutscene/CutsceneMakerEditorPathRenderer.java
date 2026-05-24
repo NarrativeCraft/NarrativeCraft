@@ -38,7 +38,7 @@ import org.joml.Matrix4f;
 
 public class CutsceneMakerEditorPathRenderer {
 
-    // Number of ticks between each sampled point along the path
+    // Number of ticks between each sampled point along the pathString
     private static final int SAMPLE_STEP = 2;
 
     public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {

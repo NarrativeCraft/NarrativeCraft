@@ -26,9 +26,14 @@ package fr.loudo.narrativecraft.utils;
 import com.google.common.io.Files;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.S2CCharacterSkin;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
+import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
+import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.io.File;
@@ -93,5 +98,32 @@ public class UtilsServer {
         } catch (Exception e) {
             NarrativeCraftMod.LOGGER.error("Failed to send character skin of {}", characterStory.getName(), e);
         }
+    }
+
+    public static void openMainScreenToPlayer(ServerPlayer player, boolean canContinue, boolean finishedStory) {
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (playerSession == null) return;
+
+        Services.PACKET.sendToPlayer(player, new BiMainScreenEnter(NarrativeEnvironment.PRODUCTION));
+        MainScreenMakerEditor editor = new MainScreenMakerEditor(
+                NarrativeCraftMod.getInstance().getMainScreenData(), playerSession, NarrativeEnvironment.PRODUCTION);
+        editor.init();
+        playerSession.setEditor(editor);
+        Services.PACKET.sendToPlayer(player, new S2COpenMainScreen(canContinue, finishedStory));
+    }
+
+    public static void openMainScreenToPlayer(ServerPlayer player) {
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (playerSession == null) return;
+
+        StoryHandler storyHandler =
+                NarrativeCraftMod.getInstance().getSaveFileManager().loadSave(playerSession);
+
+        boolean canContinue = storyHandler != null;
+        boolean finishedStory = storyHandler != null && storyHandler.hasFinishedStory();
+
+        openMainScreenToPlayer(player, canContinue, finishedStory);
     }
 }

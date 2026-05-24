@@ -53,7 +53,7 @@ public class NarrativeCraftFile {
                         .registerTypeAdapter(CameraAngle.class, new CameraAngleDeserializer())
                         .create();
                 return gson.fromJson(data, CameraAngle.class);
-            } catch (java.io.IOException e) {
+            } catch (IOException e) {
                 NarrativeCraftMod.LOGGER.error("Failed to init main screen data!", e);
             }
         }

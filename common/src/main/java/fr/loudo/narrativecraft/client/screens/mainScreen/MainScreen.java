@@ -1,0 +1,207 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.client.screens.mainScreen;
+
+import com.mojang.blaze3d.platform.NativeImage;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
+import fr.loudo.narrativecraft.network.story.C2SPlayStory;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.sounds.SoundEvent;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
+
+public class MainScreen extends Screen {
+
+    private static final int BUTTON_WIDTH = 110;
+    private static final int BUTTON_HEIGHT = 20;
+    private static final int BUTTON_GAP = 4;
+    private static final int MARGIN_LEFT = 50;
+    private static final int LOGO_GAP = 20;
+
+    private static final Identifier LOGO_SPRITE = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "logo");
+    private static final Identifier LOGO_FILE =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/gui/sprites/logo.png");
+    private static final Identifier BACKGROUND_MUSIC =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "music.main_screen");
+    private static final SimpleSoundInstance MAIN_MUSIC_INSTANCE =
+            SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(BACKGROUND_MUSIC), 1);
+
+    private final boolean canContinue;
+    private final boolean finishedStory;
+
+    private boolean hasLogo;
+    private int logoNativeWidth;
+    private int logoNativeHeight;
+
+    public MainScreen(boolean canContinue, boolean finishedStory) {
+        super(Component.empty());
+        this.canContinue = canContinue;
+        this.finishedStory = finishedStory;
+    }
+
+    @Override
+    protected void init() {
+        loadLogoInfo();
+
+        int buttonCount = 3 + (canContinue ? 1 : 0) + (finishedStory ? 1 : 0);
+        int totalButtonHeight = buttonCount * BUTTON_HEIGHT + (buttonCount - 1) * BUTTON_GAP;
+
+        int logoDisplayWidth = Math.min(width / 3, 500);
+        int logoDisplayHeight =
+                (hasLogo && logoNativeWidth > 0) ? (logoDisplayWidth * logoNativeHeight / logoNativeWidth) : 0;
+
+        int totalBlockHeight = (hasLogo ? logoDisplayHeight + LOGO_GAP : 0) + totalButtonHeight;
+        int blockStartY = (height - totalBlockHeight) / 2;
+
+        int buttonStartY = blockStartY + (hasLogo ? logoDisplayHeight + LOGO_GAP : 0);
+        int buttonX = MARGIN_LEFT;
+
+        int currentY = buttonStartY;
+
+        if (canContinue) {
+            addRenderableWidget(Button.builder(Translation.message("screen.main.continue"), button -> {
+                        close();
+                        Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), true));
+                    })
+                    .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build());
+            currentY += BUTTON_HEIGHT + BUTTON_GAP;
+        }
+
+        addRenderableWidget(Button.builder(Translation.message("screen.main.new_game"), button -> {
+                    close();
+                    Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false));
+                })
+                .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build());
+        currentY += BUTTON_HEIGHT + BUTTON_GAP;
+
+        if (finishedStory) {
+            addRenderableWidget(Button.builder(
+                            Translation.message("screen.main.select_scene"),
+                            button -> minecraft.setScreen(new SelectChaptersScreen(this)))
+                    .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build());
+            currentY += BUTTON_HEIGHT + BUTTON_GAP;
+        }
+
+        addRenderableWidget(Button.builder(
+                        Translation.message("screen.main.options"),
+                        button -> minecraft.setScreen(new OptionsScreen(this)))
+                .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build());
+        currentY += BUTTON_HEIGHT + BUTTON_GAP;
+
+        addRenderableWidget(Button.builder(Translation.message("screen.main.quit"), button -> {
+                    ClientNarrativeCraftMod.getInstance()
+                            .getPlayerSession()
+                            .getEditor()
+                            .stop();
+                    close();
+                    minecraft.disconnectFromWorld(Component.empty());
+                })
+                .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build());
+
+        if (!minecraft.getSoundManager().isActive(MAIN_MUSIC_INSTANCE)) {
+            minecraft.getSoundManager().play(MAIN_MUSIC_INSTANCE);
+        }
+    }
+
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+
+        if (!hasLogo) return;
+
+        int logoDisplayWidth = Math.min(width / 3, 500);
+        int logoDisplayHeight =
+                logoNativeWidth > 0 ? (logoDisplayWidth * logoNativeHeight / logoNativeWidth) : logoDisplayWidth / 4;
+
+        int buttonCount = 3 + (canContinue ? 1 : 0) + (finishedStory ? 1 : 0);
+        int totalButtonHeight = buttonCount * BUTTON_HEIGHT + (buttonCount - 1) * BUTTON_GAP;
+        int totalBlockHeight = logoDisplayHeight + LOGO_GAP + totalButtonHeight;
+        int blockStartY = (height - totalBlockHeight) / 2;
+
+        graphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED,
+                LOGO_SPRITE,
+                MARGIN_LEFT,
+                blockStartY,
+                logoDisplayWidth,
+                logoDisplayHeight);
+    }
+
+    public void close() {
+        minecraft.setScreen(null);
+        minecraft.getSoundManager().stop(MAIN_MUSIC_INSTANCE);
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor().stop();
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(null);
+        Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
+    }
+
+    @Override
+    protected void extractBlurredBackground(GuiGraphicsExtractor graphics) {}
+
+    @Override
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {}
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    @Override
+    public void onClose() {}
+
+    private void loadLogoInfo() {
+        Optional<Resource> resource = minecraft.getResourceManager().getResource(LOGO_FILE);
+        if (resource.isEmpty()) {
+            hasLogo = false;
+            return;
+        }
+        try (InputStream stream = resource.get().open()) {
+            NativeImage image = NativeImage.read(stream);
+            logoNativeWidth = image.getWidth();
+            logoNativeHeight = image.getHeight();
+            image.close();
+            hasLogo = true;
+        } catch (IOException e) {
+            hasLogo = false;
+        }
+    }
+}

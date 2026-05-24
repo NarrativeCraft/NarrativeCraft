@@ -43,8 +43,8 @@ import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.*;
@@ -55,21 +55,19 @@ import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
-import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
-import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
-import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
-import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
+import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ServerPacketHandler {
 
@@ -164,7 +162,7 @@ public class ServerPacketHandler {
         editor.init();
     }
 
-    public static void stopEditorMaker(S2CStopEditorMaker packet, Player player) {
+    public static void stopEditorMaker(BiStopEditorMaker packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         EditorMaker editor = session.getEditor();
@@ -438,6 +436,31 @@ public class ServerPacketHandler {
                     (ServerPlayer) player,
                     new S2CToastMessage(
                             Translation.message("camera_angle"), Translation.message("camera_angle.save.failed")));
+        }
+    }
+
+    public static void playStory(C2SPlayStory packet, Player player) {
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (playerSession == null) return;
+
+        try {
+            StoryHandler storyHandler;
+            if (packet.fromSave()) {
+                storyHandler =
+                        NarrativeCraftMod.getInstance().getSaveFileManager().loadSave(playerSession);
+            } else {
+                storyHandler = new StoryHandler(playerSession);
+            }
+            playerSession.setStoryHandler(storyHandler);
+            if (packet.stitchName().isEmpty()) {
+                storyHandler.start();
+            } else {
+                storyHandler.start(packet.stitchName().get());
+            }
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error("Failed to start story!", e);
+            player.sendSystemMessage(Translation.message("error.start_story"));
         }
     }
 

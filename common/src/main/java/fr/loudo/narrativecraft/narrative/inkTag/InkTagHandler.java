@@ -116,7 +116,6 @@ public final class InkTagHandler {
     }
 
     public void stopAll() {
-        pendingTags.clear();
         blockingAction = null;
         pendingClientAcks.clear();
 

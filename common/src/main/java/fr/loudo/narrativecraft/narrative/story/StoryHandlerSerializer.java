@@ -77,6 +77,10 @@ public class StoryHandlerSerializer implements JsonSerializer<StoryHandler> {
         }
 
         json.addProperty("ended", src.isEnded());
+        json.addProperty("finishedStory", src.hasFinishedStory());
+        json.addProperty(
+                "chapterId", src.getPlayerSession().getChapter().getId().toString());
+        json.addProperty("sceneId", src.getPlayerSession().getScene().getId().toString());
 
         return json;
     }

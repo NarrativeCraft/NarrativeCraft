@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
+import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.network.story.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -123,6 +124,8 @@ public class OnPacketRegisterEventNeoForge {
                 S2CMainScreenData.TYPE,
                 S2CMainScreenData.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::receiveMainScreenData);
+        registrar.playToClient(
+                S2COpenMainScreen.TYPE, S2COpenMainScreen.STREAM_CODEC, ClientPacketHandlerNeoForge::openMainScreen);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
@@ -209,9 +212,10 @@ public class OnPacketRegisterEventNeoForge {
                 ServerPacketHandlerNeoForge::interactionEnter,
                 ClientPacketHandlerNeoForge::interactionEnter);
         registrar.playBidirectional(
-                S2CStopEditorMaker.TYPE,
-                S2CStopEditorMaker.STREAM_CODEC,
+                BiStopEditorMaker.TYPE,
+                BiStopEditorMaker.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::stopEditorMaker,
                 ClientPacketHandlerNeoForge::stopEditorMaker);
+        registrar.playToServer(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC, ServerPacketHandlerNeoForge::playStory);
     }
 }

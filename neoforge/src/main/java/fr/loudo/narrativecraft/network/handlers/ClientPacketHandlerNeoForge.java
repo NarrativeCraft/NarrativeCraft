@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
+import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
@@ -146,7 +147,7 @@ public class ClientPacketHandlerNeoForge {
         context.enqueueWork(() -> ClientPacketHandler.cameraAngleEnter(packet));
     }
 
-    public static void stopEditorMaker(S2CStopEditorMaker packet, IPayloadContext context) {
+    public static void stopEditorMaker(BiStopEditorMaker packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.stopEditorMaker(packet));
     }
 
@@ -178,5 +179,9 @@ public class ClientPacketHandlerNeoForge {
 
     public static void receiveMainScreenData(S2CMainScreenData packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.receiveMainScreenData(packet));
+    }
+
+    public static void openMainScreen(S2COpenMainScreen packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.openMainScreen(packet));
     }
 }

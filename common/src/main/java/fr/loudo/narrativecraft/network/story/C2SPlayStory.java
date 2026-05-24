@@ -21,18 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.story;
 
-import fr.loudo.narrativecraft.network.story.C2SPlayStory;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import java.util.Optional;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class BiPacketRegister {
+public record C2SPlayStory(Optional<String> stitchName, boolean fromSave) implements CustomPacketPayload {
 
-    public static void register() {
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC);
+    public static final Type<C2SPlayStory> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_story"));
+
+    public static final StreamCodec<ByteBuf, C2SPlayStory> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
+            C2SPlayStory::stitchName,
+            ByteBufCodecs.BOOL,
+            C2SPlayStory::fromSave,
+            C2SPlayStory::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

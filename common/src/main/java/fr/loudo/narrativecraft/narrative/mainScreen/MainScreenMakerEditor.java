@@ -26,6 +26,9 @@ package fr.loudo.narrativecraft.narrative.mainScreen;
 import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
+import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 
 public class MainScreenMakerEditor extends CameraAngleMakerEditorMaker {
@@ -36,5 +39,16 @@ public class MainScreenMakerEditor extends CameraAngleMakerEditorMaker {
     public MainScreenMakerEditor(
             CameraAngle cameraAngle, PlayerSession playerSession, NarrativeEnvironment environment) {
         super(cameraAngle, playerSession, environment);
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        if (cameraAngle.getScene() == null
+                && !cameraAngle.getCameras().isEmpty()
+                && environment == NarrativeEnvironment.PRODUCTION) {
+            CameraView cameraView = cameraAngle.getCameras().get(0);
+            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CEnterCameraView(cameraView.getId()));
+        }
     }
 }

@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
@@ -63,6 +64,7 @@ import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
+import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
@@ -375,7 +377,7 @@ public class ClientPacketHandler {
         Minecraft.getInstance().setScreen(null);
     }
 
-    public static void stopEditorMaker(S2CStopEditorMaker packet) {
+    public static void stopEditorMaker(BiStopEditorMaker packet) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         EditorMaker editor = session.getEditor();
         if (editor == null) return;
@@ -444,6 +446,10 @@ public class ClientPacketHandler {
         CameraAngle cameraAngle = new CameraAngle("", "", null);
         CameraAngleDeserializer.deserializeInto(packet.dataJson(), cameraAngle);
         ClientNarrativeCraftMod.getInstance().setMainScreenData(cameraAngle);
+    }
+
+    public static void openMainScreen(S2COpenMainScreen packet) {
+        Minecraft.getInstance().setScreen(new MainScreen(packet.canContinue(), packet.finishedStory()));
     }
 
     public static void enterMainScreen(BiMainScreenEnter packet) {

@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
+import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
@@ -69,7 +70,7 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay().register(S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CStopEditorMaker.TYPE, S2CStopEditorMaker.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(BiStopEditorMaker.TYPE, BiStopEditorMaker.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CCharacterSkin.TYPE, S2CCharacterSkin.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
@@ -78,5 +79,6 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay().register(S2CRenderSaveIcon.TYPE, S2CRenderSaveIcon.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BiMainScreenEnter.TYPE, BiMainScreenEnter.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CMainScreenData.TYPE, S2CMainScreenData.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2COpenMainScreen.TYPE, S2COpenMainScreen.STREAM_CODEC);
     }
 }

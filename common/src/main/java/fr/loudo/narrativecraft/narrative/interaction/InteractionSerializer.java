@@ -72,7 +72,7 @@ public class InteractionSerializer implements JsonSerializer<Interaction> {
         JsonObject json = new JsonObject();
         json.addProperty("id", zone.getId().toString());
         json.addProperty("name", zone.getName());
-        json.addProperty("stitchName", zone.getStitchName());
+        json.addProperty("path", zone.getStitchName());
         json.addProperty("x1", zone.getCorner1().x);
         json.addProperty("y1", zone.getCorner1().y);
         json.addProperty("z1", zone.getCorner1().z);
@@ -87,7 +87,7 @@ public class InteractionSerializer implements JsonSerializer<Interaction> {
         JsonObject json = new JsonObject();
         json.addProperty("id", point.getId().toString());
         json.addProperty("name", point.getName());
-        json.addProperty("stitchName", point.getStitchName());
+        json.addProperty("path", point.getStitchName());
         json.addProperty("x", point.getPosition().x);
         json.addProperty("y", point.getPosition().y);
         json.addProperty("z", point.getPosition().z);

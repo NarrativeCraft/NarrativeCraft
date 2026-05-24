@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
@@ -46,6 +46,7 @@ import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
+import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ServerPacketHandlerNeoForge {
@@ -84,7 +85,7 @@ public class ServerPacketHandlerNeoForge {
         context.enqueueWork(() -> ServerPacketHandler.cameraAngleEnter(packet, context.player()));
     }
 
-    public static void stopEditorMaker(S2CStopEditorMaker packet, IPayloadContext context) {
+    public static void stopEditorMaker(BiStopEditorMaker packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.stopEditorMaker(packet, context.player()));
     }
 
@@ -154,5 +155,9 @@ public class ServerPacketHandlerNeoForge {
 
     public static void mainScreenSave(C2SMainScreenSave packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.mainScreenSave(packet, context.player()));
+    }
+
+    public static void playStory(C2SPlayStory packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.playStory(packet, context.player()));
     }
 }

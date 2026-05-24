@@ -86,7 +86,7 @@ public class InteractionDeserializer extends NarrativeDeserializer<Interaction> 
 
         UUID id = UUID.fromString(json.get("id").getAsString());
         String name = json.get("name").getAsString();
-        String stitchName = json.has("stitchName") ? json.get("stitchName").getAsString() : "";
+        String stitchName = json.has("path") ? json.get("path").getAsString() : "";
         Vec3 corner1 = new Vec3(
                 json.get("x1").getAsDouble(),
                 json.get("y1").getAsDouble(),
@@ -105,7 +105,7 @@ public class InteractionDeserializer extends NarrativeDeserializer<Interaction> 
 
         UUID id = UUID.fromString(json.get("id").getAsString());
         String name = json.get("name").getAsString();
-        String stitchName = json.has("stitchName") ? json.get("stitchName").getAsString() : "";
+        String stitchName = json.has("path") ? json.get("path").getAsString() : "";
         Vec3 position = new Vec3(
                 json.get("x").getAsDouble(),
                 json.get("y").getAsDouble(),

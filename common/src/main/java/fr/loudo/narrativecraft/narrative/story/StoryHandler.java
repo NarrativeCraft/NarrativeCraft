@@ -42,15 +42,17 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     private static final Pattern SPEAKER_PATTERN = Pattern.compile("^(\\w+)\\s*:\\s*(.+)$", Pattern.DOTALL);
+    private static final Pattern KNOT_CHAPTER_PATTERN = Pattern.compile("^chapter_(\\d+)");
 
     private final PlayerSession playerSession;
     private final Story story;
@@ -62,10 +64,18 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     private Snapshot snapshot;
     private String pendingDialogueText;
     private boolean ended = false;
+    private boolean finishedStory;
+    private boolean loadedFromSave = false;
 
     public StoryHandler(PlayerSession playerSession) throws Exception {
         this.playerSession = playerSession;
         this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
+        this.inkTagHandler = new InkTagHandler(playerSession, this);
+    }
+
+    public StoryHandler(PlayerSession playerSession, String saveJson) throws Exception {
+        this.playerSession = playerSession;
+        this.story = new Story(saveJson);
         this.inkTagHandler = new InkTagHandler(playerSession, this);
     }
 
@@ -77,7 +87,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
             String lastCharacterSpoke,
             Snapshot snapshot,
             String pendingDialogueText,
-            boolean ended)
+            boolean ended,
+            boolean finishedStory)
             throws Exception {
         this.playerSession = playerSession;
         this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
@@ -89,21 +100,37 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         this.snapshot = snapshot;
         this.pendingDialogueText = pendingDialogueText;
         this.ended = ended;
+        this.finishedStory = finishedStory;
+        this.loadedFromSave = true;
     }
 
     public void start() throws Exception {
-        Chapter firstChapter =
-                NarrativeCraftMod.getInstance().getChapterManager().get(0);
-        Scene firstScene = firstChapter.getSceneManager().get(0);
-        playerSession.setChapter(firstChapter);
-        playerSession.setScene(firstScene);
-        Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(), new S2CPlayerSession(firstChapter.getId(), firstScene.getId()));
+        if (!loadedFromSave) {
+            Chapter firstChapter =
+                    NarrativeCraftMod.getInstance().getChapterManager().get(0);
+            Scene firstScene = firstChapter.getSceneManager().get(0);
+            playerSession.setChapter(firstChapter);
+            playerSession.setScene(firstScene);
+            Services.PACKET.sendToPlayer(
+                    playerSession.getPlayer(), new S2CPlayerSession(firstChapter.getId(), firstScene.getId()));
+        }
         advance();
     }
 
     public void start(String knotPath) throws Exception {
         story.choosePathString(knotPath);
+        Chapter chapter = getChapterFromKnotName(knotPath);
+        if (chapter == null) {
+            stop();
+            throw new Exception("Chapter of the knot does not exists!");
+        }
+        Scene scene = getSceneFromKnotName(chapter, knotPath);
+        if (scene == null) {
+            stop();
+            throw new Exception("Scene of the knot does not exists!");
+        }
+        playerSession.setChapter(chapter);
+        playerSession.setScene(scene);
         advance();
     }
 
@@ -204,6 +231,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
                 if (snapshot != null) {
                     text = snapshot.text;
                     tags = snapshot.tags;
+                } else if (loadedFromSave) {
+                    loadedFromSave = false;
+                    text = story.getCurrentText().stripTrailing();
+                    tags = story.getCurrentTags();
                 } else {
                     text = story.Continue().stripTrailing();
                     tags = story.getCurrentTags();
@@ -331,6 +362,14 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CShowChoices(texts));
     }
 
+    public void triggerChangeScene() {
+        for (Entity entity : characterEntities.values()) {
+            entity.remove(Entity.RemovalReason.KILLED);
+        }
+        characterEntities.clear();
+        inkTagHandler.stopAll();
+    }
+
     private void finish() {
         if (playerSession.isGameplayMode()) return;
         ended = true;
@@ -383,6 +422,28 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     public void addInteractionId(UUID interactionId) {
         interactionIds.add(interactionId);
+    }
+
+    public boolean hasFinishedStory() {
+        return finishedStory;
+    }
+
+    public void setFinishedStory(boolean finishedStory) {
+        this.finishedStory = finishedStory;
+    }
+
+    public static Chapter getChapterFromKnotName(String knotName) {
+        Matcher matcher = KNOT_CHAPTER_PATTERN.matcher(knotName);
+        if (!matcher.find()) return null;
+        int chapterIndex = Integer.parseInt(matcher.group(1));
+        return NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
+    }
+
+    public static Scene getSceneFromKnotName(Chapter chapter, String knotName) {
+        for (Scene scene : chapter.getSceneManager().getList()) {
+            if (scene.knotName().equals(knotName)) return scene;
+        }
+        return null;
     }
 
     public record Snapshot(String text, List<String> tags) {}

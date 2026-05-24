@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
@@ -55,7 +56,6 @@ public class NarrativeEntryInit {
         NarrativeCraftMod.getInstance().getCorruptedDeserialization().clear();
 
         NarrativeCraftFile file = NarrativeCraftMod.getInstance().getFile();
-        NarrativeCraftMod.getInstance().setMainScreenData(file.getMainScreenData());
 
         // Order is important!! e.g. Chapters must be initialized before scenes of chapter can be initialized.
         characters();
@@ -67,6 +67,14 @@ public class NarrativeEntryInit {
         cutscenes();
         cameraAngles();
         interactions();
+
+        NarrativeCraftMod.getInstance().setMainScreenData(file.getMainScreenData());
+
+        try {
+            NarrativeCraftMod.getInstance().setCompiledStoryJson(StoryCompilerHandler.compileToJson());
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error("Failed to compile story (init process)", e);
+        }
     }
 
     private static void chapters() {

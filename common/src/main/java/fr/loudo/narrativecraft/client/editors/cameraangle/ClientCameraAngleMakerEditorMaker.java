@@ -40,7 +40,7 @@ import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
@@ -156,7 +156,8 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     @Override
     public void stop() {
-        playerSession.setCameraView(null);
+        exitPreview();
+        minecraft.setScreen(null);
     }
 
     public void tick() {
@@ -330,10 +331,9 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                     if (b) {
                         save();
                     }
-                    Services.PACKET.sendToServer(S2CStopEditorMaker.INSTANCE);
+                    stop();
+                    Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
                     playerSession.setEditor(null);
-                    exitPreview();
-                    minecraft.setScreen(null);
                 },
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.save"));

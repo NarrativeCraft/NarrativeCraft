@@ -29,7 +29,8 @@ import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
+import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.UUID;
@@ -59,6 +60,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
 
     @Override
     public void init() {
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiInteractionEnter(interaction, environment));
         if (environment == NarrativeEnvironment.DEVELOPMENT) teleportToEditorOrigin();
     }
 
@@ -108,7 +110,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
     }
 
     public void stop() {
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), S2CStopEditorMaker.INSTANCE);
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
     }
 
     public Interaction getInteraction() {

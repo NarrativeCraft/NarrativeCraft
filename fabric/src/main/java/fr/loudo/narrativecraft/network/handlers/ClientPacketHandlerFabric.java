@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
+import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
@@ -108,7 +109,7 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (packet, context) -> {
             ClientPacketHandler.cameraAngleEnter(packet);
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CStopEditorMaker.TYPE, (packet, context) -> {
+        ClientPlayNetworking.registerGlobalReceiver(BiStopEditorMaker.TYPE, (packet, context) -> {
             ClientPacketHandler.stopEditorMaker(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(BiInteractionEnter.TYPE, (packet, context) -> {
@@ -131,6 +132,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CMainScreenData.TYPE, (packet, context) -> {
             ClientPacketHandler.receiveMainScreenData(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2COpenMainScreen.TYPE, (packet, context) -> {
+            ClientPacketHandler.openMainScreen(packet);
         });
     }
 }

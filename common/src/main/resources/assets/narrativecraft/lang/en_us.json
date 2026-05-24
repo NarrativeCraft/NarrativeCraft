@@ -96,6 +96,7 @@
   "narrativecraft.error.record.no_characters": "You need to have at least one character to save your recording!",
   "narrativecraft.error.register_character_skin": "Failed to register skin for character %s!",
   "narrativecraft.error.story": "An error occurred on the story!",
+  "narrativecraft.error.start_story": "Failed to start story!",
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",
@@ -149,5 +150,18 @@
   "narrativecraft.story.not_running": "No story is running for %s.",
   "narrativecraft.story.stopped": "Story stopped for %s.",
 
-  "narrativecraft.story.validation_error.not_exists": "%s %s does not exists in this scene."
+  "narrativecraft.story.validation_error.not_exists": "%s %s does not exists in this scene.",
+
+  "narrativecraft.screen.main.continue": "Continue",
+  "narrativecraft.screen.main.new_game": "New Game",
+  "narrativecraft.screen.main.select_scene": "Select Scene",
+  "narrativecraft.screen.main.options": "Options",
+  "narrativecraft.screen.main.quit": "Quit",
+  "narrativecraft.screen.main.select_chapter.title": "Select Chapter",
+  "narrativecraft.screen.main.select_scene.title": "Select Scene",
+  "narrativecraft.screen.main.options.title": "Options",
+  "narrativecraft.screen.main.options.text_speed": "Text Speed: %d",
+  "narrativecraft.screen.main.options.auto_skip": "Auto-Skip",
+  "narrativecraft.screen.main.options.minecraft_options": "Minecraft Options",
+  "narrativecraft.screen.main.options.done": "Done"
 }

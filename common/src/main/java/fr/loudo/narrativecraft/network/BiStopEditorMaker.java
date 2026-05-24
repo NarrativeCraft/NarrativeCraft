@@ -29,16 +29,16 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public class S2CStopEditorMaker implements CustomPacketPayload {
+public class BiStopEditorMaker implements CustomPacketPayload {
 
-    public static final S2CStopEditorMaker INSTANCE = new S2CStopEditorMaker();
+    public static final BiStopEditorMaker INSTANCE = new BiStopEditorMaker();
 
-    private S2CStopEditorMaker() {}
+    private BiStopEditorMaker() {}
 
-    public static final Type<S2CStopEditorMaker> TYPE =
+    public static final Type<BiStopEditorMaker> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "stop_editor_maker"));
 
-    public static final StreamCodec<ByteBuf, S2CStopEditorMaker> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, BiStopEditorMaker> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

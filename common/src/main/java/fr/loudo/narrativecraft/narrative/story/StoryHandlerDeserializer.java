@@ -28,8 +28,12 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -90,6 +94,21 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
                 obj.has("pendingDialogueText") ? obj.get("pendingDialogueText").getAsString() : null;
 
         boolean ended = obj.has("ended") && obj.get("ended").getAsBoolean();
+        boolean finishedStory =
+                obj.has("finishedStory") && obj.get("finishedStory").getAsBoolean();
+
+        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+        Chapter firstChapter = chapterManager.getList().get(0);
+        UUID chapterId =
+                obj.has("chapterId") ? UUID.fromString(obj.get("chapterId").getAsString()) : firstChapter.getId();
+        UUID sceneId = obj.has("sceneId")
+                ? UUID.fromString(obj.get("sceneId").getAsString())
+                : firstChapter.getSceneManager().get(0).getId();
+
+        Chapter chapter = chapterManager.getById(chapterId);
+        playerSession.setChapter(chapter);
+        Scene scene = chapter.getSceneManager().getById(sceneId);
+        playerSession.setScene(scene);
 
         try {
             return new StoryHandler(
@@ -100,7 +119,8 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
                     lastCharacterSpoke,
                     snapshot,
                     pendingDialogueText,
-                    ended);
+                    ended,
+                    finishedStory);
         } catch (Exception e) {
             throw new JsonParseException(e);
         }

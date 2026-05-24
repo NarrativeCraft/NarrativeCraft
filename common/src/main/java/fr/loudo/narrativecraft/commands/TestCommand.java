@@ -23,12 +23,14 @@
 
 package fr.loudo.narrativecraft.commands;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import fr.loudo.narrativecraft.network.S2CRenderSaveIcon;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.UtilsServer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
@@ -65,6 +67,8 @@ public class TestCommand {
                             Services.PACKET.sendToPlayer(player, new S2CDialogTest("stop", "", 0));
                             return 1;
                         })))
+                .then(Commands.literal("mainscreen")
+                        .executes(ctx -> openMainScreen(ctx.getSource().getPlayerOrException())))
                 .then(Commands.literal("saveicon")
                         .executes(ctx -> sendSaveIcon(ctx.getSource().getPlayerOrException(), 0.2, 0.9, 0.2))
                         .then(Commands.argument("in", DoubleArgumentType.doubleArg(0))
@@ -87,9 +91,14 @@ public class TestCommand {
                                                         DoubleArgumentType.getDouble(ctx, "out"))))))));
     }
 
+    private static int openMainScreen(ServerPlayer player) {
+        UtilsServer.openMainScreenToPlayer(player, true, true);
+        return Command.SINGLE_SUCCESS;
+    }
+
     private static int sendSaveIcon(ServerPlayer player, double in, double stay, double out) {
         Services.PACKET.sendToPlayer(player, new S2CRenderSaveIcon(in, stay, out));
-        return 1;
+        return Command.SINGLE_SUCCESS;
     }
 
     private static Entity findNearestEntity(ServerPlayer player) {

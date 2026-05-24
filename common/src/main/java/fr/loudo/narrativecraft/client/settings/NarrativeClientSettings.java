@@ -21,18 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.client.settings;
 
-import fr.loudo.narrativecraft.network.story.C2SPlayStory;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+public class NarrativeClientSettings {
 
-public class BiPacketRegister {
+    public static double textSpeed = 3.0;
+    public static boolean autoSkip = false;
 
-    public static void register() {
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC);
-    }
+    // TODO: persistance (chargement/sauvegarde dans un fichier client)
 }

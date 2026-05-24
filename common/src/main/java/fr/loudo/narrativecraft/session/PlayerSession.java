@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.session;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.*;
 import javax.annotation.Nullable;
@@ -52,7 +52,7 @@ public class PlayerSession extends AbstractPlayerSession {
     public void clear() {
         super.clear();
         characterIdsSkinLoaded.clear();
-        Services.PACKET.sendToPlayer(player, S2CStopEditorMaker.INSTANCE);
+        Services.PACKET.sendToPlayer(player, BiStopEditorMaker.INSTANCE);
     }
 
     public PlayerSession(ServerPlayer player) {

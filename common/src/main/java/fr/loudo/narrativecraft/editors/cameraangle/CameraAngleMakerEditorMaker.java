@@ -36,7 +36,7 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
@@ -49,6 +49,7 @@ import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -63,19 +64,17 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.*;
-
 public class CameraAngleMakerEditorMaker implements EditorMaker {
 
     public static final String ENTITY_TAG = "nc_camera_angle";
 
-    private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
-    private final Map<UUID, Entity> characterEntities = new HashMap<>();
-    private final List<TemplateReference> templateReferences = new ArrayList<>();
-    private final Map<UUID, List<UUID>> placementsByTemplateReference = new HashMap<>();
-    private final CameraAngle cameraAngle;
-    private final PlayerSession playerSession;
-    private final NarrativeEnvironment environment;
+    protected final List<CharacterPlacement> characterPlacements = new ArrayList<>();
+    protected final Map<UUID, Entity> characterEntities = new HashMap<>();
+    protected final List<TemplateReference> templateReferences = new ArrayList<>();
+    protected final Map<UUID, List<UUID>> placementsByTemplateReference = new HashMap<>();
+    protected final CameraAngle cameraAngle;
+    protected final PlayerSession playerSession;
+    protected final NarrativeEnvironment environment;
 
     public CameraAngleMakerEditorMaker(CameraAngle cameraAngle, PlayerSession playerSession) {
         this.cameraAngle = cameraAngle;
@@ -147,13 +146,13 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void stop() {
-        if (environment == NarrativeEnvironment.DEVELOPMENT) {
-            playerSession.changeGameMode(playerSession.getLastGameType());
+        playerSession.changeGameMode(playerSession.getLastGameType());
+        if (environment == NarrativeEnvironment.DEVELOPMENT || cameraAngle.getScene() == null) {
             for (Entity entity : characterEntities.values()) {
                 entity.remove(Entity.RemovalReason.DISCARDED);
             }
         }
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), S2CStopEditorMaker.INSTANCE);
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
         for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
             Services.PACKET.sendToPlayer(
                     playerSession.getPlayer(),

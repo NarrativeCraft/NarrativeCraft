@@ -36,7 +36,6 @@ import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -76,8 +75,6 @@ public class InteractionInkAction extends InkAction {
             if (lastEditorMaker != null) {
                 lastEditorMaker.stop();
             }
-            Services.PACKET.sendToPlayer(
-                    session.getPlayer(), new BiInteractionEnter(interaction, NarrativeEnvironment.PRODUCTION));
             InteractionMakerEditorMaker editorMaker =
                     new InteractionMakerEditorMaker(interaction, session, NarrativeEnvironment.PRODUCTION);
             session.setEditor(editorMaker);

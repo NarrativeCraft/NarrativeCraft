@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.S2CStopEditorMaker;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
@@ -44,6 +44,7 @@ import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
+import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 public class ServerPacketHandlerFabric {
@@ -67,7 +68,7 @@ public class ServerPacketHandlerFabric {
         ServerPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (packet, context) -> {
             ServerPacketHandler.cameraAngleEnter(packet, context.player());
         });
-        ServerPlayNetworking.registerGlobalReceiver(S2CStopEditorMaker.TYPE, (packet, context) -> {
+        ServerPlayNetworking.registerGlobalReceiver(BiStopEditorMaker.TYPE, (packet, context) -> {
             ServerPacketHandler.stopEditorMaker(packet, context.player());
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleSave.TYPE, (packet, context) -> {
@@ -111,6 +112,9 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SMainScreenSave.TYPE, (packet, context) -> {
             ServerPacketHandler.mainScreenSave(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SPlayStory.TYPE, (packet, context) -> {
+            ServerPacketHandler.playStory(packet, context.player());
         });
     }
 }
