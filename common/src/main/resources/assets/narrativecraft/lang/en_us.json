@@ -97,6 +97,7 @@
   "narrativecraft.error.register_character_skin": "Failed to register skin for character %s!",
   "narrativecraft.error.story": "An error occurred on the story!",
   "narrativecraft.error.start_story": "Failed to start story!",
+  "narrativecraft.error.save_settings": "Failed to save your settings!",
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",

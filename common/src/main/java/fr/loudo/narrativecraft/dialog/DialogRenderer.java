@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.dialog;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
+import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 
 public abstract class DialogRenderer {
 
@@ -56,7 +57,9 @@ public abstract class DialogRenderer {
     public void start(String text) {
         scrollText.setText(text);
         animator.startAppear();
-        autoSkipTicks = data.isAutoSkipEnabled() ? (int) (data.getAutoSkipSeconds() * 20f) : -1;
+        autoSkipTicks = data.isAutoSkipEnabled() || NarrativeClientSettings.autoSkip
+                ? 60
+                : -1; // TODO: calculate auto skip seconds based on text length
         currentTick = 0;
         skipProgress = 0f;
         previousSkipProgress = 0f;
@@ -90,7 +93,7 @@ public abstract class DialogRenderer {
 
         // Text scrolls only once the appear animation is done
         if (animator.isTextScrollAllowed()) {
-            scrollText.tick(data.getScrollSpeed());
+            scrollText.tick(data.getScrollSpeed() > 0 ? data.getScrollSpeed() : NarrativeClientSettings.textSpeed);
         }
 
         // Skip indicator slides in when text is fully shown

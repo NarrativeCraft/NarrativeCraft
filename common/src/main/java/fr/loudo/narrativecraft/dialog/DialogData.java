@@ -47,7 +47,7 @@ public class DialogData {
     private int textColor = 0xFFFFFFFF;
     private Identifier backgroundImage = null;
 
-    private float scrollSpeed = 1.5f;
+    private float scrollSpeed = 0;
     private Identifier letterSound = null;
     private boolean soundMuted = false;
 

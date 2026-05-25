@@ -23,9 +23,12 @@
 
 package fr.loudo.narrativecraft.client.screens.mainScreen;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.io.IOException;
 import java.util.Locale;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
@@ -88,14 +91,22 @@ public class OptionsScreen extends Screen {
                 .bounds(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT)
                 .build());
 
-        addRenderableWidget(Button.builder(
-                        Translation.message("screen.main.options.done"), button -> minecraft.setScreen(lastScreen))
+        addRenderableWidget(Button.builder(Translation.message("screen.main.options.done"), button -> {
+                    minecraft.setScreen(lastScreen);
+                    try {
+                        NarrativeClientSettings.save();
+                    } catch (IOException e) {
+                        NarrativeCraftMod.LOGGER.error("Failed to save user settings!", e);
+                        minecraft.player.sendSystemMessage(
+                                Translation.message("error.save_settings").withStyle(ChatFormatting.RED));
+                    }
+                })
                 .bounds(middleX, height - ELEMENT_HEIGHT - 10, ELEMENT_WIDTH, ELEMENT_HEIGHT)
                 .build());
     }
 
-    private static double sliderValueToSpeed(double sliderValue) {
-        return Math.clamp(sliderValue * 4.0 + 1.0, 1.0, 5.0);
+    private static float sliderValueToSpeed(double sliderValue) {
+        return (float) Math.clamp(sliderValue * 4.0 + 1.0, 1.0, 5.0);
     }
 
     private static Component buildTextSpeedLabel(double speed) {
