@@ -172,5 +172,21 @@
   "narrativecraft.screen.dialog_preview.field.offset_y": "Offset Y:",
   "narrativecraft.screen.dialog_preview.field.scale": "Scale:",
   "narrativecraft.screen.dialog_preview.field.bg_color": "Bg Color:",
-  "narrativecraft.screen.dialog_preview.field.text_color": "Text Color:"
+  "narrativecraft.screen.dialog_preview.field.text_color": "Text Color:",
+
+  "narrativecraft.screen.dialog_editor.advanced.width": "Width:",
+  "narrativecraft.screen.dialog_editor.advanced.padding_x": "Padding X:",
+  "narrativecraft.screen.dialog_editor.advanced.padding_y": "Padding Y:",
+  "narrativecraft.screen.dialog_editor.advanced.letter_spacing": "Letter Spacing:",
+  "narrativecraft.screen.dialog_editor.advanced.line_gap": "Line Gap:",
+  "narrativecraft.screen.dialog_editor.advanced.scroll_speed": "Scroll Speed:",
+  "narrativecraft.screen.dialog_editor.advanced.tail_visible": "Tail Visible:",
+  "narrativecraft.screen.dialog_editor.advanced.sound_muted": "Sound Muted:",
+  "narrativecraft.screen.dialog_editor.advanced.alignment": "Alignment:",
+  "narrativecraft.screen.dialog_editor.advanced.bg_image": "BG Image:",
+  "narrativecraft.screen.dialog_editor.advanced.letter_sound": "Letter Sound:",
+  "narrativecraft.screen.dialog_editor.advanced.close": "Close",
+
+  "narrativecraft.widget.toggle.on": "On",
+  "narrativecraft.widget.toggle.off": "Off"
 }

@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.client.editors.widgets;
 
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
-import java.util.function.Consumer;
+import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
@@ -35,6 +35,8 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+
+import java.util.function.Consumer;
 
 public class DialogSetupAdvancedPanel {
 
@@ -60,8 +62,8 @@ public class DialogSetupAdvancedPanel {
     private EditBox backgroundImageBox;
     private EditBox letterSoundBox;
 
-    private int tailVisibleRowY = -1;
-    private int soundMutedRowY = -1;
+    private ToggleButton tailVisibleButton;
+    private ToggleButton soundMutedButton;
     private int alignmentRowY = -1;
     private int closeRowY = -1;
 
@@ -76,8 +78,6 @@ public class DialogSetupAdvancedPanel {
 
     public void setFieldSet(DialogFieldSet fieldSet) {
         this.fieldSet = fieldSet;
-        tailVisibleRowY = -1;
-        soundMutedRowY = -1;
         alignmentRowY = -1;
         closeRowY = -1;
     }
@@ -165,6 +165,14 @@ public class DialogSetupAdvancedPanel {
                     } catch (Exception ignored) {
                     }
                 });
+
+        int editBoxWidth = PANEL_WIDTH - PANEL_PADDING * 2 - LABEL_WIDTH - 2;
+        tailVisibleButton = new ToggleButton(0, 0, editBoxWidth, ROW_HEIGHT, data.isTailVisible(), data::setTailVisible);
+        soundMutedButton = new ToggleButton(0, 0, editBoxWidth, ROW_HEIGHT, data.isSoundMuted(), value -> {
+            data.setSoundMuted(value);
+            DialogRenderer3D dialog = previewPanel.getCurrentDialog();
+            if (dialog != null) dialog.getScrollText().setMutedSound(value);
+        });
     }
 
     public void tick() {
@@ -204,52 +212,37 @@ public class DialogSetupAdvancedPanel {
         int y = 14;
 
         if (fieldSet == DialogFieldSet.ALL) {
-            y = renderFieldRow(graphics, mc, "Width:", contentX, editBoxX, y, widthBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, "Padding X:", contentX, editBoxX, y, paddingXBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, "Padding Y:", contentX, editBoxX, y, paddingYBox, mouseX, mouseY);
-            y = renderFieldRow(
-                    graphics, mc, "Letter Spacing:", contentX, editBoxX, y, letterSpacingBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, "Line Gap:", contentX, editBoxX, y, lineGapBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, "Scroll Speed:", contentX, editBoxX, y, scrollSpeedBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.width"), contentX, editBoxX, y, widthBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.padding_x"), contentX, editBoxX, y, paddingXBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.padding_y"), contentX, editBoxX, y, paddingYBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.letter_spacing"), contentX, editBoxX, y, letterSpacingBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.line_gap"), contentX, editBoxX, y, lineGapBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.scroll_speed"), contentX, editBoxX, y, scrollSpeedBox, mouseX, mouseY);
 
-            tailVisibleRowY = y;
-            y = renderBoolRow(
-                    graphics,
-                    mc,
-                    "Tail Visible:",
-                    contentX,
-                    editBoxX,
-                    editBoxWidth,
-                    y,
-                    data.isTailVisible(),
-                    mouseX,
-                    mouseY);
+            graphics.text(mc.font, trans("screen.dialog_editor.advanced.tail_visible"), contentX, y + 3, 0xFFCCCCCC);
+            tailVisibleButton.setX(editBoxX);
+            tailVisibleButton.setY(y);
+            tailVisibleButton.extractRenderState(graphics, mouseX, mouseY, 0);
+            y += ROW_HEIGHT + ROW_GAP;
 
-            soundMutedRowY = y;
-            y = renderBoolRow(
-                    graphics,
-                    mc,
-                    "Sound Muted:",
-                    contentX,
-                    editBoxX,
-                    editBoxWidth,
-                    y,
-                    data.isSoundMuted(),
-                    mouseX,
-                    mouseY);
+            graphics.text(mc.font, trans("screen.dialog_editor.advanced.sound_muted"), contentX, y + 3, 0xFFCCCCCC);
+            soundMutedButton.setX(editBoxX);
+            soundMutedButton.setY(y);
+            soundMutedButton.extractRenderState(graphics, mouseX, mouseY, 0);
+            y += ROW_HEIGHT + ROW_GAP;
 
             alignmentRowY = y;
             y = renderAlignmentRow(graphics, mc, contentX, editBoxX, editBoxWidth, y, data, mouseX, mouseY);
         }
 
-        y = renderFieldRow(graphics, mc, "BG Image:", contentX, editBoxX, y, backgroundImageBox, mouseX, mouseY);
-        y = renderFieldRow(graphics, mc, "Letter Sound:", contentX, editBoxX, y, letterSoundBox, mouseX, mouseY);
+        y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.bg_image"), contentX, editBoxX, y, backgroundImageBox, mouseX, mouseY);
+        y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.letter_sound"), contentX, editBoxX, y, letterSoundBox, mouseX, mouseY);
 
         y += ROW_GAP * 2;
         closeRowY = y;
         boolean closeHover = isOver(mouseX, mouseY, contentX, y, 90, ROW_HEIGHT);
         graphics.fill(contentX, y, contentX + 90, y + ROW_HEIGHT, closeHover ? 0xFF666666 : 0xFF444444);
-        String closeText = "Close";
+        String closeText = trans("screen.dialog_editor.advanced.close");
         graphics.text(
                 mc.font, closeText, contentX + 45 - mc.font.width(closeText) / 2, y + (ROW_HEIGHT - 8) / 2, 0xFFFFFFFF);
     }
@@ -273,30 +266,6 @@ public class DialogSetupAdvancedPanel {
         return y + ROW_HEIGHT + ROW_GAP;
     }
 
-    private int renderBoolRow(
-            GuiGraphicsExtractor graphics,
-            Minecraft mc,
-            String label,
-            int contentX,
-            int editBoxX,
-            int editBoxWidth,
-            int y,
-            boolean value,
-            int mouseX,
-            int mouseY) {
-        graphics.text(mc.font, label, contentX, y + 3, 0xFFCCCCCC);
-        boolean hover = isOver(mouseX, mouseY, editBoxX, y, editBoxWidth, ROW_HEIGHT);
-        graphics.fill(editBoxX, y, editBoxX + editBoxWidth, y + ROW_HEIGHT, hover ? 0xFF555555 : 0xFF333333);
-        String valueText = value ? "On" : "Off";
-        graphics.text(
-                mc.font,
-                valueText,
-                editBoxX + editBoxWidth / 2 - mc.font.width(valueText) / 2,
-                y + (ROW_HEIGHT - 8) / 2,
-                0xFFFFFFFF);
-        return y + ROW_HEIGHT + ROW_GAP;
-    }
-
     private int renderAlignmentRow(
             GuiGraphicsExtractor graphics,
             Minecraft mc,
@@ -307,7 +276,7 @@ public class DialogSetupAdvancedPanel {
             DialogData data,
             int mouseX,
             int mouseY) {
-        graphics.text(mc.font, "Alignment:", contentX, y + 3, 0xFFCCCCCC);
+        graphics.text(mc.font, trans("screen.dialog_editor.advanced.alignment"), contentX, y + 3, 0xFFCCCCCC);
         DialogData.TextAlignment current = data.getTextAlignment();
         DialogData.TextAlignment[] alignments = DialogData.TextAlignment.values();
         int buttonWidth = editBoxWidth / 3 - 1;
@@ -354,18 +323,8 @@ public class DialogSetupAdvancedPanel {
             if (tryFocus(scrollSpeedBox, mouseX, mouseY, event)) return true;
             if (tryFocus(skipSecondsBox, mouseX, mouseY, event)) return true;
 
-            if (tailVisibleRowY >= 0 && isOver(mouseX, mouseY, editBoxX, tailVisibleRowY, editBoxWidth, ROW_HEIGHT)) {
-                data.setTailVisible(!data.isTailVisible());
-                return true;
-            }
-            if (soundMutedRowY >= 0 && isOver(mouseX, mouseY, editBoxX, soundMutedRowY, editBoxWidth, ROW_HEIGHT)) {
-                data.setSoundMuted(!data.isSoundMuted());
-                DialogRenderer3D dialog = previewPanel.getCurrentDialog();
-                if (dialog != null) {
-                    dialog.getScrollText().setMutedSound(data.isSoundMuted());
-                }
-                return true;
-            }
+            if (tailVisibleButton != null && tailVisibleButton.mouseClicked(event, false)) return true;
+            if (soundMutedButton != null && soundMutedButton.mouseClicked(event, false)) return true;
             if (alignmentRowY >= 0) {
                 DialogData.TextAlignment[] alignments = DialogData.TextAlignment.values();
                 int buttonWidth = editBoxWidth / 3 - 1;
@@ -484,5 +443,9 @@ public class DialogSetupAdvancedPanel {
 
     private boolean isOver(int mouseX, int mouseY, int x, int y, int w, int h) {
         return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h;
+    }
+
+    private String trans(String key) {
+        return Translation.message(key).getString();
     }
 }
