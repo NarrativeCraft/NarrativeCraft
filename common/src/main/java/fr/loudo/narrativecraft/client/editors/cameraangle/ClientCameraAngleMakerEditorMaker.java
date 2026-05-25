@@ -93,7 +93,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     private final Map<DialogData, DialogRenderer3D> previewDialogRenderers = new HashMap<>();
     private final DialogPreviewPanel dialogPreviewPanel =
             new DialogPreviewPanel(this::toggleAdvancedPanel, DEFAULT_DIALOG_TEXT);
-    private final DialogSetupAdvancedPanel advancedPanel = new DialogSetupAdvancedPanel();
+    private final DialogSetupAdvancedPanel advancedPanel = new DialogSetupAdvancedPanel(dialogPreviewPanel);
 
     {
         dialogPreviewPanel.setFieldSet(DialogFieldSet.CAMERA_VIEW);
@@ -178,6 +178,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                     player.onGround(),
                     false));
         }
+        advancedPanel.tick();
     }
 
     @Override

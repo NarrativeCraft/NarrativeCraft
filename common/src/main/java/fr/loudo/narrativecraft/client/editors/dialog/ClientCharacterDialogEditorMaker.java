@@ -70,7 +70,7 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
     private Button saveButton;
 
     private final DialogPreviewPanel previewPanel = new DialogPreviewPanel(this::toggleAdvancedPanel, DEFAULT_TEXT);
-    private final DialogSetupAdvancedPanel advancedPanel = new DialogSetupAdvancedPanel();
+    private final DialogSetupAdvancedPanel advancedPanel = new DialogSetupAdvancedPanel(previewPanel);
 
     public ClientCharacterDialogEditorMaker(ICharacterStory character, Runnable onSave) {
         this.character = character;
@@ -119,7 +119,9 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
     }
 
     @Override
-    public void tick() {}
+    public void tick() {
+        advancedPanel.tick();
+    }
 
     @Override
     public void teleportToEditorOrigin() {}

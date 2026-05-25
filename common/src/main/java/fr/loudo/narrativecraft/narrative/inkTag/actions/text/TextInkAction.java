@@ -35,13 +35,14 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.utils.FadeState;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 @InkCommand(
         keyword = "text",
@@ -303,7 +304,7 @@ public class TextInkAction extends InkAction {
             dialogData = new DialogData();
             dialogData.setWidth(width);
             dialogData.setTextColor(ARGB.color(255, color));
-            scrollText = new DialogScrollText();
+            scrollText = new DialogScrollText(dialogData.getLetterSound(), dialogData.isSoundMuted());
             scrollText.setText(text);
             if (noTyping) scrollText.forceFinish();
             return InkActionResult.ok();

@@ -459,4 +459,10 @@ public class DialogPreviewPanel {
     private boolean isOver(int mouseX, int mouseY, int x, int y, int w, int h) {
         return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h;
     }
+
+    public DialogRenderer3D getCurrentDialog() {
+        DialogPreviewEntry current = getSelectedEntry();
+        if (current == null) return null;
+        return current.getRenderer();
+    }
 }

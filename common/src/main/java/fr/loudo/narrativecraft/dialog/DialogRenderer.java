@@ -31,7 +31,7 @@ public abstract class DialogRenderer {
 
     protected final DialogLayout layout = new DialogLayout();
     protected final DialogAnimator animator = new DialogAnimator();
-    protected final DialogScrollText scrollText = new DialogScrollText();
+    protected final DialogScrollText scrollText;
     protected DialogData data;
 
     private Runnable onStoppedCallback;
@@ -52,6 +52,7 @@ public abstract class DialogRenderer {
         animator.onStopped(() -> {
             if (onStoppedCallback != null) onStoppedCallback.run();
         });
+        scrollText = new DialogScrollText(data.getLetterSound(), data.isSoundMuted());
     }
 
     public void start(String text) {

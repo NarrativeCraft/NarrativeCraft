@@ -28,16 +28,19 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.dialog.ITextEffect;
 import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
 import fr.loudo.narrativecraft.dialog.effects.WaitTextEffect;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Matrix4f;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DialogScrollText {
 
@@ -46,10 +49,18 @@ public class DialogScrollText {
     private static final Pattern PARAM = Pattern.compile("(\\w+)=(\\S+)");
 
     private final List<LetterEntry> letters = new ArrayList<>();
+
     private int visibleCount = 0;
     private float tickAccumulator = 0f;
     private int waitTicksRemaining = 0;
     private long currentTick = 0;
+    private Identifier sound;
+    private boolean mutedSound;
+
+    public DialogScrollText(Identifier sound, boolean mutedSound) {
+        this.sound = sound;
+        this.mutedSound = mutedSound;
+    }
 
     public void setText(String rawText) {
         letters.clear();
@@ -81,7 +92,11 @@ public class DialogScrollText {
                 break;
             }
 
-            if (entry.soundCallback != null) entry.soundCallback.run();
+            if (!mutedSound) {
+                float pitch = 0.8F + new Random().nextFloat() * 0.4F;
+                SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(sound);
+                Minecraft.getInstance().player.playSound(soundEvent, 1.0F, pitch);
+            }
         }
     }
 
@@ -333,12 +348,19 @@ public class DialogScrollText {
         return ARGB.color(alpha, ARGB.red(color), ARGB.green(color), ARGB.blue(color));
     }
 
+    public void setMutedSound(boolean mutedSound) {
+        this.mutedSound = mutedSound;
+    }
+
+    public void setSound(Identifier sound) {
+        this.sound = sound;
+    }
+
     private static class LetterEntry {
         final String letter;
         final String effectName;
         final Map<String, String> params;
         boolean visible = false;
-        Runnable soundCallback;
 
         LetterEntry(String letter, String effectName, Map<String, String> params) {
             this.letter = letter;

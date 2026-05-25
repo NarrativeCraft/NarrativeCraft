@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.dialog;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.resources.Identifier;
 
 public class DialogData {
@@ -48,7 +49,7 @@ public class DialogData {
     private Identifier backgroundImage = null;
 
     private float scrollSpeed = 0;
-    private Identifier letterSound = null;
+    private Identifier letterSound = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
     private boolean soundMuted = false;
 
     private boolean tailVisible = true;

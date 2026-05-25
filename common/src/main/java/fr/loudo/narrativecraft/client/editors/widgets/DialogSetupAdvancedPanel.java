@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.client.editors.widgets;
 
 import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -47,6 +48,7 @@ public class DialogSetupAdvancedPanel {
     private DialogData data;
     private DialogFieldSet fieldSet = DialogFieldSet.ALL;
     private boolean visible = false;
+    private DialogPreviewPanel previewPanel;
 
     private EditBox widthBox;
     private EditBox paddingXBox;
@@ -62,6 +64,10 @@ public class DialogSetupAdvancedPanel {
     private int soundMutedRowY = -1;
     private int alignmentRowY = -1;
     private int closeRowY = -1;
+
+    public DialogSetupAdvancedPanel(DialogPreviewPanel previewPanel) {
+        this.previewPanel = previewPanel;
+    }
 
     public void setData(DialogData data) {
         this.data = data;
@@ -159,6 +165,14 @@ public class DialogSetupAdvancedPanel {
                     } catch (Exception ignored) {
                     }
                 });
+    }
+
+    public void tick() {
+        if (letterSoundBox != null && letterSoundBox.isFocused()) {
+            DialogRenderer3D dialog = previewPanel.getCurrentDialog();
+            if (dialog == null) return;
+            dialog.getScrollText().setSound(Identifier.parse(letterSoundBox.getValue()));
+        }
     }
 
     private EditBox makeBox(Minecraft mc, int maxLength, String value, Consumer<String> responder) {
@@ -346,6 +360,10 @@ public class DialogSetupAdvancedPanel {
             }
             if (soundMutedRowY >= 0 && isOver(mouseX, mouseY, editBoxX, soundMutedRowY, editBoxWidth, ROW_HEIGHT)) {
                 data.setSoundMuted(!data.isSoundMuted());
+                DialogRenderer3D dialog = previewPanel.getCurrentDialog();
+                if (dialog != null) {
+                    dialog.getScrollText().setMutedSound(data.isSoundMuted());
+                }
                 return true;
             }
             if (alignmentRowY >= 0) {
