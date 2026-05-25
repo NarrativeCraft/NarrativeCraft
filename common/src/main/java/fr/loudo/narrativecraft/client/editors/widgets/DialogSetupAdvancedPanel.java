@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.client.editors.widgets;
 
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -36,7 +35,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 
-public class CameraViewDialogSetupAdvancedPanel {
+public class DialogSetupAdvancedPanel {
 
     private static final int PANEL_X = 5;
     private static final int PANEL_WIDTH = 172;
@@ -45,7 +44,8 @@ public class CameraViewDialogSetupAdvancedPanel {
     private static final int ROW_GAP = 2;
     private static final int LABEL_WIDTH = 84;
 
-    private CameraViewDialogSetup setup;
+    private DialogData data;
+    private DialogFieldSet fieldSet = DialogFieldSet.ALL;
     private boolean visible = false;
 
     private EditBox widthBox;
@@ -59,14 +59,21 @@ public class CameraViewDialogSetupAdvancedPanel {
     private EditBox letterSoundBox;
 
     private int tailVisibleRowY = -1;
-    private int autoSkipRowY = -1;
     private int soundMutedRowY = -1;
     private int alignmentRowY = -1;
     private int closeRowY = -1;
 
-    public void setSetup(CameraViewDialogSetup setup) {
-        this.setup = setup;
+    public void setData(DialogData data) {
+        this.data = data;
         rebuildEditBoxes();
+    }
+
+    public void setFieldSet(DialogFieldSet fieldSet) {
+        this.fieldSet = fieldSet;
+        tailVisibleRowY = -1;
+        soundMutedRowY = -1;
+        alignmentRowY = -1;
+        closeRowY = -1;
     }
 
     public void setVisible(boolean visible) {
@@ -79,9 +86,8 @@ public class CameraViewDialogSetupAdvancedPanel {
     }
 
     private void rebuildEditBoxes() {
-        if (setup == null) return;
+        if (data == null) return;
         Minecraft mc = Minecraft.getInstance();
-        DialogData data = setup.getDialogData();
 
         widthBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getWidth()), text -> {
             try {
@@ -165,9 +171,8 @@ public class CameraViewDialogSetupAdvancedPanel {
     }
 
     public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
-        if (!visible || setup == null) return;
+        if (!visible || data == null) return;
         Minecraft mc = Minecraft.getInstance();
-        DialogData data = setup.getDialogData();
 
         int panelTop = 5;
         int panelHeight = computePanelHeight(data);
@@ -184,49 +189,44 @@ public class CameraViewDialogSetupAdvancedPanel {
         int editBoxWidth = PANEL_WIDTH - PANEL_PADDING * 2 - LABEL_WIDTH - 2;
         int y = 14;
 
-        y = renderFieldRow(graphics, mc, "Width:", contentX, editBoxX, y, widthBox, mouseX, mouseY);
-        y = renderFieldRow(graphics, mc, "Padding X:", contentX, editBoxX, y, paddingXBox, mouseX, mouseY);
-        y = renderFieldRow(graphics, mc, "Padding Y:", contentX, editBoxX, y, paddingYBox, mouseX, mouseY);
-        y = renderFieldRow(graphics, mc, "Letter Spacing:", contentX, editBoxX, y, letterSpacingBox, mouseX, mouseY);
-        y = renderFieldRow(graphics, mc, "Line Gap:", contentX, editBoxX, y, lineGapBox, mouseX, mouseY);
-        y = renderFieldRow(graphics, mc, "Scroll Speed:", contentX, editBoxX, y, scrollSpeedBox, mouseX, mouseY);
+        if (fieldSet == DialogFieldSet.ALL) {
+            y = renderFieldRow(graphics, mc, "Width:", contentX, editBoxX, y, widthBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, "Padding X:", contentX, editBoxX, y, paddingXBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, "Padding Y:", contentX, editBoxX, y, paddingYBox, mouseX, mouseY);
+            y = renderFieldRow(
+                    graphics, mc, "Letter Spacing:", contentX, editBoxX, y, letterSpacingBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, "Line Gap:", contentX, editBoxX, y, lineGapBox, mouseX, mouseY);
+            y = renderFieldRow(graphics, mc, "Scroll Speed:", contentX, editBoxX, y, scrollSpeedBox, mouseX, mouseY);
 
-        tailVisibleRowY = y;
-        y = renderBoolRow(
-                graphics,
-                mc,
-                "Tail Visible:",
-                contentX,
-                editBoxX,
-                editBoxWidth,
-                y,
-                data.isTailVisible(),
-                mouseX,
-                mouseY);
+            tailVisibleRowY = y;
+            y = renderBoolRow(
+                    graphics,
+                    mc,
+                    "Tail Visible:",
+                    contentX,
+                    editBoxX,
+                    editBoxWidth,
+                    y,
+                    data.isTailVisible(),
+                    mouseX,
+                    mouseY);
 
-        autoSkipRowY = y;
-        y = renderBoolRow(
-                graphics,
-                mc,
-                "Auto Skip:",
-                contentX,
-                editBoxX,
-                editBoxWidth,
-                y,
-                data.isAutoSkipEnabled(),
-                mouseX,
-                mouseY);
+            soundMutedRowY = y;
+            y = renderBoolRow(
+                    graphics,
+                    mc,
+                    "Sound Muted:",
+                    contentX,
+                    editBoxX,
+                    editBoxWidth,
+                    y,
+                    data.isSoundMuted(),
+                    mouseX,
+                    mouseY);
 
-        if (data.isAutoSkipEnabled()) {
-            y = renderFieldRow(graphics, mc, "Skip Seconds:", contentX, editBoxX, y, skipSecondsBox, mouseX, mouseY);
+            alignmentRowY = y;
+            y = renderAlignmentRow(graphics, mc, contentX, editBoxX, editBoxWidth, y, data, mouseX, mouseY);
         }
-
-        soundMutedRowY = y;
-        y = renderBoolRow(
-                graphics, mc, "Sound Muted:", contentX, editBoxX, editBoxWidth, y, data.isSoundMuted(), mouseX, mouseY);
-
-        alignmentRowY = y;
-        y = renderAlignmentRow(graphics, mc, contentX, editBoxX, editBoxWidth, y, data, mouseX, mouseY);
 
         y = renderFieldRow(graphics, mc, "BG Image:", contentX, editBoxX, y, backgroundImageBox, mouseX, mouseY);
         y = renderFieldRow(graphics, mc, "Letter Sound:", contentX, editBoxX, y, letterSoundBox, mouseX, mouseY);
@@ -320,10 +320,9 @@ public class CameraViewDialogSetupAdvancedPanel {
     }
 
     public boolean mouseClicked(MouseButtonEvent event) {
-        if (!visible || setup == null) return false;
+        if (!visible || data == null) return false;
         int mouseX = (int) event.x();
         int mouseY = (int) event.y();
-        DialogData data = setup.getDialogData();
         if (!isOver(mouseX, mouseY, PANEL_X, 5, PANEL_WIDTH, computePanelHeight(data))) return false;
 
         int contentX = PANEL_X + PANEL_PADDING;
@@ -332,40 +331,38 @@ public class CameraViewDialogSetupAdvancedPanel {
 
         unfocusAll();
 
-        if (tryFocus(widthBox, mouseX, mouseY, event)) return true;
-        if (tryFocus(paddingXBox, mouseX, mouseY, event)) return true;
-        if (tryFocus(paddingYBox, mouseX, mouseY, event)) return true;
-        if (tryFocus(letterSpacingBox, mouseX, mouseY, event)) return true;
-        if (tryFocus(lineGapBox, mouseX, mouseY, event)) return true;
-        if (tryFocus(scrollSpeedBox, mouseX, mouseY, event)) return true;
-        if (skipSecondsBox != null && tryFocus(skipSecondsBox, mouseX, mouseY, event)) return true;
-        if (tryFocus(backgroundImageBox, mouseX, mouseY, event)) return true;
-        if (tryFocus(letterSoundBox, mouseX, mouseY, event)) return true;
+        if (fieldSet == DialogFieldSet.ALL) {
+            if (tryFocus(widthBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(paddingXBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(paddingYBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(letterSpacingBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(lineGapBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(scrollSpeedBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(skipSecondsBox, mouseX, mouseY, event)) return true;
 
-        if (tailVisibleRowY >= 0 && isOver(mouseX, mouseY, editBoxX, tailVisibleRowY, editBoxWidth, ROW_HEIGHT)) {
-            data.setTailVisible(!data.isTailVisible());
-            return true;
-        }
-        if (autoSkipRowY >= 0 && isOver(mouseX, mouseY, editBoxX, autoSkipRowY, editBoxWidth, ROW_HEIGHT)) {
-            data.setAutoSkipEnabled(!data.isAutoSkipEnabled());
-            rebuildEditBoxes();
-            return true;
-        }
-        if (soundMutedRowY >= 0 && isOver(mouseX, mouseY, editBoxX, soundMutedRowY, editBoxWidth, ROW_HEIGHT)) {
-            data.setSoundMuted(!data.isSoundMuted());
-            return true;
-        }
-        if (alignmentRowY >= 0) {
-            DialogData.TextAlignment[] alignments = DialogData.TextAlignment.values();
-            int buttonWidth = editBoxWidth / 3 - 1;
-            for (int i = 0; i < alignments.length; i++) {
-                int btnX = editBoxX + i * (buttonWidth + 1);
-                if (isOver(mouseX, mouseY, btnX, alignmentRowY, buttonWidth, ROW_HEIGHT)) {
-                    data.setTextAlignment(alignments[i]);
-                    return true;
+            if (tailVisibleRowY >= 0 && isOver(mouseX, mouseY, editBoxX, tailVisibleRowY, editBoxWidth, ROW_HEIGHT)) {
+                data.setTailVisible(!data.isTailVisible());
+                return true;
+            }
+            if (soundMutedRowY >= 0 && isOver(mouseX, mouseY, editBoxX, soundMutedRowY, editBoxWidth, ROW_HEIGHT)) {
+                data.setSoundMuted(!data.isSoundMuted());
+                return true;
+            }
+            if (alignmentRowY >= 0) {
+                DialogData.TextAlignment[] alignments = DialogData.TextAlignment.values();
+                int buttonWidth = editBoxWidth / 3 - 1;
+                for (int i = 0; i < alignments.length; i++) {
+                    int btnX = editBoxX + i * (buttonWidth + 1);
+                    if (isOver(mouseX, mouseY, btnX, alignmentRowY, buttonWidth, ROW_HEIGHT)) {
+                        data.setTextAlignment(alignments[i]);
+                        return true;
+                    }
                 }
             }
         }
+
+        if (tryFocus(backgroundImageBox, mouseX, mouseY, event)) return true;
+        if (tryFocus(letterSoundBox, mouseX, mouseY, event)) return true;
         if (closeRowY >= 0 && isOver(mouseX, mouseY, contentX, closeRowY, 90, ROW_HEIGHT)) {
             visible = false;
             return true;
@@ -374,49 +371,58 @@ public class CameraViewDialogSetupAdvancedPanel {
     }
 
     public void keyPressed(KeyEvent event) {
-        forwardKeyToFocused(widthBox, event);
-        forwardKeyToFocused(paddingXBox, event);
-        forwardKeyToFocused(paddingYBox, event);
-        forwardKeyToFocused(letterSpacingBox, event);
-        forwardKeyToFocused(lineGapBox, event);
-        forwardKeyToFocused(scrollSpeedBox, event);
-        forwardKeyToFocused(skipSecondsBox, event);
+        if (fieldSet == DialogFieldSet.ALL) {
+            forwardKeyToFocused(widthBox, event);
+            forwardKeyToFocused(paddingXBox, event);
+            forwardKeyToFocused(paddingYBox, event);
+            forwardKeyToFocused(letterSpacingBox, event);
+            forwardKeyToFocused(lineGapBox, event);
+            forwardKeyToFocused(scrollSpeedBox, event);
+            forwardKeyToFocused(skipSecondsBox, event);
+        }
         forwardKeyToFocused(backgroundImageBox, event);
         forwardKeyToFocused(letterSoundBox, event);
     }
 
     public void charTyped(CharacterEvent event) {
-        forwardCharToFocused(widthBox, event);
-        forwardCharToFocused(paddingXBox, event);
-        forwardCharToFocused(paddingYBox, event);
-        forwardCharToFocused(letterSpacingBox, event);
-        forwardCharToFocused(lineGapBox, event);
-        forwardCharToFocused(scrollSpeedBox, event);
-        forwardCharToFocused(skipSecondsBox, event);
+        if (fieldSet == DialogFieldSet.ALL) {
+            forwardCharToFocused(widthBox, event);
+            forwardCharToFocused(paddingXBox, event);
+            forwardCharToFocused(paddingYBox, event);
+            forwardCharToFocused(letterSpacingBox, event);
+            forwardCharToFocused(lineGapBox, event);
+            forwardCharToFocused(scrollSpeedBox, event);
+            forwardCharToFocused(skipSecondsBox, event);
+        }
         forwardCharToFocused(backgroundImageBox, event);
         forwardCharToFocused(letterSoundBox, event);
     }
 
     public boolean isAnyBoxFocused() {
-        return isFocused(widthBox)
-                || isFocused(paddingXBox)
-                || isFocused(paddingYBox)
-                || isFocused(letterSpacingBox)
-                || isFocused(lineGapBox)
-                || isFocused(scrollSpeedBox)
-                || isFocused(skipSecondsBox)
-                || isFocused(backgroundImageBox)
-                || isFocused(letterSoundBox);
+        if (fieldSet == DialogFieldSet.ALL) {
+            if (isFocused(widthBox)
+                    || isFocused(paddingXBox)
+                    || isFocused(paddingYBox)
+                    || isFocused(letterSpacingBox)
+                    || isFocused(lineGapBox)
+                    || isFocused(scrollSpeedBox)
+                    || isFocused(skipSecondsBox)) {
+                return true;
+            }
+        }
+        return isFocused(backgroundImageBox) || isFocused(letterSoundBox);
     }
 
     public void unfocusAll() {
-        setFocus(widthBox, false);
-        setFocus(paddingXBox, false);
-        setFocus(paddingYBox, false);
-        setFocus(letterSpacingBox, false);
-        setFocus(lineGapBox, false);
-        setFocus(scrollSpeedBox, false);
-        setFocus(skipSecondsBox, false);
+        if (fieldSet == DialogFieldSet.ALL) {
+            setFocus(widthBox, false);
+            setFocus(paddingXBox, false);
+            setFocus(paddingYBox, false);
+            setFocus(letterSpacingBox, false);
+            setFocus(lineGapBox, false);
+            setFocus(scrollSpeedBox, false);
+            setFocus(skipSecondsBox, false);
+        }
         setFocus(backgroundImageBox, false);
         setFocus(letterSoundBox, false);
     }
@@ -448,8 +454,13 @@ public class CameraViewDialogSetupAdvancedPanel {
     }
 
     private int computePanelHeight(DialogData data) {
-        int rowCount = 6 + 3 + 1 + 2;
-        if (data.isAutoSkipEnabled()) rowCount++;
+        int rowCount;
+        if (fieldSet == DialogFieldSet.ALL) {
+            rowCount = 6 + 3 + 1 + 2;
+            if (data.isAutoSkipEnabled()) rowCount++;
+        } else {
+            rowCount = 2;
+        }
         return 14 + rowCount * (ROW_HEIGHT + ROW_GAP) + ROW_GAP * 2 + ROW_HEIGHT + PANEL_PADDING;
     }
 

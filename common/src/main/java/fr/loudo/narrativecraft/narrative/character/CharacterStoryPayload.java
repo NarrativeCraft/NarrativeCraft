@@ -36,37 +36,33 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
             ByteBufCodecs.STRING_UTF8,
             CharacterStoryPayload::getDescription,
             ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getDialogPresetName,
-            ByteBufCodecs.STRING_UTF8,
             CharacterStoryPayload::getModelType,
             ByteBufCodecs.STRING_UTF8,
             CharacterStoryPayload::getEntityTypeId,
             MainCharacterAttribute.STREAM_CODEC,
             CharacterStoryPayload::getMainCharacterAttribute,
+            ByteBufCodecs.STRING_UTF8,
+            CharacterStoryPayload::getDialogDataJson,
             CharacterStoryPayload::new);
 
-    private final String dialogPresetName;
     private final String modelType;
     private final String entityTypeId;
     private final MainCharacterAttribute mainCharacterAttribute;
+    private final String dialogDataJson;
 
     public CharacterStoryPayload(
             String name,
             String description,
-            String dialogPresetName,
             String modelType,
             String entityTypeId,
-            MainCharacterAttribute mainCharacterAttribute) {
+            MainCharacterAttribute mainCharacterAttribute,
+            String dialogDataJson) {
         super(name, description);
-        this.dialogPresetName = dialogPresetName != null ? dialogPresetName : "";
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
         this.mainCharacterAttribute =
                 mainCharacterAttribute != null ? mainCharacterAttribute : new MainCharacterAttribute();
-    }
-
-    public String getDialogPresetName() {
-        return dialogPresetName;
+        this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
     }
 
     public String getModelType() {
@@ -79,5 +75,9 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
 
     public MainCharacterAttribute getMainCharacterAttribute() {
         return mainCharacterAttribute;
+    }
+
+    public String getDialogDataJson() {
+        return dialogDataJson;
     }
 }

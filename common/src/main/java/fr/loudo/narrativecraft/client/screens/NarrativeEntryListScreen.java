@@ -24,11 +24,13 @@
 package fr.loudo.narrativecraft.client.screens;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -120,6 +122,17 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                 .bounds(10, 35, 20, 20)
                 .build();
         this.addRenderableWidget(settingsButton);
+
+        Button globalDialogButton = Button.builder(Component.literal("D"), b -> {
+                    ClientGlobalDialogEditorMaker editor = new ClientGlobalDialogEditorMaker();
+                    editor.init();
+                    ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(editor);
+                    minecraft.setScreen(new ClearScreen());
+                    Services.PACKET.sendToServer(new C2SEnterDialogEditor("global", ""));
+                })
+                .bounds(10, 60, 20, 20)
+                .build();
+        this.addRenderableWidget(globalDialogButton);
 
         if (!breadCrumb.isEmpty()) {
             addRenderableWidget(new BreadcrumbWidget(20, this.height / 2, breadCrumb, this.font));

@@ -23,8 +23,11 @@
 
 package fr.loudo.narrativecraft.client.narrative.character;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
@@ -62,11 +65,18 @@ public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, N
         if (npc == null) return;
 
         npc.setName(payload.getName());
-        npc.setDialogPresetName(payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
         if (!payload.getModelType().isEmpty()) {
             npc.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         npc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        String dialogDataJson = payload.getDialogDataJson();
+        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
+            try {
+                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
+                npc.setDialogData(DialogDataIO.deserialize(json));
+            } catch (Exception ignored) {
+            }
+        }
 
         UtilsClient.reloadListScreen();
     }
@@ -100,11 +110,18 @@ public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, N
 
     private Npc buildFromPayload(UUID entryId, NpcPayload payload, Scene scene) {
         Npc npc = new Npc(entryId, payload.getName(), scene);
-        npc.setDialogPresetName(payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
         if (!payload.getModelType().isEmpty()) {
             npc.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         npc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        String dialogDataJson = payload.getDialogDataJson();
+        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
+            try {
+                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
+                npc.setDialogData(DialogDataIO.deserialize(json));
+            } catch (Exception ignored) {
+            }
+        }
         return npc;
     }
 

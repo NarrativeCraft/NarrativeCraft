@@ -23,6 +23,9 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
+import com.google.gson.Gson;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
@@ -36,7 +39,7 @@ import net.minecraft.world.entity.player.PlayerModelType;
 public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implements ICharacterStory {
 
     private final CharacterType characterType = CharacterType.NORMAL;
-    private String dialogPresetName;
+    private DialogData dialogData = new DialogData();
     private EntityType<?> entityType = EntityType.PLAYER;
     private PlayerModelType modelType;
     private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
@@ -49,8 +52,8 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
         super(id, name, description);
     }
 
-    public String getDialogPresetName() {
-        return dialogPresetName;
+    public DialogData getDialogData() {
+        return dialogData;
     }
 
     @Override
@@ -67,8 +70,8 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
         return new File(characterFolder, NarrativeCraftFileDefault.SKIN_CHARACTER_FILE);
     }
 
-    public void setDialogPresetName(String dialogPresetName) {
-        this.dialogPresetName = dialogPresetName;
+    public void setDialogData(DialogData dialogData) {
+        this.dialogData = dialogData;
     }
 
     public EntityType<?> getEntityType() {
@@ -106,8 +109,9 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
     public CharacterStoryPayload toPayload() {
         String modelTypeName = modelType != null ? modelType.name() : "";
         String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
+        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData));
         return new CharacterStoryPayload(
-                name, description, dialogPresetName, modelTypeName, entityTypeId, mainCharacterAttribute);
+                name, description, modelTypeName, entityTypeId, mainCharacterAttribute, dialogDataJson);
     }
 
     @Override

@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.events.client;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -39,6 +41,10 @@ public class OnScreenKeyEvent {
             cutsceneEditor.charTyped(event);
         } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.charTyped(event);
+        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
+            globalDialogEditor.charTyped(event);
+        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
+            characterDialogEditor.charTyped(event);
         }
     }
 
@@ -49,6 +55,10 @@ public class OnScreenKeyEvent {
             cutsceneEditor.keyPressed(event);
         } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.keyPressed(event);
+        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
+            globalDialogEditor.keyPressed(event);
+        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
+            characterDialogEditor.keyPressed(event);
         }
     }
 }

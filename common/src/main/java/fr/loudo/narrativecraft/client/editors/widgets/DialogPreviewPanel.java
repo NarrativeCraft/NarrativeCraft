@@ -23,13 +23,12 @@
 
 package fr.loudo.narrativecraft.client.editors.widgets;
 
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
-import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
+import fr.loudo.narrativecraft.utils.Translation;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
@@ -39,7 +38,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 
-public class CameraAngleDialogPreviewPanel {
+public class DialogPreviewPanel {
 
     private static final int PANEL_WIDTH = 170;
     private static final int PADDING = 6;
@@ -48,8 +47,11 @@ public class CameraAngleDialogPreviewPanel {
     private static final int EDITBOX_HEIGHT = 10;
     private static final int FIELD_GAP = 3;
 
-    private final ClientCameraAngleMakerEditorMaker editor;
-    private CameraView cameraView;
+    private final Consumer<DialogData> onToggleAdvanced;
+    private final String defaultDialogText;
+
+    private DialogFieldSet fieldSet = DialogFieldSet.ALL;
+    private List<DialogPreviewEntry> entries = new ArrayList<>();
     private int selectedIndex = 0;
 
     private EditBox previewTextBox;
@@ -61,93 +63,106 @@ public class CameraAngleDialogPreviewPanel {
 
     private int advancedButtonY = 0;
 
-    public CameraAngleDialogPreviewPanel(ClientCameraAngleMakerEditorMaker editor) {
-        this.editor = editor;
+    public DialogPreviewPanel(Consumer<DialogData> onToggleAdvanced, String defaultDialogText) {
+        this.onToggleAdvanced = onToggleAdvanced;
+        this.defaultDialogText = defaultDialogText;
     }
 
-    public void setCameraView(CameraView cameraView) {
-        this.cameraView = cameraView;
+    public void setFieldSet(DialogFieldSet fieldSet) {
+        this.fieldSet = fieldSet;
+        rebuildEditBoxes();
+    }
+
+    public void setEntries(List<DialogPreviewEntry> entries) {
+        this.entries = entries != null ? entries : new ArrayList<>();
         this.selectedIndex = 0;
         rebuildEditBoxes();
     }
 
     private void rebuildEditBoxes() {
         Minecraft mc = Minecraft.getInstance();
-        CameraViewDialogSetup setup = getSelectedSetup();
+        DialogPreviewEntry entry = getSelectedEntry();
 
-        previewTextBox = makeEditBox(mc, 256, setup != null ? setup.getPreviewText() : "");
+        previewTextBox = makeEditBox(mc, 256, entry != null ? entry.getPreviewText() : "");
         previewTextBox.setResponder(text -> {
-            CameraViewDialogSetup current = getSelectedSetup();
+            DialogPreviewEntry current = getSelectedEntry();
             if (current == null) return;
             current.setPreviewText(text);
-            DialogRenderer3D renderer = editor.getRendererForSetup(current);
+            DialogRenderer3D renderer = current.getRenderer();
             if (renderer != null) {
-                renderer.update(text.isEmpty() ? ClientCameraAngleMakerEditorMaker.DEFAULT_DIALOG_TEXT : text);
+                renderer.update(text.isEmpty() ? defaultDialogText : text);
             }
         });
 
-        if (setup != null) {
-            DialogData data = setup.getDialogData();
+        if (entry != null) {
+            DialogData data = entry.getData();
 
-            offsetXBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getOffsetX()));
-            offsetXBox.setResponder(text -> {
-                CameraViewDialogSetup s = getSelectedSetup();
-                if (s == null) return;
-                try {
-                    s.getDialogData().setOffsetX(Float.parseFloat(text));
-                } catch (NumberFormatException ignored) {
-                }
-            });
+            if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CAMERA_VIEW) {
+                offsetXBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getOffsetX()));
+                offsetXBox.setResponder(text -> {
+                    DialogPreviewEntry s = getSelectedEntry();
+                    if (s == null) return;
+                    try {
+                        s.getData().setOffsetX(Float.parseFloat(text));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
 
-            offsetYBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getOffsetY()));
-            offsetYBox.setResponder(text -> {
-                CameraViewDialogSetup s = getSelectedSetup();
-                if (s == null) return;
-                try {
-                    s.getDialogData().setOffsetY(Float.parseFloat(text));
-                } catch (NumberFormatException ignored) {
-                }
-            });
+                offsetYBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getOffsetY()));
+                offsetYBox.setResponder(text -> {
+                    DialogPreviewEntry s = getSelectedEntry();
+                    if (s == null) return;
+                    try {
+                        s.getData().setOffsetY(Float.parseFloat(text));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
 
-            scaleBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getScale()));
-            scaleBox.setResponder(text -> {
-                CameraViewDialogSetup s = getSelectedSetup();
-                if (s == null) return;
-                try {
-                    s.getDialogData().setScale(Float.parseFloat(text));
-                } catch (NumberFormatException ignored) {
-                }
-            });
+                scaleBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getScale()));
+                scaleBox.setResponder(text -> {
+                    DialogPreviewEntry s = getSelectedEntry();
+                    if (s == null) return;
+                    try {
+                        s.getData().setScale(Float.parseFloat(text));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+            } else {
+                offsetXBox = null;
+                offsetYBox = null;
+                scaleBox = null;
+            }
 
-            backgroundColorBox = makeEditBox(mc, 10, String.format("%08X", data.getBackgroundColor()));
-            backgroundColorBox.setResponder(text -> {
-                CameraViewDialogSetup s = getSelectedSetup();
-                if (s == null) return;
-                try {
-                    s.getDialogData().setBackgroundColor((int) Long.parseLong(text, 16));
-                } catch (NumberFormatException ignored) {
-                }
-            });
+            if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
+                backgroundColorBox = makeEditBox(mc, 10, String.format("%08X", data.getBackgroundColor()));
+                backgroundColorBox.setResponder(text -> {
+                    DialogPreviewEntry s = getSelectedEntry();
+                    if (s == null) return;
+                    try {
+                        s.getData().setBackgroundColor((int) Long.parseLong(text, 16));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
 
-            textColorBox = makeEditBox(mc, 10, String.format("%08X", data.getTextColor()));
-            textColorBox.setResponder(text -> {
-                CameraViewDialogSetup s = getSelectedSetup();
-                if (s == null) return;
-                try {
-                    s.getDialogData().setTextColor((int) Long.parseLong(text, 16));
-                } catch (NumberFormatException ignored) {
-                }
-            });
+                textColorBox = makeEditBox(mc, 10, String.format("%08X", data.getTextColor()));
+                textColorBox.setResponder(text -> {
+                    DialogPreviewEntry s = getSelectedEntry();
+                    if (s == null) return;
+                    try {
+                        s.getData().setTextColor((int) Long.parseLong(text, 16));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+            } else {
+                backgroundColorBox = null;
+                textColorBox = null;
+            }
         } else {
             offsetXBox = null;
             offsetYBox = null;
             scaleBox = null;
             backgroundColorBox = null;
             textColorBox = null;
-        }
-        editor.closeAdvancedPanel();
-        if (editor.advancedPanelVisible()) {
-            editor.openAdvancedPanel(getSelectedSetup());
         }
     }
 
@@ -159,29 +174,28 @@ public class CameraAngleDialogPreviewPanel {
     }
 
     public void render(GuiGraphicsExtractor graphics, int screenWidth, int screenHeight, int mouseX, int mouseY) {
-        if (cameraView == null) return;
-        List<CameraViewDialogSetup> setups = cameraView.getDialogSetups();
+        if (entries.isEmpty()) return;
 
         Minecraft mc = Minecraft.getInstance();
         int panelX = getPanelX(screenWidth);
         int panelY = 35;
-        int contentHeight = computeContentHeight(setups.size());
+        int contentHeight = computeContentHeight(entries.size());
 
         graphics.fill(panelX - 1, panelY - 1, panelX + PANEL_WIDTH + 1, panelY + contentHeight + 1, 0xFFAAAAAA);
         graphics.fill(panelX, panelY, panelX + PANEL_WIDTH, panelY + contentHeight, ARGB.color(220, 0, 0, 0));
 
         int y = panelY + PADDING;
 
-        graphics.text(mc.font, "Dialog Preview", panelX + PADDING, y, 0xFFFFFFFF);
+        graphics.text(
+                mc.font,
+                Translation.message("screen.dialog_preview.title").getString(),
+                panelX + PADDING,
+                y,
+                0xFFFFFFFF);
         y += ROW_HEIGHT + 2;
 
-        if (setups.isEmpty()) {
-            graphics.text(mc.font, "No setups configured", panelX + PADDING, y, 0xFF888888);
-            return;
-        }
-
-        for (int i = 0; i < setups.size(); i++) {
-            CameraViewDialogSetup setup = setups.get(i);
+        for (int i = 0; i < entries.size(); i++) {
+            DialogPreviewEntry entry = entries.get(i);
             boolean selected = i == selectedIndex;
             int rowColor = selected
                     ? 0xFF4466AA
@@ -189,30 +203,83 @@ public class CameraAngleDialogPreviewPanel {
                             ? 0xFF334455
                             : 0xFF222222);
             graphics.fill(panelX + PADDING, y, panelX + PANEL_WIDTH - PADDING, y + ROW_HEIGHT - 2, rowColor);
-            graphics.text(
-                    mc.font,
-                    resolveCharacterName(setup),
-                    panelX + PADDING + 2,
-                    y + 2,
-                    selected ? 0xFFFFFFFF : 0xFFAAAAAA);
+            graphics.text(mc.font, entry.getLabel(), panelX + PADDING + 2, y + 2, selected ? 0xFFFFFFFF : 0xFFAAAAAA);
             y += ROW_HEIGHT;
         }
 
         y += 4;
-        if (getSelectedSetup() == null) return;
+        if (getSelectedEntry() == null) return;
 
-        y = renderEditBoxRow(graphics, mc, "Text:", panelX, y, previewTextBox, mouseX, mouseY);
-        y = renderEditBoxRow(graphics, mc, "Offset X:", panelX, y, offsetXBox, mouseX, mouseY);
-        y = renderEditBoxRow(graphics, mc, "Offset Y:", panelX, y, offsetYBox, mouseX, mouseY);
-        y = renderEditBoxRow(graphics, mc, "Scale:", panelX, y, scaleBox, mouseX, mouseY);
-        y = renderEditBoxRow(graphics, mc, "Bg Color:", panelX, y, backgroundColorBox, mouseX, mouseY);
-        y = renderEditBoxRow(graphics, mc, "Text Color:", panelX, y, textColorBox, mouseX, mouseY);
+        y = renderEditBoxRow(
+                graphics,
+                mc,
+                Translation.message("screen.dialog_preview.field.text").getString(),
+                panelX,
+                y,
+                previewTextBox,
+                mouseX,
+                mouseY);
+        if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CAMERA_VIEW) {
+            y = renderEditBoxRow(
+                    graphics,
+                    mc,
+                    Translation.message("screen.dialog_preview.field.offset_x").getString(),
+                    panelX,
+                    y,
+                    offsetXBox,
+                    mouseX,
+                    mouseY);
+            y = renderEditBoxRow(
+                    graphics,
+                    mc,
+                    Translation.message("screen.dialog_preview.field.offset_y").getString(),
+                    panelX,
+                    y,
+                    offsetYBox,
+                    mouseX,
+                    mouseY);
+            y = renderEditBoxRow(
+                    graphics,
+                    mc,
+                    Translation.message("screen.dialog_preview.field.scale").getString(),
+                    panelX,
+                    y,
+                    scaleBox,
+                    mouseX,
+                    mouseY);
+        }
+        if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
+            y = renderEditBoxRow(
+                    graphics,
+                    mc,
+                    Translation.message("screen.dialog_preview.field.bg_color").getString(),
+                    panelX,
+                    y,
+                    backgroundColorBox,
+                    mouseX,
+                    mouseY);
+            y = renderEditBoxRow(
+                    graphics,
+                    mc,
+                    Translation.message("screen.dialog_preview.field.text_color")
+                            .getString(),
+                    panelX,
+                    y,
+                    textColorBox,
+                    mouseX,
+                    mouseY);
+        }
 
-        advancedButtonY = y;
-        int advBtnWidth = PANEL_WIDTH - PADDING * 2;
-        boolean advHover = isOver(mouseX, mouseY, panelX + PADDING, y, advBtnWidth, 10);
-        graphics.fill(panelX + PADDING, y, panelX + PADDING + advBtnWidth, y + 10, advHover ? 0xFF555577 : 0xFF333355);
-        graphics.text(mc.font, "...", panelX + PANEL_WIDTH / 2 - mc.font.width("...") / 2, y + 1, 0xFFFFFFFF);
+        if (fieldSet != DialogFieldSet.CAMERA_VIEW) {
+            advancedButtonY = y;
+            int advBtnWidth = PANEL_WIDTH - PADDING * 2;
+            boolean advHover = isOver(mouseX, mouseY, panelX + PADDING, y, advBtnWidth, 10);
+            graphics.fill(
+                    panelX + PADDING, y, panelX + PADDING + advBtnWidth, y + 10, advHover ? 0xFF555577 : 0xFF333355);
+            graphics.text(mc.font, "...", panelX + PANEL_WIDTH / 2 - mc.font.width("...") / 2, y + 1, 0xFFFFFFFF);
+        } else {
+            advancedButtonY = -1;
+        }
     }
 
     private int renderEditBoxRow(
@@ -235,15 +302,14 @@ public class CameraAngleDialogPreviewPanel {
     }
 
     public boolean mouseClicked(MouseButtonEvent event) {
-        if (cameraView == null) return false;
+        if (entries.isEmpty()) return false;
         Minecraft mc = Minecraft.getInstance();
         int panelX = getPanelX(mc.getWindow().getGuiScaledWidth());
         int mouseX = (int) event.x();
         int mouseY = (int) event.y();
 
-        List<CameraViewDialogSetup> setups = cameraView.getDialogSetups();
         int y = 35 + PADDING + ROW_HEIGHT + 2;
-        for (int i = 0; i < setups.size(); i++) {
+        for (int i = 0; i < entries.size(); i++) {
             if (isOver(mouseX, mouseY, panelX + PADDING, y, PANEL_WIDTH - PADDING * 2, ROW_HEIGHT - 2)) {
                 if (selectedIndex != i) {
                     selectedIndex = i;
@@ -254,7 +320,7 @@ public class CameraAngleDialogPreviewPanel {
             y += ROW_HEIGHT;
         }
 
-        if (getSelectedSetup() == null) return false;
+        if (getSelectedEntry() == null) return false;
 
         unfocusAll();
 
@@ -266,8 +332,13 @@ public class CameraAngleDialogPreviewPanel {
         if (tryFocusBox(textColorBox, mouseX, mouseY, event)) return true;
 
         int advBtnWidth = PANEL_WIDTH - PADDING * 2;
-        if (advancedButtonY > 0 && isOver(mouseX, mouseY, panelX + PADDING, advancedButtonY, advBtnWidth, 10)) {
-            editor.toggleAdvancedPanel(getSelectedSetup());
+        if (fieldSet != DialogFieldSet.CAMERA_VIEW
+                && advancedButtonY > 0
+                && isOver(mouseX, mouseY, panelX + PADDING, advancedButtonY, advBtnWidth, 10)) {
+            DialogPreviewEntry entry = getSelectedEntry();
+            if (entry != null && onToggleAdvanced != null) {
+                onToggleAdvanced.accept(entry.getData());
+            }
             return true;
         }
 
@@ -350,17 +421,29 @@ public class CameraAngleDialogPreviewPanel {
         return box != null && box.isFocused();
     }
 
-    private int computeContentHeight(int setupCount) {
+    private int computeContentHeight(int entryCount) {
         int height = PADDING;
         height += ROW_HEIGHT + 2;
-        if (setupCount == 0) {
+        if (entryCount == 0) {
             height += ROW_HEIGHT + PADDING;
             return height;
         }
-        height += setupCount * ROW_HEIGHT;
+        height += entryCount * ROW_HEIGHT;
         height += 4;
-        height += 6 * ((ROW_HEIGHT - 2) + EDITBOX_HEIGHT + FIELD_GAP);
-        height += 10 + PADDING;
+        int fieldCount;
+        boolean hasAdvancedButton;
+        if (fieldSet == DialogFieldSet.CHARACTER) {
+            fieldCount = 3;
+            hasAdvancedButton = true;
+        } else if (fieldSet == DialogFieldSet.CAMERA_VIEW) {
+            fieldCount = 4;
+            hasAdvancedButton = false;
+        } else {
+            fieldCount = 6;
+            hasAdvancedButton = true;
+        }
+        height += fieldCount * ((ROW_HEIGHT - 2) + EDITBOX_HEIGHT + FIELD_GAP);
+        if (hasAdvancedButton) height += 10 + PADDING;
         return height;
     }
 
@@ -368,22 +451,9 @@ public class CameraAngleDialogPreviewPanel {
         return screenWidth - PANEL_WIDTH - PADDING_RIGHT;
     }
 
-    private CameraViewDialogSetup getSelectedSetup() {
-        if (cameraView == null) return null;
-        List<CameraViewDialogSetup> setups = cameraView.getDialogSetups();
-        if (setups.isEmpty() || selectedIndex >= setups.size()) return null;
-        return setups.get(selectedIndex);
-    }
-
-    private String resolveCharacterName(CameraViewDialogSetup setup) {
-        if (editor.getCameraAngle() == null)
-            return setup.getCharacterPlacementId().toString().substring(0, 8);
-        for (CharacterPlacement placement : editor.getCharacterPlacements()) {
-            if (placement.getId().equals(setup.getCharacterPlacementId())) {
-                return placement.getCharacterStory().getName();
-            }
-        }
-        return setup.getCharacterPlacementId().toString().substring(0, 8);
+    private DialogPreviewEntry getSelectedEntry() {
+        if (entries.isEmpty() || selectedIndex >= entries.size()) return null;
+        return entries.get(selectedIndex);
     }
 
     private boolean isOver(int mouseX, int mouseY, int x, int y, int w, int h) {

@@ -32,7 +32,6 @@ import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogPresetManager;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
@@ -41,6 +40,7 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
@@ -118,19 +118,19 @@ public class CameraAngleInkAction extends InkAction {
     }
 
     private void registerDialogData(StoryHandler storyHandler) {
-        DialogPresetManager presetManager = NarrativeCraftMod.getInstance().getDialogPresetManager();
-        for (CameraViewDialogSetup setup : cameraView.getDialogSetups()) {
-            CharacterPlacement placement = findPlacementById(setup.getCharacterPlacementId());
-            if (placement == null) continue;
-            if (!(placement.getCharacterStory() instanceof CharacterStory character)) continue;
-            DialogData resolved = presetManager.resolve(character.getDialogPresetName(), setup.getDialogData());
+        DialogData global = NarrativeCraftMod.getInstance().getGlobalDialogData();
+        for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
+            if (!(placement.getCharacterStory() instanceof ICharacterStory character)) continue;
+            CameraViewDialogSetup setup = findSetupForPlacement(placement.getId());
+            DialogData cameraData = setup != null ? setup.getDialogData() : null;
+            DialogData resolved = DialogData.resolve(global, character.getDialogData(), cameraData);
             storyHandler.registerDialogDataForCharacter(character, resolved);
         }
     }
 
-    private CharacterPlacement findPlacementById(UUID placementId) {
-        for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
-            if (placement.getId().equals(placementId)) return placement;
+    private CameraViewDialogSetup findSetupForPlacement(UUID placementId) {
+        for (CameraViewDialogSetup setup : cameraView.getDialogSetups()) {
+            if (setup.getCharacterPlacementId().equals(placementId)) return setup;
         }
         return null;
     }

@@ -21,34 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.network.dialog;
 
-import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.util.UUID;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public interface ICharacterStory {
+public record S2CDialogEditorEntitySpawned(int entityId) implements CustomPacketPayload {
 
-    UUID getId();
+    public static final Type<S2CDialogEditorEntitySpawned> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_editor_entity_spawned"));
 
-    String getName();
+    public static final StreamCodec<ByteBuf, S2CDialogEditorEntitySpawned> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, S2CDialogEditorEntitySpawned::entityId, S2CDialogEditorEntitySpawned::new);
 
-    String getDescription();
-
-    DialogData getDialogData();
-
-    void setDialogData(DialogData dialogData);
-
-    Scene getScene();
-
-    File getSkinFile();
-
-    EntityType<?> getEntityType();
-
-    PlayerModelType getModelType();
-
-    CharacterType getCharacterType();
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

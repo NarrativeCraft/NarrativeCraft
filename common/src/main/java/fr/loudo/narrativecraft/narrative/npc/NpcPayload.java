@@ -36,8 +36,6 @@ public class NpcPayload extends NarrativeEntryPayload {
             ByteBufCodecs.STRING_UTF8,
             NpcPayload::getName,
             ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getDialogPresetName,
-            ByteBufCodecs.STRING_UTF8,
             NpcPayload::getModelType,
             ByteBufCodecs.STRING_UTF8,
             NpcPayload::getEntityTypeId,
@@ -45,26 +43,24 @@ public class NpcPayload extends NarrativeEntryPayload {
             NpcPayload::getSceneId,
             UUIDUtil.STREAM_CODEC,
             NpcPayload::getChapterId,
+            ByteBufCodecs.STRING_UTF8,
+            NpcPayload::getDialogDataJson,
             NpcPayload::new);
 
-    private final String dialogPresetName;
     private final String modelType;
     private final String entityTypeId;
     private final UUID sceneId;
     private final UUID chapterId;
+    private final String dialogDataJson;
 
     public NpcPayload(
-            String name, String dialogPresetName, String modelType, String entityTypeId, UUID sceneId, UUID chapterId) {
+            String name, String modelType, String entityTypeId, UUID sceneId, UUID chapterId, String dialogDataJson) {
         super(name, "");
-        this.dialogPresetName = dialogPresetName != null ? dialogPresetName : "";
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
         this.sceneId = sceneId;
         this.chapterId = chapterId;
-    }
-
-    public String getDialogPresetName() {
-        return dialogPresetName;
+        this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
     }
 
     public String getModelType() {
@@ -81,5 +77,9 @@ public class NpcPayload extends NarrativeEntryPayload {
 
     public UUID getChapterId() {
         return chapterId;
+    }
+
+    public String getDialogDataJson() {
+        return dialogDataJson;
     }
 }

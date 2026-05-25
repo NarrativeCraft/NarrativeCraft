@@ -28,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -63,9 +64,8 @@ public class NpcDeserializer extends NarrativeDeserializer<Npc> {
 
         Npc npc = new Npc(id, name, scene);
 
-        String dialogPresetName = jsonObject.get("dialogPresetName").getAsString();
-        if (!dialogPresetName.isEmpty()) {
-            npc.setDialogPresetName(dialogPresetName);
+        if (jsonObject.has("dialogData") && jsonObject.get("dialogData").isJsonObject()) {
+            npc.setDialogData(DialogDataIO.deserialize(jsonObject.getAsJsonObject("dialogData")));
         }
 
         String modelTypeName = jsonObject.get("modelType").getAsString();

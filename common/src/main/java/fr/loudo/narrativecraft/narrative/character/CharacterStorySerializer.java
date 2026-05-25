@@ -27,6 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import java.lang.reflect.Type;
 import net.minecraft.core.registries.BuiltInRegistries;
 
@@ -35,7 +36,7 @@ public class CharacterStorySerializer implements JsonSerializer<CharacterStory> 
     public static void serializeSharedCharacterFields(JsonObject json, CharacterStory src) {
         json.addProperty("id", src.getId().toString());
         json.addProperty("name", src.getName());
-        json.addProperty("dialogPresetName", src.getDialogPresetName() != null ? src.getDialogPresetName() : "");
+        json.add("dialogData", DialogDataIO.serialize(src.getDialogData()));
         json.addProperty(
                 "modelType", src.getModelType() != null ? src.getModelType().name() : "");
         json.addProperty(

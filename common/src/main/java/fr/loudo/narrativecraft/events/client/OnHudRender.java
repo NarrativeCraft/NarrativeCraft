@@ -27,6 +27,8 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
@@ -50,6 +52,10 @@ public class OnHudRender {
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.render(graphics, deltaTracker);
+        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
+            globalDialogEditor.render(graphics, deltaTracker);
+        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
+            characterDialogEditor.render(graphics, deltaTracker);
         }
     }
 

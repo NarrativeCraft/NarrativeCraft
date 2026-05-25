@@ -27,6 +27,8 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.*;
+import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
+import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerNeoForge;
@@ -126,6 +128,10 @@ public class OnPacketRegisterEventNeoForge {
                 ClientPacketHandlerNeoForge::receiveMainScreenData);
         registrar.playToClient(
                 S2COpenMainScreen.TYPE, S2COpenMainScreen.STREAM_CODEC, ClientPacketHandlerNeoForge::openMainScreen);
+        registrar.playToClient(
+                S2CDialogEditorEntitySpawned.TYPE,
+                S2CDialogEditorEntitySpawned.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::onDialogEditorEntitySpawned);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
@@ -179,6 +185,10 @@ public class OnPacketRegisterEventNeoForge {
                 ServerPacketHandlerNeoForge::mainScreenCaptureCharacter);
         registrar.playToServer(
                 C2SMainScreenSave.TYPE, C2SMainScreenSave.STREAM_CODEC, ServerPacketHandlerNeoForge::mainScreenSave);
+        registrar.playToServer(
+                C2SEnterDialogEditor.TYPE,
+                C2SEnterDialogEditor.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::enterDialogEditor);
     }
 
     private static void registerBiPackets(PayloadRegistrar registrar) {

@@ -23,7 +23,10 @@
 
 package fr.loudo.narrativecraft.narrative.npc;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
@@ -92,11 +95,11 @@ public class NpcEditor implements NarrativeEntryEditor<NpcPayload, Npc> {
         }
 
         oldNpc.setName(payload.getName());
-        oldNpc.setDialogPresetName(payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
         if (!payload.getModelType().isEmpty()) {
             oldNpc.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         oldNpc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        oldNpc.setDialogData(newNpc.getDialogData());
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }
@@ -120,11 +123,18 @@ public class NpcEditor implements NarrativeEntryEditor<NpcPayload, Npc> {
 
     private Npc buildFromPayload(UUID entryId, NpcPayload payload, Scene scene) {
         Npc npc = new Npc(entryId, payload.getName(), scene);
-        npc.setDialogPresetName(payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
         if (!payload.getModelType().isEmpty()) {
             npc.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         npc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        String dialogDataJson = payload.getDialogDataJson();
+        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
+            try {
+                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
+                npc.setDialogData(DialogDataIO.deserialize(json));
+            } catch (Exception ignored) {
+            }
+        }
         return npc;
     }
 

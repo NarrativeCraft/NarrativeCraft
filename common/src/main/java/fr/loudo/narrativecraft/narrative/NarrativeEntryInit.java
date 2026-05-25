@@ -69,6 +69,7 @@ public class NarrativeEntryInit {
         interactions();
 
         NarrativeCraftMod.getInstance().setMainScreenData(file.getMainScreenData());
+        NarrativeCraftMod.getInstance().setGlobalDialogData(file.getGlobalDialogData());
 
         try {
             NarrativeCraftMod.getInstance().setCompiledStoryJson(StoryCompilerHandler.compileToJson());

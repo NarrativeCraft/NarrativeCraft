@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
+import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
@@ -80,5 +81,7 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay().register(BiMainScreenEnter.TYPE, BiMainScreenEnter.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CMainScreenData.TYPE, S2CMainScreenData.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2COpenMainScreen.TYPE, S2COpenMainScreen.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay()
+                .register(S2CDialogEditorEntitySpawned.TYPE, S2CDialogEditorEntitySpawned.STREAM_CODEC);
     }
 }

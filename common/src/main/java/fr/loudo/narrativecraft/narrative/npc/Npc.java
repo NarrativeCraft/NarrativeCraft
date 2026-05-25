@@ -23,6 +23,9 @@
 
 package fr.loudo.narrativecraft.narrative.npc;
 
+import com.google.gson.Gson;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
@@ -39,7 +42,7 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
 
     private final Scene scene;
     private final CharacterType characterType = CharacterType.NPC;
-    private String dialogPresetName;
+    private DialogData dialogData = new DialogData();
     private EntityType<?> entityType = EntityType.PLAYER;
     private PlayerModelType modelType;
 
@@ -66,12 +69,12 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
         return new File(npcFolder, NarrativeCraftFileDefault.SKIN_CHARACTER_FILE);
     }
 
-    public String getDialogPresetName() {
-        return dialogPresetName;
+    public DialogData getDialogData() {
+        return dialogData;
     }
 
-    public void setDialogPresetName(String dialogPresetName) {
-        this.dialogPresetName = dialogPresetName;
+    public void setDialogData(DialogData dialogData) {
+        this.dialogData = dialogData;
     }
 
     public EntityType<?> getEntityType() {
@@ -100,14 +103,14 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
         String modelTypeName = modelType != null ? modelType.name() : "";
         String entityTypeIdStr =
                 BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
-        String dialogPresetNameStr = dialogPresetName != null ? dialogPresetName : "";
+        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData));
         return new NpcPayload(
                 name,
-                dialogPresetNameStr,
                 modelTypeName,
                 entityTypeIdStr,
                 scene.getId(),
-                scene.getChapter().getId());
+                scene.getChapter().getId(),
+                dialogDataJson);
     }
 
     @Override

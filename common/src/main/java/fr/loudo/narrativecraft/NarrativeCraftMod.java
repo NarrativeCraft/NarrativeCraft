@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.api.APISetup;
-import fr.loudo.narrativecraft.dialog.DialogPresetManager;
+import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.effects.TextEffectRegister;
 import fr.loudo.narrativecraft.dialog.effects.TextEffectRegistry;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneLayerRegister;
@@ -66,7 +66,7 @@ public class NarrativeCraftMod {
     private final ActionRegistry actionRegistry = new ActionRegistry();
     private final CutsceneLayerRegistry cutsceneLayerRegistry = new CutsceneLayerRegistry();
     private final TextEffectRegistry textEffectRegistry = new TextEffectRegistry();
-    private final DialogPresetManager dialogPresetManager = new DialogPresetManager();
+    private DialogData globalDialogData = new DialogData();
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
     private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
     private final SaveFileManager saveFileManager = new SaveFileManager();
@@ -121,8 +121,12 @@ public class NarrativeCraftMod {
         return textEffectRegistry;
     }
 
-    public DialogPresetManager getDialogPresetManager() {
-        return dialogPresetManager;
+    public DialogData getGlobalDialogData() {
+        return globalDialogData;
+    }
+
+    public void setGlobalDialogData(DialogData globalDialogData) {
+        this.globalDialogData = globalDialogData;
     }
 
     public NarrativeCraftFile getFile() {

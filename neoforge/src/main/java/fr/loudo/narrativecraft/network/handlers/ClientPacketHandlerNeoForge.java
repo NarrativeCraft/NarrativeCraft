@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
+import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
@@ -105,6 +106,10 @@ public class ClientPacketHandlerNeoForge {
         context.enqueueWork(() -> {
             ClientPacketHandler.onPlacementEntitySpawned(packet);
         });
+    }
+
+    public static void onDialogEditorEntitySpawned(S2CDialogEditorEntitySpawned packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.onDialogEditorEntitySpawned(packet));
     }
 
     public static void enterCameraView(S2CEnterCameraView packet, IPayloadContext context) {

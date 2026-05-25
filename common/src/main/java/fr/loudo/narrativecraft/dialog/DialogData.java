@@ -80,6 +80,43 @@ public class DialogData {
         this.textAlignment = source.textAlignment;
     }
 
+    public void copyFrom(DialogData source) {
+        this.offsetX = source.offsetX;
+        this.offsetY = source.offsetY;
+        this.width = source.width;
+        this.paddingX = source.paddingX;
+        this.paddingY = source.paddingY;
+        this.scale = source.scale;
+        this.letterSpacing = source.letterSpacing;
+        this.lineGap = source.lineGap;
+        this.backgroundColor = source.backgroundColor;
+        this.textColor = source.textColor;
+        this.backgroundImage = source.backgroundImage;
+        this.scrollSpeed = source.scrollSpeed;
+        this.letterSound = source.letterSound;
+        this.soundMuted = source.soundMuted;
+        this.tailVisible = source.tailVisible;
+        this.autoSkipEnabled = source.autoSkipEnabled;
+        this.autoSkipSeconds = source.autoSkipSeconds;
+        this.textAlignment = source.textAlignment;
+    }
+
+    public static DialogData resolve(DialogData global, DialogData character, DialogData cameraView) {
+        DialogData result = from(from(global, character), cameraView);
+        if (character != null) {
+            result.backgroundColor = character.backgroundColor;
+            result.textColor = character.textColor;
+            result.backgroundImage = character.backgroundImage;
+            result.letterSound = character.letterSound;
+        }
+        if (cameraView != null) {
+            result.offsetX = cameraView.offsetX;
+            result.offsetY = cameraView.offsetY;
+            result.scale = cameraView.scale;
+        }
+        return result;
+    }
+
     public static DialogData from(DialogData preset, DialogData overrides) {
         DialogData base = preset != null ? new DialogData(preset) : new DialogData();
         if (overrides == null) return base;

@@ -23,7 +23,10 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.CharacterManager;
@@ -90,13 +93,12 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
 
         oldCharacter.setName(payload.getName());
         oldCharacter.setDescription(payload.getDescription());
-        oldCharacter.setDialogPresetName(
-                payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
         if (!payload.getModelType().isEmpty()) {
             oldCharacter.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         oldCharacter.setMainCharacterAttribute(newAttribute);
+        oldCharacter.setDialogData(newCharacter.getDialogData());
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }
@@ -130,12 +132,19 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
 
     private CharacterStory buildFromPayload(UUID entryId, CharacterStoryPayload payload) {
         CharacterStory character = new CharacterStory(entryId, payload.getName(), payload.getDescription());
-        character.setDialogPresetName(payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
         if (!payload.getModelType().isEmpty()) {
             character.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         character.setMainCharacterAttribute(new MainCharacterAttribute(payload.getMainCharacterAttribute()));
+        String dialogDataJson = payload.getDialogDataJson();
+        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
+            try {
+                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
+                character.setDialogData(DialogDataIO.deserialize(json));
+            } catch (Exception ignored) {
+            }
+        }
         return character;
     }
 

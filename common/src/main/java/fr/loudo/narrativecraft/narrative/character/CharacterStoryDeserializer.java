@@ -27,6 +27,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import java.lang.reflect.Type;
 import java.util.UUID;
@@ -38,9 +39,8 @@ import net.minecraft.world.entity.player.PlayerModelType;
 public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterStory> {
 
     public static void applySharedCharacterFields(JsonObject jsonObject, CharacterStory character) {
-        String dialogPresetName = jsonObject.get("dialogPresetName").getAsString();
-        if (!dialogPresetName.isEmpty()) {
-            character.setDialogPresetName(dialogPresetName);
+        if (jsonObject.has("dialogData") && jsonObject.get("dialogData").isJsonObject()) {
+            character.setDialogData(DialogDataIO.deserialize(jsonObject.getAsJsonObject("dialogData")));
         }
 
         String modelTypeName = jsonObject.get("modelType").getAsString();

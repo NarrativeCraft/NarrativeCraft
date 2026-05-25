@@ -21,34 +21,41 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.client.editors.widgets;
 
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.util.UUID;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
+import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 
-public interface ICharacterStory {
+public class DialogPreviewEntry {
 
-    UUID getId();
+    private final String label;
+    private final DialogData data;
+    private final DialogRenderer3D renderer;
+    private String previewText = "";
 
-    String getName();
+    public DialogPreviewEntry(String label, DialogData data, DialogRenderer3D renderer) {
+        this.label = label;
+        this.data = data;
+        this.renderer = renderer;
+    }
 
-    String getDescription();
+    public String getLabel() {
+        return label;
+    }
 
-    DialogData getDialogData();
+    public DialogData getData() {
+        return data;
+    }
 
-    void setDialogData(DialogData dialogData);
+    public DialogRenderer3D getRenderer() {
+        return renderer;
+    }
 
-    Scene getScene();
+    public String getPreviewText() {
+        return previewText;
+    }
 
-    File getSkinFile();
-
-    EntityType<?> getEntityType();
-
-    PlayerModelType getModelType();
-
-    CharacterType getCharacterType();
+    public void setPreviewText(String previewText) {
+        this.previewText = previewText;
+    }
 }

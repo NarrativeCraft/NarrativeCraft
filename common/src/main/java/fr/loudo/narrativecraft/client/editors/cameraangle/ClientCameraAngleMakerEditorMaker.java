@@ -24,16 +24,14 @@
 package fr.loudo.narrativecraft.client.editors.cameraangle;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.widgets.CameraAngleDialogPreviewPanel;
-import fr.loudo.narrativecraft.client.editors.widgets.CameraViewDialogSetupAdvancedPanel;
-import fr.loudo.narrativecraft.client.editors.widgets.FovSliderWidget;
-import fr.loudo.narrativecraft.client.editors.widgets.RollSliderWidget;
+import fr.loudo.narrativecraft.client.editors.widgets.*;
 import fr.loudo.narrativecraft.client.screens.ClearScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleCameraNameScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleCharacterPickerScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleEditorMenuScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleTemplatePickerScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.ModKeys;
@@ -48,7 +46,6 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.*;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -65,6 +62,8 @@ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
@@ -92,9 +91,15 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     private boolean renderingHud = true;
     private boolean editingCameraViewPosition = false;
     private final Map<UUID, Integer> placementEntityIds = new HashMap<>();
-    private final List<DialogRenderer3D> previewDialogRenderers = new ArrayList<>();
-    private final CameraAngleDialogPreviewPanel dialogPreviewPanel = new CameraAngleDialogPreviewPanel(this);
-    private final CameraViewDialogSetupAdvancedPanel advancedPanel = new CameraViewDialogSetupAdvancedPanel();
+    private final Map<DialogData, DialogRenderer3D> previewDialogRenderers = new HashMap<>();
+    private final DialogPreviewPanel dialogPreviewPanel =
+            new DialogPreviewPanel(this::toggleAdvancedPanel, DEFAULT_DIALOG_TEXT);
+    private final DialogSetupAdvancedPanel advancedPanel = new DialogSetupAdvancedPanel();
+
+    {
+        dialogPreviewPanel.setFieldSet(DialogFieldSet.CAMERA_VIEW);
+        advancedPanel.setFieldSet(DialogFieldSet.CAMERA_VIEW);
+    }
 
     private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
     private final List<TemplateReference> templateReferences = new ArrayList<>();
@@ -391,27 +396,31 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         previewMode = PreviewMode.DIALOG;
         rollWidget.setVisible(false);
         fovWidget.setVisible(false);
+        List<DialogPreviewEntry> entries = new ArrayList<>();
         for (CameraViewDialogSetup setup : previewCameraView.getDialogSetups()) {
             Entity entity = getEntityForPlacement(setup.getCharacterPlacementId());
             if (entity == null) continue;
-            DialogRenderer3D renderer = new DialogRenderer3D(setup.getDialogData(), entity);
+            DialogData data = setup.getDialogData();
+            DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
             renderer.onStopped(() -> {
-                previewDialogRenderers.remove(renderer);
+                previewDialogRenderers.remove(data);
                 playerSession.removeDialog3D(renderer);
             });
-            String text = setup.getPreviewText().isEmpty()
-                    ? ClientCameraAngleMakerEditorMaker.DEFAULT_DIALOG_TEXT
-                    : setup.getPreviewText();
+            String text = setup.getPreviewText().isEmpty() ? DEFAULT_DIALOG_TEXT : setup.getPreviewText();
             renderer.start(text);
-            previewDialogRenderers.add(renderer);
+            previewDialogRenderers.put(data, renderer);
             playerSession.addDialog3D(renderer);
+            String label = resolvePlacementLabel(setup.getCharacterPlacementId());
+            DialogPreviewEntry entry = new DialogPreviewEntry(label, data, renderer);
+            entry.setPreviewText(setup.getPreviewText());
+            entries.add(entry);
         }
-        dialogPreviewPanel.setCameraView(previewCameraView);
+        dialogPreviewPanel.setEntries(entries);
     }
 
     public void exitDialogMode() {
         previewMode = PreviewMode.CAMERA;
-        for (DialogRenderer3D renderer : new ArrayList<>(previewDialogRenderers)) {
+        for (DialogRenderer3D renderer : new ArrayList<>(previewDialogRenderers.values())) {
             renderer.stop();
         }
         previewDialogRenderers.clear();
@@ -448,15 +457,8 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         return null;
     }
 
-    public DialogRenderer3D getRendererForSetup(CameraViewDialogSetup setup) {
-        int index =
-                previewCameraView != null ? previewCameraView.getDialogSetups().indexOf(setup) : -1;
-        if (index < 0 || index >= previewDialogRenderers.size()) return null;
-        return previewDialogRenderers.get(index);
-    }
-
-    public void openAdvancedPanel(CameraViewDialogSetup setup) {
-        advancedPanel.setSetup(setup);
+    public void openAdvancedPanel(DialogData data) {
+        advancedPanel.setData(data);
         advancedPanel.setVisible(true);
     }
 
@@ -464,17 +466,26 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         return advancedPanel.isVisible();
     }
 
-    public void toggleAdvancedPanel(CameraViewDialogSetup setup) {
+    public void toggleAdvancedPanel(DialogData data) {
         if (advancedPanel.isVisible()) {
             advancedPanel.setVisible(false);
         } else {
-            advancedPanel.setSetup(setup);
+            advancedPanel.setData(data);
             advancedPanel.setVisible(true);
         }
     }
 
     public void closeAdvancedPanel() {
         advancedPanel.setVisible(false);
+    }
+
+    private String resolvePlacementLabel(UUID placementId) {
+        for (CharacterPlacement placement : characterPlacements) {
+            if (placement.getId().equals(placementId)) {
+                return placement.getCharacterStory().getName();
+            }
+        }
+        return placementId.toString().substring(0, 8);
     }
 
     private void editCameraPosition() {
@@ -681,7 +692,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         return previewMode;
     }
 
-    public List<DialogRenderer3D> getPreviewDialogRenderers() {
+    public Map<DialogData, DialogRenderer3D> getPreviewDialogRenderers() {
         return previewDialogRenderers;
     }
 

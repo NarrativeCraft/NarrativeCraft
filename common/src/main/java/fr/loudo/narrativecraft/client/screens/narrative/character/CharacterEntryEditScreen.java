@@ -23,11 +23,19 @@
 
 package fr.loudo.narrativecraft.client.screens.narrative.character;
 
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
+import fr.loudo.narrativecraft.client.screens.ClearScreen;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.NarrativeEntryAction;
+import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<CharacterStory> {
 
@@ -52,6 +60,28 @@ public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<C
                 .size(GLOBAL_WIDTH, 20)
                 .build();
         addElementToWidgetsList(mainCharacterSettingsButton);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        if (entry != null) {
+            CharacterStory target = entry;
+            Button dialogEditorButton = Button.builder(Component.literal("D"), b -> {
+                        ClientCharacterDialogEditorMaker editor = new ClientCharacterDialogEditorMaker(
+                                target,
+                                () -> Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
+                                        target.getId(), target.toPayload(), NarrativeEntryAction.EDIT)));
+                        editor.init();
+                        ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(editor);
+                        minecraft.setScreen(new ClearScreen());
+                        Services.PACKET.sendToServer(new C2SEnterDialogEditor(
+                                "character", target.getId().toString()));
+                    })
+                    .bounds(sendButton.getX() + sendButton.getWidth() + 5, sendButton.getY(), 20, 20)
+                    .build();
+            addRenderableWidget(dialogEditorButton);
+        }
     }
 
     @Override

@@ -33,6 +33,8 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
@@ -58,6 +60,7 @@ import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
+import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
@@ -161,6 +164,16 @@ public class ClientPacketHandler {
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor == null) return;
         editor.registerPlacementEntityId(packet.placementId(), packet.entityId());
+    }
+
+    public static void onDialogEditorEntitySpawned(S2CDialogEditorEntitySpawned packet) {
+        EditorMaker editor =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editor instanceof ClientGlobalDialogEditorMaker globalEditor) {
+            globalEditor.registerEntityId(packet.entityId());
+        } else if (editor instanceof ClientCharacterDialogEditorMaker characterEditor) {
+            characterEditor.registerEntityId(packet.entityId());
+        }
     }
 
     public static void loadInteractionEditorData(S2CInteractionEditorData packet) {

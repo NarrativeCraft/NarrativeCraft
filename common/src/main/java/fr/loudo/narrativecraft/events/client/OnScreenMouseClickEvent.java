@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.events.client;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
+import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -41,6 +43,10 @@ public class OnScreenMouseClickEvent {
             cameraAngleEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
         } else if (editorMaker instanceof ClientInteractionMakerEditorMaker interactionEditor) {
             interactionEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
+            globalDialogEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
+            characterDialogEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
         }
     }
 
@@ -51,6 +57,10 @@ public class OnScreenMouseClickEvent {
             cutsceneEditor.mouseReleased(mouseButtonEvent);
         } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
             cameraAngleEditor.mouseReleased(mouseButtonEvent);
+        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
+            globalDialogEditor.mouseReleased(mouseButtonEvent);
+        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
+            characterDialogEditor.mouseReleased(mouseButtonEvent);
         }
     }
 }

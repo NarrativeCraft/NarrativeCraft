@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.editors.dialog.DialogEditorMaker;
 import fr.loudo.narrativecraft.editors.interaction.InteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
@@ -41,6 +42,7 @@ import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
+import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
@@ -48,6 +50,7 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.*;
+import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
@@ -59,15 +62,14 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class ServerPacketHandler {
 
@@ -169,6 +171,37 @@ public class ServerPacketHandler {
         if (editor == null) return;
         editor.stop();
         session.setEditor(null);
+    }
+
+    public static void enterDialogEditor(C2SEnterDialogEditor packet, Player player) {
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession session = sessionManager.getByPlayer(player);
+
+        ICharacterStory character = null;
+        if (!packet.targetId().isEmpty()) {
+            UUID targetId = UUID.fromString(packet.targetId());
+            if ("character".equals(packet.editorType())) {
+                character =
+                        NarrativeCraftMod.getInstance().getCharacterManager().getById(targetId);
+            } else if ("npc".equals(packet.editorType())) {
+                character = findNpcById(targetId);
+            }
+        }
+
+        DialogEditorMaker editor = new DialogEditorMaker(session, character);
+        session.setEditor(editor);
+        editor.init();
+    }
+
+    private static Npc findNpcById(UUID id) {
+        for (Chapter chapter :
+                NarrativeCraftMod.getInstance().getChapterManager().getList()) {
+            for (Scene scene : chapter.getSceneManager().getList()) {
+                Npc npc = scene.getNpcManager().getById(id);
+                if (npc != null) return npc;
+            }
+        }
+        return null;
     }
 
     public static void cameraAngleSave(C2SCameraAngleSave packet, Player player) {

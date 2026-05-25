@@ -21,34 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.client.editors.widgets;
 
-import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.util.UUID;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
-
-public interface ICharacterStory {
-
-    UUID getId();
-
-    String getName();
-
-    String getDescription();
-
-    DialogData getDialogData();
-
-    void setDialogData(DialogData dialogData);
-
-    Scene getScene();
-
-    File getSkinFile();
-
-    EntityType<?> getEntityType();
-
-    PlayerModelType getModelType();
-
-    CharacterType getCharacterType();
+public enum DialogFieldSet {
+    ALL,
+    CHARACTER,
+    CAMERA_VIEW
 }

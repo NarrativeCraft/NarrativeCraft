@@ -163,5 +163,13 @@
   "narrativecraft.screen.main.options.text_speed": "Text Speed: %d",
   "narrativecraft.screen.main.options.auto_skip": "Auto-Skip",
   "narrativecraft.screen.main.options.minecraft_options": "Minecraft Options",
-  "narrativecraft.screen.main.options.done": "Done"
+  "narrativecraft.screen.main.options.done": "Done",
+
+  "narrativecraft.screen.dialog_preview.title": "Dialog Preview",
+  "narrativecraft.screen.dialog_preview.field.text": "Text:",
+  "narrativecraft.screen.dialog_preview.field.offset_x": "Offset X:",
+  "narrativecraft.screen.dialog_preview.field.offset_y": "Offset Y:",
+  "narrativecraft.screen.dialog_preview.field.scale": "Scale:",
+  "narrativecraft.screen.dialog_preview.field.bg_color": "Bg Color:",
+  "narrativecraft.screen.dialog_preview.field.text_color": "Text Color:"
 }

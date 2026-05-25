@@ -25,7 +25,11 @@ package fr.loudo.narrativecraft.files;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
@@ -68,6 +72,30 @@ public class NarrativeCraftFile {
                 .create();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(mainScreenDataFile))) {
             gson.toJson(mainScreenData, writer);
+        }
+    }
+
+    public DialogData getGlobalDialogData() {
+        File dataFolder = init.getDataDirectory();
+        File globalDialogFile = new File(dataFolder, NarrativeCraftFileInit.GLOBAL_DIALOG_DATA_NAME);
+        if (globalDialogFile.exists()) {
+            try {
+                String content = Files.readString(globalDialogFile.toPath());
+                JsonObject json = JsonParser.parseString(content).getAsJsonObject();
+                return DialogDataIO.deserialize(json);
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Failed to load global dialog data!", e);
+            }
+        }
+        return new DialogData();
+    }
+
+    public void saveGlobalDialogData(DialogData data) throws IOException {
+        File dataFolder = init.getDataDirectory();
+        File globalDialogFile = new File(dataFolder, NarrativeCraftFileInit.GLOBAL_DIALOG_DATA_NAME);
+        JsonObject json = DialogDataIO.serialize(data);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(globalDialogFile))) {
+            new Gson().toJson(json, writer);
         }
     }
 }

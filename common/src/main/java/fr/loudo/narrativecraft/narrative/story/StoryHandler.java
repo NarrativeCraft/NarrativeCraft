@@ -42,12 +42,11 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
@@ -307,9 +306,11 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
                 }
             }
             DialogData dialogData = characterDialogData.get(speaker.toLowerCase());
-            String dialogDataJson = dialogData != null
-                    ? CameraAngleSerializer.serializeDialogData(dialogData).toString()
-                    : "";
+            if (dialogData == null) {
+                dialogData = NarrativeCraftMod.getInstance().getGlobalDialogData();
+            }
+            String dialogDataJson =
+                    CameraAngleSerializer.serializeDialogData(dialogData).toString();
             Services.PACKET.sendToPlayer(
                     playerSession.getPlayer(),
                     new S2CShowDialogue(speaker.toLowerCase(), dialogueText, entityId, dialogDataJson));

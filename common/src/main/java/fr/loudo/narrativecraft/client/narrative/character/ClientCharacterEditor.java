@@ -23,8 +23,11 @@
 
 package fr.loudo.narrativecraft.client.narrative.character;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryPayload;
@@ -59,13 +62,19 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
 
         oldCharacter.setName(payload.getName());
         oldCharacter.setDescription(payload.getDescription());
-        oldCharacter.setDialogPresetName(
-                payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
         if (!payload.getModelType().isEmpty()) {
             oldCharacter.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         oldCharacter.setMainCharacterAttribute(payload.getMainCharacterAttribute());
+        String dialogDataJson = payload.getDialogDataJson();
+        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
+            try {
+                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
+                oldCharacter.setDialogData(DialogDataIO.deserialize(json));
+            } catch (Exception ignored) {
+            }
+        }
         UtilsClient.reloadListScreen();
     }
 
@@ -78,12 +87,19 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
 
     private CharacterStory buildFromPayload(UUID entryId, CharacterStoryPayload payload) {
         CharacterStory character = new CharacterStory(entryId, payload.getName(), payload.getDescription());
-        character.setDialogPresetName(payload.getDialogPresetName().isEmpty() ? null : payload.getDialogPresetName());
         if (!payload.getModelType().isEmpty()) {
             character.setModelType(PlayerModelType.valueOf(payload.getModelType()));
         }
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         character.setMainCharacterAttribute(payload.getMainCharacterAttribute());
+        String dialogDataJson = payload.getDialogDataJson();
+        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
+            try {
+                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
+                character.setDialogData(DialogDataIO.deserialize(json));
+            } catch (Exception ignored) {
+            }
+        }
         return character;
     }
 
