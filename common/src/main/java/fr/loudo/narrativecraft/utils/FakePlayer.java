@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.utils;
 
 import com.mojang.authlib.GameProfile;
+import fr.loudo.narrativecraft.mixin.accessor.AvatarAccessor;
 import io.netty.channel.ChannelFutureListener;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
@@ -53,6 +54,7 @@ public class FakePlayer extends ServerPlayer {
         super(level.getServer(), level, profile, DEFAULT_CLIENT_INFO);
         this.connection = new FakePlayerNetHandler(level.getServer(), this, profile);
         this.isInvulnerable = isInvulnerable;
+        getEntityData().set(AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
 
         this.invulnerableTime = 0;
     }

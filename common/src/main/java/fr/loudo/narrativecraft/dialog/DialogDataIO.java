@@ -54,6 +54,7 @@ public final class DialogDataIO {
         json.addProperty("autoSkipEnabled", data.isAutoSkipEnabled());
         json.addProperty("autoSkipSeconds", data.getAutoSkipSeconds());
         json.addProperty("textAlignment", data.getTextAlignment().name());
+        json.addProperty("textShadow", data.isTextShadow());
         return json;
     }
 
@@ -91,6 +92,7 @@ public final class DialogDataIO {
             } catch (IllegalArgumentException ignored) {
             }
         }
+        if (json.has("textShadow")) data.setTextShadow(json.get("textShadow").getAsBoolean());
         return data;
     }
 }

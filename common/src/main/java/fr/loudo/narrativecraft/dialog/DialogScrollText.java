@@ -28,6 +28,9 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.dialog.ITextEffect;
 import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
 import fr.loudo.narrativecraft.dialog.effects.WaitTextEffect;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -37,10 +40,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Matrix4f;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DialogScrollText {
 
@@ -276,7 +275,7 @@ public class DialogScrollText {
                     pos[0] + offset.x,
                     pos[1] + offset.y,
                     color,
-                    false,
+                    data.isTextShadow(),
                     matrix,
                     bufferSource,
                     Font.DisplayMode.SEE_THROUGH,

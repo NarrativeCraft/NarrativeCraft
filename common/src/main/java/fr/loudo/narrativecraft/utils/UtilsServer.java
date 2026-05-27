@@ -100,6 +100,23 @@ public class UtilsServer {
         }
     }
 
+    public static void sendCharacterSkin(ServerPlayer player, ICharacterStory characterStory) {
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        try {
+            File skinFile = characterStory.getSkinFile();
+            if (skinFile == null || !skinFile.exists()) return;
+            byte[] skinBytes = Files.toByteArray(skinFile);
+            PlayerSession playerSession = sessionManager.getByPlayer(player);
+            if (playerSession == null) return;
+            // cache system, saves bandwidth
+            if (playerSession.getCharacterIdsSkinLoaded().contains(characterStory.getId())) return;
+            Services.PACKET.sendToPlayer(player, new S2CCharacterSkin(characterStory.getId(), skinBytes));
+            playerSession.getCharacterIdsSkinLoaded().add(characterStory.getId());
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error("Failed to send character skin of {}", characterStory.getName(), e);
+        }
+    }
+
     public static void openMainScreenToPlayer(ServerPlayer player, boolean canContinue, boolean finishedStory) {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);

@@ -39,6 +39,8 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.io.IOException;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -49,9 +51,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-
-import java.io.IOException;
-import java.util.List;
 
 public class ClientGlobalDialogEditorMaker implements EditorMaker {
 

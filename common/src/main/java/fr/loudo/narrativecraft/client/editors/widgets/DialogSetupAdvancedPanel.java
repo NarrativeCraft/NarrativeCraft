@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.editors.widgets;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
@@ -35,8 +36,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
-
-import java.util.function.Consumer;
 
 public class DialogSetupAdvancedPanel {
 
@@ -57,13 +56,13 @@ public class DialogSetupAdvancedPanel {
     private EditBox paddingYBox;
     private EditBox letterSpacingBox;
     private EditBox lineGapBox;
-    private EditBox scrollSpeedBox;
     private EditBox skipSecondsBox;
     private EditBox backgroundImageBox;
     private EditBox letterSoundBox;
 
     private ToggleButton tailVisibleButton;
     private ToggleButton soundMutedButton;
+    private ToggleButton textShadowButton;
     private int alignmentRowY = -1;
     private int closeRowY = -1;
 
@@ -126,12 +125,6 @@ public class DialogSetupAdvancedPanel {
             } catch (NumberFormatException ignored) {
             }
         });
-        scrollSpeedBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getScrollSpeed()), text -> {
-            try {
-                data.setScrollSpeed(Float.parseFloat(text));
-            } catch (NumberFormatException ignored) {
-            }
-        });
         skipSecondsBox = data.isAutoSkipEnabled()
                 ? makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getAutoSkipSeconds()), text -> {
                     try {
@@ -167,11 +160,17 @@ public class DialogSetupAdvancedPanel {
                 });
 
         int editBoxWidth = PANEL_WIDTH - PANEL_PADDING * 2 - LABEL_WIDTH - 2;
-        tailVisibleButton = new ToggleButton(0, 0, editBoxWidth, ROW_HEIGHT, data.isTailVisible(), data::setTailVisible);
+        tailVisibleButton =
+                new ToggleButton(0, 0, editBoxWidth, ROW_HEIGHT, data.isTailVisible(), data::setTailVisible);
         soundMutedButton = new ToggleButton(0, 0, editBoxWidth, ROW_HEIGHT, data.isSoundMuted(), value -> {
             data.setSoundMuted(value);
             DialogRenderer3D dialog = previewPanel.getCurrentDialog();
             if (dialog != null) dialog.getScrollText().setMutedSound(value);
+        });
+        textShadowButton = new ToggleButton(0, 0, editBoxWidth, ROW_HEIGHT, data.isTextShadow(), value -> {
+            data.setTextShadow(value);
+            DialogRenderer3D dialog = previewPanel.getCurrentDialog();
+            if (dialog != null) dialog.getData().setTextShadow(value);
         });
     }
 
@@ -212,18 +211,56 @@ public class DialogSetupAdvancedPanel {
         int y = 14;
 
         if (fieldSet == DialogFieldSet.ALL) {
-            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.width"), contentX, editBoxX, y, widthBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.padding_x"), contentX, editBoxX, y, paddingXBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.padding_y"), contentX, editBoxX, y, paddingYBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.letter_spacing"), contentX, editBoxX, y, letterSpacingBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.line_gap"), contentX, editBoxX, y, lineGapBox, mouseX, mouseY);
-            y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.scroll_speed"), contentX, editBoxX, y, scrollSpeedBox, mouseX, mouseY);
-
-            graphics.text(mc.font, trans("screen.dialog_editor.advanced.tail_visible"), contentX, y + 3, 0xFFCCCCCC);
-            tailVisibleButton.setX(editBoxX);
-            tailVisibleButton.setY(y);
-            tailVisibleButton.extractRenderState(graphics, mouseX, mouseY, 0);
-            y += ROW_HEIGHT + ROW_GAP;
+            y = renderFieldRow(
+                    graphics,
+                    mc,
+                    trans("screen.dialog_editor.advanced.width"),
+                    contentX,
+                    editBoxX,
+                    y,
+                    widthBox,
+                    mouseX,
+                    mouseY);
+            y = renderFieldRow(
+                    graphics,
+                    mc,
+                    trans("screen.dialog_editor.advanced.padding_x"),
+                    contentX,
+                    editBoxX,
+                    y,
+                    paddingXBox,
+                    mouseX,
+                    mouseY);
+            y = renderFieldRow(
+                    graphics,
+                    mc,
+                    trans("screen.dialog_editor.advanced.padding_y"),
+                    contentX,
+                    editBoxX,
+                    y,
+                    paddingYBox,
+                    mouseX,
+                    mouseY);
+            y = renderFieldRow(
+                    graphics,
+                    mc,
+                    trans("screen.dialog_editor.advanced.letter_spacing"),
+                    contentX,
+                    editBoxX,
+                    y,
+                    letterSpacingBox,
+                    mouseX,
+                    mouseY);
+            y = renderFieldRow(
+                    graphics,
+                    mc,
+                    trans("screen.dialog_editor.advanced.line_gap"),
+                    contentX,
+                    editBoxX,
+                    y,
+                    lineGapBox,
+                    mouseX,
+                    mouseY);
 
             graphics.text(mc.font, trans("screen.dialog_editor.advanced.sound_muted"), contentX, y + 3, 0xFFCCCCCC);
             soundMutedButton.setX(editBoxX);
@@ -235,8 +272,40 @@ public class DialogSetupAdvancedPanel {
             y = renderAlignmentRow(graphics, mc, contentX, editBoxX, editBoxWidth, y, data, mouseX, mouseY);
         }
 
-        y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.bg_image"), contentX, editBoxX, y, backgroundImageBox, mouseX, mouseY);
-        y = renderFieldRow(graphics, mc, trans("screen.dialog_editor.advanced.letter_sound"), contentX, editBoxX, y, letterSoundBox, mouseX, mouseY);
+        if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
+            graphics.text(mc.font, trans("screen.dialog_editor.advanced.tail_visible"), contentX, y + 3, 0xFFCCCCCC);
+            tailVisibleButton.setX(editBoxX);
+            tailVisibleButton.setY(y);
+            tailVisibleButton.extractRenderState(graphics, mouseX, mouseY, 0);
+            y += ROW_HEIGHT + ROW_GAP;
+
+            graphics.text(mc.font, trans("screen.dialog_editor.advanced.text_shadow"), contentX, y + 3, 0xFFCCCCCC);
+            textShadowButton.setX(editBoxX);
+            textShadowButton.setY(y);
+            textShadowButton.extractRenderState(graphics, mouseX, mouseY, 0);
+            y += ROW_HEIGHT + ROW_GAP;
+        }
+
+        y = renderFieldRow(
+                graphics,
+                mc,
+                trans("screen.dialog_editor.advanced.bg_image"),
+                contentX,
+                editBoxX,
+                y,
+                backgroundImageBox,
+                mouseX,
+                mouseY);
+        y = renderFieldRow(
+                graphics,
+                mc,
+                trans("screen.dialog_editor.advanced.letter_sound"),
+                contentX,
+                editBoxX,
+                y,
+                letterSoundBox,
+                mouseX,
+                mouseY);
 
         y += ROW_GAP * 2;
         closeRowY = y;
@@ -320,10 +389,8 @@ public class DialogSetupAdvancedPanel {
             if (tryFocus(paddingYBox, mouseX, mouseY, event)) return true;
             if (tryFocus(letterSpacingBox, mouseX, mouseY, event)) return true;
             if (tryFocus(lineGapBox, mouseX, mouseY, event)) return true;
-            if (tryFocus(scrollSpeedBox, mouseX, mouseY, event)) return true;
             if (tryFocus(skipSecondsBox, mouseX, mouseY, event)) return true;
 
-            if (tailVisibleButton != null && tailVisibleButton.mouseClicked(event, false)) return true;
             if (soundMutedButton != null && soundMutedButton.mouseClicked(event, false)) return true;
             if (alignmentRowY >= 0) {
                 DialogData.TextAlignment[] alignments = DialogData.TextAlignment.values();
@@ -336,6 +403,11 @@ public class DialogSetupAdvancedPanel {
                     }
                 }
             }
+        }
+
+        if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
+            if (tailVisibleButton != null && tailVisibleButton.mouseClicked(event, false)) return true;
+            if (textShadowButton != null && textShadowButton.mouseClicked(event, false)) return true;
         }
 
         if (tryFocus(backgroundImageBox, mouseX, mouseY, event)) return true;
@@ -354,7 +426,6 @@ public class DialogSetupAdvancedPanel {
             forwardKeyToFocused(paddingYBox, event);
             forwardKeyToFocused(letterSpacingBox, event);
             forwardKeyToFocused(lineGapBox, event);
-            forwardKeyToFocused(scrollSpeedBox, event);
             forwardKeyToFocused(skipSecondsBox, event);
         }
         forwardKeyToFocused(backgroundImageBox, event);
@@ -368,7 +439,6 @@ public class DialogSetupAdvancedPanel {
             forwardCharToFocused(paddingYBox, event);
             forwardCharToFocused(letterSpacingBox, event);
             forwardCharToFocused(lineGapBox, event);
-            forwardCharToFocused(scrollSpeedBox, event);
             forwardCharToFocused(skipSecondsBox, event);
         }
         forwardCharToFocused(backgroundImageBox, event);
@@ -382,7 +452,6 @@ public class DialogSetupAdvancedPanel {
                     || isFocused(paddingYBox)
                     || isFocused(letterSpacingBox)
                     || isFocused(lineGapBox)
-                    || isFocused(scrollSpeedBox)
                     || isFocused(skipSecondsBox)) {
                 return true;
             }
@@ -397,7 +466,6 @@ public class DialogSetupAdvancedPanel {
             setFocus(paddingYBox, false);
             setFocus(letterSpacingBox, false);
             setFocus(lineGapBox, false);
-            setFocus(scrollSpeedBox, false);
             setFocus(skipSecondsBox, false);
         }
         setFocus(backgroundImageBox, false);
@@ -433,8 +501,10 @@ public class DialogSetupAdvancedPanel {
     private int computePanelHeight(DialogData data) {
         int rowCount;
         if (fieldSet == DialogFieldSet.ALL) {
-            rowCount = 6 + 3 + 1 + 2;
+            rowCount = 6 + 4 + 1 + 2;
             if (data.isAutoSkipEnabled()) rowCount++;
+        } else if (fieldSet == DialogFieldSet.CHARACTER) {
+            rowCount = 2 + 2;
         } else {
             rowCount = 2;
         }

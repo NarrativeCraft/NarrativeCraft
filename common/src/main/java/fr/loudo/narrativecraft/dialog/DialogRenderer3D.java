@@ -107,6 +107,7 @@ public class DialogRenderer3D extends DialogRenderer {
         renderBackground(poseStack, bufferSource, totalWidth, totalHeight, opacity);
         if (!isAnimating()) {
             renderText(poseStack, bufferSource, partialTick);
+            bufferSource.endBatch();
         }
 
         if (data.isTailVisible()) {
@@ -156,22 +157,40 @@ public class DialogRenderer3D extends DialogRenderer {
             float totalWidth,
             float totalHeight,
             float opacity) {
-        int color = applyOpacity(data.getBackgroundColor(), opacity);
-        VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
         Matrix4f matrix = poseStack.last().pose();
 
-        consumer.addVertex(matrix, 0, 0, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, 0, totalHeight, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, totalWidth, totalHeight, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, totalWidth, 0, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
+        if (data.getBackgroundImage() != null) {
+            int color = applyOpacity(0xFFFFFFFF, opacity);
+            VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textSeeThrough(data.getBackgroundImage()));
+            consumer.addVertex(matrix, 0, 0, 0).setColor(color).setUv(0f, 0f).setLight(LightCoordsUtil.FULL_BRIGHT);
+            consumer.addVertex(matrix, 0, totalHeight, 0)
+                    .setColor(color)
+                    .setUv(0f, 1f)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT);
+            consumer.addVertex(matrix, totalWidth, totalHeight, 0)
+                    .setColor(color)
+                    .setUv(1f, 1f)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT);
+            consumer.addVertex(matrix, totalWidth, 0, 0)
+                    .setColor(color)
+                    .setUv(1f, 0f)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT);
+        } else {
+            int color = applyOpacity(data.getBackgroundColor(), opacity);
+            VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
+            consumer.addVertex(matrix, 0, 0, 0)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setColor(color);
+            consumer.addVertex(matrix, 0, totalHeight, 0)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setColor(color);
+            consumer.addVertex(matrix, totalWidth, totalHeight, 0)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setColor(color);
+            consumer.addVertex(matrix, totalWidth, 0, 0)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setColor(color);
+        }
 
         bufferSource.endBatch();
     }

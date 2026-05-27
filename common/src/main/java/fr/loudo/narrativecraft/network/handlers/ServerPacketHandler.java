@@ -62,6 +62,7 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -186,6 +187,9 @@ public class ServerPacketHandler {
             } else if ("npc".equals(packet.editorType())) {
                 character = findNpcById(targetId);
             }
+            UtilsServer.sendCharacterSkin((ServerPlayer) player, character);
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player, new S2CCharacterStoryAction(targetId, S2CCharacterStoryAction.Action.ADD));
         }
 
         DialogEditorMaker editor = new DialogEditorMaker(session, character);

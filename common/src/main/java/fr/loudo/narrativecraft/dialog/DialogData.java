@@ -55,6 +55,7 @@ public class DialogData {
     private boolean tailVisible = true;
     private boolean autoSkipEnabled = false;
     private float autoSkipSeconds = 3f;
+    private boolean textShadow = false;
 
     private TextAlignment textAlignment = TextAlignment.LEFT;
 
@@ -79,6 +80,7 @@ public class DialogData {
         this.autoSkipEnabled = source.autoSkipEnabled;
         this.autoSkipSeconds = source.autoSkipSeconds;
         this.textAlignment = source.textAlignment;
+        this.textShadow = source.textShadow;
     }
 
     public void copyFrom(DialogData source) {
@@ -100,6 +102,7 @@ public class DialogData {
         this.autoSkipEnabled = source.autoSkipEnabled;
         this.autoSkipSeconds = source.autoSkipSeconds;
         this.textAlignment = source.textAlignment;
+        this.textShadow = source.textShadow;
     }
 
     public static DialogData resolve(DialogData global, DialogData character, DialogData cameraView) {
@@ -141,6 +144,7 @@ public class DialogData {
         if (overrides.autoSkipEnabled != defaults.autoSkipEnabled) base.autoSkipEnabled = overrides.autoSkipEnabled;
         if (overrides.autoSkipSeconds != defaults.autoSkipSeconds) base.autoSkipSeconds = overrides.autoSkipSeconds;
         if (overrides.textAlignment != defaults.textAlignment) base.textAlignment = overrides.textAlignment;
+        if (overrides.textShadow != defaults.textShadow) base.textShadow = overrides.textShadow;
         return base;
     }
 
@@ -286,5 +290,13 @@ public class DialogData {
 
     public void setTextAlignment(TextAlignment textAlignment) {
         this.textAlignment = textAlignment;
+    }
+
+    public boolean isTextShadow() {
+        return textShadow;
+    }
+
+    public void setTextShadow(boolean textShadow) {
+        this.textShadow = textShadow;
     }
 }
