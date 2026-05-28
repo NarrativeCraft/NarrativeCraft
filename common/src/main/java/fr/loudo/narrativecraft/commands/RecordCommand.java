@@ -253,6 +253,26 @@ public class RecordCommand {
             return 0;
         }
 
+        Animation existingAnimation = playerSession.getScene().getAnimationManager().getByName(recordName);
+        if (existingAnimation != null) {
+            if (!recordName.equals(recording.getPendingOverwriteName())) {
+                recording.setPendingOverwriteName(recordName);
+                context.getSource()
+                        .sendFailure(Translation.message("record.overwrite_confirm", recordName));
+                return 0;
+            }
+            recording.setPendingOverwriteName(null);
+            context.getSource().sendSuccess(() -> Translation.message("record.saving"), false);
+            if (recording.save(recordName, existingAnimation)) {
+                context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);
+            } else {
+                context.getSource().sendFailure(Translation.message("error.record.save"));
+            }
+            RECORDING_MANAGER.remove(recording);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        recording.setPendingOverwriteName(null);
         context.getSource().sendSuccess(() -> Translation.message("record.saving"), false);
         if (recording.save(recordName)) {
             context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);

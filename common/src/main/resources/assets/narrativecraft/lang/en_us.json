@@ -104,6 +104,7 @@
   "narrativecraft.record.saving": "Saving...",
   "narrativecraft.record.saved": "Recording saved!",
   "narrativecraft.record.discarded": "Recording discarded.",
+  "narrativecraft.record.overwrite_confirm": "Animation '%s' already exists. Run the command again to overwrite it.",
   "narrativecraft.record.already_recording": "You are already recording!",
   "narrativecraft.record.not_recording": "You are not recording.",
   "narrativecraft.record.recorded_nothing": "You recorded nothing!",

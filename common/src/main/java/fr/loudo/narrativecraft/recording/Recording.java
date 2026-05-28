@@ -66,6 +66,7 @@ public class Recording implements IRecording {
     private int nextNearbyEntityLocalId = 1;
     private boolean isRecording = false;
     private int tick = 0;
+    private String pendingOverwriteName = null;
 
     public Recording(PlayerSession playerSession) {
         this.playerSession = playerSession;
@@ -184,9 +185,24 @@ public class Recording implements IRecording {
     }
 
     public boolean save(String name) {
+        return save(name, null);
+    }
+
+    public boolean save(String name, Animation animationToOverwrite) {
         CharacterStory characterStory =
                 NarrativeCraftMod.getInstance().getCharacterManager().getList().get(0);
         Animation animation = new Animation(id, name, playerSession.getScene(), tick, characterStory);
+
+        if (animationToOverwrite != null) {
+            if (NarrativeCraftFileRegistry.getInstance().delete(animationToOverwrite)
+                    == NarrativeCraftFileEditor.OPERATION_FAILED) {
+                return false;
+            }
+            animationToOverwrite.getScene().getAnimationManager().remove(animationToOverwrite);
+            Services.PACKET.sendToPlayer(
+                    getPlayer(),
+                    BiSyncNarrativeEntryPacket.delete(animationToOverwrite.getId(), animationToOverwrite.toPayload()));
+        }
 
         if (NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_FAILED) {
             return false;
@@ -237,5 +253,13 @@ public class Recording implements IRecording {
 
     public List<RecordingEntityData> getRecordingEntityDataList() {
         return recordingEntityDataList;
+    }
+
+    public String getPendingOverwriteName() {
+        return pendingOverwriteName;
+    }
+
+    public void setPendingOverwriteName(String pendingOverwriteName) {
+        this.pendingOverwriteName = pendingOverwriteName;
     }
 }
