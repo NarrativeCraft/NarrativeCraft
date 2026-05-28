@@ -253,12 +253,12 @@ public class RecordCommand {
             return 0;
         }
 
-        Animation existingAnimation = playerSession.getScene().getAnimationManager().getByName(recordName);
+        Animation existingAnimation =
+                playerSession.getScene().getAnimationManager().getByName(recordName);
         if (existingAnimation != null) {
             if (!recordName.equals(recording.getPendingOverwriteName())) {
                 recording.setPendingOverwriteName(recordName);
-                context.getSource()
-                        .sendFailure(Translation.message("record.overwrite_confirm", recordName));
+                context.getSource().sendFailure(Translation.message("record.overwrite_confirm", recordName));
                 return 0;
             }
             recording.setPendingOverwriteName(null);

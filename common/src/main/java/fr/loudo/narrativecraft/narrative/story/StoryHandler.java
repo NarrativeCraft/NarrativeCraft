@@ -42,16 +42,18 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     private static final Pattern SPEAKER_PATTERN = Pattern.compile("^(\\w+)\\s*:\\s*(.+)$", Pattern.DOTALL);
     private static final Pattern KNOT_CHAPTER_PATTERN = Pattern.compile("^chapter_(\\d+)");
+    private static final String TAG_2D = "[2D]";
 
     private final PlayerSession playerSession;
     private final Story story;
@@ -295,15 +297,13 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     private void sendDialogue(String text) {
         String[] parts = parseSpeaker(text);
-        String speaker = parts[0];
+        String speaker = parts[0].isEmpty() ? TAG_2D : parts[0];
         String dialogueText = parts[1];
         if (!text.isEmpty()) {
             int entityId = S2CShowDialogue.NO_ENTITY;
-            if (!speaker.isEmpty()) {
-                Entity entity = characterEntities.get(speaker.toLowerCase());
-                if (entity != null) {
-                    entityId = entity.getId();
-                }
+            Entity entity = characterEntities.get(speaker.toLowerCase());
+            if (entity != null) {
+                entityId = entity.getId();
             }
             DialogData dialogData = characterDialogData.get(speaker.toLowerCase());
             if (dialogData == null) {
@@ -386,7 +386,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         if (matcher.matches()) {
             return new String[] {matcher.group(1), matcher.group(2).trim()};
         }
-        return new String[] {"", text};
+        return new String[] {TAG_2D, text};
     }
 
     public Map<String, Entity> getCharacterEntities() {

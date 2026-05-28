@@ -43,22 +43,22 @@ public class DialogRenderer2D extends DialogRenderer {
         BOTTOM_RIGHT
     }
 
-    private static final float SKIP_INDICATOR_SIZE = 8f;
+    private static final float BOX_WIDTH = 430f;
+    private static final float BOX_HEIGHT = 80f;
+    private static final float SKIP_INDICATOR_SIZE = 6f;
+    private static final float SKIP_SLIDE_OFFSET = -5f;
 
     private final Anchor anchor;
     private final int anchorOffsetX;
     private final int anchorOffsetY;
-
-    private static final float SKIP_SLIDE_OFFSET = -5f;
 
     public DialogRenderer2D(DialogData data, Anchor anchor, int anchorOffsetX, int anchorOffsetY) {
         super(data);
         this.anchor = anchor;
         this.anchorOffsetX = anchorOffsetX;
         this.anchorOffsetY = anchorOffsetY;
-        if (data.getTextAlignment() == DialogData.TextAlignment.LEFT) {
-            data.setTextAlignment(DialogData.TextAlignment.CENTER);
-        }
+        data.setTextAlignment(DialogData.TextAlignment.CENTER);
+        data.setWidth(BOX_WIDTH - 50f);
     }
 
     public DialogRenderer2D(DialogData data) {
@@ -68,6 +68,12 @@ public class DialogRenderer2D extends DialogRenderer {
     @Override
     public void tick() {
         super.tick();
+    }
+
+    @Override
+    public void update(String newText) {
+        super.update(newText);
+        data.setWidth(BOX_WIDTH - 50f);
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
@@ -82,21 +88,15 @@ public class DialogRenderer2D extends DialogRenderer {
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-        // Recompute layout
         layout.compute(data, scrollText, mc.font);
-        checkAndApplyPendingResize();
 
-        boolean resizing = animator.getState() == DialogAnimator.State.RESIZING;
-        float totalWidth = (resizing ? animator.getResizeWidth(partialTick) : layout.getTotalWidth()) * data.getScale();
-        float totalHeight =
-                (resizing ? animator.getResizeHeight(partialTick) : layout.getTotalHeight()) * data.getScale();
+        float totalWidth = BOX_WIDTH * data.getScale();
+        float totalHeight = BOX_HEIGHT * data.getScale();
 
-        // Anchor position
         float[] origin = computeAnchorOrigin(screenWidth, screenHeight, totalWidth, totalHeight);
         float dialogX = origin[0] + anchorOffsetX;
         float dialogY = origin[1] + anchorOffsetY;
 
-        // Apply scale from the dialog centre
         float centerX = dialogX + totalWidth / 2f;
         float centerY = dialogY + totalHeight / 2f;
 
@@ -107,27 +107,20 @@ public class DialogRenderer2D extends DialogRenderer {
         pose.translate(-totalWidth / 2f, -totalHeight / 2f);
 
         renderBackground(graphics, totalWidth, totalHeight, opacity);
-        renderText(graphics, totalWidth, totalHeight, partialTick, opacity);
-
+        renderText(graphics, totalWidth, partialTick);
         renderSkipIndicator(graphics, totalWidth, totalHeight, opacity, partialTick);
 
         pose.popMatrix();
     }
 
     private void renderBackground(GuiGraphicsExtractor graphics, float totalWidth, float totalHeight, float opacity) {
-        int color = applyOpacity(data.getBackgroundColor(), opacity);
+        int color = applyOpacity(data.getBackgroundColor(), 1.0F);
         graphics.fill(0, 0, (int) totalWidth, (int) totalHeight, color);
     }
 
-    private void renderText(
-            GuiGraphicsExtractor graphics, float totalWidth, float totalHeight, float partialTick, float opacity) {
-        float textX =
-                switch (data.getTextAlignment()) {
-                    case LEFT -> data.getPaddingX() * data.getScale();
-                    case CENTER -> totalWidth / 2f;
-                    case RIGHT -> totalWidth - data.getPaddingX() * data.getScale();
-                };
-        float textY = (totalHeight - layout.getHeight()) / 2f;
+    private void renderText(GuiGraphicsExtractor graphics, float totalWidth, float partialTick) {
+        float textX = (totalWidth - layout.getWidth()) / 2f;
+        float textY = (BOX_HEIGHT - layout.getHeight()) / 2f;
         scrollText.render2D(graphics, textX, textY, data, partialTick);
     }
 

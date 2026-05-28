@@ -35,7 +35,7 @@ public class DialogData {
     }
 
     private float offsetX = 0f;
-    private float offsetY = 0.3f;
+    private float offsetY = 0.4f;
 
     private float width = 80f;
     private float paddingX = 4f;
@@ -110,7 +110,9 @@ public class DialogData {
         if (character != null) {
             result.backgroundColor = character.backgroundColor;
             result.textColor = character.textColor;
-            result.backgroundImage = character.backgroundImage;
+            if (character.backgroundImage != null) {
+                result.backgroundImage = character.backgroundImage;
+            }
             result.letterSound = character.letterSound;
         }
         if (cameraView != null) {
