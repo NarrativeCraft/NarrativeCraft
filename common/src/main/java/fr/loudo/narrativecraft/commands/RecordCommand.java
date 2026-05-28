@@ -39,13 +39,12 @@ import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class RecordCommand {
 
@@ -108,8 +107,11 @@ public class RecordCommand {
             if (name.isEmpty()) continue;
             Subscene subscene = playerSession.getScene().getSubsceneManager().getByName(name);
             if (subscene == null) {
-                context.getSource().sendFailure(Translation.message(
-                        "error.not_exists", Translation.message("subscene").getString(), name));
+                context.getSource()
+                        .sendFailure(Translation.message(
+                                "error.not_exists",
+                                Translation.message("subscene").getString(),
+                                name));
                 return 0;
             }
             subscenes.add(subscene);

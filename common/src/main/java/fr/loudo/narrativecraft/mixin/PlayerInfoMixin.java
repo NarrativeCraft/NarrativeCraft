@@ -55,7 +55,8 @@ public abstract class PlayerInfoMixin {
             Identifier skinPath = Identifier.fromNamespaceAndPath(
                     NarrativeCraftMod.MOD_ID,
                     "character/" + characterStory.getId().toString());
-            AbstractTexture resource = Minecraft.getInstance().getTextureManager().getTexture(skinPath);
+            AbstractTexture resource =
+                    Minecraft.getInstance().getTextureManager().getTexture(skinPath);
             // means if the character has not skin loaded because if not the class is "SimpleTexture"
             if (!(resource instanceof DynamicTexture)) continue;
             PlayerSkin playerSkin = PlayerSkin.insecure(
