@@ -27,7 +27,10 @@ import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.PlayerSkin;
@@ -48,10 +51,13 @@ public abstract class PlayerInfoMixin {
         GameProfile profile = getProfile();
         for (ICharacterStory characterStory :
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld()) {
-            if (!profile.id().equals(characterStory.getId())) return;
+            if (!profile.id().equals(characterStory.getId())) continue;
             Identifier skinPath = Identifier.fromNamespaceAndPath(
                     NarrativeCraftMod.MOD_ID,
                     "character/" + characterStory.getId().toString());
+            AbstractTexture resource = Minecraft.getInstance().getTextureManager().getTexture(skinPath);
+            // means if the character has not skin loaded because if not the class is "SimpleTexture"
+            if (!(resource instanceof DynamicTexture)) continue;
             PlayerSkin playerSkin = PlayerSkin.insecure(
                     new ClientAsset.ResourceTexture(skinPath, skinPath), null, null, characterStory.getModelType());
             cir.setReturnValue(playerSkin);
