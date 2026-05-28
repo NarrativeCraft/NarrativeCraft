@@ -173,6 +173,7 @@
   "narrativecraft.screen.dialog_preview.field.offset_y": "Offset Y:",
   "narrativecraft.screen.dialog_preview.field.scale": "Scale:",
   "narrativecraft.screen.dialog_preview.field.bg_color": "Bg Color:",
+  "narrativecraft.screen.dialog_preview.field.opacity": "Opacity:",
   "narrativecraft.screen.dialog_preview.field.text_color": "Text Color:",
 
   "narrativecraft.screen.dialog_editor.advanced.width": "Width:",

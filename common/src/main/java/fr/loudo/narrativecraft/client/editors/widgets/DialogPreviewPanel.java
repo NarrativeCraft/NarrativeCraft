@@ -59,6 +59,7 @@ public class DialogPreviewPanel {
     private EditBox offsetYBox;
     private EditBox scaleBox;
     private EditBox backgroundColorBox;
+    private EditBox opacityBox;
     private EditBox textColorBox;
 
     private int advancedButtonY = 0;
@@ -134,27 +135,46 @@ public class DialogPreviewPanel {
             }
 
             if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
-                backgroundColorBox = makeEditBox(mc, 10, String.format("%08X", data.getBackgroundColor()));
+                backgroundColorBox = makeEditBox(mc, 6, String.format("%06X", data.getBackgroundColor() & 0xFFFFFF));
                 backgroundColorBox.setResponder(text -> {
                     DialogPreviewEntry s = getSelectedEntry();
                     if (s == null) return;
                     try {
-                        s.getData().setBackgroundColor((int) Long.parseLong(text, 16));
+                        int rgb = (int) Long.parseLong(text, 16) & 0xFFFFFF;
+                        int alpha = (s.getData().getBackgroundColor() >> 24) & 0xFF;
+                        s.getData().setBackgroundColor((alpha << 24) | rgb);
                     } catch (NumberFormatException ignored) {
                     }
                 });
 
-                textColorBox = makeEditBox(mc, 10, String.format("%08X", data.getTextColor()));
+                int alpha = (data.getBackgroundColor() >> 24) & 0xFF;
+                opacityBox = makeEditBox(mc, 4, String.format(java.util.Locale.ROOT, "%.2f", alpha / 255f));
+                opacityBox.setResponder(text -> {
+                    DialogPreviewEntry s = getSelectedEntry();
+                    if (s == null) return;
+                    try {
+                        float value = Float.parseFloat(text);
+                        if (value < 0f || value > 1f) return;
+                        int newAlpha = Math.round(value * 255f);
+                        int rgb = s.getData().getBackgroundColor() & 0xFFFFFF;
+                        s.getData().setBackgroundColor((newAlpha << 24) | rgb);
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+
+                textColorBox = makeEditBox(mc, 6, String.format("%06X", data.getTextColor() & 0xFFFFFF));
                 textColorBox.setResponder(text -> {
                     DialogPreviewEntry s = getSelectedEntry();
                     if (s == null) return;
                     try {
-                        s.getData().setTextColor((int) Long.parseLong(text, 16));
+                        int rgb = (int) Long.parseLong(text, 16) & 0xFFFFFF;
+                        s.getData().setTextColor(0xFF000000 | rgb);
                     } catch (NumberFormatException ignored) {
                     }
                 });
             } else {
                 backgroundColorBox = null;
+                opacityBox = null;
                 textColorBox = null;
             }
         } else {
@@ -162,6 +182,7 @@ public class DialogPreviewPanel {
             offsetYBox = null;
             scaleBox = null;
             backgroundColorBox = null;
+            opacityBox = null;
             textColorBox = null;
         }
     }
@@ -261,6 +282,15 @@ public class DialogPreviewPanel {
             y = renderEditBoxRow(
                     graphics,
                     mc,
+                    Translation.message("screen.dialog_preview.field.opacity").getString(),
+                    panelX,
+                    y,
+                    opacityBox,
+                    mouseX,
+                    mouseY);
+            y = renderEditBoxRow(
+                    graphics,
+                    mc,
                     Translation.message("screen.dialog_preview.field.text_color")
                             .getString(),
                     panelX,
@@ -329,6 +359,7 @@ public class DialogPreviewPanel {
         if (tryFocusBox(offsetYBox, mouseX, mouseY, event)) return true;
         if (tryFocusBox(scaleBox, mouseX, mouseY, event)) return true;
         if (tryFocusBox(backgroundColorBox, mouseX, mouseY, event)) return true;
+        if (tryFocusBox(opacityBox, mouseX, mouseY, event)) return true;
         if (tryFocusBox(textColorBox, mouseX, mouseY, event)) return true;
 
         int advBtnWidth = PANEL_WIDTH - PADDING * 2;
@@ -361,6 +392,7 @@ public class DialogPreviewPanel {
         setBoxFocus(offsetYBox, false);
         setBoxFocus(scaleBox, false);
         setBoxFocus(backgroundColorBox, false);
+        setBoxFocus(opacityBox, false);
         setBoxFocus(textColorBox, false);
     }
 
@@ -388,6 +420,7 @@ public class DialogPreviewPanel {
         forwardKeyToFocused(offsetYBox, event);
         forwardKeyToFocused(scaleBox, event);
         forwardKeyToFocused(backgroundColorBox, event);
+        forwardKeyToFocused(opacityBox, event);
         forwardKeyToFocused(textColorBox, event);
     }
 
@@ -401,6 +434,7 @@ public class DialogPreviewPanel {
         forwardCharToFocused(offsetYBox, event);
         forwardCharToFocused(scaleBox, event);
         forwardCharToFocused(backgroundColorBox, event);
+        forwardCharToFocused(opacityBox, event);
         forwardCharToFocused(textColorBox, event);
     }
 
@@ -414,6 +448,7 @@ public class DialogPreviewPanel {
                 || isFocused(offsetYBox)
                 || isFocused(scaleBox)
                 || isFocused(backgroundColorBox)
+                || isFocused(opacityBox)
                 || isFocused(textColorBox);
     }
 
@@ -433,13 +468,13 @@ public class DialogPreviewPanel {
         int fieldCount;
         boolean hasAdvancedButton;
         if (fieldSet == DialogFieldSet.CHARACTER) {
-            fieldCount = 3;
+            fieldCount = 4;
             hasAdvancedButton = true;
         } else if (fieldSet == DialogFieldSet.CAMERA_VIEW) {
             fieldCount = 4;
             hasAdvancedButton = false;
         } else {
-            fieldCount = 6;
+            fieldCount = 7;
             hasAdvancedButton = true;
         }
         height += fieldCount * ((ROW_HEIGHT - 2) + EDITBOX_HEIGHT + FIELD_GAP);

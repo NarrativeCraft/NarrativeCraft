@@ -35,7 +35,7 @@ public class DialogData {
     }
 
     private float offsetX = 0f;
-    private float offsetY = 0.4f;
+    private float offsetY = 0.5f;
 
     private float width = 80f;
     private float paddingX = 4f;
