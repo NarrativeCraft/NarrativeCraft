@@ -26,10 +26,12 @@ package fr.loudo.narrativecraft.client.screens.narrative.cutscene;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import java.util.List;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
+import java.util.List;
 
 public class CutsceneEntryListScreen extends NarrativeEntryListScreen<Cutscene> {
 
@@ -52,7 +54,10 @@ public class CutsceneEntryListScreen extends NarrativeEntryListScreen<Cutscene> 
 
     protected Button addAssignButton(int x, int y, Cutscene item) {
         Button assignButton = Button.builder(Component.literal("⚙"), b -> {
-                    minecraft.setScreen(new CutsceneSubscenesAssignScreen(item, this));
+                    Screen screen = Minecraft.getInstance().hasShiftDown()
+                            ? new CutsceneAnimationsAssignScreen(item, this)
+                            : new CutsceneSubscenesAssignScreen(item, this);
+                    minecraft.setScreen(screen);
                 })
                 .bounds(x, y, 20, 20)
                 .build();

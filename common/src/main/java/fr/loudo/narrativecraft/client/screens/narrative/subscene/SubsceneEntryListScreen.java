@@ -26,10 +26,11 @@ package fr.loudo.narrativecraft.client.screens.narrative.subscene;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
+import java.util.List;
 
 public class SubsceneEntryListScreen extends NarrativeEntryListScreen<Subscene> {
 
