@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.actions.*;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class Recording implements IRecording {
     private final UUID id = UUID.randomUUID();
     private final PlayerSession playerSession;
     private final List<RecordingEntityData> recordingEntityDataList = new ArrayList<>();
+    private final List<Playback> subscenePlaybacks = new ArrayList<>();
     private int nextNearbyEntityLocalId = 1;
     private boolean isRecording = false;
     private int tick = 0;
@@ -156,7 +158,16 @@ public class Recording implements IRecording {
 
     public void stop() {
         isRecording = false;
+        for (Playback playback : subscenePlaybacks) {
+            playback.stopAndKill();
+            NarrativeCraftMod.getInstance().getPlaybackManager().remove(playback);
+        }
+        subscenePlaybacks.clear();
         NarrativeCraftMod.EVENT_BUS.post(new RecordingStopEvent(getPlayer(), this));
+    }
+
+    public void addSubscenePlayback(Playback playback) {
+        subscenePlaybacks.add(playback);
     }
 
     private void seedActions(RecordingEntityData data) {

@@ -27,9 +27,14 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -39,7 +44,9 @@ import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 
-// TODO: play a subscene when recording
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+
 public class RecordCommand {
 
     private static final RecordingManager RECORDING_MANAGER =
@@ -50,7 +57,13 @@ public class RecordCommand {
         dispatcher.register(Commands.literal("nc")
                 .requires(commandSourceStack ->
                         commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
-                .then(Commands.literal("record").then(Commands.literal("start").executes(RecordCommand::startRecord)))
+                .then(Commands.literal("record")
+                        .then(Commands.literal("start")
+                                .executes(RecordCommand::startRecord)
+                                .then(Commands.literal("with")
+                                        .then(Commands.argument("subscene_names", StringArgumentType.greedyString())
+                                                .suggests(RecordCommand::suggestSubscenes)
+                                                .executes(RecordCommand::startRecordWithSubscenes)))))
                 .then(Commands.literal("record").then(Commands.literal("stop").executes(RecordCommand::stopRecord)))
                 .then(Commands.literal("record")
                         .then(Commands.literal("discard").executes(RecordCommand::discardRecord)))
@@ -61,7 +74,6 @@ public class RecordCommand {
     }
 
     private static int startRecord(CommandContext<CommandSourceStack> context) {
-
         ServerPlayer player = context.getSource().getPlayer();
         if (RECORDING_MANAGER.isRecording(player)) {
             context.getSource().sendFailure(Translation.message("record.already_recording"));
@@ -74,13 +86,100 @@ public class RecordCommand {
             return 0;
         }
 
+        return doStartRecord(context, playerSession, List.of());
+    }
+
+    private static int startRecordWithSubscenes(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
+        if (RECORDING_MANAGER.isRecording(player)) {
+            context.getSource().sendFailure(Translation.message("record.already_recording"));
+            return 0;
+        }
+
+        PlayerSession playerSession = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!playerSession.sessionSet()) {
+            context.getSource().sendFailure(Translation.message("session.no_session"));
+            return 0;
+        }
+
+        String subsceneNamesRaw = StringArgumentType.getString(context, "subscene_names");
+        List<Subscene> subscenes = new ArrayList<>();
+        for (String name : subsceneNamesRaw.trim().split("\\s+")) {
+            if (name.isEmpty()) continue;
+            Subscene subscene = playerSession.getScene().getSubsceneManager().getByName(name);
+            if (subscene == null) {
+                context.getSource().sendFailure(Translation.message(
+                        "error.not_exists", Translation.message("subscene").getString(), name));
+                return 0;
+            }
+            subscenes.add(subscene);
+        }
+
+        return doStartRecord(context, playerSession, subscenes);
+    }
+
+    private static int doStartRecord(
+            CommandContext<CommandSourceStack> context, PlayerSession playerSession, List<Subscene> subscenes) {
+        ServerPlayer player = context.getSource().getPlayer();
+
+        List<Animation> animationsToPlay = new ArrayList<>();
+        for (Subscene subscene : subscenes) {
+            for (Animation animation : subscene.getAnimations()) {
+                if (!animation.initialize()) {
+                    context.getSource()
+                            .sendFailure(Translation.message("error.animation.initialize", animation.getName()));
+                    return 0;
+                }
+                animationsToPlay.add(animation);
+            }
+        }
+
         Recording recording = new Recording(playerSession);
         RECORDING_MANAGER.add(recording);
-        recording.start();
 
+        for (Animation animation : animationsToPlay) {
+            Playback playback = new Playback(animation, player);
+            playback.setKillOnEnd(true);
+            NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
+            playback.start();
+            recording.addSubscenePlayback(playback);
+        }
+
+        recording.start();
         context.getSource().sendSuccess(() -> Translation.message("record.start"), false);
 
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static CompletableFuture<Suggestions> suggestSubscenes(
+            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        ServerPlayer player = context.getSource().getPlayer();
+        PlayerSession session = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!session.sessionSet()) return builder.buildFuture();
+
+        String remaining = builder.getRemaining();
+        int lastSpace = remaining.lastIndexOf(' ');
+        String currentWord = lastSpace >= 0 ? remaining.substring(lastSpace + 1) : remaining;
+
+        Set<String> alreadyTyped = new HashSet<>();
+        if (lastSpace > 0) {
+            alreadyTyped.addAll(Arrays.asList(remaining.substring(0, lastSpace).split("\\s+")));
+        }
+
+        SuggestionsBuilder offsetBuilder = builder.createOffset(builder.getStart() + lastSpace + 1);
+
+        for (Subscene subscene : session.getScene().getSubsceneManager().getList()) {
+            String name = subscene.getName();
+            if (!alreadyTyped.contains(name) && name.toLowerCase().startsWith(currentWord.toLowerCase())) {
+                if (name.contains(" ")) {
+                    offsetBuilder.suggest("\"" + name + "\"");
+                } else {
+                    offsetBuilder.suggest(name);
+                }
+            }
+        }
+
+        return offsetBuilder.buildFuture();
     }
 
     private static int stopRecord(CommandContext<CommandSourceStack> context) {
