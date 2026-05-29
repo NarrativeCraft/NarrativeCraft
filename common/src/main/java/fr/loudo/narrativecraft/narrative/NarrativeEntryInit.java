@@ -44,6 +44,7 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -67,6 +68,8 @@ public class NarrativeEntryInit {
         cutscenes();
         cameraAngles();
         interactions();
+
+        NarrativeServerSettings.init(file.getInit().getDataDirectory().toPath());
 
         NarrativeCraftMod.getInstance().setMainScreenData(file.getMainScreenData());
         NarrativeCraftMod.getInstance().setGlobalDialogData(file.getGlobalDialogData());

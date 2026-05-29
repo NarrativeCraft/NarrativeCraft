@@ -72,6 +72,12 @@
   "narrativecraft.screen.animation_character_picker": "Select Character",
 
   "narrativecraft.screen.settings.main_screen_maker_editor": "Main Screen Editor",
+  "narrativecraft.screen.settings.world_settings": "World Settings",
+
+  "narrativecraft.screen.world_settings.title": "World Settings",
+  "narrativecraft.screen.world_settings.show_main_screen_on_join": "Show Main Screen on Join: %s",
+  "narrativecraft.screen.world_settings.tooltip.main_screen": "Only available in singleplayer",
+  "narrativecraft.screen.world_settings.done": "Done",
 
   "narrativecraft.screen.main_screen.disabled_template": "Disabled on Main Screen Editor",
 
@@ -159,6 +165,7 @@
   "narrativecraft.screen.main.select_scene": "Select Scene",
   "narrativecraft.screen.main.options": "Options",
   "narrativecraft.screen.main.quit": "Quit",
+  "narrativecraft.screen.main.leave_screen": "Leave Screen",
   "narrativecraft.screen.main.select_chapter.title": "Select Chapter",
   "narrativecraft.screen.main.select_scene.title": "Select Scene",
   "narrativecraft.screen.main.options.title": "Options",

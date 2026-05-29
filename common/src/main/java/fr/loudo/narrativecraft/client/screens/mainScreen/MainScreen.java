@@ -36,12 +36,14 @@ import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
+import org.lwjgl.glfw.GLFW;
 
 public class MainScreen extends Screen {
 
@@ -50,6 +52,7 @@ public class MainScreen extends Screen {
     private static final int BUTTON_GAP = 4;
     private static final int MARGIN_LEFT = 50;
     private static final int LOGO_GAP = 20;
+    private static final int SECRET_CTRL_PRESSES = 10;
 
     private static final Identifier LOGO_SPRITE = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "logo");
     private static final Identifier LOGO_FILE =
@@ -61,6 +64,9 @@ public class MainScreen extends Screen {
 
     private final boolean canContinue;
     private final boolean finishedStory;
+
+    private int ctrlPressCount = 0;
+    private Button leaveScreenButton;
 
     private boolean hasLogo;
     private int logoNativeWidth;
@@ -136,6 +142,14 @@ public class MainScreen extends Screen {
                 .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
 
+        leaveScreenButton = Button.builder(Translation.message("screen.main.leave_screen"), button -> {
+                    Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
+                })
+                .bounds(width - BUTTON_WIDTH - 10, 10, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build();
+        leaveScreenButton.visible = ctrlPressCount >= SECRET_CTRL_PRESSES;
+        addRenderableWidget(leaveScreenButton);
+
         if (!minecraft.getSoundManager().isActive(MAIN_MUSIC_INSTANCE)) {
             minecraft.getSoundManager().play(MAIN_MUSIC_INSTANCE);
         }
@@ -182,6 +196,17 @@ public class MainScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (event.key() == GLFW.GLFW_KEY_LEFT_CONTROL) {
+            ctrlPressCount++;
+            if (ctrlPressCount >= SECRET_CTRL_PRESSES && leaveScreenButton != null) {
+                leaveScreenButton.visible = true;
+            }
+        }
+        return super.keyPressed(event);
     }
 
     @Override

@@ -70,5 +70,12 @@ public class NarrativeSettingsScreen extends Screen {
                 .bounds(width / 2 - BUTTON_WIDTH / 2, 10, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
         addRenderableWidget(mainScreenMakerEditor);
+
+        Button worldSettings = Button.builder(
+                        Translation.message("screen.settings.world_settings"),
+                        button -> minecraft.setScreen(new NarrativeWorldSettingsScreen(this)))
+                .bounds(width / 2 - BUTTON_WIDTH / 2, 10 + BUTTON_HEIGHT + 5, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build();
+        addRenderableWidget(worldSettings);
     }
 }
