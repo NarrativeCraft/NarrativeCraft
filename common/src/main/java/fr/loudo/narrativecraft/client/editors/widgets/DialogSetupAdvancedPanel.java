@@ -39,6 +39,9 @@ import net.minecraft.util.ARGB;
 
 public class DialogSetupAdvancedPanel {
 
+    private static final String DEFAULT_LETTER_SOUND_ID = "narrativecraft:sfx.dialog_sound";
+    private static final String DEFAULT_LETTER_SOUND_DISPLAY = "default";
+
     private static final int PANEL_X = 5;
     private static final int PANEL_WIDTH = 172;
     private static final int PANEL_PADDING = 4;
@@ -147,17 +150,25 @@ public class DialogSetupAdvancedPanel {
                     } catch (Exception ignored) {
                     }
                 });
-        letterSoundBox = makeBox(
-                mc, 256, data.getLetterSound() != null ? data.getLetterSound().toString() : "", text -> {
-                    if (text.isEmpty()) {
-                        data.setLetterSound(null);
-                        return;
-                    }
-                    try {
-                        data.setLetterSound(Identifier.parse(text));
-                    } catch (Exception ignored) {
-                    }
-                });
+        String letterSoundInitial = data.getLetterSound() != null
+                ? (DEFAULT_LETTER_SOUND_ID.equals(data.getLetterSound().toString())
+                        ? DEFAULT_LETTER_SOUND_DISPLAY
+                        : data.getLetterSound().toString())
+                : "";
+        letterSoundBox = makeBox(mc, 256, letterSoundInitial, text -> {
+            if (text.isEmpty()) {
+                data.setLetterSound(null);
+                return;
+            }
+            if (DEFAULT_LETTER_SOUND_DISPLAY.equals(text)) {
+                data.setLetterSound(Identifier.parse(DEFAULT_LETTER_SOUND_ID));
+                return;
+            }
+            try {
+                data.setLetterSound(Identifier.parse(text));
+            } catch (Exception ignored) {
+            }
+        });
 
         int editBoxWidth = PANEL_WIDTH - PANEL_PADDING * 2 - LABEL_WIDTH - 2;
         tailVisibleButton =
@@ -178,7 +189,11 @@ public class DialogSetupAdvancedPanel {
         if (letterSoundBox != null && letterSoundBox.isFocused()) {
             DialogRenderer3D dialog = previewPanel.getCurrentDialog();
             if (dialog == null) return;
-            dialog.getScrollText().setSound(Identifier.parse(letterSoundBox.getValue()));
+            String value = letterSoundBox.getValue();
+            Identifier soundId = DEFAULT_LETTER_SOUND_DISPLAY.equals(value)
+                    ? Identifier.parse(DEFAULT_LETTER_SOUND_ID)
+                    : Identifier.parse(value);
+            dialog.getScrollText().setSound(soundId);
         }
     }
 
