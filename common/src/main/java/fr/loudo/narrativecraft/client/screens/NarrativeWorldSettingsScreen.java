@@ -26,13 +26,12 @@ package fr.loudo.narrativecraft.client.screens;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.io.IOException;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import java.io.IOException;
 
 public class NarrativeWorldSettingsScreen extends Screen {
 

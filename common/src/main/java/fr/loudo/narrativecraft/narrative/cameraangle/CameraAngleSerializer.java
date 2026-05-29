@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import com.google.gson.*;
 import com.mojang.serialization.DataResult;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import java.lang.reflect.Type;
@@ -118,7 +119,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
     }
 
     public static JsonObject serializeDialogData(DialogData data) {
-        return DialogDataIO.serialize(data);
+        return DialogDataIO.serialize(data, DialogFieldSet.CAMERA_VIEW);
     }
 
     static JsonObject serializeCharacterPlacement(CharacterPlacement placement) {

@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.npc;
 
 import com.google.gson.Gson;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
@@ -103,7 +104,7 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
         String modelTypeName = modelType != null ? modelType.name() : "";
         String entityTypeIdStr =
                 BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
-        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData));
+        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData, DialogFieldSet.CHARACTER));
         return new NpcPayload(
                 name,
                 modelTypeName,

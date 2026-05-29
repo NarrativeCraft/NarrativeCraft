@@ -27,6 +27,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import java.lang.reflect.Type;
@@ -40,7 +41,8 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
 
     public static void applySharedCharacterFields(JsonObject jsonObject, CharacterStory character) {
         if (jsonObject.has("dialogData") && jsonObject.get("dialogData").isJsonObject()) {
-            character.setDialogData(DialogDataIO.deserialize(jsonObject.getAsJsonObject("dialogData")));
+            character.setDialogData(
+                    DialogDataIO.deserialize(jsonObject.getAsJsonObject("dialogData"), DialogFieldSet.CHARACTER));
         }
 
         String modelTypeName = jsonObject.get("modelType").getAsString();

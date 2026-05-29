@@ -29,6 +29,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.managers.ChapterManager;
@@ -63,7 +64,8 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
         if (obj.has("characterDialogData")) {
             JsonObject dialogDataObj = obj.getAsJsonObject("characterDialogData");
             for (String key : dialogDataObj.keySet()) {
-                characterDialogData.put(key, DialogDataIO.deserialize(dialogDataObj.getAsJsonObject(key)));
+                characterDialogData.put(
+                        key, DialogDataIO.deserialize(dialogDataObj.getAsJsonObject(key), DialogFieldSet.CHARACTER));
             }
         }
 

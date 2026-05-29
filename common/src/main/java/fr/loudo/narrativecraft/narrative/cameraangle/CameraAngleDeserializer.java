@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import com.google.gson.*;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
@@ -138,7 +139,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
     }
 
     public static DialogData deserializeDialogData(JsonObject json) {
-        return DialogDataIO.deserialize(json);
+        return DialogDataIO.deserialize(json, DialogFieldSet.CAMERA_VIEW);
     }
 
     public static CharacterPlacement deserializeCharacterPlacementFromJson(String json, Scene scene) {

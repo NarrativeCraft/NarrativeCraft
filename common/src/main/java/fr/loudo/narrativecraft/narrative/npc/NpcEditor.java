@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.npc;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
@@ -131,7 +132,7 @@ public class NpcEditor implements NarrativeEntryEditor<NpcPayload, Npc> {
         if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
             try {
                 JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-                npc.setDialogData(DialogDataIO.deserialize(json));
+                npc.setDialogData(DialogDataIO.deserialize(json, DialogFieldSet.CHARACTER));
             } catch (Exception ignored) {
             }
         }

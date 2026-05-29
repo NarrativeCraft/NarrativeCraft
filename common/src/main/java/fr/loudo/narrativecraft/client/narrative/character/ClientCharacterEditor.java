@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.narrative.character;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.managers.CharacterManager;
@@ -71,7 +72,7 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
         if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
             try {
                 JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-                oldCharacter.setDialogData(DialogDataIO.deserialize(json));
+                oldCharacter.setDialogData(DialogDataIO.deserialize(json, DialogFieldSet.CHARACTER));
             } catch (Exception ignored) {
             }
         }
@@ -96,7 +97,7 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
         if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
             try {
                 JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-                character.setDialogData(DialogDataIO.deserialize(json));
+                character.setDialogData(DialogDataIO.deserialize(json, DialogFieldSet.CHARACTER));
             } catch (Exception ignored) {
             }
         }

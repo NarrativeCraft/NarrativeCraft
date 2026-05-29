@@ -27,6 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import java.lang.reflect.Type;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -38,7 +39,7 @@ public class NpcSerializer implements JsonSerializer<Npc> {
         JsonObject json = new JsonObject();
         json.addProperty("id", src.getId().toString());
         json.addProperty("name", src.getName());
-        json.add("dialogData", DialogDataIO.serialize(src.getDialogData()));
+        json.add("dialogData", DialogDataIO.serialize(src.getDialogData(), DialogFieldSet.CHARACTER));
         json.addProperty(
                 "modelType", src.getModelType() != null ? src.getModelType().name() : "");
         json.addProperty(

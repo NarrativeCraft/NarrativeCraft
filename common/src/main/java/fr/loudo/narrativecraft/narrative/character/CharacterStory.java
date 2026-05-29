@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.character;
 
 import com.google.gson.Gson;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
@@ -109,7 +110,7 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
     public CharacterStoryPayload toPayload() {
         String modelTypeName = modelType != null ? modelType.name() : "";
         String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
-        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData));
+        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData, DialogFieldSet.CHARACTER));
         return new CharacterStoryPayload(
                 name, description, modelTypeName, entityTypeId, mainCharacterAttribute, dialogDataJson);
     }
