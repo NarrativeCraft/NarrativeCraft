@@ -143,8 +143,6 @@ public class Playback implements IPlaybackSession {
     }
 
     public void stopAndKill() {
-        if (!isPlaying) return;
-
         killOnEnd = true;
         stop();
     }
