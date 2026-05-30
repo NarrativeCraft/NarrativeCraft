@@ -59,7 +59,7 @@ public class GameplayInkAction extends InkAction {
         if (storyHandler == null) return InkActionResult.ignored();
 
         EditorMaker editorMaker = currentSession.getEditor();
-        if (!(editorMaker instanceof InteractionMakerEditorMaker)) {
+        if (!(editorMaker instanceof InteractionMakerEditorMaker) && editorMaker != null) {
             editorMaker.stop();
         }
         currentSession.setGameplayMode(true);

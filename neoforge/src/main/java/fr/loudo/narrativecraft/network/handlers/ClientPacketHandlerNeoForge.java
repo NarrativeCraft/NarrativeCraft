@@ -41,6 +41,7 @@ import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
 import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -188,5 +189,9 @@ public class ClientPacketHandlerNeoForge {
 
     public static void openMainScreen(S2COpenMainScreen packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.openMainScreen(packet));
+    }
+
+    public static void notifyClientPlayStory(S2CNotifyClientPlayStory packet, IPayloadContext context) {
+        context.enqueueWork(ClientPacketHandler::notifyClientPlayStory);
     }
 }

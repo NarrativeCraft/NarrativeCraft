@@ -35,13 +35,16 @@ import fr.loudo.narrativecraft.keys.PressKeyListener;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.platform.Services;
+import net.minecraft.client.Minecraft;
+
 import java.util.ArrayList;
 import java.util.Iterator;
-import net.minecraft.client.Minecraft;
 
 public class OnClientTickEvent {
 
     public static void tick(Minecraft minecraft) {
+        if (Minecraft.getInstance().isPaused()) return;
+
         PressKeyListener.onKeyPressed(minecraft);
 
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();

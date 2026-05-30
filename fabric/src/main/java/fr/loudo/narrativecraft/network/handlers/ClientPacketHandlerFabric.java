@@ -41,6 +41,7 @@ import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
 import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
@@ -139,6 +140,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2COpenMainScreen.TYPE, (packet, context) -> {
             ClientPacketHandler.openMainScreen(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CNotifyClientPlayStory.TYPE, (packet, context) -> {
+            ClientPacketHandler.notifyClientPlayStory();
         });
     }
 }

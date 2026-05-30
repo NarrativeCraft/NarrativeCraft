@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
 import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
@@ -83,5 +84,7 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay().register(S2COpenMainScreen.TYPE, S2COpenMainScreen.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CDialogEditorEntitySpawned.TYPE, S2CDialogEditorEntitySpawned.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay()
+                .register(S2CNotifyClientPlayStory.TYPE, S2CNotifyClientPlayStory.STREAM_CODEC);
     }
 }

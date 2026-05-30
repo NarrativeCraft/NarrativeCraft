@@ -132,6 +132,8 @@ public class OnPacketRegisterEventNeoForge {
                 S2CDialogEditorEntitySpawned.TYPE,
                 S2CDialogEditorEntitySpawned.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::onDialogEditorEntitySpawned);
+        registrar.playToClient(
+                S2CNotifyClientPlayStory.TYPE, S2CNotifyClientPlayStory.STREAM_CODEC, ClientPacketHandlerNeoForge::notifyClientPlayStory);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
@@ -195,7 +197,8 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playBidirectional(
                 BiSyncNarrativeEntryPacket.TYPE,
                 BiSyncNarrativeEntryPacket.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::syncNarrativeEntry);
+                ServerPacketHandlerNeoForge::syncNarrativeEntry,
+                ClientPacketHandlerNeoForge::syncNarrativeEntry);
         registrar.playBidirectional(
                 BiCutscenePlayHeadPacket.TYPE,
                 BiCutscenePlayHeadPacket.STREAM_CODEC,

@@ -46,6 +46,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
     private final List<InkAction> activeClientInkActions = new ArrayList<>();
     private final Set<UUID> clickedInteractionPointIds = new HashSet<>();
+    private boolean inStory;
     private CameraView cameraView;
     private DialogRenderer mainDialog;
     private boolean stopNextDialog;
@@ -146,6 +147,14 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public void setStopNextDialog(boolean stopNextDialog) {
         this.stopNextDialog = stopNextDialog;
+    }
+
+    public boolean isInStory() {
+        return inStory;
+    }
+
+    public void setInStory(boolean inStory) {
+        this.inStory = inStory;
     }
 
     public List<UUID> getLoadedCharactersSkin() {

@@ -26,7 +26,9 @@ package fr.loudo.narrativecraft.mixin;
 import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -40,6 +42,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Mixin(PlayerInfo.class)
 public abstract class PlayerInfoMixin {
 
@@ -49,19 +55,68 @@ public abstract class PlayerInfoMixin {
     @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
     private void narrativecraft$getCharacterSkin(CallbackInfoReturnable<PlayerSkin> cir) {
         GameProfile profile = getProfile();
-        for (ICharacterStory characterStory :
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld()) {
+
+        List<ICharacterStory> charactersInWorld = ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
+        for (ICharacterStory characterStory : charactersInWorld) {
             if (!profile.id().equals(characterStory.getId())) continue;
-            Identifier skinPath = Identifier.fromNamespaceAndPath(
-                    NarrativeCraftMod.MOD_ID,
-                    "character/" + characterStory.getId().toString());
-            AbstractTexture resource =
-                    Minecraft.getInstance().getTextureManager().getTexture(skinPath);
-            // means if the character has not skin loaded because if not the class is "SimpleTexture"
-            if (!(resource instanceof DynamicTexture)) continue;
-            PlayerSkin playerSkin = PlayerSkin.insecure(
-                    new ClientAsset.ResourceTexture(skinPath, skinPath), null, null, characterStory.getModelType());
-            cir.setReturnValue(playerSkin);
+
+            if (isMainCharacterWithPlayerSkin(characterStory)) {
+                cir.setReturnValue(Minecraft.getInstance().player.getSkin());
+                continue;
+            }
+
+            buildCharacterSkin(characterStory).ifPresent(cir::setReturnValue);
         }
+
+        if (profile.id().equals(Minecraft.getInstance().player.getUUID())) {
+            resolveLocalPlayerSkin().ifPresent(cir::setReturnValue);
+        }
+    }
+
+    private boolean isMainCharacterWithPlayerSkin(ICharacterStory characterStory) {
+        if (!(characterStory instanceof CharacterStory concreteCharacter)) return false;
+
+        MainCharacterAttribute attr = concreteCharacter.getMainCharacterAttribute();
+        return attr.isMainCharacter()
+                && attr.getSkin() == MainCharacterAttribute.SkinMode.SKIN_OF_PLAYER;
+    }
+
+    private Optional<PlayerSkin> buildCharacterSkin(ICharacterStory characterStory) {
+        Identifier skinPath = getSkinIdentifier(characterStory.getId());
+
+        if (!isDynamicTextureLoaded(skinPath)) return Optional.empty();
+
+        return Optional.of(PlayerSkin.insecure(
+                new ClientAsset.ResourceTexture(skinPath, skinPath),
+                null, null,
+                characterStory.getModelType()
+        ));
+    }
+
+    private Optional<PlayerSkin> resolveLocalPlayerSkin() {
+        CharacterStory mainCharacter = ClientNarrativeCraftMod.getInstance()
+                .getCharacterManager()
+                .getMainCharacter();
+
+        if (mainCharacter == null || !ClientNarrativeCraftMod.getInstance().getPlayerSession().isInStory()) return Optional.empty();
+
+        MainCharacterAttribute attr = mainCharacter.getMainCharacterAttribute();
+        if (attr.getSkin() != MainCharacterAttribute.SkinMode.CLIENT_HAS_CHARACTER_SKIN) return Optional.empty();
+
+        return buildCharacterSkin(mainCharacter);
+    }
+
+    private Identifier getSkinIdentifier(UUID characterId) {
+        return Identifier.fromNamespaceAndPath(
+                NarrativeCraftMod.MOD_ID,
+                "character/" + characterId
+        );
+    }
+
+    private boolean isDynamicTextureLoaded(Identifier skinPath) {
+        AbstractTexture texture = Minecraft.getInstance()
+                .getTextureManager()
+                .getTexture(skinPath);
+        return texture instanceof DynamicTexture;
     }
 }
