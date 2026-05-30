@@ -25,14 +25,17 @@ package fr.loudo.narrativecraft.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -40,6 +43,8 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
+
+import java.util.List;
 
 public class StoryCommand {
 
@@ -55,13 +60,23 @@ public class StoryCommand {
                                         commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayerOrException();
-                                    return playFor(ctx, player);
+                                    return playFor(ctx, player, null);
                                 })
                                 .then(Commands.argument("target", EntityArgument.player())
                                         .executes(ctx -> {
                                             ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
-                                            return playFor(ctx, target);
-                                        })))
+                                            return playFor(ctx, target, null);
+                                        })
+                                        .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
+                                                .suggests(CommandSuggestions::suggestChapters)
+                                                .then(Commands.argument("scene_name", StringArgumentType.string())
+                                                        .suggests(CommandSuggestions::suggestSceneByChapter)
+                                                        .executes(ctx -> {
+                                                            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+                                                            return playFor(ctx, target,
+                                                                    IntegerArgumentType.getInteger(ctx, "chapter_index"),
+                                                                    StringArgumentType.getString(ctx, "scene_name"));
+                                                        })))))
                         .then(Commands.literal("stop")
                                 .requires(commandSourceStack ->
                                         commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
@@ -111,7 +126,7 @@ public class StoryCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int playFor(CommandContext<CommandSourceStack> context, ServerPlayer target) {
+    private static int playFor(CommandContext<CommandSourceStack> context, ServerPlayer target, String knotPath) {
         String compiledJson = NarrativeCraftMod.getInstance().getCompiledStoryJson();
         if (compiledJson == null) {
             context.getSource()
@@ -130,7 +145,11 @@ public class StoryCommand {
         try {
             StoryHandler storyHandler = new StoryHandler(session);
             session.setStoryHandler(storyHandler);
-            storyHandler.start();
+            if (knotPath != null) {
+                storyHandler.start(knotPath);
+            } else {
+                storyHandler.start();
+            }
         } catch (Exception e) {
             NarrativeCraftMod.LOGGER.error(
                     "Failed to start story for player {}", target.getName().getString(), e);
@@ -144,6 +163,25 @@ public class StoryCommand {
                                 .withStyle(ChatFormatting.GREEN),
                         false);
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static int playFor(
+            CommandContext<CommandSourceStack> context, ServerPlayer target, int chapterIndex, String sceneName) {
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
+        if (chapter == null) {
+            context.getSource()
+                    .sendFailure(Translation.message("error.not_exists", Translation.message("chapter").getString(), chapterIndex));
+            return 0;
+        }
+
+        Scene scene = chapter.getSceneManager().getByName(sceneName);
+        if (scene == null) {
+            context.getSource()
+                    .sendFailure(Translation.message("error.not_exists", Translation.message("scene").getString(), sceneName));
+            return 0;
+        }
+
+        return playFor(context, target, scene.knotName());
     }
 
     private static int stopFor(CommandContext<CommandSourceStack> context, ServerPlayer target) {
