@@ -20,6 +20,8 @@
     "GuiTextRenderStateMixin",
     "MinecraftMixin",
     "PlayerInfoMixin",
+    "SoundEngineMixin",
+    "SoundManagerMixin",
     "accessor.GuiGraphicsExtractorAccessor"
   ],
   "server": [],

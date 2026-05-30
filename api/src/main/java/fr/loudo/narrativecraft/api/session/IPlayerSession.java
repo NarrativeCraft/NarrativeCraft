@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.api.session;
 
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 
 public interface IPlayerSession {
@@ -32,4 +34,8 @@ public interface IPlayerSession {
     boolean isGameplayMode();
 
     void setGameplayMode(boolean gameplayMode);
+
+    boolean isClientSide();
+
+    List<InkAction> getActiveClientInkActions();
 }

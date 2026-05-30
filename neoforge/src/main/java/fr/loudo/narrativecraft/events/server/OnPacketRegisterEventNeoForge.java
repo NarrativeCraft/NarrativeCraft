@@ -133,7 +133,9 @@ public class OnPacketRegisterEventNeoForge {
                 S2CDialogEditorEntitySpawned.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::onDialogEditorEntitySpawned);
         registrar.playToClient(
-                S2CNotifyClientPlayStory.TYPE, S2CNotifyClientPlayStory.STREAM_CODEC, ClientPacketHandlerNeoForge::notifyClientPlayStory);
+                S2CNotifyClientPlayStory.TYPE,
+                S2CNotifyClientPlayStory.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::notifyClientPlayStory);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {

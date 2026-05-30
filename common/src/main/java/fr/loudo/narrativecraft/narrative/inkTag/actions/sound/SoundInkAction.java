@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.utils.VolumeAudio;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
@@ -46,19 +47,19 @@ import net.minecraft.util.Mth;
 public class SoundInkAction extends InkAction {
 
     private SoundManager soundManager;
-    private SoundInstance soundInstance;
+    private SoundInkInstance soundInstance;
     private String soundAction;
     private String identifier;
     private String soundName;
     private float volume;
+    private float currentVolume;
     private float pitch;
     private boolean looping;
-    private double fadeTime;
 
     public enum SoundType {
         SFX,
         SONG,
-        SOUND
+        STOP
     }
 
     private SoundType soundType;
@@ -69,7 +70,7 @@ public class SoundInkAction extends InkAction {
             isRunning = false;
             return;
         }
-        if (!soundManager.isActive(soundInstance)) {
+        if (!soundManager.isActive(soundInstance) && soundAction.equals("play")) {
             isRunning = false;
             return;
         }
@@ -83,12 +84,17 @@ public class SoundInkAction extends InkAction {
 
     @Override
     public void partialTick(float partialTick) {
-        // TODO: fade volume via VolumeAudio mixin when available
         if (soundInstance == null || soundManager == null || totalTick == 0 || !isRunning) return;
         double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
-        float newVolume =
-                soundAction.equals("start") ? (float) Mth.lerp(t, 0.0, volume) : (float) Mth.lerp(t, volume, 0.0);
-        if (newVolume <= 0.0f && soundAction.equals("stop")) {
+        soundInstance.setFading(t < 1.0);
+        currentVolume =
+                soundAction.equals("play") ? (float) Mth.lerp(t, 0.0, volume) : (float) Mth.lerp(t, volume, 0.0);
+        if (soundAction.equals("play")) {
+            ((VolumeAudio) soundManager).narrativecraft$setVolume(soundInstance, currentVolume);
+        } else {
+            ((VolumeAudio) soundManager).narrativecraft$setVolume(soundInstance.getIdentifier(), currentVolume);
+        }
+        if (currentVolume <= 0.0f && soundAction.equals("stop")) {
             soundManager.stop(soundInstance);
         }
     }
@@ -109,8 +115,8 @@ public class SoundInkAction extends InkAction {
         }
 
         soundAction = cmd.getString("action");
-        if (!soundAction.equals("start") && !soundAction.equals("stop")) {
-            return InkActionResult.error("Sound action must be 'start' or 'stop'.");
+        if (!soundAction.equals("play") && !soundAction.equals("stop")) {
+            return InkActionResult.error("Sound action must be 'play' or 'stop'.");
         }
 
         String rawName = cmd.getString("name");
@@ -126,7 +132,7 @@ public class SoundInkAction extends InkAction {
         volume = cmd.getFloat("volume");
         pitch = cmd.getFloat("pitch");
         looping = cmd.flag("loop");
-        fadeTime = cmd.getFloat("fadeTime");
+        double fadeTime = cmd.getFloat("fadeTime");
         totalTick = (int) (fadeTime * 20.0);
         return InkActionResult.ok();
     }
@@ -134,23 +140,44 @@ public class SoundInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
         soundManager = Minecraft.getInstance().getSoundManager();
-        if (soundAction.equals("start")) {
-            soundInstance = createSoundInstance();
-            soundManager.play(soundInstance);
-        } else if (soundAction.equals("stop")) {
-            if (soundName.equals("all")) {
-                soundManager.stop(null, SoundSource.MASTER);
-            } else {
-                // stop the matching running instance, relies on sharing reference via running actions
-                // TODO: find and stop the matching SoundInkAction in the active client list
-                soundManager.stop(null, SoundSource.MASTER);
+        soundInstance = createSoundInstance();
+
+        if (soundType == SoundType.STOP && soundName.equals("all")) {
+            for (InkAction inkAction : playerSession.getActiveClientInkActions()) {
+                if (!(inkAction instanceof SoundInkAction soundInkAction)) continue;
+                soundInkAction.stop();
             }
             isRunning = false;
+            return InkActionResult.ok();
         }
+
+        switch (soundAction) {
+            case "play" -> soundManager.play(soundInstance);
+            case "stop" -> {
+                for (InkAction inkAction : playerSession.getActiveClientInkActions()) {
+                    if (!(inkAction instanceof SoundInkAction soundInkAction)) continue;
+
+                    if (soundName.equals("all") && soundInkAction.soundType == this.soundType) {
+                        soundInkAction.stop();
+                    } else if (soundInkAction
+                                    .soundInstance
+                                    .getIdentifier()
+                                    .compareTo(this.soundInstance.getIdentifier())
+                            == 0) {
+                        this.volume = soundInkAction.currentVolume;
+                        soundInkAction.totalTick = 0;
+                    }
+                }
+            }
+        }
+        if (soundName.equals("all")) {
+            isRunning = false;
+        }
+
         return InkActionResult.ok();
     }
 
-    private SoundInstance createSoundInstance() {
+    private SoundInkInstance createSoundInstance() {
         return new SoundInkInstance(
                 Identifier.fromNamespaceAndPath(identifier, soundName),
                 SoundSource.MASTER,

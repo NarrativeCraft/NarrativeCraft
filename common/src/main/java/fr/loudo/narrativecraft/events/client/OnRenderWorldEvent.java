@@ -33,12 +33,13 @@ import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPathRe
 import fr.loudo.narrativecraft.client.editors.interaction.InteractionMakerEditorRenderer;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
-import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import org.joml.Matrix4fStack;
 import org.joml.Matrix4fc;
+
+import java.util.List;
 
 public class OnRenderWorldEvent {
 
@@ -55,6 +56,7 @@ public class OnRenderWorldEvent {
 
         renderDialog3D(poseStack, deltaTracker);
         renderClientInkActions(poseStack, deltaTracker);
+        partialTickInkActions(deltaTracker);
 
         modelViewStack.popMatrix();
     }
@@ -77,6 +79,13 @@ public class OnRenderWorldEvent {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         for (InkAction action : session.getActiveClientInkActions()) {
             action.render(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
+        }
+    }
+
+    private static void partialTickInkActions(DeltaTracker deltaTracker) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        for (InkAction action : session.getActiveClientInkActions()) {
+            action.partialTick(deltaTracker.getGameTimeDeltaPartialTick(true));
         }
     }
 }

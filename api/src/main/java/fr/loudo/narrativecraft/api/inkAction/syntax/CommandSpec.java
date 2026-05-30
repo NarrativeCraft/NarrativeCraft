@@ -23,11 +23,7 @@
 
 package fr.loudo.narrativecraft.api.inkAction.syntax;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Compiled representation of a command syntax declaration.
@@ -81,16 +77,11 @@ public final class CommandSpec {
                 }
                 activeFlags.add(flagName);
 
-            } else if (token.contains(":")) {
+            } else if (token.contains(":") && namedArgs.containsKey(token.substring(0, token.indexOf(':')))) {
                 int colonIndex = token.indexOf(':');
                 String name = token.substring(0, colonIndex);
                 String rawValue = token.substring(colonIndex + 1);
-                NamedArgDef def = namedArgs.get(name);
-                if (def == null) {
-                    throw new IllegalArgumentException("Unknown named argument '" + name + "' for tag '" + keyword
-                            + "'. " + "Declared named args: " + namedArgs.keySet());
-                }
-                args.put(name, def.type().parse(rawValue));
+                args.put(name, namedArgs.get(name).type().parse(rawValue));
 
             } else {
                 if (positionalIndex < positionalArgs.size()) {

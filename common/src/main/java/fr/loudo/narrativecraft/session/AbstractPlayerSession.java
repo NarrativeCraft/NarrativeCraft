@@ -23,10 +23,12 @@
 
 package fr.loudo.narrativecraft.session;
 
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 
 public class AbstractPlayerSession implements IPlayerSession {
@@ -91,4 +93,14 @@ public class AbstractPlayerSession implements IPlayerSession {
 
     @Override
     public void setGameplayMode(boolean gameplayMode) {}
+
+    @Override
+    public boolean isClientSide() {
+        return false;
+    }
+
+    @Override
+    public List<InkAction> getActiveClientInkActions() {
+        return List.of();
+    }
 }

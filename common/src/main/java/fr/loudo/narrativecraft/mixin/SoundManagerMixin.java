@@ -21,24 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.story;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.utils.VolumeAudio;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.resources.Identifier;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
-public record S2CNotifyClientPlayStory() implements CustomPacketPayload {
-
-    public static final Type<S2CNotifyClientPlayStory> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "notify_client_play_story"));
-
-    public static final StreamCodec<ByteBuf, S2CNotifyClientPlayStory> STREAM_CODEC =
-            StreamCodec.unit(new S2CNotifyClientPlayStory());
+@Mixin(SoundManager.class)
+public class SoundManagerMixin implements fr.loudo.narrativecraft.utils.VolumeAudio {
+    @Shadow
+    @Final
+    private SoundEngine soundEngine;
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public void narrativecraft$setVolume(SoundInstance soundInstance, float volume) {
+        ((VolumeAudio) this.soundEngine).narrativecraft$setVolume(soundInstance, volume);
+    }
+
+    @Override
+    public void narrativecraft$setVolume(Identifier source, float volume) {
+        ((VolumeAudio) this.soundEngine).narrativecraft$setVolume(source, volume);
     }
 }

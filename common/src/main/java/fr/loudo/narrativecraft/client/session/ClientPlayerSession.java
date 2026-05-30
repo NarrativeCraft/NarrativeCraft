@@ -76,6 +76,11 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     }
 
     @Override
+    public boolean isClientSide() {
+        return true;
+    }
+
+    @Override
     public void clear() {
         super.clear();
         new ArrayList<>(activeDialog2DRenderers).forEach(this::removeDialog2D);

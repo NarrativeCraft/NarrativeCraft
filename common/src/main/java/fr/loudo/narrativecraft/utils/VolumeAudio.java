@@ -21,24 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.story;
+package fr.loudo.narrativecraft.utils;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.resources.Identifier;
 
-public record S2CNotifyClientPlayStory() implements CustomPacketPayload {
+public interface VolumeAudio {
 
-    public static final Type<S2CNotifyClientPlayStory> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "notify_client_play_story"));
+    public void narrativecraft$setVolume(SoundInstance soundInstance, float volume);
 
-    public static final StreamCodec<ByteBuf, S2CNotifyClientPlayStory> STREAM_CODEC =
-            StreamCodec.unit(new S2CNotifyClientPlayStory());
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
+    public void narrativecraft$setVolume(Identifier source, float volume);
 }

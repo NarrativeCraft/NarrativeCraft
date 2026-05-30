@@ -30,6 +30,8 @@ import net.minecraft.util.RandomSource;
 
 public class SoundInkInstance extends AbstractSoundInstance {
 
+    private boolean isFading;
+
     public SoundInkInstance(
             Identifier location,
             SoundSource source,
@@ -53,6 +55,14 @@ public class SoundInkInstance extends AbstractSoundInstance {
         this.delay = delay;
         this.attenuation = attenuation;
         this.relative = relative;
+    }
+
+    public boolean isFading() {
+        return isFading;
+    }
+
+    public void setFading(boolean fading) {
+        isFading = fading;
     }
 
     @Override

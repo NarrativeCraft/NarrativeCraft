@@ -29,6 +29,9 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -42,10 +45,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 @Mixin(PlayerInfo.class)
 public abstract class PlayerInfoMixin {
 
@@ -56,7 +55,8 @@ public abstract class PlayerInfoMixin {
     private void narrativecraft$getCharacterSkin(CallbackInfoReturnable<PlayerSkin> cir) {
         GameProfile profile = getProfile();
 
-        List<ICharacterStory> charactersInWorld = ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
+        List<ICharacterStory> charactersInWorld =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
         for (ICharacterStory characterStory : charactersInWorld) {
             if (!profile.id().equals(characterStory.getId())) continue;
 
@@ -77,8 +77,7 @@ public abstract class PlayerInfoMixin {
         if (!(characterStory instanceof CharacterStory concreteCharacter)) return false;
 
         MainCharacterAttribute attr = concreteCharacter.getMainCharacterAttribute();
-        return attr.isMainCharacter()
-                && attr.getSkin() == MainCharacterAttribute.SkinMode.SKIN_OF_PLAYER;
+        return attr.isMainCharacter() && attr.getSkin() == MainCharacterAttribute.SkinMode.SKIN_OF_PLAYER;
     }
 
     private Optional<PlayerSkin> buildCharacterSkin(ICharacterStory characterStory) {
@@ -87,18 +86,15 @@ public abstract class PlayerInfoMixin {
         if (!isDynamicTextureLoaded(skinPath)) return Optional.empty();
 
         return Optional.of(PlayerSkin.insecure(
-                new ClientAsset.ResourceTexture(skinPath, skinPath),
-                null, null,
-                characterStory.getModelType()
-        ));
+                new ClientAsset.ResourceTexture(skinPath, skinPath), null, null, characterStory.getModelType()));
     }
 
     private Optional<PlayerSkin> resolveLocalPlayerSkin() {
-        CharacterStory mainCharacter = ClientNarrativeCraftMod.getInstance()
-                .getCharacterManager()
-                .getMainCharacter();
+        CharacterStory mainCharacter =
+                ClientNarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
 
-        if (mainCharacter == null || !ClientNarrativeCraftMod.getInstance().getPlayerSession().isInStory()) return Optional.empty();
+        if (mainCharacter == null
+                || !ClientNarrativeCraftMod.getInstance().getPlayerSession().isInStory()) return Optional.empty();
 
         MainCharacterAttribute attr = mainCharacter.getMainCharacterAttribute();
         if (attr.getSkin() != MainCharacterAttribute.SkinMode.CLIENT_HAS_CHARACTER_SKIN) return Optional.empty();
@@ -107,16 +103,11 @@ public abstract class PlayerInfoMixin {
     }
 
     private Identifier getSkinIdentifier(UUID characterId) {
-        return Identifier.fromNamespaceAndPath(
-                NarrativeCraftMod.MOD_ID,
-                "character/" + characterId
-        );
+        return Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character/" + characterId);
     }
 
     private boolean isDynamicTextureLoaded(Identifier skinPath) {
-        AbstractTexture texture = Minecraft.getInstance()
-                .getTextureManager()
-                .getTexture(skinPath);
+        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(skinPath);
         return texture instanceof DynamicTexture;
     }
 }
