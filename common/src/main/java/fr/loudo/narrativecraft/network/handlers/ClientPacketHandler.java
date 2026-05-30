@@ -75,15 +75,16 @@ import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ClientPacketHandler {
 
@@ -261,7 +262,10 @@ public class ClientPacketHandler {
 
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         DialogRenderer dialogRenderer = session.getMainDialog();
-        if (dialogRenderer == null) return;
+        if (dialogRenderer == null) {
+            Services.PACKET.sendToServer(new C2SDialogueFinished());
+            return;
+        }
 
         dialogRenderer.stop();
     }

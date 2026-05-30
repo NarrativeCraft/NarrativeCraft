@@ -66,11 +66,11 @@ public class OnEnterInkAction extends InkAction {
         Scene scene = StoryHandler.getSceneFromKnotName(chapter, knotName);
         if (scene == null) return InkActionResult.ignored();
 
-        session.apply(chapter, scene);
         if (chapter.getId().equals(session.getChapter().getId())
                 && scene.getId().equals(session.getScene().getId())) {
             return InkActionResult.ignored();
         }
+        session.apply(chapter, scene);
 
         storyHandler.triggerChangeScene();
         Services.PACKET.sendToPlayer(session.getPlayer(), new S2CPlayerSession(chapter.getId(), scene.getId()));
