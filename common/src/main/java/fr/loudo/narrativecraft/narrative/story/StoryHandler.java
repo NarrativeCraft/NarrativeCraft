@@ -43,15 +43,16 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.entity.Entity;
 
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
-    private static final Pattern SPEAKER_PATTERN = Pattern.compile("^(\\w+)\\s*:\\s*(.+)$", Pattern.DOTALL);
+    private static final Pattern SPEAKER_PATTERN = Pattern.compile("^([^:]+?)\\s*:\\s*(.+)$", Pattern.DOTALL);
     private static final Pattern KNOT_CHAPTER_PATTERN = Pattern.compile("^chapter_(\\d+)");
     private static final String TAG_2D = "[2D]";
 
