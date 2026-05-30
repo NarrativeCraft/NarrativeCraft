@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 
 public class CutsceneEditorPlayback {
 
@@ -58,7 +59,7 @@ public class CutsceneEditorPlayback {
     }
 
     public void tick(DeltaTracker delta) {
-        if (!playing || dragPause || totalTick <= 0) return;
+        if (!playing || dragPause || totalTick <= 0 || Minecraft.getInstance().isPaused()) return;
 
         currentTick += delta.getGameTimeDeltaTicks();
 
@@ -100,5 +101,9 @@ public class CutsceneEditorPlayback {
 
     public void setDragPause(boolean dragPause) {
         this.dragPause = dragPause;
+    }
+
+    public void setTotalTick(int totalTick) {
+        this.totalTick = totalTick;
     }
 }

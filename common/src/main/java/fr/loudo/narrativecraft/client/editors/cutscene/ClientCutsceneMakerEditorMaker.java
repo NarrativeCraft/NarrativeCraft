@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.widgets.RollSliderWidget;
+import fr.loudo.narrativecraft.client.screens.InputScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
@@ -140,6 +141,31 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                 .bounds(30, 5, 20, 20)
                 .build());
 
+        if (cutscene.getAnimations().isEmpty() && cutscene.getSubscenes().isEmpty()) {
+            buttons.add(Button.builder(
+                            Component.literal("⏱"),
+                            button -> mc.setScreen(new InputScreen(
+                                    Translation.message("screen.set_max_tick.title"),
+                                    raw -> {
+                                        try {
+                                            int value = Integer.parseInt(raw);
+                                            cutscene.setManualMaxTick(value);
+                                            totalTick = value;
+                                            playback.setTotalTick(value);
+                                            zoomFactor = getMinZoomFactor();
+                                            clampViewStart();
+                                            mc.setScreen(null);
+                                        } catch (NumberFormatException e) {
+                                            UtilsClient.sendToast(
+                                                    Translation.message("error"),
+                                                    Translation.message("error.only_numbers"));
+                                        }
+                                    },
+                                    null)))
+                    .bounds(55, 5, 20, 20)
+                    .build());
+        }
+
         addLayerButton = Button.builder(Component.literal("+"), b -> layerSelector.toggle())
                 .bounds(0, 0, 10, 10)
                 .build();
@@ -152,6 +178,15 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
             control.play();
             playback.play(0);
         }
+    }
+
+    public void applyManualMaxTick(int value) {
+        if (value <= 0) return;
+        cutscene.setManualMaxTick(value);
+        totalTick = value;
+        playback.setTotalTick(value);
+        zoomFactor = getMinZoomFactor();
+        clampViewStart();
     }
 
     @Override

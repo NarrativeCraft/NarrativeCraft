@@ -126,9 +126,11 @@ public class ServerPacketHandler {
         if (cutscene == null) return;
 
         CutsceneDeserializer.deserializeLayers(packet.getLayersJson(), cutscene);
+        cutscene.setManualMaxTick(packet.getManualMaxTick());
         int result = NarrativeCraftFileRegistry.getInstance().edit(cutscene);
         Services.PACKET.sendToPlayer(
-                (ServerPlayer) player, new S2CCutsceneEditorData(cutscene.getId(), packet.getLayersJson()));
+                (ServerPlayer) player,
+                new S2CCutsceneEditorData(cutscene.getId(), packet.getLayersJson(), cutscene.getManualMaxTick()));
 
         if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
             Services.PACKET.sendToPlayer(

@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -43,8 +44,6 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
-
-import java.util.List;
 
 public class StoryCommand {
 
@@ -72,9 +71,13 @@ public class StoryCommand {
                                                 .then(Commands.argument("scene_name", StringArgumentType.string())
                                                         .suggests(CommandSuggestions::suggestSceneByChapter)
                                                         .executes(ctx -> {
-                                                            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
-                                                            return playFor(ctx, target,
-                                                                    IntegerArgumentType.getInteger(ctx, "chapter_index"),
+                                                            ServerPlayer target =
+                                                                    EntityArgument.getPlayer(ctx, "target");
+                                                            return playFor(
+                                                                    ctx,
+                                                                    target,
+                                                                    IntegerArgumentType.getInteger(
+                                                                            ctx, "chapter_index"),
                                                                     StringArgumentType.getString(ctx, "scene_name"));
                                                         })))))
                         .then(Commands.literal("stop")
@@ -170,14 +173,16 @@ public class StoryCommand {
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
         if (chapter == null) {
             context.getSource()
-                    .sendFailure(Translation.message("error.not_exists", Translation.message("chapter").getString(), chapterIndex));
+                    .sendFailure(Translation.message(
+                            "error.not_exists", Translation.message("chapter").getString(), chapterIndex));
             return 0;
         }
 
         Scene scene = chapter.getSceneManager().getByName(sceneName);
         if (scene == null) {
             context.getSource()
-                    .sendFailure(Translation.message("error.not_exists", Translation.message("scene").getString(), sceneName));
+                    .sendFailure(Translation.message(
+                            "error.not_exists", Translation.message("scene").getString(), sceneName));
             return 0;
         }
 

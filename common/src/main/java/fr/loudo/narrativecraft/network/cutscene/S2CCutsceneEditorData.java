@@ -32,7 +32,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CCutsceneEditorData(UUID cutsceneId, String layersJson) implements CustomPacketPayload {
+public record S2CCutsceneEditorData(UUID cutsceneId, String layersJson, int manualMaxTick)
+        implements CustomPacketPayload {
 
     public static final Type<S2CCutsceneEditorData> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_editor_data"));
@@ -42,6 +43,8 @@ public record S2CCutsceneEditorData(UUID cutsceneId, String layersJson) implemen
             S2CCutsceneEditorData::cutsceneId,
             ByteBufCodecs.STRING_UTF8,
             S2CCutsceneEditorData::layersJson,
+            ByteBufCodecs.VAR_INT,
+            S2CCutsceneEditorData::manualMaxTick,
             S2CCutsceneEditorData::new);
 
     @Override

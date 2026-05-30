@@ -160,6 +160,8 @@
 
   "narrativecraft.story.validation_error.not_exists": "%s %s does not exists in this scene.",
 
+  "narrativecraft.screen.set_max_tick.title": "Set Max Tick",
+
   "narrativecraft.screen.main.continue": "Continue",
   "narrativecraft.screen.main.new_game": "New Game",
   "narrativecraft.screen.main.select_scene": "Select Scene",

@@ -39,19 +39,22 @@ public class C2SCutsceneSave implements CustomPacketPayload {
     private final UUID sceneId;
     private final UUID cutsceneId;
     private final String layersJson;
+    private final int manualMaxTick;
 
     public C2SCutsceneSave(Cutscene cutscene, String layersJson) {
         this.chapterId = cutscene.getScene().getChapter().getId();
         this.sceneId = cutscene.getScene().getId();
         this.cutsceneId = cutscene.getId();
         this.layersJson = layersJson;
+        this.manualMaxTick = cutscene.getManualMaxTick();
     }
 
-    public C2SCutsceneSave(UUID chapterId, UUID sceneId, UUID cutsceneId, String layersJson) {
+    public C2SCutsceneSave(UUID chapterId, UUID sceneId, UUID cutsceneId, String layersJson, int manualMaxTick) {
         this.chapterId = chapterId;
         this.sceneId = sceneId;
         this.cutsceneId = cutsceneId;
         this.layersJson = layersJson;
+        this.manualMaxTick = manualMaxTick;
     }
 
     public static final Type<C2SCutsceneSave> TYPE =
@@ -66,6 +69,8 @@ public class C2SCutsceneSave implements CustomPacketPayload {
             C2SCutsceneSave::getCutsceneId,
             ByteBufCodecs.STRING_UTF8,
             C2SCutsceneSave::getLayersJson,
+            ByteBufCodecs.VAR_INT,
+            C2SCutsceneSave::getManualMaxTick,
             C2SCutsceneSave::new);
 
     public UUID getChapterId() {
@@ -82,6 +87,10 @@ public class C2SCutsceneSave implements CustomPacketPayload {
 
     public String getLayersJson() {
         return layersJson;
+    }
+
+    public int getManualMaxTick() {
+        return manualMaxTick;
     }
 
     @Override

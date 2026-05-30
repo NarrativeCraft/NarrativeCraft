@@ -87,6 +87,10 @@ public class CutsceneDeserializer extends NarrativeDeserializer<Cutscene> {
 
         Cutscene cutscene = new Cutscene(id, name, description, scene, animations, subscenes);
 
+        if (obj.has("manualMaxTick")) {
+            cutscene.setManualMaxTick(obj.get("manualMaxTick").getAsInt());
+        }
+
         if (obj.has("layers")) {
             List<CutsceneMakerEditorLayer> editorLayers = new ArrayList<>();
             for (JsonElement layerElement : obj.getAsJsonArray("layers")) {

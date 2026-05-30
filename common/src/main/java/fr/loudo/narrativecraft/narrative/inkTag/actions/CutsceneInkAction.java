@@ -30,12 +30,14 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
@@ -75,6 +77,13 @@ public class CutsceneInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
+
+        EditorMaker editor = ((PlayerSession) playerSession).getEditor();
+        if (editor != null) {
+            editor.stop();
+            Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
+        }
+
         editorMaker =
                 new CutsceneMakerEditorMaker(cutscene, (PlayerSession) playerSession, NarrativeEnvironment.PRODUCTION);
         ((PlayerSession) playerSession).setEditor(editorMaker);

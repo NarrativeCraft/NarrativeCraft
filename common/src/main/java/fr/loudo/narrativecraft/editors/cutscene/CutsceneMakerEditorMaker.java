@@ -23,7 +23,9 @@
 
 package fr.loudo.narrativecraft.editors.cutscene;
 
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
+import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
@@ -38,12 +40,13 @@ import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CutsceneMakerEditorMaker implements EditorMaker {
 
@@ -53,6 +56,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     private final PlayerSession playerSession;
     private int totalTick;
     private int currentTick;
+    private int lastKeyframeTick;
     private boolean playing;
     private NarrativeEnvironment environment;
 
@@ -97,8 +101,10 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         if (cutscene.getEditorLayers() != null && !cutscene.getEditorLayers().isEmpty()) {
             String layersJson = CutsceneSerializer.serializeLayers(cutscene.getEditorLayers());
             Services.PACKET.sendToPlayer(
-                    playerSession.getPlayer(), new S2CCutsceneEditorData(cutscene.getId(), layersJson));
+                    playerSession.getPlayer(),
+                    new S2CCutsceneEditorData(cutscene.getId(), layersJson, cutscene.getManualMaxTick()));
         }
+        lastKeyframeTick = getLastTick();
     }
 
     public void teleportToEditorOrigin() {
@@ -180,7 +186,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public boolean isFinished() {
-        return currentTick >= totalTick;
+        return currentTick >= lastKeyframeTick;
     }
 
     public void pause() {
@@ -220,5 +226,19 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
 
     public void setCurrentTick(int currentTick) {
         this.currentTick = currentTick;
+    }
+
+    public int getLastTick() {
+        int maxTick = 0;
+        if (cutscene.getEditorLayers() != null) {
+            for (CutsceneMakerEditorLayer editorLayer : cutscene.getEditorLayers()) {
+                for (Keyframe keyframe : editorLayer.getLayer().getKeyframes()) {
+                    if (keyframe.getTick() > maxTick) {
+                        maxTick = keyframe.getTick();
+                    }
+                }
+            }
+        }
+        return maxTick;
     }
 }

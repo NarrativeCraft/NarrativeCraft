@@ -62,6 +62,8 @@ public class CutsceneSerializer implements JsonSerializer<Cutscene> {
         }
         json.add("subsceneIds", subsceneIds);
 
+        json.addProperty("manualMaxTick", src.getManualMaxTick());
+
         JsonArray layers = new JsonArray();
         if (src.getEditorLayers() != null) {
             for (CutsceneMakerEditorLayer editorLayer : src.getEditorLayers()) {

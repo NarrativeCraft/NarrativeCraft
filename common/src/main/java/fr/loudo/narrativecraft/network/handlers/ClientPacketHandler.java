@@ -73,16 +73,15 @@ import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class ClientPacketHandler {
 
@@ -142,6 +141,7 @@ public class ClientPacketHandler {
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         if (!(cutsceneMakerEditor instanceof ClientCutsceneMakerEditorMaker editor)) return;
         editor.loadLayers(packet.layersJson());
+        editor.applyManualMaxTick(packet.manualMaxTick());
     }
 
     public static void loadCameraAngleEditorData(S2CCameraAngleEditorData packet) {

@@ -38,6 +38,7 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> {
     private List<Animation> animations;
     private List<Subscene> subscenes;
     private List<CutsceneMakerEditorLayer> editorLayers;
+    private int manualMaxTick = 0;
 
     public Cutscene(
             UUID id,
@@ -67,7 +68,7 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> {
     }
 
     public int getMaxTick() {
-        int maxTick = 0;
+        int maxTick = manualMaxTick;
         for (Subscene subscene : subscenes) {
             for (Animation animation : subscene.getAnimations()) {
                 maxTick = Math.max(maxTick, animation.getTotalTick());
@@ -77,6 +78,14 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> {
             maxTick = Math.max(maxTick, animation.getTotalTick());
         }
         return maxTick;
+    }
+
+    public int getManualMaxTick() {
+        return manualMaxTick;
+    }
+
+    public void setManualMaxTick(int manualMaxTick) {
+        this.manualMaxTick = manualMaxTick;
     }
 
     public Scene getScene() {
