@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
+import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.client.player.LocalPlayer;
 
@@ -37,8 +37,7 @@ public class OnClientDisconnectEvent {
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return;
 
-        Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.QUIT));
-        playerSession.getCutsceneDataSession().reset();
-        playerSession.setEditor(null);
+        Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
+        playerSession.clear();
     }
 }

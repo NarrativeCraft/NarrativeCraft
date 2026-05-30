@@ -85,12 +85,14 @@ public class ClientPlayerSession extends AbstractPlayerSession {
         super.clear();
         new ArrayList<>(activeDialog2DRenderers).forEach(this::removeDialog2D);
         new ArrayList<>(activeDialog3DRenderers).forEach(this::removeDialog3D);
+        activeClientInkActions.clear();
         cutsceneDataSession.reset();
         clickedInteractionPointIds.clear();
         charactersInWorld.clear();
         mainDialog = null;
         cameraView = null;
         stopNextDialog = false;
+        inStory = false;
     }
 
     public boolean hasClickedInteractionPoint(UUID pointId) {
