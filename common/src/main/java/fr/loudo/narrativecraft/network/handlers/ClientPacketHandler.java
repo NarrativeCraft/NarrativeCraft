@@ -36,14 +36,12 @@ import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHe
 import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogRenderer;
-import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
-import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.dialog.*;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
@@ -335,7 +333,7 @@ public class ClientPacketHandler {
         if (dialogDataJson == null || dialogDataJson.isEmpty()) return null;
         try {
             JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-            return CameraAngleDeserializer.deserializeDialogData(json);
+            return DialogDataIO.deserialize(json, DialogFieldSet.ALL);
         } catch (Exception e) {
             return null;
         }

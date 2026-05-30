@@ -26,9 +26,10 @@ package fr.loudo.narrativecraft.narrative.story;
 import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.managers.CharacterManager;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
@@ -42,11 +43,12 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
@@ -311,7 +313,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
                 dialogData = NarrativeCraftMod.getInstance().getGlobalDialogData();
             }
             String dialogDataJson =
-                    CameraAngleSerializer.serializeDialogData(dialogData).toString();
+                    DialogDataIO.serialize(dialogData, DialogFieldSet.ALL).toString();
             Services.PACKET.sendToPlayer(
                     playerSession.getPlayer(),
                     new S2CShowDialogue(speaker.toLowerCase(), dialogueText, entityId, dialogDataJson));
