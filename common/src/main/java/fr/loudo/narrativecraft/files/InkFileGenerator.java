@@ -132,7 +132,7 @@ public class InkFileGenerator {
     }
 
     private static String toRelativePath(File base, File target) {
-        return base.toPath().relativize(target.toPath()).toString().replace(File.separatorChar, '/');
+        return base.toPath().relativize(target.toPath()).toString();
     }
 
     private static int extractLeadingInt(String name) {
