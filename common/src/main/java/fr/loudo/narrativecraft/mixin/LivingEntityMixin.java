@@ -24,66 +24,36 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.recording.Recording;
-import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
-import fr.loudo.narrativecraft.narrative.recording.actions.HurtAction;
-import fr.loudo.narrativecraft.narrative.recording.actions.SleepAction;
-import fr.loudo.narrativecraft.narrative.recording.actions.SwingAction;
+import fr.loudo.narrativecraft.playback.Playback;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
+import fr.loudo.narrativecraft.recording.actions.SleepAction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin {
-
-    @Shadow
-    public abstract void remove(Entity.RemovalReason p_276115_);
-
-    @Inject(method = "swing(Lnet/minecraft/world/InteractionHand;)V", at = @At(value = "HEAD"))
-    private void narrativecraft$onSwing(InteractionHand hand, CallbackInfo ci) {
-        if ((Object) this instanceof ServerPlayer player) {
-            Recording recording =
-                    NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-            if (recording == null || !recording.isRecording()) return;
-            SwingAction action = new SwingAction(recording.getTick(), hand);
-            recording.getActionDataFromEntity(player).addAction(action);
-        }
-    }
+public class LivingEntityMixin {
 
     @Inject(method = "startSleeping", at = @At("HEAD"))
-    private void narrativecraft$startSleep(BlockPos pos, CallbackInfo ci) {
-        if ((Object) this instanceof ServerPlayer player) {
-            Recording recording =
-                    NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-            if (recording == null || !recording.isRecording()) return;
-            SleepAction sleepAction = new SleepAction(recording.getTick(), pos);
-            recording.getActionDataFromEntity(player).addAction(sleepAction);
-        }
+    private void narrativecraft$startSleeping(BlockPos pos, CallbackInfo ci) {
+        LivingEntity livingEntity = (LivingEntity) (Object) this;
+        RecordingEntityData recordingEntityData =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(livingEntity);
+        if (recordingEntityData == null) return;
+
+        recordingEntityData.addAction(new SleepAction(recordingEntityData.getRecordingTick(), pos));
     }
 
-    @Inject(method = "hurtServer", at = @At("HEAD"))
-    private void narrativecraft$hurtServer(
-            ServerLevel serverLevel, DamageSource damageSource, float damageHit, CallbackInfoReturnable<Boolean> cir) {
-        if (damageSource.getEntity() instanceof ServerPlayer player) {
-            Recording recording =
-                    NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-            if (recording == null || !recording.isRecording()) return;
-            HurtAction hurtAction = new HurtAction(recording.getTick());
-            LivingEntity livingEntity = (LivingEntity) (Object) this;
-            ActionsData actionsData = recording.getActionDataFromEntity(livingEntity);
-            if (actionsData == null) return;
-            actionsData.addAction(hurtAction);
-            recording.trackEntity(livingEntity, recording.getTick());
+    @Inject(method = "dropAllDeathLoot", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$shouldDropLoot(ServerLevel level, DamageSource source, CallbackInfo ci) {
+        LivingEntity livingEntity = (LivingEntity) (Object) this;
+        if (livingEntity.entityTags().contains(Playback.ENTITY_TAG)) {
+            ci.cancel();
         }
     }
 }

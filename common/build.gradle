@@ -3,24 +3,12 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-repositories {
-    mavenLocal()
-    maven {
-        url 'https://maven.kosmx.dev/'
-    }
-    maven { url = "https://repo.redlance.org/public" }
-}
-
 neoForge {
     neoFormVersion = neo_form_version
     // Automatically enable AccessTransformers if the file exists
     def at = file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
-    }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
     }
 }
 
@@ -29,16 +17,10 @@ dependencies {
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
-    compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
-    compileOnly("io.github.kosmx.emotes:emotesServer:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
-    compileOnly("io.github.kosmx.emotes:emotesMc:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
-    implementation "com.bladecoder.ink:blade-ink:1.2.1+nc"
+
+    implementation "com.bladecoder.ink:blade-ink:1.3.2"
+    implementation "com.bladecoder.ink:blade-ink-compiler:1.3.2"
+    implementation project(':api')
 }
 
 configurations {
@@ -57,3 +39,21 @@ artifacts {
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }
 
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'common')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'common')
+            }
+        }
+    }
+}

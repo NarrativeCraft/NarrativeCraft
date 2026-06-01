@@ -24,35 +24,47 @@
 package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.api.events.session.PlayerSessionEndEvent;
+import fr.loudo.narrativecraft.api.events.session.PlayerSessionStartEvent;
+import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.FakePlayer;
 import net.minecraft.world.entity.player.Player;
 
-public class PlayerSessionManager {
+public class PlayerSessionManager extends Manager<PlayerSession> {
 
-    private final List<PlayerSession> playerSessions = new ArrayList<>();
-
-    public void addSession(PlayerSession playerSession) {
-        if (playerSessions.contains(playerSession)) return;
-        playerSessions.add(playerSession);
-        NarrativeCraftMod.LOGGER.info(playerSessions.toString());
+    @Override
+    public void add(PlayerSession item) {
+        // Fake player trying to fit in loool
+        if (item.getPlayer() instanceof FakePlayer) return;
+        super.add(item);
+        NarrativeCraftMod.EVENT_BUS.post(new PlayerSessionStartEvent(item));
     }
 
-    public void removeSession(PlayerSession playerSession) {
-        playerSessions.remove(playerSession);
+    @Override
+    public void remove(PlayerSession item) {
+        NarrativeCraftMod.EVENT_BUS.post(new PlayerSessionEndEvent(item));
+        super.remove(item);
     }
 
-    public PlayerSession getSessionByPlayer(Player player) {
-        for (PlayerSession playerSession : playerSessions) {
-            if (playerSession.isSamePlayer(player)) {
+    public PlayerSession getByPlayer(Player player) {
+        for (PlayerSession playerSession : list) {
+            if (playerSession.getPlayer().getUUID().equals(player.getUUID())) {
                 return playerSession;
             }
         }
         return null;
     }
 
-    public List<PlayerSession> getPlayerSessions() {
-        return playerSessions;
+    @SuppressWarnings("unchecked")
+    public <T extends EditorMaker> T getEditor(Player player, Class<T> clazz) {
+        for (PlayerSession playerSession : list) {
+            if (playerSession.getPlayer().getUUID().equals(player.getUUID())
+                    && playerSession.getEditor() != null
+                    && playerSession.getEditor().getClass().equals(clazz)) {
+                return (T) playerSession.getEditor();
+            }
+        }
+        return null;
     }
 }

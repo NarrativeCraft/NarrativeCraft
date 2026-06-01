@@ -23,117 +23,107 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import com.google.gson.Gson;
+import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogDataIO;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.util.Util;
-import java.io.IOException;
-import net.minecraft.client.Minecraft;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import java.io.File;
+import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.PlayerModelType;
 
-public class CharacterStory extends NarrativeEntry {
+public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implements ICharacterStory {
 
-    private transient EntityType<?> entityType;
+    public static final String USERNAME_VARIABLE = "user";
 
+    private final CharacterType characterType = CharacterType.NORMAL;
+    private DialogData dialogData = new DialogData();
+    private EntityType<?> entityType = EntityType.PLAYER;
+    private PlayerModelType modelType;
     private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
-    private String birthDate;
-    private CharacterType characterType;
-    private CharacterModel model;
-    private boolean showNametag;
-    private int entityTypeId;
 
-    public CharacterStory(
-            String name,
-            String description,
-            String day,
-            String month,
-            String year,
-            CharacterModel model,
-            CharacterType characterType) {
+    public CharacterStory(String name, String description) {
         super(name, description);
-        this.birthDate = day + "/" + month + "/" + year;
-        this.characterType = characterType;
-        this.model = model;
-        this.entityType = EntityType.PLAYER;
-        this.entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
-        showNametag = characterType == CharacterType.MAIN;
     }
 
-    public void updateEntityType(EntityType<?> entityType, Scene scene) {
-        EntityType<?> oldEntityType = this.entityType;
-        int oldEntityTypeId = entityTypeId;
-        try {
-            this.entityType = entityType;
-            entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
-            if (scene != null) {
-                NarrativeCraftFile.updateCharacterData(this, this, scene);
-            } else {
-                NarrativeCraftFile.updateCharacterData(this, this);
-            }
-        } catch (IOException e) {
-            this.entityType = oldEntityType;
-            entityTypeId = oldEntityTypeId;
-            Util.sendCrashMessage(Minecraft.getInstance().player, e);
-            Minecraft.getInstance().setScreen(null);
-        }
+    public CharacterStory(UUID id, String name, String description) {
+        super(id, name, description);
     }
 
-    public String getBirthDate() {
-        return birthDate;
+    public DialogData getDialogData() {
+        return dialogData;
     }
 
-    public void setBirthDate(String birthDate) {
-        this.birthDate = birthDate;
+    @Override
+    public Scene getScene() {
+        return null;
     }
 
-    public CharacterType getCharacterType() {
-        return characterType;
+    @Override
+    public File getSkinFile() {
+        File charactersFolder = NarrativeCraftFileUtil.getCharactersFolder();
+        File characterFolder = new File(charactersFolder, toFileName());
+        if (!characterFolder.exists()) return null;
+
+        return new File(characterFolder, NarrativeCraftFileDefault.SKIN_CHARACTER_FILE);
     }
 
-    public void setCharacterType(CharacterType characterType) {
-        this.characterType = characterType;
+    public void setDialogData(DialogData dialogData) {
+        this.dialogData = dialogData;
     }
 
-    public CharacterModel getModel() {
-        return model;
-    }
-
-    public void setModel(CharacterModel model) {
-        this.model = model;
+    public EntityType<?> getEntityType() {
+        return entityType;
     }
 
     public void setEntityType(EntityType<?> entityType) {
         this.entityType = entityType;
     }
 
-    public int getEntityTypeId() {
-        return entityTypeId;
-    }
-
-    public boolean showNametag() {
-        return showNametag;
-    }
-
-    public void setShowNametag(boolean showNametag) {
-        this.showNametag = showNametag;
-    }
-
-    public EntityType<?> getEntityType() {
-        if (entityType == null) {
-            entityType = EntityType.PLAYER;
+    public PlayerModelType getModelType() {
+        if (modelType == null) {
+            return PlayerModelType.WIDE;
         }
-        return entityType;
+        return modelType;
+    }
+
+    public void setModelType(PlayerModelType modelType) {
+        this.modelType = modelType;
+    }
+
+    public CharacterType getCharacterType() {
+        return characterType;
     }
 
     public MainCharacterAttribute getMainCharacterAttribute() {
-        if (mainCharacterAttribute == null) {
-            mainCharacterAttribute = new MainCharacterAttribute();
-        }
         return mainCharacterAttribute;
     }
 
     public void setMainCharacterAttribute(MainCharacterAttribute mainCharacterAttribute) {
         this.mainCharacterAttribute = mainCharacterAttribute;
+    }
+
+    @Override
+    public CharacterStoryPayload toPayload() {
+        String modelTypeName = modelType != null ? modelType.name() : "";
+        String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
+        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData, DialogFieldSet.CHARACTER));
+        return new CharacterStoryPayload(
+                name, description, modelTypeName, entityTypeId, mainCharacterAttribute, dialogDataJson);
+    }
+
+    @Override
+    public String formattedName() {
+        return mainCharacterAttribute.isMainCharacter() ? "[M] " + name : name;
+    }
+
+    @Override
+    public String toFileName() {
+        return name.toLowerCase().replace(" ", "_");
     }
 }

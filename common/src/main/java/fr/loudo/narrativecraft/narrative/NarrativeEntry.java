@@ -23,11 +23,21 @@
 
 package fr.loudo.narrativecraft.narrative;
 
-public class NarrativeEntry {
+import java.util.UUID;
+
+public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
+    protected final UUID id;
     protected String name;
     protected String description;
 
+    public NarrativeEntry(UUID id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+
     public NarrativeEntry(String name, String description) {
+        this.id = UUID.randomUUID();
         this.name = name;
         this.description = description;
     }
@@ -47,4 +57,18 @@ public class NarrativeEntry {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public abstract T toPayload();
+
+    /**
+     * If your entry needs extra info in the name, otherwise juste return the current name
+     * @return formatted name
+     */
+    public abstract String formattedName();
+
+    public abstract String toFileName();
 }

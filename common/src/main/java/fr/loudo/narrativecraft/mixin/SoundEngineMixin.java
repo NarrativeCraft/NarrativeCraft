@@ -23,13 +23,16 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.audio.VolumeAudio;
-import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkInstance;
+import com.google.common.collect.Multimap;
+import fr.loudo.narrativecraft.client.inkTag.actions.sound.SoundInkInstance;
+import fr.loudo.narrativecraft.utils.VolumeAudio;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,13 +52,25 @@ public abstract class SoundEngineMixin implements VolumeAudio {
     @Shadow
     private boolean loaded;
 
-    // Code owned by Mojang. Removed from 1.21.10
+    @Shadow
+    @Final
+    private Multimap<SoundSource, SoundInstance> instanceBySource;
+
     @Override
     public void narrativecraft$setVolume(SoundInstance soundInstance, float volume) {
         if (this.loaded) {
             ChannelAccess.ChannelHandle channelHandle = this.instanceToChannel.get(soundInstance);
             if (channelHandle != null) {
                 channelHandle.execute((channel) -> channel.setVolume(volume * this.calculateVolume(soundInstance)));
+            }
+        }
+    }
+
+    @Override
+    public void narrativecraft$setVolume(Identifier source, float volume) {
+        for (SoundInstance instance : this.instanceBySource.get(SoundSource.MASTER)) {
+            if (source == null || instance.getIdentifier().equals(source)) {
+                narrativecraft$setVolume(instance, volume);
             }
         }
     }
@@ -71,7 +86,9 @@ public abstract class SoundEngineMixin implements VolumeAudio {
             Map<SoundInstance, ChannelAccess.ChannelHandle> instance,
             BiConsumer<? super SoundInstance, ? super ChannelAccess.ChannelHandle> v) {
         instance.forEach((soundInstance, channelHandle) -> {
-            if (soundInstance instanceof SoundInkInstance) return;
+            if (soundInstance instanceof SoundInkInstance soundInkInstance) {
+                if (soundInkInstance.isFading()) return;
+            }
             float f = this.calculateVolume(soundInstance);
             channelHandle.execute((channel) -> channel.setVolume(f));
         });

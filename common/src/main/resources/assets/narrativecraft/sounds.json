@@ -6,5 +6,13 @@
   "sfx.choice_appear": {
     "category": "master",
     "sounds": ["narrativecraft:sfx/choice_appear"]
+  },
+  "music.1": {
+    "category": "master",
+    "sounds": ["narrativecraft:music/1"]
+  },
+  "music.2": {
+    "category": "master",
+    "sounds": ["narrativecraft:music/2"]
   }
 }

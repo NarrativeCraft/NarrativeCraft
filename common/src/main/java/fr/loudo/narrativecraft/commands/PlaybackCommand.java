@@ -27,225 +27,124 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.managers.PlaybackManager;
-import fr.loudo.narrativecraft.narrative.Environment;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
-import fr.loudo.narrativecraft.narrative.playback.Playback;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.util.CommandUtil;
-import fr.loudo.narrativecraft.util.Translation;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.playback.Playback;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 
-// TODO: Play a playback for a specific player
+// TODO: play a subscene
 public class PlaybackCommand {
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(stack -> stack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("playback")
-                        .then(Commands.literal("play")
-                                .then(Commands.literal("animation")
-                                        .then(Commands.argument("animation_name", StringArgumentType.string())
-                                                .suggests(PlaybackCommand::getAnimationSuggestion)
-                                                .executes(context -> playAnimation(
-                                                        context,
-                                                        StringArgumentType.getString(context, "animation_name")))))
-                                .then(Commands.literal("subscene")
-                                        .then(Commands.argument("subscene_name", StringArgumentType.string())
-                                                .suggests(PlaybackCommand::getSubscenesSuggestion)
-                                                .executes(context -> playSubscene(
-                                                        context,
-                                                        StringArgumentType.getString(context, "subscene_name"))))))
-                        .then(Commands.literal("stop")
-                                .then(Commands.literal("animation")
-                                        .then(Commands.argument("animation_name", StringArgumentType.string())
-                                                .suggests(PlaybackCommand::getAnimationsPlaying)
-                                                .executes(context -> stopAnimation(
-                                                        context,
-                                                        StringArgumentType.getString(context, "animation_name")))))
-                                .then(Commands.literal("subscene")
-                                        .then(Commands.argument("subscene_name", StringArgumentType.string())
-                                                .suggests(PlaybackCommand::getSubscenesPlaying)
-                                                .executes(context -> stopSubscene(
-                                                        context,
-                                                        StringArgumentType.getString(context, "subscene_name"))))))
-                        .then(Commands.literal("stop_all").executes(PlaybackCommand::stopAllPlayback))));
+                        .then(Commands.literal("start")
+                                .then(Commands.argument("animation_name", StringArgumentType.string())
+                                        .suggests(PlaybackCommand::suggestAnimations)
+                                        .then(Commands.argument("targets", EntityArgument.players())
+                                                .executes(PlaybackCommand::startPlaybackToPlayers))
+                                        .executes(context -> startPlayback(
+                                                context, StringArgumentType.getString(context, "animation_name")))))));
     }
 
-    private static int playAnimation(CommandContext<CommandSourceStack> context, String animationName) {
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        Animation animation = playerSession.getScene().getAnimationByName(animationName);
+    private static Animation getAnimation(CommandContext<CommandSourceStack> context, String animationName) {
+        ServerPlayer player = context.getSource().getPlayer();
+
+        PlayerSession session = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!session.sessionSet()) {
+            context.getSource().sendFailure(Translation.message("session.no_session"));
+            return null;
+        }
+
+        Animation animation = session.getScene().getAnimationManager().getByName(animationName);
         if (animation == null) {
             context.getSource()
                     .sendFailure(Translation.message(
-                            "animation.no_exists",
-                            animationName,
-                            playerSession.getScene().getName()));
+                            "error.not_exists", Translation.message("animation").getString(), animationName));
+            return null;
+        }
+        if (!animation.initialize()) {
+            context.getSource().sendFailure(Translation.message("error.animation.initialize", animation.getName()));
+            return null;
+        }
+        return animation;
+    }
+
+    private static int startPlayback(CommandContext<CommandSourceStack> context, String animationName) {
+
+        Animation animation = getAnimation(context, animationName);
+        if (animation == null) {
             return 0;
         }
-        Playback playback = new Playback(
-                PlaybackManager.ID_INCREMENTER.incrementAndGet(),
-                animation,
-                context.getSource().getLevel(),
-                Environment.RECORDING,
-                false);
+
+        ServerPlayer player = context.getSource().getPlayer();
+        Playback playback = new Playback(animation, player);
+        playback.setKillOnEnd(true);
+        NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
         playback.start();
-        playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
-        playback.setOnStop(() -> playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime()));
-        context.getSource()
-                .sendSuccess(() -> Translation.message("playback.animation.play", animation.getName()), false);
-        playerSession.getPlaybackManager().addPlayback(playback);
+
+        context.getSource().sendSuccess(() -> Translation.message("playback.start", animationName), false);
+
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int playSubscene(CommandContext<CommandSourceStack> context, String subsceneName) {
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        Subscene subscene = playerSession.getScene().getSubsceneByName(subsceneName);
-        if (subscene == null) {
+    private static int startPlaybackToPlayers(CommandContext<CommandSourceStack> context) {
+
+        try {
+            String animationName = StringArgumentType.getString(context, "animation_name");
+            Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "targets");
+
+            Animation animation = getAnimation(context, animationName);
+            if (animation == null) {
+                return 0;
+            }
+
+            ServerPlayer player = context.getSource().getPlayer();
+
+            Playback playback = new Playback(animation, player);
+            playback.setKillOnEnd(true);
+            NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
+            playback.start(players);
+
             context.getSource()
-                    .sendFailure(Translation.message(
-                            "subscene.no_exists",
-                            subsceneName,
-                            playerSession.getScene().getName()));
+                    .sendSuccess(() -> Translation.message("playback.start_for_players", animationName), false);
+
+        } catch (CommandSyntaxException e) {
+            NarrativeCraftMod.LOGGER.error("Failed to start playback", e);
             return 0;
         }
-        subscene.start(context.getSource().getLevel(), Environment.RECORDING, false);
-        playerSession.getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
-        for (Playback playback : subscene.getPlaybacks()) {
-            playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
-            playback.setOnStop(() -> playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime()));
-        }
-        context.getSource().sendSuccess(() -> Translation.message("playback.subscene.play", subscene.getName()), false);
+
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int stopAnimation(CommandContext<CommandSourceStack> context, String animationName) {
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        Animation animation = playerSession.getScene().getAnimationByName(animationName);
-        if (animation == null) {
-            context.getSource()
-                    .sendFailure(Translation.message(
-                            "animation.no_exists",
-                            animationName,
-                            playerSession.getScene().getName()));
-            return 0;
-        }
-        List<Playback> playbacks = playerSession.getPlaybackManager().getAnimationsByNamePlaying(animationName);
-        if (playbacks.isEmpty()) {
-            context.getSource()
-                    .sendFailure(Translation.message(
-                            "playback.animation.not_playing",
-                            animationName,
-                            playerSession.getScene().getName()));
-            return 0;
-        }
-        for (Playback playback : playbacks) {
-            playback.stop(true);
-        }
-        context.getSource()
-                .sendSuccess(() -> Translation.message("playback.animation.stop", animation.getName()), false);
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int stopSubscene(CommandContext<CommandSourceStack> context, String subsceneName) {
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        Subscene subscene = playerSession.getScene().getSubsceneByName(subsceneName);
-        if (subscene == null) {
-            context.getSource()
-                    .sendFailure(Translation.message(
-                            "subscene.no_exists",
-                            subsceneName,
-                            playerSession.getScene().getName()));
-            return 0;
-        }
-        if (!subscene.isPlaying()) {
-            context.getSource()
-                    .sendFailure(Translation.message(
-                            "playback.subscene.not_playing",
-                            subsceneName,
-                            playerSession.getScene().getName()));
-            return 0;
-        }
-        subscene.stop(true);
-        context.getSource().sendSuccess(() -> Translation.message("playback.subscene.stop", subscene.getName()), false);
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int stopAllPlayback(CommandContext<CommandSourceStack> context) {
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        PlaybackManager playbackManager = playerSession.getPlaybackManager();
-        if (playbackManager.getPlaybacksPlaying().isEmpty()) {
-            context.getSource().sendFailure(Translation.message("playbacks.not_playing"));
-            return 0;
-        }
-        playbackManager.stopAll();
-        context.getSource().sendSuccess(() -> Translation.message("playback.stop_all"), false);
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static CompletableFuture<Suggestions> getAnimationSuggestion(
+    private static CompletableFuture<Suggestions> suggestAnimations(
             CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
-        if (playerSession == null) return builder.buildFuture();
-        return CommandUtil.getNamesNarrativeEntrySuggestion(
-                builder, playerSession.getScene().getAnimations());
-    }
+        ServerPlayer player = context.getSource().getPlayer();
+        PlayerSession session = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!session.sessionSet()) return builder.buildFuture();
 
-    private static CompletableFuture<Suggestions> getSubscenesSuggestion(
-            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
-        if (playerSession == null) return builder.buildFuture();
-        return CommandUtil.getNamesNarrativeEntrySuggestion(
-                builder, playerSession.getScene().getSubscenes());
-    }
-
-    private static CompletableFuture<Suggestions> getAnimationsPlaying(
-            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
-        if (playerSession == null) return builder.buildFuture();
-        List<Animation> animationPlaying = new ArrayList<>();
-        for (Playback playback : playerSession.getPlaybackManager().getAnimationsByNamePlaying()) {
-            animationPlaying.add(playback.getAnimation());
-        }
-        return CommandUtil.getNamesNarrativeEntrySuggestion(builder, animationPlaying);
-    }
-
-    private static CompletableFuture<Suggestions> getSubscenesPlaying(
-            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
-        if (playerSession == null) return builder.buildFuture();
-        List<Subscene> subscenePlaying = new ArrayList<>();
-        for (Subscene subscene : playerSession.getScene().getSubscenes()) {
-            if (subscene.isPlaying()) {
-                subscenePlaying.add(subscene);
+        for (Animation animation : session.getScene().getAnimationManager().getList()) {
+            String name = animation.getName();
+            if (name.contains(" ")) {
+                builder.suggest("\"" + name + "\"");
+            } else {
+                builder.suggest(name);
             }
         }
-        return CommandUtil.getNamesNarrativeEntrySuggestion(builder, subscenePlaying);
+
+        return builder.buildFuture();
     }
 }

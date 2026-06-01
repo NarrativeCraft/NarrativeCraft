@@ -23,234 +23,224 @@
 
 package fr.loudo.narrativecraft.narrative;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
-import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
-import fr.loudo.narrativecraft.narrative.character.CharacterType;
-import fr.loudo.narrativecraft.narrative.dialog.DialogData;
-import fr.loudo.narrativecraft.serialization.*;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
+import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
+import fr.loudo.narrativecraft.narrative.interaction.Interaction;
+import fr.loudo.narrativecraft.narrative.npc.Npc;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
+import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import java.util.List;
-import java.util.Random;
+import net.minecraft.server.level.ServerPlayer;
 
 public class NarrativeEntryInit {
 
-    public static boolean hasError;
-
     public static void init() {
-        hasError = false;
-        NarrativeCraftMod.getInstance().clearManagers();
+        // Not supposed to be populated on servers, but on singleplayer world it stills on memory so data aren't updated
+        NarrativeCraftMod.getInstance().getChapterManager().clear();
+        NarrativeCraftMod.getInstance().getCharacterManager().clear();
+        NarrativeCraftMod.getInstance().getCorruptedDeserialization().clear();
+
+        NarrativeCraftFile file = NarrativeCraftMod.getInstance().getFile();
+
+        // Order is important!! e.g. Chapters must be initialized before scenes of chapter can be initialized.
+        characters();
+        chapters();
+        scenes();
+        npcs();
+        animations();
+        subscenes();
+        cutscenes();
+        cameraAngles();
+        interactions();
+
+        NarrativeServerSettings.init(file.getInit().getDataDirectory().toPath());
+
+        NarrativeCraftMod.getInstance().setMainScreenData(file.getMainScreenData());
+        NarrativeCraftMod.getInstance().setGlobalDialogData(file.getGlobalDialogData());
+
         try {
-            NarrativeCraftFile.createGlobalDialogValues();
-            DialogData.globalDialogData = NarrativeCraftFile.getGlobalDialogValues();
-            initCharacters();
-            initChapters();
-            NarrativeCraftFile.updateInkIncludes();
+            NarrativeCraftMod.getInstance().setCompiledStoryJson(StoryCompilerHandler.compileToJson());
         } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Couldn't init story data", e);
-            hasError = true;
+            NarrativeCraftMod.LOGGER.error("Failed to compile story (init process)", e);
         }
     }
 
-    private static void initChapters() throws Exception {
-        File chaptersFolder = NarrativeCraftFile.chaptersDirectory;
-        if (chaptersFolder == null || !chaptersFolder.exists() || !chaptersFolder.isDirectory()) {
-            NarrativeCraftMod.LOGGER.warn("Chapter directory is null, doesn't exist, or is not a directory");
-            return;
-        }
-        File[] chaptersSubFolder = chaptersFolder.listFiles();
-        if (chaptersSubFolder == null) return;
+    private static void chapters() {
         ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        Gson gson = new Gson();
-        for (File chapterFolder : chaptersSubFolder) {
-            String dataContent = Files.readString(
-                    NarrativeCraftFile.getDataFile(chapterFolder).toPath());
-            Chapter chapterData = gson.fromJson(dataContent, Chapter.class);
-            int index = Integer.parseInt(chapterFolder.getName());
-            Chapter chapter = new Chapter(chapterData.getName(), chapterData.getDescription(), index);
-            chapterManager.addChapter(chapter);
-            initScenesOfChapter(chapter);
-        }
-    }
+        List<DeserializationResult<Chapter>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Chapter.class);
 
-    private static void initScenesOfChapter(Chapter chapter) throws Exception {
-        File scenesDirectory = NarrativeCraftFile.getScenesFolder(chapter);
-        File[] scenesFolder = scenesDirectory.listFiles();
-        if (scenesFolder == null) return;
-        Gson gson = new Gson();
-        for (File sceneFolder : scenesFolder) {
-            File dataFile = NarrativeCraftFile.getDataFileFromSceneFolder(sceneFolder);
-            String dataContent = Files.readString(dataFile.toPath());
-            Scene sceneData = gson.fromJson(dataContent, Scene.class);
-            if (sceneData.getRank() <= 0) {
-                throw new Exception(String.format(
-                        "Scene %s from chapter %s rank is equal to or less than 0.",
-                        sceneData.name, chapter.getIndex()));
+        for (DeserializationResult<Chapter> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
             }
-            Scene scene = new Scene(sceneData.getName(), sceneData.getDescription(), chapter);
-            scene.setRank(sceneData.getRank());
-            initNpcs(scene);
-            initAnimations(scene);
-            initSubscenes(scene);
-            initCutscenes(scene);
-            initCameraAngleGroups(scene);
-            initInteraction(scene);
-            chapter.addScene(scene);
+            Chapter chapter = deserializationResult.entry();
+            chapterManager.add(chapter);
         }
     }
 
-    private static void initAnimations(Scene scene) throws IOException {
-        File animationFolder = NarrativeCraftFile.getAnimationsFolder(scene);
-        File[] animationsFile = animationFolder.listFiles();
-        if (animationsFile == null) return;
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Animation.class, new AnimationSerializer(scene))
-                .create();
-        for (File animationFile : animationsFile) {
-            String content = Files.readString(animationFile.toPath());
-            Animation animation = gson.fromJson(content, Animation.class);
-            if (animation == null) continue;
-            scene.getAnimations().add(animation);
-        }
-    }
-
-    private static void initSubscenes(Scene scene) throws IOException {
-        File subsceneFile = NarrativeCraftFile.getSubsceneFile(scene);
-        String content = Files.readString(subsceneFile.toPath());
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene))
-                .create();
-        Type type = new TypeToken<List<Subscene>>() {}.getType();
-        List<Subscene> subscenes = gson.fromJson(content, type);
-        if (subscenes == null) return;
-        scene.getSubscenes().addAll(subscenes);
-    }
-
-    private static void initCutscenes(Scene scene) throws IOException {
-        File cutsceneFile = NarrativeCraftFile.getCutsceneFile(scene);
-        String content = Files.readString(cutsceneFile.toPath());
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Cutscene.class, new CutsceneSerializer(scene))
-                .create();
-        Type type = new TypeToken<List<Cutscene>>() {}.getType();
-        List<Cutscene> cutscenes = gson.fromJson(content, type);
-        if (cutscenes == null) return;
-        scene.getCutscenes().addAll(cutscenes);
-    }
-
-    private static void initCameraAngleGroups(Scene scene) throws IOException {
-        File cameraAngleGroupsFile = NarrativeCraftFile.getCameraAngelGroupFile(scene);
-        String content = Files.readString(cameraAngleGroupsFile.toPath());
-        Type type = new TypeToken<List<CameraAngle>>() {}.getType();
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(scene))
-                .create();
-        List<CameraAngle> cameraAngleGroups = gson.fromJson(content, type);
-        if (cameraAngleGroups == null) return;
-        cameraAngleGroups.forEach(group -> group.setScene(scene));
-        scene.getCameraAngles().addAll(cameraAngleGroups);
-    }
-
-    private static void initInteraction(Scene scene) throws IOException {
-        File interactionFile = NarrativeCraftFile.getInteractionFile(scene);
-        String content = Files.readString(interactionFile.toPath());
-        Type type = new TypeToken<List<Interaction>>() {}.getType();
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(scene))
-                .create();
-        List<Interaction> interactions = gson.fromJson(content, type);
-        if (interactions == null) return;
-        interactions.forEach(interaction -> interaction.setScene(scene));
-        scene.setInteractions(interactions);
-    }
-
-    private static void initNpcs(Scene scene) throws Exception {
-        File[] npcsFolder = NarrativeCraftFile.getNpcFolder(scene).listFiles();
-        if (npcsFolder == null) return;
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(CharacterStory.class, new CharacterSerializer())
-                .create();
-        for (File characterFolder : npcsFolder) {
-            File dataFile = NarrativeCraftFile.getDataFile(characterFolder);
-            String dataContent = Files.readString(dataFile.toPath());
-            CharacterStory characterStory = gson.fromJson(dataContent, CharacterStory.class);
-            if (characterStory == null) {
-                throw new Exception(String.format(
-                        "NPC %s of scene %s couldn't be initialized", characterFolder.getName(), scene.getName()));
+    private static void scenes() {
+        List<DeserializationResult<Scene>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Scene.class);
+        for (DeserializationResult<Scene> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
             }
-            characterStory.setCharacterType(CharacterType.NPC);
-            scene.addNpc(characterStory);
+            Scene scene = deserializationResult.entry();
+            scene.getChapter().getSceneManager().add(scene);
         }
     }
 
-    private static void initCharacters() throws Exception {
-        File[] charactersFolder = NarrativeCraftFile.characterDirectory.listFiles();
-        if (charactersFolder == null) return;
+    private static void animations() {
+        List<DeserializationResult<Animation>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Animation.class);
+        for (DeserializationResult<Animation> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Animation animation = deserializationResult.entry();
+            animation.getScene().getAnimationManager().add(animation);
+        }
+    }
+
+    private static void subscenes() {
+        List<DeserializationResult<Subscene>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Subscene.class);
+        for (DeserializationResult<Subscene> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Subscene subscene = deserializationResult.entry();
+            subscene.getScene().getSubsceneManager().add(subscene);
+        }
+    }
+
+    private static void cutscenes() {
+        List<DeserializationResult<Cutscene>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Cutscene.class);
+        for (DeserializationResult<Cutscene> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Cutscene cutscene = deserializationResult.entry();
+            cutscene.getScene().getCutsceneManager().add(cutscene);
+        }
+    }
+
+    private static void cameraAngles() {
+        List<DeserializationResult<CameraAngle>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(CameraAngle.class);
+        for (DeserializationResult<CameraAngle> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            CameraAngle cameraAngle = deserializationResult.entry();
+            cameraAngle.getScene().getCameraAngleManager().add(cameraAngle);
+        }
+    }
+
+    private static void interactions() {
+        List<DeserializationResult<Interaction>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Interaction.class);
+        for (DeserializationResult<Interaction> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Interaction interaction = deserializationResult.entry();
+            interaction.getScene().getInteractionManager().add(interaction);
+        }
+    }
+
+    private static void npcs() {
+        List<DeserializationResult<Npc>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(Npc.class);
+        for (DeserializationResult<Npc> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
+            }
+            Npc npc = deserializationResult.entry();
+            npc.getScene().getNpcManager().add(npc);
+        }
+    }
+
+    private static void characters() {
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(CharacterStory.class, new CharacterSerializer())
-                .create();
-        for (File characterFolder : charactersFolder) {
-            File dataFile = NarrativeCraftFile.getDataFile(characterFolder);
-            String dataContent = Files.readString(dataFile.toPath());
-            CharacterStory characterStory = gson.fromJson(dataContent, CharacterStory.class);
-            if (characterStory == null) {
-                throw new Exception(String.format("Character %s couldn't be initialized", characterFolder.getName()));
+        List<DeserializationResult<CharacterStory>> deserializationResults =
+                NarrativeCraftFileRegistry.getInstance().deserialize(CharacterStory.class);
+
+        for (DeserializationResult<CharacterStory> deserializationResult : deserializationResults) {
+            if (deserializationResult.corrupted()) {
+                NarrativeCraftMod.getInstance().getCorruptedDeserialization().add(deserializationResult);
+                continue;
             }
-            characterStory.setCharacterType(CharacterType.MAIN);
-            characterManager.addCharacter(characterStory);
+            characterManager.add(deserializationResult.entry());
         }
-        if (characterManager.getMainCharacter() == null
-                && !characterManager.getCharacterStories().isEmpty()) {
-            CharacterStory characterStory =
-                    characterManager.getCharacterStories().get(0);
-            characterManager
-                    .getCharacterStories()
-                    .get(0)
-                    .getMainCharacterAttribute()
-                    .setMainCharacter(true);
-            NarrativeCraftFile.updateCharacterData(characterStory, characterStory);
+    }
+
+    public static void sendDataToPlayer(ServerPlayer player) {
+        Services.PACKET.sendToPlayer(player, S2CNarrativeDataClear.INSTANCE);
+        CameraAngle mainScreenData = NarrativeCraftMod.getInstance().getMainScreenData();
+        if (mainScreenData != null) {
+            Services.PACKET.sendToPlayer(
+                    player, new S2CMainScreenData(CameraAngleSerializer.serializeData(mainScreenData)));
         }
-        if (NarrativeCraftMod.firstTime) {
-            CharacterStory steve = new CharacterStory(
-                    "Steve", "Steve from Minecraft.", "17", "05", "2009", CharacterModel.WIDE, CharacterType.MAIN);
-            CharacterStory alex = new CharacterStory(
-                    "Alex", "Alex from Minecraft.", "22", "08", "2014", CharacterModel.SLIM, CharacterType.MAIN);
-            steve.getMainCharacterAttribute().setMainCharacter(true);
-            characterManager.addCharacter(steve);
-            characterManager.addCharacter(alex);
-            NarrativeCraftFile.createCharacterFolder(steve);
-            NarrativeCraftFile.createCharacterFolder(alex);
-            if (new Random().nextInt(0, 500) >= 445) {
-                steve.getMainCharacterAttribute().setMainCharacter(false);
-                CharacterStory herobrine = new CharacterStory(
-                        "Herobrine",
-                        "You can't escape me. §kYour story is now mine...",
-                        "00",
-                        "00",
-                        "9999",
-                        CharacterModel.WIDE,
-                        CharacterType.MAIN);
-                herobrine.getMainCharacterAttribute().setMainCharacter(true);
-                characterManager.addCharacter(herobrine);
-                NarrativeCraftFile.createCharacterFolder(herobrine);
+        for (CharacterStory character :
+                NarrativeCraftMod.getInstance().getCharacterManager().getList()) {
+            Services.PACKET.sendToPlayer(
+                    player, BiSyncNarrativeEntryPacket.add(character.getId(), character.toPayload()));
+        }
+        for (Chapter chapter :
+                NarrativeCraftMod.getInstance().getChapterManager().getList()) {
+            Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(chapter.getId(), chapter.toPayload()));
+            for (Scene scene : chapter.getSceneManager().getList()) {
+                Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(scene.getId(), scene.toPayload()));
+                for (Npc npc : scene.getNpcManager().getList()) {
+                    Services.PACKET.sendToPlayer(player, BiSyncNarrativeEntryPacket.add(npc.getId(), npc.toPayload()));
+                }
+                for (Animation animation : scene.getAnimationManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
+                }
+                for (Subscene subscene : scene.getSubsceneManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(subscene.getId(), subscene.toPayload()));
+                }
+                for (Cutscene cutscene : scene.getCutsceneManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(cutscene.getId(), cutscene.toPayload()));
+                }
+                for (CameraAngle cameraAngle : scene.getCameraAngleManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(cameraAngle.getId(), cameraAngle.toPayload()));
+                }
+                for (Interaction interaction : scene.getInteractionManager().getList()) {
+                    Services.PACKET.sendToPlayer(
+                            player, BiSyncNarrativeEntryPacket.add(interaction.getId(), interaction.toPayload()));
+                }
             }
         }
     }

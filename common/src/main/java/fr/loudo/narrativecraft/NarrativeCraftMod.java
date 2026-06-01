@@ -23,93 +23,153 @@
 
 package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.managers.*;
-import fr.loudo.narrativecraft.options.NarrativeClientOption;
-import fr.loudo.narrativecraft.options.NarrativeWorldOption;
-import fr.loudo.narrativecraft.register.InkActionRegister;
-import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.resources.Identifier;
+import fr.loudo.narrativecraft.api.APISetup;
+import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.effects.TextEffectRegister;
+import fr.loudo.narrativecraft.dialog.effects.TextEffectRegistry;
+import fr.loudo.narrativecraft.editors.cutscene.CutsceneLayerRegister;
+import fr.loudo.narrativecraft.editors.cutscene.CutsceneLayerRegistry;
+import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileEditorsRegister;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.managers.RecordingManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.events.EventBus;
+import fr.loudo.narrativecraft.narrative.inkTag.InkActionRegister;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
+import fr.loudo.narrativecraft.narrative.save.SaveFileManager;
+import fr.loudo.narrativecraft.playback.PlaybackManager;
+import fr.loudo.narrativecraft.recording.actions.ActionRegister;
+import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NarrativeCraftMod {
-    private static final NarrativeCraftMod instance = new NarrativeCraftMod();
-
     public static final String MOD_ID = "narrativecraft";
     public static final String MOD_NAME = "NarrativeCraft";
-    public static final String MAJOR_VERSION = "1.0.0";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
+    public static final EventBus EVENT_BUS = new EventBus();
+    private static final NarrativeCraftMod instance = new NarrativeCraftMod();
 
-    public static boolean firstTime = false;
-    public static MinecraftServer server;
-    public static RenderType dialogBackgroundRenderType = RenderTypes.textBackgroundSeeThrough();
-
-    private final CharacterManager characterManager = new CharacterManager();
-    private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
     private final ChapterManager chapterManager = new ChapterManager();
+    private final CharacterManager characterManager = new CharacterManager();
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
-    private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer = new NarrativeCraftLogoRenderer(
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png"));
-    private NarrativeClientOption narrativeClientOptions = new NarrativeClientOption();
-    private NarrativeWorldOption narrativeWorldOption = new NarrativeWorldOption();
+    private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
+    private final ActionRegistry actionRegistry = new ActionRegistry();
+    private final CutsceneLayerRegistry cutsceneLayerRegistry = new CutsceneLayerRegistry();
+    private final TextEffectRegistry textEffectRegistry = new TextEffectRegistry();
+    private DialogData globalDialogData = new DialogData();
+    private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
+    private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
+    private final SaveFileManager saveFileManager = new SaveFileManager();
+    private CameraAngle mainScreenData;
 
-    public static NarrativeCraftMod getInstance() {
-        return instance;
-    }
+    private String compiledStoryJson;
+
+    private final NarrativeCraftFile file = new NarrativeCraftFile();
+
+    private MinecraftServer server;
 
     public static void commonInit() {
+        NarrativeCraftFileEditorsRegister.register();
+        NarrativeEditorsRegister.register();
+        APISetup.init(getInstance());
+
+        ActionRegister.register(getInstance().getActionRegistry());
+        CutsceneLayerRegister.register(getInstance().getCutsceneLayerRegistry());
+        TextEffectRegister.register(getInstance().getTextEffectRegistry());
         InkActionRegister.register();
-    }
-
-    public CharacterManager getCharacterManager() {
-        return characterManager;
-    }
-
-    public PlayerSessionManager getPlayerSessionManager() {
-        return playerSessionManager;
     }
 
     public ChapterManager getChapterManager() {
         return chapterManager;
     }
 
-    public RecordingManager getRecordingManager() {
-        return recordingManager;
+    public CharacterManager getCharacterManager() {
+        return characterManager;
     }
 
     public PlaybackManager getPlaybackManager() {
         return playbackManager;
     }
 
-    public NarrativeCraftLogoRenderer getNarrativeCraftLogoRenderer() {
-        return narrativeCraftLogoRenderer;
+    public RecordingManager getRecordingManager() {
+        return recordingManager;
     }
 
-    public NarrativeClientOption getNarrativeClientOptions() {
-        return narrativeClientOptions;
+    public PlayerSessionManager getPlayerSessionManager() {
+        return playerSessionManager;
     }
 
-    public NarrativeWorldOption getNarrativeWorldOption() {
-        return narrativeWorldOption;
+    public ActionRegistry getActionRegistry() {
+        return actionRegistry;
     }
 
-    public void setNarrativeClientOptions(NarrativeClientOption narrativeClientOptions) {
-        this.narrativeClientOptions = narrativeClientOptions;
+    public CutsceneLayerRegistry getCutsceneLayerRegistry() {
+        return cutsceneLayerRegistry;
     }
 
-    public void setNarrativeWorldOption(NarrativeWorldOption narrativeWorldOption) {
-        this.narrativeWorldOption = narrativeWorldOption;
+    public TextEffectRegistry getTextEffectRegistry() {
+        return textEffectRegistry;
     }
 
-    public void clearManagers() {
-        chapterManager.getChapters().clear();
-        playerSessionManager.getPlayerSessions().clear();
-        characterManager.getCharacterStories().clear();
-        recordingManager.getRecordings().clear();
-        playbackManager.getPlaybacks().clear();
+    public DialogData getGlobalDialogData() {
+        return globalDialogData;
+    }
+
+    public void setGlobalDialogData(DialogData globalDialogData) {
+        this.globalDialogData = globalDialogData;
+    }
+
+    public NarrativeCraftFile getFile() {
+        return file;
+    }
+
+    public MinecraftServer getServer() {
+        return server;
+    }
+
+    public CameraAngle getMainScreenData() {
+        return mainScreenData;
+    }
+
+    public void setMainScreenData(CameraAngle mainScreenData) {
+        this.mainScreenData = mainScreenData;
+    }
+
+    public List<DeserializationResult<?>> getCorruptedDeserialization() {
+        return corruptedDeserialization;
+    }
+
+    public InkTagDispatcherImpl getInkTagDispatcher() {
+        return inkTagDispatcher;
+    }
+
+    public String getCompiledStoryJson() {
+        return compiledStoryJson;
+    }
+
+    public void setCompiledStoryJson(String compiledStoryJson) {
+        this.compiledStoryJson = compiledStoryJson;
+    }
+
+    public void setServer(MinecraftServer server) {
+        this.server = server;
+    }
+
+    public SaveFileManager getSaveFileManager() {
+        return saveFileManager;
+    }
+
+    public static NarrativeCraftMod getInstance() {
+        return instance;
     }
 }

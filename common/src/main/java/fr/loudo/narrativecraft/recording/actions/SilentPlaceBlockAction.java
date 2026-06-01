@@ -1,0 +1,86 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.recording.actions;
+
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
+import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.state.BlockState;
+
+public class SilentPlaceBlockAction extends DataBlockAction {
+
+    public static final String ID = "silent_place_block";
+
+    private boolean onlyServerSide;
+
+    public SilentPlaceBlockAction(int tick) {
+        super(tick);
+    }
+
+    public SilentPlaceBlockAction(int tick, BlockPos blockPos, BlockState blockState) {
+        super(tick, blockPos, blockState);
+    }
+
+    @Override
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        BlockState previous = session.getBlockStateAtTick(blockPos, tick);
+        return List.of(new SilentPlaceBlockAction(tick, blockPos, previous));
+    }
+
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
+
+        ServerLevel level = session.getLevel();
+
+        if (session.forSpecificPlayers() && !onlyServerSide) {
+            for (ServerPlayer player : session.getTargetedPlayers()) {
+                player.connection.send(new ClientboundBlockUpdatePacket(blockPos, blockState));
+            }
+        } else {
+            level.setBlock(blockPos, blockState, 3);
+        }
+
+        session.recordBlockState(tick, blockPos, blockState);
+        return ActionResult.OK;
+    }
+
+    public boolean isOnlyServerSide() {
+        return onlyServerSide;
+    }
+
+    public void setOnlyServerSide(boolean onlyServerSide) {
+        this.onlyServerSide = onlyServerSide;
+    }
+}

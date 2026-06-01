@@ -23,28 +23,18 @@
 
 package fr.loudo.narrativecraft.managers;
 
-import fr.loudo.narrativecraft.narrative.recording.Recording;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.api.managers.IRecordingManager;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
+import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
-public class RecordingManager {
+public class RecordingManager extends Manager<Recording> implements IRecordingManager {
 
-    private final List<Recording> recordings = new ArrayList<>();
-
-    public void addRecording(Recording recording) {
-        if (recordings.contains(recording)) return;
-        recordings.add(recording);
-    }
-
-    public void removeRecording(Recording recording) {
-        recordings.remove(recording);
-    }
-
-    public Recording getRecording(Entity entity) {
-        for (Recording recording : recordings) {
-            if (recording.isSameEntity(entity)) {
+    public Recording getById(UUID id) {
+        for (Recording recording : list) {
+            if (recording.getId().equals(id)) {
                 return recording;
             }
         }
@@ -52,19 +42,43 @@ public class RecordingManager {
     }
 
     public boolean isRecording(ServerPlayer player) {
-        for (Recording recording : recordings) {
-            if (recording.isSameEntity(player) && recording.isRecording()) {
+        for (Recording recording : list) {
+            if (recording.getPlayer().getUUID().equals(player.getUUID()) && recording.isRecording()) {
                 return true;
             }
         }
         return false;
     }
 
-    public List<Recording> getCurrentRecording() {
-        return recordings.stream().filter(Recording::isRecording).toList();
+    public Recording getRecording(ServerPlayer player) {
+        for (Recording recording : list) {
+            if (recording.getPlayer().getUUID().equals(player.getUUID())) {
+                return recording;
+            }
+        }
+        return null;
     }
 
-    public List<Recording> getRecordings() {
-        return recordings;
+    @Override
+    public Recording getRecording(Entity entity) {
+        for (Recording recording : list) {
+            for (RecordingEntityData recordingEntityData : recording.getRecordingEntityDataList()) {
+                if (recordingEntityData.getEntity().getUUID().equals(entity.getUUID())) {
+                    return recording;
+                }
+            }
+        }
+        return null;
+    }
+
+    public RecordingEntityData getRecordingEntityData(Entity entity) {
+        for (Recording recording : list) {
+            for (RecordingEntityData data : recording.getRecordingEntityDataList()) {
+                if (data.getEntity().getUUID().equals(entity.getUUID())) {
+                    return data;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -27,22 +27,20 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
-import fr.loudo.narrativecraft.narrative.playback.Playback;
-import fr.loudo.narrativecraft.narrative.recording.Recording;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.screens.components.ChooseCharacterScreen;
-import fr.loudo.narrativecraft.util.CommandUtil;
-import fr.loudo.narrativecraft.util.ScreenUtils;
-import fr.loudo.narrativecraft.util.Translation;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import net.minecraft.client.Minecraft;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.playback.Playback;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,218 +48,239 @@ import net.minecraft.server.permissions.Permissions;
 
 public class RecordCommand {
 
-    private static final RecordingManager recordingManager =
+    private static final RecordingManager RECORDING_MANAGER =
             NarrativeCraftMod.getInstance().getRecordingManager();
-    public static final List<ServerPlayer> playerTryingOverride = new ArrayList<>();
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(commandSourceStack ->
+                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("record")
                         .then(Commands.literal("start")
+                                .executes(RecordCommand::startRecord)
                                 .then(Commands.literal("with")
-                                        .then(Commands.argument("subscenes", StringArgumentType.greedyString())
-                                                .suggests(NarrativeCraftMod.getInstance()
-                                                        .getChapterManager()
-                                                        .getSubscenesOfScenesSuggestions())
-                                                .executes(commandContext -> {
-                                                    String subscenes =
-                                                            StringArgumentType.getString(commandContext, "subscenes");
-                                                    return startRecordingWithSubscenes(commandContext, subscenes);
-                                                })))
-                                .executes(RecordCommand::startRecording))
-                        .then(Commands.literal("stop").executes(RecordCommand::stopRecording))
+                                        .then(Commands.argument("subscene_names", StringArgumentType.greedyString())
+                                                .suggests(RecordCommand::suggestSubscenes)
+                                                .executes(RecordCommand::startRecordWithSubscenes)))))
+                .then(Commands.literal("record").then(Commands.literal("stop").executes(RecordCommand::stopRecord)))
+                .then(Commands.literal("record")
+                        .then(Commands.literal("discard").executes(RecordCommand::discardRecord)))
+                .then(Commands.literal("record")
                         .then(Commands.literal("save")
-                                .then(Commands.argument("animation_name", StringArgumentType.string())
-                                        .executes(context -> saveRecording(
-                                                context, StringArgumentType.getString(context, "animation_name")))))));
+                                .then(Commands.argument("record_name", StringArgumentType.string())
+                                        .executes(RecordCommand::saveRecord)))));
     }
 
-    private static int startRecording(CommandContext<CommandSourceStack> context) {
-
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        if (playerSession.getController() != null) {
-            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+    private static int startRecord(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
+        if (RECORDING_MANAGER.isRecording(player)) {
+            context.getSource().sendFailure(Translation.message("record.already_recording"));
             return 0;
         }
 
+        PlayerSession playerSession = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!playerSession.sessionSet()) {
+            context.getSource().sendFailure(Translation.message("session.no_session"));
+            return 0;
+        }
+
+        return doStartRecord(context, playerSession, List.of());
+    }
+
+    private static int startRecordWithSubscenes(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
+        if (RECORDING_MANAGER.isRecording(player)) {
+            context.getSource().sendFailure(Translation.message("record.already_recording"));
+            return 0;
+        }
+
+        PlayerSession playerSession = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!playerSession.sessionSet()) {
+            context.getSource().sendFailure(Translation.message("session.no_session"));
+            return 0;
+        }
+
+        String subsceneNamesRaw = StringArgumentType.getString(context, "subscene_names");
+        List<Subscene> subscenes = new ArrayList<>();
+        for (String name : subsceneNamesRaw.trim().split("\\s+")) {
+            if (name.isEmpty()) continue;
+            Subscene subscene = playerSession.getScene().getSubsceneManager().getByName(name);
+            if (subscene == null) {
+                context.getSource()
+                        .sendFailure(Translation.message(
+                                "error.not_exists",
+                                Translation.message("subscene").getString(),
+                                name));
+                return 0;
+            }
+            subscenes.add(subscene);
+        }
+
+        return doStartRecord(context, playerSession, subscenes);
+    }
+
+    private static int doStartRecord(
+            CommandContext<CommandSourceStack> context, PlayerSession playerSession, List<Subscene> subscenes) {
         ServerPlayer player = context.getSource().getPlayer();
 
-        if (recordingManager.isRecording(player)) {
-            context.getSource().sendFailure(Translation.message("record.start.already_recording"));
-            return 0;
+        List<Animation> animationsToPlay = new ArrayList<>();
+        for (Subscene subscene : subscenes) {
+            for (Animation animation : subscene.getAnimations()) {
+                if (!animation.initialize()) {
+                    context.getSource()
+                            .sendFailure(Translation.message("error.animation.initialize", animation.getName()));
+                    return 0;
+                }
+                animationsToPlay.add(animation);
+            }
         }
 
-        Recording recording = recordingManager.getRecording(player);
-        if (recording == null) {
-            recording = new Recording(context.getSource().getPlayer(), playerSession);
+        Recording recording = new Recording(playerSession);
+        RECORDING_MANAGER.add(recording);
+
+        for (Animation animation : animationsToPlay) {
+            Playback playback = new Playback(animation, player);
+            playback.setKillOnEnd(true);
+            NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
+            playback.start();
+            recording.addSubscenePlayback(playback);
         }
+
         recording.start();
-        recordingManager.addRecording(recording);
-
-        context.getSource().sendSuccess(() -> Translation.message("record.start.success"), false);
+        context.getSource().sendSuccess(() -> Translation.message("record.start"), false);
 
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int startRecordingWithSubscenes(CommandContext<CommandSourceStack> context, String subscenes) {
-
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        if (playerSession.getController() != null) {
-            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
-            return 0;
-        }
-
+    private static CompletableFuture<Suggestions> suggestSubscenes(
+            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         ServerPlayer player = context.getSource().getPlayer();
+        PlayerSession session = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!session.sessionSet()) return builder.buildFuture();
 
-        if (recordingManager.isRecording(player)) {
-            context.getSource().sendFailure(Translation.message("record.start.already_recording"));
-            return 0;
+        String remaining = builder.getRemaining();
+        int lastSpace = remaining.lastIndexOf(' ');
+        String currentWord = lastSpace >= 0 ? remaining.substring(lastSpace + 1) : remaining;
+
+        Set<String> alreadyTyped = new HashSet<>();
+        if (lastSpace > 0) {
+            alreadyTyped.addAll(Arrays.asList(remaining.substring(0, lastSpace).split("\\s+")));
         }
 
-        List<Subscene> subsceneToPlay = new ArrayList<>();
-        subscenes = subscenes.replaceAll("\"", "");
-        String[] subsceneNameList = subscenes.split(",");
-        for (String subsceneName : subsceneNameList) {
-            Subscene subscene = playerSession.getScene().getSubsceneByName(subsceneName);
-            if (subscene != null) {
-                subsceneToPlay.add(subscene);
-            } else {
-                context.getSource().sendFailure(Translation.message("subscene.no_exists", subsceneName));
-            }
-        }
+        SuggestionsBuilder offsetBuilder = builder.createOffset(builder.getStart() + lastSpace + 1);
 
-        if (subsceneNameList.length == subsceneToPlay.size()) {
-            Recording recording = recordingManager.getRecording(player);
-            if (recording == null) {
-                recording = new Recording(context.getSource().getPlayer(), playerSession, subsceneToPlay);
-            }
-            recording.setSubscenesPlaying(subsceneToPlay);
-            recording.start();
-            for (Subscene subscene : subsceneToPlay) {
-                for (Playback playback : subscene.getPlaybacks()) {
-                    playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
+        for (Subscene subscene : session.getScene().getSubsceneManager().getList()) {
+            String name = subscene.getName();
+            if (!alreadyTyped.contains(name) && name.toLowerCase().startsWith(currentWord.toLowerCase())) {
+                if (name.contains(" ")) {
+                    offsetBuilder.suggest("\"" + name + "\"");
+                } else {
+                    offsetBuilder.suggest(name);
                 }
             }
-            recordingManager.addRecording(recording);
-            context.getSource()
-                    .sendSuccess(
-                            () -> Translation.message("record.start.with_subscenes", Arrays.toString(subsceneNameList)),
-                            true);
         }
 
-        return Command.SINGLE_SUCCESS;
+        return offsetBuilder.buildFuture();
     }
 
-    private static int stopRecording(CommandContext<CommandSourceStack> context) {
-
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        if (playerSession.getController() != null) {
-            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
-            return 0;
-        }
+    private static int stopRecord(CommandContext<CommandSourceStack> context) {
 
         ServerPlayer player = context.getSource().getPlayer();
 
-        if (!recordingManager.isRecording(player)) {
-            context.getSource().sendFailure(Translation.message("record.stop.no_recording"));
+        PlayerSession playerSession = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!playerSession.sessionSet()) {
+            context.getSource().sendFailure(Translation.message("session.no_session"));
             return 0;
         }
 
-        Recording recording = recordingManager.getRecording(player);
-        recording.stop();
-        playerSession.getCharacterRuntimes().clear();
+        Recording recording = RECORDING_MANAGER.getRecording(player);
 
-        context.getSource().sendSuccess(() -> Translation.message("record.stop.success"), false);
-
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int saveRecording(CommandContext<CommandSourceStack> context, String newAnimationName) {
-        PlayerSession playerSession =
-                CommandUtil.getSession(context, context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        if (playerSession.getController() != null) {
-            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
-            return 0;
-        }
-
-        ServerPlayer player = context.getSource().getPlayer();
-
-        Recording recording = recordingManager.getRecording(context.getSource().getPlayer());
         if (recording == null) {
-            context.getSource().sendFailure(Translation.message("record.save.recorded_nothing"));
+            context.getSource().sendFailure(Translation.message("record.not_recording"));
+            return 0;
+        }
+
+        recording.stop();
+        context.getSource().sendSuccess(() -> Translation.message("record.stop"), false);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int discardRecord(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
+
+        Recording recording = RECORDING_MANAGER.getRecording(player);
+        if (recording == null) {
+            context.getSource().sendFailure(Translation.message("record.not_recording"));
+            return 0;
+        }
+
+        recording.stop();
+        RECORDING_MANAGER.remove(recording);
+
+        context.getSource().sendSuccess(() -> Translation.message("record.discarded"), false);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int saveRecord(CommandContext<CommandSourceStack> context) {
+
+        String recordName = StringArgumentType.getString(context, "record_name");
+
+        ServerPlayer player = context.getSource().getPlayer();
+
+        PlayerSession playerSession = UtilsServer.getPlayerSessionByPlayer(player);
+        if (!playerSession.sessionSet()) {
+            context.getSource().sendFailure(Translation.message("session.no_session"));
+            return 0;
+        }
+
+        Recording recording = RECORDING_MANAGER.getRecording(player);
+
+        if (recording == null) {
+            context.getSource().sendFailure(Translation.message("record.recorded_nothing"));
             return 0;
         }
 
         if (recording.isRecording()) {
-            context.getSource().sendFailure(Translation.message("record.save.stop_record_before_save"));
+            context.getSource().sendFailure(Translation.message("record.recording"));
+        }
+
+        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        if (characterManager.getList().isEmpty()) {
+            context.getSource().sendFailure(Translation.message("error.record.no_characters"));
             return 0;
         }
 
-        recording.stop();
-
-        Animation animation = playerSession.getScene().getAnimationByName(newAnimationName);
-        // If a player tries to override an animation that already exists
-        if (animation != null) {
-            if (!playerTryingOverride.contains(player)) {
-                playerTryingOverride.add(context.getSource().getPlayer());
-                context.getSource()
-                        .sendFailure(Translation.message(
-                                "record.save.overwrite",
-                                newAnimationName,
-                                playerSession.getScene().getName(),
-                                playerSession.getChapter().getIndex()));
+        Animation existingAnimation =
+                playerSession.getScene().getAnimationManager().getByName(recordName);
+        if (existingAnimation != null) {
+            if (!recordName.equals(recording.getPendingOverwriteName())) {
+                recording.setPendingOverwriteName(recordName);
+                context.getSource().sendFailure(Translation.message("record.overwrite_confirm", recordName));
                 return 0;
-            } else {
-                playerTryingOverride.remove(player);
             }
-        } else {
-            animation = new Animation(newAnimationName, playerSession.getScene());
-            playerTryingOverride.remove(player);
+            recording.setPendingOverwriteName(null);
+            context.getSource().sendSuccess(() -> Translation.message("record.saving"), false);
+            if (recording.save(recordName, existingAnimation)) {
+                context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);
+            } else {
+                context.getSource().sendFailure(Translation.message("error.record.save"));
+            }
+            RECORDING_MANAGER.remove(recording);
+            return Command.SINGLE_SUCCESS;
         }
-        Animation finalAnimation = animation;
-        ChooseCharacterScreen screen = new ChooseCharacterScreen(
-                null,
-                Translation.message("screen.story_manager.link_animation_character")
-                        .getString(),
-                null,
-                playerSession.getScene(),
-                characterStory -> {
-                    if (characterStory == null) {
-                        ScreenUtils.sendToast(
-                                Translation.message("global.error"),
-                                Translation.message("animation.must_link_character"));
-                        return;
-                    }
-                    try {
-                        finalAnimation.setCharacter(characterStory);
-                        recording.save(finalAnimation);
-                        context.getSource()
-                                .sendSuccess(
-                                        () -> Translation.message(
-                                                "record.save.success",
-                                                finalAnimation.getName(),
-                                                playerSession.getScene().getName(),
-                                                playerSession.getChapter().getIndex()),
-                                        true);
-                        recordingManager.removeRecording(recording);
-                    } catch (IOException e) {
-                        context.getSource()
-                                .sendFailure(Translation.message(
-                                        "record.save.fail",
-                                        finalAnimation.getName(),
-                                        playerSession.getChapter().getIndex(),
-                                        playerSession.getScene().getName()));
-                    }
-                });
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+
+        recording.setPendingOverwriteName(null);
+        context.getSource().sendSuccess(() -> Translation.message("record.saving"), false);
+        if (recording.save(recordName)) {
+            context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);
+        } else {
+            context.getSource().sendFailure(Translation.message("error.record.save"));
+        }
+
+        RECORDING_MANAGER.remove(recording);
 
         return Command.SINGLE_SUCCESS;
     }

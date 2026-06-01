@@ -30,9 +30,12 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.network.S2CPlayerSession;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.UtilsServer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,58 +45,59 @@ public class PlayerSessionCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(stack -> stack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("session")
-                        .then(Commands.literal("clear").executes(PlayerSessionCommand::clearSession))
+                        .then(Commands.literal("clear").executes(PlayerSessionCommand::clear))
                         .then(Commands.literal("set")
                                 .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
-                                        .suggests(NarrativeCraftMod.getInstance()
-                                                .getChapterManager()
-                                                .getChapterSuggestions())
+                                        .suggests(CommandSuggestions::suggestChapters)
                                         .then(Commands.argument("scene_name", StringArgumentType.string())
-                                                .suggests(NarrativeCraftMod.getInstance()
-                                                        .getChapterManager()
-                                                        .getSceneSuggestionsByChapter())
+                                                .suggests(CommandSuggestions::suggestSceneByChapter)
                                                 .executes(context -> setSession(
                                                         context,
                                                         IntegerArgumentType.getInteger(context, "chapter_index"),
                                                         StringArgumentType.getString(context, "scene_name"))))))));
     }
 
-    private static int setSession(CommandContext<CommandSourceStack> context, int chapterIndex, String sceneName) {
+    private static int clear(CommandContext<CommandSourceStack> context) {
 
-        if (!NarrativeCraftMod.getInstance().getChapterManager().chapterExists(chapterIndex)) {
-            context.getSource().sendFailure(Translation.message("chapter.no_exists", chapterIndex));
-            return 0;
-        }
+        PlayerSession playerSession =
+                UtilsServer.getPlayerSessionByPlayer(context.getSource().getPlayer());
+        playerSession.clear();
 
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
-
-        if (!chapter.sceneExists(sceneName)) {
-            context.getSource().sendFailure(Translation.message("scene.no_exists", sceneName, chapterIndex));
-            return 0;
-        }
-
-        Scene scene = chapter.getSceneByName(sceneName);
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
-        playerSession.setChapter(chapter);
-        playerSession.setScene(scene);
-        context.getSource()
-                .sendSuccess(() -> Translation.message("session.set", chapter.getIndex(), scene.getName()), false);
+        context.getSource().sendSuccess(() -> Translation.message("session.clear"), false);
 
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int clearSession(CommandContext<CommandSourceStack> context) {
+    private static int setSession(CommandContext<CommandSourceStack> context, int chapterIndex, String sceneName) {
 
         ServerPlayer player = context.getSource().getPlayer();
 
-        PlayerSession playerSession =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
-        playerSession.reset();
-        context.getSource().sendSuccess(() -> Translation.message("session.cleared"), false);
+        PlayerSession playerSession = UtilsServer.getPlayerSessionByPlayer(player);
+
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
+        if (chapter == null) {
+            context.getSource()
+                    .sendFailure(Translation.message(
+                            "error.not_exists", Translation.message("chapter").getString(), chapterIndex));
+            return 0;
+        }
+
+        Scene scene = chapter.getSceneManager().getByName(sceneName);
+        if (scene == null) {
+            context.getSource()
+                    .sendFailure(Translation.message(
+                            "error.not_exists", Translation.message("scene").getString(), sceneName));
+            return 0;
+        }
+
+        playerSession.apply(chapter, scene);
+        Services.PACKET.sendToPlayer(player, new S2CPlayerSession(chapter.getId(), scene.getId()));
+
+        context.getSource()
+                .sendSuccess(
+                        () -> Translation.message("session.set", chapter.getChapterIndex(), scene.getName()), false);
 
         return Command.SINGLE_SUCCESS;
     }

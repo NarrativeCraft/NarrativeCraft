@@ -29,4 +29,6 @@ import net.minecraft.server.level.ServerPlayer;
 public interface IPacketSender {
 
     void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+
+    void sendToServer(CustomPacketPayload packet);
 }

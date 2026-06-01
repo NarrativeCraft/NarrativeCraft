@@ -25,24 +25,22 @@ package fr.loudo.narrativecraft.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.StoryValidation;
-import fr.loudo.narrativecraft.util.ErrorLine;
-import fr.loudo.narrativecraft.util.Translation;
-import fr.loudo.narrativecraft.util.Util;
+import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
@@ -51,126 +49,166 @@ public class StoryCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("story")
-                        .then(Commands.literal("validate")
-                                .executes(commandContext -> validateStory(commandContext, true)))
+                        .then(Commands.literal("reload")
+                                .requires(commandSourceStack ->
+                                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                                .executes(StoryCommand::reload))
                         .then(Commands.literal("play")
-                                .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
-                                        .suggests(NarrativeCraftMod.getInstance()
-                                                .getChapterManager()
-                                                .getChapterSuggestions())
-                                        .then(Commands.argument("scene_name", StringArgumentType.string())
-                                                .suggests(NarrativeCraftMod.getInstance()
-                                                        .getChapterManager()
-                                                        .getSceneSuggestionsByChapter())
-                                                .then(Commands.argument("debug", BoolArgumentType.bool())
-                                                        .executes(context -> playStoryChapterStory(
-                                                                context,
-                                                                IntegerArgumentType.getInteger(
-                                                                        context, "chapter_index"),
-                                                                StringArgumentType.getString(context, "scene_name"),
-                                                                BoolArgumentType.getBool(context, "debug")))))))
-                        .then(Commands.literal("stop").executes(StoryCommand::stopStory))));
+                                .requires(commandSourceStack ->
+                                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                                .executes(ctx -> {
+                                    ServerPlayer player = ctx.getSource().getPlayerOrException();
+                                    return playFor(ctx, player, null);
+                                })
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(ctx -> {
+                                            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+                                            return playFor(ctx, target, null);
+                                        })
+                                        .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
+                                                .suggests(CommandSuggestions::suggestChapters)
+                                                .then(Commands.argument("scene_name", StringArgumentType.string())
+                                                        .suggests(CommandSuggestions::suggestSceneByChapter)
+                                                        .executes(ctx -> {
+                                                            ServerPlayer target =
+                                                                    EntityArgument.getPlayer(ctx, "target");
+                                                            return playFor(
+                                                                    ctx,
+                                                                    target,
+                                                                    IntegerArgumentType.getInteger(
+                                                                            ctx, "chapter_index"),
+                                                                    StringArgumentType.getString(ctx, "scene_name"));
+                                                        })))))
+                        .then(Commands.literal("stop")
+                                .requires(commandSourceStack ->
+                                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                                .executes(ctx -> {
+                                    ServerPlayer player = ctx.getSource().getPlayerOrException();
+                                    return stopFor(ctx, player);
+                                })
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(ctx -> {
+                                            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+                                            return stopFor(ctx, target);
+                                        })))));
     }
 
-    private static int validateStory(CommandContext<CommandSourceStack> context, boolean fullValidation) {
-        ServerPlayer player = context.getSource().getPlayer();
-        if (fullValidation) {
-            player.sendSystemMessage(Component.empty());
-            player.sendSystemMessage(
-                    Translation.message("validation.validating").withStyle(ChatFormatting.YELLOW));
-        }
+    private static int reload(CommandContext<CommandSourceStack> context) {
+        context.getSource()
+                .sendSystemMessage(Translation.message("story.compiling").withStyle(ChatFormatting.YELLOW));
+
+        String compiledJson;
         try {
-            List<ErrorLine> results = StoryValidation.validate();
-            List<ErrorLine> warnLines =
-                    results.stream().filter(ErrorLine::isWarn).toList();
-            List<ErrorLine> errorLines =
-                    results.stream().filter(errorLine -> !errorLine.isWarn()).toList();
-            if (errorLines.isEmpty() && warnLines.isEmpty() && fullValidation) {
-                player.sendSystemMessage(
-                        Translation.message("validation.validated").withStyle(ChatFormatting.GREEN));
-                player.sendSystemMessage(Component.empty());
-                return Command.SINGLE_SUCCESS;
-            }
-            if (!fullValidation && errorLines.isEmpty()) return Command.SINGLE_SUCCESS;
-            for (ErrorLine errorLine : results) {
-                player.sendSystemMessage(errorLine.toMessage());
-            }
-            if (!errorLines.isEmpty()) {
-                player.sendSystemMessage(Translation.message(
-                                "validation.found_errors",
-                                Component.literal(String.valueOf(errorLines.size()))
-                                        .withStyle(ChatFormatting.GOLD))
-                        .withStyle(ChatFormatting.RED));
-                player.sendSystemMessage(Component.empty());
-            }
-            if (!warnLines.isEmpty()) {
-                player.sendSystemMessage(Translation.message(
-                                "validation.found_warns",
-                                Component.literal(String.valueOf(warnLines.size()))
-                                        .withStyle(ChatFormatting.GOLD))
-                        .withStyle(ChatFormatting.YELLOW));
-            }
-            return errorLines.isEmpty() ? Command.SINGLE_SUCCESS : 0;
+            compiledJson = StoryCompilerHandler.compileToJson();
         } catch (Exception e) {
-            Util.sendCrashMessage(player, e);
+            context.getSource().sendSystemMessage(Component.empty());
+            NarrativeCraftMod.LOGGER.error("Failed to compile story", e);
+            context.getSource().sendFailure(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
+            return 0;
         }
-        if (fullValidation) {
-            player.sendSystemMessage(Component.empty());
+
+        List<StoryCompilerHandler.TagError> tagErrors = StoryCompilerHandler.validateTags();
+        if (!tagErrors.isEmpty()) {
+            for (StoryCompilerHandler.TagError tagError : tagErrors) {
+                context.getSource().sendFailure(tagError.toMessage());
+            }
+            context.getSource()
+                    .sendFailure(Translation.message(
+                                    "story.error_compilation",
+                                    Component.literal(String.valueOf(tagErrors.size()))
+                                            .withStyle(ChatFormatting.GOLD))
+                            .withStyle(ChatFormatting.RED));
+            return 0;
         }
+
+        NarrativeCraftMod.getInstance().setCompiledStoryJson(compiledJson);
+        context.getSource()
+                .sendSuccess(() -> Translation.message("story.compiled").withStyle(ChatFormatting.GREEN), false);
 
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int playStoryChapterStory(
-            CommandContext<CommandSourceStack> context, int chapterIndex, String sceneName, boolean debug) {
-
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        if (!NarrativeCraftFile.getStoryFile().exists()) {
-            context.getSource().sendFailure(Translation.message("story.no_exists"));
+    private static int playFor(CommandContext<CommandSourceStack> context, ServerPlayer target, String knotPath) {
+        String compiledJson = NarrativeCraftMod.getInstance().getCompiledStoryJson();
+        if (compiledJson == null) {
+            context.getSource()
+                    .sendFailure(Translation.message("story.not_compiled").withStyle(ChatFormatting.RED));
             return 0;
         }
+
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession session = sessionManager.getByPlayer(target);
+
+        StoryHandler existing = session.getStoryHandler();
+        if (existing != null) {
+            existing.stop();
+        }
+
+        try {
+            StoryHandler storyHandler = new StoryHandler(session);
+            session.setStoryHandler(storyHandler);
+            if (knotPath != null) {
+                storyHandler.start(knotPath);
+            } else {
+                storyHandler.start();
+            }
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Failed to start story for player {}", target.getName().getString(), e);
+            context.getSource().sendFailure(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
+            return 0;
+        }
+
+        context.getSource()
+                .sendSuccess(
+                        () -> Translation.message("story.started", target.getName())
+                                .withStyle(ChatFormatting.GREEN),
+                        false);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int playFor(
+            CommandContext<CommandSourceStack> context, ServerPlayer target, int chapterIndex, String sceneName) {
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
         if (chapter == null) {
-            context.getSource().sendFailure(Translation.message("chapter.no_exists", chapterIndex));
+            context.getSource()
+                    .sendFailure(Translation.message(
+                            "error.not_exists", Translation.message("chapter").getString(), chapterIndex));
             return 0;
         }
-        Scene scene = chapter.getSceneByName(sceneName);
-        if (scene == null) {
-            context.getSource().sendFailure(Translation.message("scene.no_exists", sceneName, chapterIndex));
-            return 0;
-        }
-        if (validateStory(context, false) == 0) return 0;
-        if (playerSession.getStoryHandler() != null) {
-            playerSession.getStoryHandler().stop();
-        }
-        StoryHandler storyHandler = new StoryHandler(chapter, scene, playerSession);
-        storyHandler.setDebugMode(debug);
-        storyHandler.start();
 
-        return Command.SINGLE_SUCCESS;
+        Scene scene = chapter.getSceneManager().getByName(sceneName);
+        if (scene == null) {
+            context.getSource()
+                    .sendFailure(Translation.message(
+                            "error.not_exists", Translation.message("scene").getString(), sceneName));
+            return 0;
+        }
+
+        return playFor(context, target, scene.knotName());
     }
 
-    private static int stopStory(CommandContext<CommandSourceStack> context) {
-        if (!context.getSource().permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return 0;
+    private static int stopFor(CommandContext<CommandSourceStack> context, ServerPlayer target) {
+        PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession session = sessionManager.getByPlayer(target);
 
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
-        if (playerSession == null) return 0;
-        StoryHandler storyHandler = playerSession.getStoryHandler();
+        StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler == null) {
-            context.getSource().sendFailure(Translation.message("story.not_playing"));
+            context.getSource()
+                    .sendFailure(Translation.message("story.not_running", target.getName())
+                            .withStyle(ChatFormatting.RED));
             return 0;
         }
 
         storyHandler.stop();
-        context.getSource().sendSuccess(() -> Translation.message("story.stopped"), false);
+        session.setStoryHandler(null);
 
+        context.getSource()
+                .sendSuccess(
+                        () -> Translation.message("story.stopped", target.getName())
+                                .withStyle(ChatFormatting.GREEN),
+                        false);
         return Command.SINGLE_SUCCESS;
     }
 }

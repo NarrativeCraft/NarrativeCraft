@@ -23,124 +23,49 @@
 
 package fr.loudo.narrativecraft.narrative.chapter;
 
-import com.mojang.brigadier.suggestion.SuggestionProvider;
+import fr.loudo.narrativecraft.api.narrative.chapter.IChapter;
+import fr.loudo.narrativecraft.managers.SceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import net.minecraft.commands.CommandSourceStack;
+import java.util.UUID;
 
-public class Chapter extends NarrativeEntry {
+public class Chapter extends NarrativeEntry<ChapterPayload> implements IChapter {
 
-    private int index;
-    private final List<Scene> scenes = new ArrayList<>();
+    private int chapterIndex;
+    private final SceneManager sceneManager = new SceneManager();
 
-    public Chapter(String name, String description, int index) {
+    public Chapter(UUID id, String name, String description, int chapterIndex) {
+        super(id, name, description);
+        this.chapterIndex = chapterIndex;
+    }
+
+    public Chapter(String name, String description, int chapterIndex) {
         super(name, description);
-        this.index = index;
+        this.chapterIndex = chapterIndex;
     }
 
-    public String knotName() {
-        return "chapter_" + index;
+    public int getChapterIndex() {
+        return chapterIndex;
     }
 
-    public void addScene(Scene scene) {
-        if (scenes.contains(scene)) return;
-        scenes.add(scene);
+    public void setChapterIndex(int chapterIndex) {
+        this.chapterIndex = chapterIndex;
     }
 
-    public void removeScene(Scene scene) {
-        scenes.remove(scene);
-        sortScenesByRank();
+    public SceneManager getSceneManager() {
+        return sceneManager;
     }
 
-    public Scene getSceneByName(String name) {
-        for (Scene scene : scenes) {
-            if (scene.getName().equalsIgnoreCase(name)) {
-                return scene;
-            }
-        }
-        return null;
+    public String formattedName() {
+        return chapterIndex + " - " + name;
     }
 
-    public Scene getSceneByRank(int rank) {
-        for (Scene scene : scenes) {
-            if (scene.getRank() == rank) {
-                return scene;
-            }
-        }
-        return null;
+    @Override
+    public ChapterPayload toPayload() {
+        return new ChapterPayload(name, description, chapterIndex);
     }
 
-    public boolean sceneExists(String name) {
-        for (Scene scene : scenes) {
-            if (scene.getName().equalsIgnoreCase(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void setSceneRank(Scene scene, int newRank) {
-        int oldRank = scene.getRank();
-        if (newRank == oldRank) {
-            return;
-        }
-
-        if (newRank < oldRank) {
-            for (Scene s : scenes) {
-                int r = s.getRank();
-                if (r >= newRank && r < oldRank) {
-                    s.setRank(r + 1);
-                }
-            }
-        } else {
-            for (Scene s : scenes) {
-                int r = s.getRank();
-                if (r <= newRank && r > oldRank) {
-                    s.setRank(r - 1);
-                }
-            }
-        }
-
-        scene.setRank(newRank);
-    }
-
-    public SuggestionProvider<CommandSourceStack> getAnimationSuggestionFromScene(Scene scene) {
-        return (context, builder) -> {
-            for (Animation animation : scene.getAnimations()) {
-                if (animation.getName().split(" ").length > 1) {
-                    builder.suggest("\"" + animation.getName() + "\"");
-                } else {
-                    builder.suggest(animation.getName());
-                }
-            }
-            return builder.buildFuture();
-        };
-    }
-
-    public List<Scene> getSortedSceneList() {
-        return scenes.stream().sorted(Comparator.comparingInt(Scene::getRank)).toList();
-    }
-
-    public List<Scene> getScenes() {
-        return scenes;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    private void sortScenesByRank() {
-        List<Scene> sortedScenes = getSortedSceneList();
-        for (int i = 0; i < sortedScenes.size(); i++) {
-            sortedScenes.get(i).setRank(i + 1);
-        }
+    @Override
+    public String toFileName() {
+        return chapterIndex + "_" + name.toLowerCase();
     }
 }

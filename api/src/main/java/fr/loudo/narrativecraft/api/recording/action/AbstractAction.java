@@ -1,0 +1,75 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.api.recording.action;
+
+import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
+import java.io.IOException;
+import java.util.List;
+
+public abstract class AbstractAction implements Action {
+
+    protected int tick;
+
+    public AbstractAction(int tick) {
+        this.tick = tick;
+    }
+
+    public abstract void write(Writer writer) throws IOException;
+
+    public abstract void read(Reader reader) throws IOException;
+
+    public abstract String getId();
+
+    public boolean differs(AbstractAction other) {
+        return true;
+    }
+
+    /**
+     * Returns the inverse of this action, captured before it executes.
+     * Called by the rewind log to undo this action when the timeline scrubs backward.
+     * Must be silent (no sounds, no visual side effects).
+     * @return Empty for stateless actions or actions fully restored by {@link #shouldExecuteOnRewind()}.
+     */
+    public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
+        return List.of();
+    }
+
+    /**
+     * Whether this action should be re-executed at the target tick during rewind
+     * to restore entity state (position, pose, flags, etc.).
+     * @return True for pure state actions, false for event actions (sounds, block changes, etc.).
+     */
+    public boolean shouldExecuteOnRewind() {
+        return false;
+    }
+
+    public int getTick() {
+        return tick;
+    }
+
+    public void setTick(int tick) {
+        this.tick = tick;
+    }
+}

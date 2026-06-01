@@ -24,45 +24,30 @@
 package fr.loudo.narrativecraft.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
-import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.inkAction.ShakeScreenInkAction;
-import java.util.List;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
-    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
-    public void narrativecraft$getZoomLevel(CallbackInfoReturnable<Float> callbackInfo) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        PlayerSession playerSession =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
-        if (playerSession == null) return;
-        KeyframeLocation keyframeLocation = playerSession.getCurrentCamera();
-        if (keyframeLocation == null) return;
-        callbackInfo.setReturnValue(keyframeLocation.getFov());
-    }
 
     @Inject(method = "bobHurt", at = @At("RETURN"))
-    public void narrativecraft$applyInkShakeScreen(PoseStack poseStack, float partialTicks, CallbackInfo ci) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        PlayerSession playerSession =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
-        if (playerSession == null) return;
-        List<InkAction> inkActionsShake = playerSession.getClientSideInkActions().stream()
-                .filter(inkAction -> inkAction instanceof ShakeScreenInkAction)
-                .toList();
-        for (InkAction shakeScreenInkAction : inkActionsShake) {
-            shakeScreenInkAction.render(poseStack, partialTicks);
+    private void narrativecraft$shakeScreenInkAction(
+            CameraRenderState cameraState, PoseStack poseStack, CallbackInfo ci) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        DeltaTracker deltaTracker = Minecraft.getInstance().getDeltaTracker();
+        for (InkAction action : session.getActiveClientInkActions()) {
+            if (!(action instanceof ClientShakeScreenInkAction clientShakeScreenInkAction)) continue;
+            clientShakeScreenInkAction.shakeScreen(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
         }
     }
 }

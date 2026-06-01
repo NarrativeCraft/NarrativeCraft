@@ -2,146 +2,74 @@
   "providers": [
     {
       "type": "bitmap",
-      "file": "narrativecraft:font/keyframe_group.png",
-      "ascent": 11,
-      "height": 14,
-      "chars": [
-        "\uE100"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/keyframe.png",
-      "ascent": 10,
-      "height": 12,
-      "chars": [
-        "\uE101"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/keyframe_trigger.png",
-      "ascent": 10,
-      "height": 12,
-      "chars": [
-        "\uE102"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/settings.png",
-      "ascent": 10,
-      "height": 12,
-      "chars": [
-        "\uE103"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/add.png",
-      "ascent": 10,
-      "height": 12,
-      "chars": [
-        "\uE104"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/edit.png",
-      "ascent": 8,
-      "height": 10,
-      "chars": [
-        "\uE105"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/remove.png",
-      "ascent": 10,
-      "height": 14,
-      "chars": [
-        "\uE106"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/character_add.png",
-      "ascent": 10,
-      "height": 14,
-      "chars": [
-        "\uE107"
-      ]
-    },
-    {
-      "type": "bitmap",
       "file": "narrativecraft:font/save.png",
-      "ascent": 10,
-      "height": 14,
+      "ascent": 9,
+      "height": 12,
       "chars": [
-        "\uE108"
+        "\uE200"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/undo.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE201"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/check.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE202"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/camera.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE203"
       ]
     },
     {
       "type": "bitmap",
       "file": "narrativecraft:font/character.png",
-      "ascent": 10,
-      "height": 14,
+      "ascent": 9,
+      "height": 12,
       "chars": [
-        "\uE109"
+        "\uE204"
       ]
     },
     {
       "type": "bitmap",
-      "file": "narrativecraft:font/dialog.png",
-      "ascent": 10,
-      "height": 14,
+      "file": "narrativecraft:font/character_template.png",
+      "ascent": 9,
+      "height": 12,
       "chars": [
-        "\uE110"
+        "\uE205"
       ]
     },
     {
       "type": "bitmap",
-      "file": "narrativecraft:font/entity.png",
-      "ascent": 10,
-      "height": 14,
+      "file": "narrativecraft:font/burger_menu.png",
+      "ascent": 9,
+      "height": 12,
       "chars": [
-        "\uE111"
+        "\uE206"
       ]
     },
     {
       "type": "bitmap",
-      "file": "narrativecraft:font/eye_open.png",
-      "ascent": 10,
-      "height": 14,
+      "file": "narrativecraft:font/search.png",
+      "ascent": 9,
+      "height": 12,
       "chars": [
-        "\uE112"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/eye_close.png",
-      "ascent": 10,
-      "height": 14,
-      "chars": [
-        "\uE113"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/folder.png",
-      "ascent": 10,
-      "height": 14,
-      "chars": [
-        "\uE114"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "narrativecraft:font/box.png",
-      "ascent": 10,
-      "height": 14,
-      "chars": [
-        "\uE115"
+        "\uE207"
       ]
     }
   ]

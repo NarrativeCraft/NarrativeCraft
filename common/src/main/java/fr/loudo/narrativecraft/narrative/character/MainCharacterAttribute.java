@@ -23,21 +23,41 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+
 public class MainCharacterAttribute {
-    private boolean mainCharacter, sameSkinAsPlayer, sameSkinAsTheir;
 
-    public MainCharacterAttribute() {}
-
-    public MainCharacterAttribute(boolean mainCharacter, boolean sameSkinAsPlayer, boolean sameSkinAsTheir) {
-        this.mainCharacter = mainCharacter;
-        this.sameSkinAsPlayer = sameSkinAsPlayer;
-        this.sameSkinAsTheir = sameSkinAsTheir;
+    public enum SkinMode {
+        SKIN_FROM_FILE,
+        SKIN_OF_PLAYER,
+        CLIENT_HAS_CHARACTER_SKIN
     }
 
-    public MainCharacterAttribute(MainCharacterAttribute mainCharacterAttribute) {
-        mainCharacter = mainCharacterAttribute.mainCharacter;
-        sameSkinAsPlayer = mainCharacterAttribute.sameSkinAsPlayer;
-        sameSkinAsTheir = mainCharacterAttribute.sameSkinAsTheir;
+    public static final StreamCodec<ByteBuf, MainCharacterAttribute> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.BOOL,
+            MainCharacterAttribute::isMainCharacter,
+            ByteBufCodecs.idMapper(i -> SkinMode.values()[i], SkinMode::ordinal),
+            MainCharacterAttribute::getSkin,
+            MainCharacterAttribute::new);
+
+    private boolean mainCharacter;
+    private SkinMode skin;
+
+    public MainCharacterAttribute() {
+        this.mainCharacter = false;
+        this.skin = SkinMode.SKIN_FROM_FILE;
+    }
+
+    public MainCharacterAttribute(boolean mainCharacter, SkinMode skin) {
+        this.mainCharacter = mainCharacter;
+        this.skin = skin;
+    }
+
+    public MainCharacterAttribute(MainCharacterAttribute other) {
+        this.mainCharacter = other.mainCharacter;
+        this.skin = other.skin;
     }
 
     public boolean isMainCharacter() {
@@ -48,19 +68,11 @@ public class MainCharacterAttribute {
         this.mainCharacter = mainCharacter;
     }
 
-    public boolean isSameSkinAsPlayer() {
-        return sameSkinAsPlayer;
+    public SkinMode getSkin() {
+        return skin;
     }
 
-    public void setSameSkinAsPlayer(boolean sameSkinAsPlayer) {
-        this.sameSkinAsPlayer = sameSkinAsPlayer;
-    }
-
-    public boolean isSameSkinAsTheir() {
-        return sameSkinAsTheir;
-    }
-
-    public void setSameSkinAsTheir(boolean sameSkinAsTheir) {
-        this.sameSkinAsTheir = sameSkinAsTheir;
+    public void setSkin(SkinMode skin) {
+        this.skin = skin;
     }
 }

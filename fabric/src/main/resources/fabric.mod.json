@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "narrativecraft",
+  "id": "${mod_id}",
   "version": "${version}",
   "name": "${mod_name}",
   "description": "${description}",
@@ -13,16 +13,19 @@
     "issues": "https://github.com/LOUDO56/NarrativeCraft/issues"
   },
   "license": "${license}",
-  "icon": "narrativecraft.png",
+  "icon": "${mod_id}.png",
   "environment": "*",
   "entrypoints": {
     "main": [
       "fr.loudo.narrativecraft.NarrativeCraftFabric"
+    ],
+    "client": [
+      "fr.loudo.narrativecraft.NarrativeCraftFabricClient"
     ]
   },
   "mixins": [
-    "narrativecraft.mixins.json",
-    "narrativecraft.fabric.mixins.json"
+    "${mod_id}.mixins.json",
+    "${mod_id}.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",

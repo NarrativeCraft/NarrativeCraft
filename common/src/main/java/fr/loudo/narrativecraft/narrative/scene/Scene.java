@@ -1,0 +1,129 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.narrative.scene;
+
+import fr.loudo.narrativecraft.api.narrative.scene.IScene;
+import fr.loudo.narrativecraft.managers.AnimationManager;
+import fr.loudo.narrativecraft.managers.NpcManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneManager;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionManager;
+import fr.loudo.narrativecraft.narrative.subscene.SubsceneManager;
+import java.util.UUID;
+
+public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
+
+    private final Chapter chapter;
+    private final AnimationManager animationManager = new AnimationManager();
+    private final SubsceneManager subsceneManager = new SubsceneManager();
+    private final CutsceneManager cutsceneManager = new CutsceneManager();
+    private final CameraAngleManager cameraAngleManager = new CameraAngleManager();
+    private final InteractionManager interactionManager = new InteractionManager();
+    private final NpcManager npcManager = new NpcManager();
+
+    private int rank;
+
+    public Scene(UUID id, String name, String description, Chapter chapter, int rank) {
+        super(id, name, description);
+        this.chapter = chapter;
+        this.rank = rank;
+    }
+
+    public Scene(String name, String description, Chapter chapter) {
+        super(name, description);
+        this.chapter = chapter;
+    }
+
+    public Scene(String name, String description, Chapter chapter, int rank) {
+        super(name, description);
+        this.chapter = chapter;
+        this.rank = rank;
+    }
+
+    public String knotName() {
+        return "chapter_" + chapter.getChapterIndex() + "_" + name.toLowerCase().replace(' ', '_');
+    }
+
+    public int getChapterIndex() {
+        return chapter.getChapterIndex();
+    }
+
+    public Chapter getChapter() {
+        return chapter;
+    }
+
+    public AnimationManager getAnimationManager() {
+        return animationManager;
+    }
+
+    public SubsceneManager getSubsceneManager() {
+        return subsceneManager;
+    }
+
+    public CutsceneManager getCutsceneManager() {
+        return cutsceneManager;
+    }
+
+    public CameraAngleManager getCameraAngleManager() {
+        return cameraAngleManager;
+    }
+
+    public InteractionManager getInteractionManager() {
+        return interactionManager;
+    }
+
+    public NpcManager getNpcManager() {
+        return npcManager;
+    }
+
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    @Override
+    public String formattedName() {
+        return name;
+    }
+
+    @Override
+    public ScenePayload toPayload() {
+        return new ScenePayload(name, description, chapter.getId(), rank);
+    }
+
+    @Override
+    public String toFileName() {
+        return chapter.getChapterIndex() + "_" + rank + "_" + name.toLowerCase().replace(' ', '_');
+    }
+}

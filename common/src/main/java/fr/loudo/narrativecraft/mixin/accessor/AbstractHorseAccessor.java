@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(AbstractHorse.class)
 public interface AbstractHorseAccessor {
+
     @Accessor
     static EntityDataAccessor<Byte> getDATA_ID_FLAGS() {
         return null;
@@ -37,6 +38,6 @@ public interface AbstractHorseAccessor {
 
     @Accessor
     static int getFLAG_STANDING() {
-        return 0;
+        return -1;
     }
 }

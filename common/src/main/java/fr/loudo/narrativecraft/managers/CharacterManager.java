@@ -23,70 +23,42 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
+import java.util.UUID;
+import javax.annotation.Nullable;
 
-public class CharacterManager {
+public class CharacterManager extends NarrativeManager<CharacterStory> {
 
-    private final List<CharacterStory> characterStories = new ArrayList<>();
-
-    public void addCharacter(CharacterStory characterStory) {
-        if (characterStories.contains(characterStory)) return;
-        characterStories.add(characterStory);
+    public List<CharacterStory> getSortedList() {
+        List<CharacterStory> sorted = new ArrayList<>(list);
+        sorted.sort(Comparator.comparingInt(c -> c.getMainCharacterAttribute().isMainCharacter() ? 0 : 1));
+        return sorted;
     }
 
-    public void removeCharacter(CharacterStory characterStory) {
-        characterStories.remove(characterStory);
-    }
-
-    public CharacterStory getCharacterByName(String name) {
-        for (CharacterStory characterStory : characterStories) {
-            if (characterStory.getName().equalsIgnoreCase(name)) {
-                return characterStory;
-            }
+    /**
+     * Retrieve a global character or a npc if you have a scene by his id.
+     * @param characterId id of the character
+     * @param scene scene of the npc if it is set
+     * @return instance of {@link ICharacterStory}
+     */
+    public ICharacterStory resolveCharacter(UUID characterId, @Nullable Scene scene) {
+        ICharacterStory characterStory = getById(characterId);
+        if (characterStory == null && scene != null) {
+            return scene.getNpcManager().getById(characterId);
         }
-        return null;
-    }
-
-    public boolean characterExists(String name) {
-        for (CharacterStory characterStory : characterStories) {
-            if (characterStory.getName().equalsIgnoreCase(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public List<CharacterStory> getCharacterStories() {
-        return characterStories;
-    }
-
-    public List<EntityType<?>> getAvailableEntityTypes() {
-        List<EntityType<?>> finalList = new ArrayList<>();
-        for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
-            String key = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
-            if (entityType.getCategory() != MobCategory.MISC
-                    || key.equals("player")
-                    || key.equals("villager")
-                    || key.equals("mannequin")) {
-                finalList.add(entityType);
-            }
-        }
-        return finalList;
+        return characterStory;
     }
 
     public CharacterStory getMainCharacter() {
-        List<CharacterStory> mainCharacters = characterStories.stream()
-                .filter(characterStory ->
-                        characterStory.getMainCharacterAttribute().isMainCharacter())
-                .toList();
-        if (mainCharacters.isEmpty()) {
-            return null;
+        for (CharacterStory characterStory : list) {
+            if (characterStory.getMainCharacterAttribute().isMainCharacter()) return characterStory;
         }
-        return mainCharacters.get(0);
+        return null;
     }
 }

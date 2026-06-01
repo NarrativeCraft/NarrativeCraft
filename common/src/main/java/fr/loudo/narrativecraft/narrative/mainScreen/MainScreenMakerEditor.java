@@ -1,0 +1,54 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.narrative.mainScreen;
+
+import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
+import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.session.PlayerSession;
+
+public class MainScreenMakerEditor extends CameraAngleMakerEditorMaker {
+    public MainScreenMakerEditor(CameraAngle cameraAngle, PlayerSession playerSession) {
+        super(cameraAngle, playerSession);
+    }
+
+    public MainScreenMakerEditor(
+            CameraAngle cameraAngle, PlayerSession playerSession, NarrativeEnvironment environment) {
+        super(cameraAngle, playerSession, environment);
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        if (cameraAngle.getScene() == null
+                && !cameraAngle.getCameras().isEmpty()
+                && environment == NarrativeEnvironment.PRODUCTION) {
+            CameraView cameraView = cameraAngle.getCameras().get(0);
+            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CEnterCameraView(cameraView.getId()));
+        }
+    }
+}

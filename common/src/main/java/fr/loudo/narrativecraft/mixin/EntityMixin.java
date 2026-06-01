@@ -24,15 +24,12 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.recording.Recording;
-import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
-import fr.loudo.narrativecraft.narrative.recording.actions.HurtAction;
-import fr.loudo.narrativecraft.narrative.recording.actions.StopRidingAction;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
+import fr.loudo.narrativecraft.recording.actions.RideEntityAction;
+import fr.loudo.narrativecraft.recording.actions.StopRideEntityAction;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,47 +38,36 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin {
-    @Shadow
-    @Nullable
-    public abstract Entity getVehicle();
+public class EntityMixin {
 
     @Shadow
-    public double yo;
+    private @Nullable Entity vehicle;
 
-    @Inject(method = "markHurt", at = @At("HEAD"))
-    private void narrativecraft$mark(CallbackInfo ci) {
-        if ((Object) this instanceof ServerPlayer player) {
-            Recording recording =
-                    NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-            if (recording == null || !recording.isRecording()) return;
-            HurtAction hurtAction = new HurtAction(recording.getTick());
-            recording.getActionDataFromEntity(player).addAction(hurtAction);
-        }
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z", at = @At("HEAD"))
+    private void narrativecraft$startRiding(
+            Entity vehicle, boolean force, boolean sendGameEvent, CallbackInfoReturnable<Boolean> cir) {
+
+        Entity entity = (Entity) (Object) this;
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
+        if (recording == null) return;
+
+        recording.addAction(new RideEntityAction(recording.getTick(), recording.markEntityAsTracked(vehicle)), entity);
     }
 
-    @Inject(method = "removeVehicle", at = @At("HEAD"))
+    @Inject(method = "stopRiding", at = @At("HEAD"))
     private void narrativecraft$stopRiding(CallbackInfo ci) {
-        if ((Object) this instanceof ServerPlayer player) {
-            Entity entity = this.getVehicle();
-            Recording recording =
-                    NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-            if (recording == null || !recording.isRecording()) return;
-            ActionsData vehicleActionsData = recording.getActionDataFromEntity(entity);
-            if (vehicleActionsData == null) return;
-            StopRidingAction stopRidingAction =
-                    new StopRidingAction(recording.getTick(), vehicleActionsData.getEntityIdRecording());
-            recording.getActionDataFromEntity(player).addAction(stopRidingAction);
-        }
-    }
 
-    @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
-    private void narrativecraft$isInvisibleTo(Player player, CallbackInfoReturnable<Boolean> cir) {
-        PlayerSession playerSession =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
-        if (playerSession == null) return;
-        if (playerSession.getCurrentCamera() != null) {
-            cir.setReturnValue(true);
-        }
+        if (vehicle == null || vehicle.isRemoved()) return;
+
+        Entity entity = (Entity) (Object) this;
+        Recording recording =
+                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
+        if (recording == null) return;
+        RecordingEntityData recordingEntityData = recording.getRecordingEntityData(vehicle);
+        if (recordingEntityData == null) return;
+
+        recording.addAction(
+                new StopRideEntityAction(recording.getTick(), recordingEntityData.getRecordingId()), entity);
     }
 }

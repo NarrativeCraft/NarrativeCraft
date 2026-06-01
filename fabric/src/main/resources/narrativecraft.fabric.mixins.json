@@ -5,17 +5,19 @@
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "BedItemMixin",
-    "BlockItemMixin",
-    "DoubleHighBlockItemMixin",
-    "LivingEntityFabricMixin",
-    "ServerPlayerFabricMixin"
+    "BedItemMixinFabric",
+    "BlockItemMixinFabric",
+    "DoubleHighBlockItemFabricMixin",
+    "ItemEntityMixinFabric",
+    "PlayerMixinFabric",
+    "ServerPlayerGameModeMixinFabric",
+    "ServerPlayerMixinFabric"
   ],
   "client": [
-    "GuiGraphicsFabricMixin",
-    "GuiMixin",
-    "LevelRendererMixin",
-    "MinecraftFabricMixin"
+    "GameRendererMixinFabric",
+    "GuiGraphicsExtractorMixinFabric",
+    "KeyboardHandlerMixinFabric",
+    "MouseHandlerMixinFabric"
   ],
   "server": [],
   "injectors": {

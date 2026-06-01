@@ -1,0 +1,109 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.client.editors.cutscene;
+
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+
+public class CutsceneEditorPlayback {
+
+    private final List<CutsceneMakerEditorLayer> editorLayers;
+    private final ClientPlayerSession playerSession;
+
+    private float currentTick = 0f;
+    private int totalTick;
+    private boolean playing = false;
+    private boolean dragPause = false;
+
+    public CutsceneEditorPlayback(
+            List<CutsceneMakerEditorLayer> editorLayers, ClientPlayerSession playerSession, int totalTick) {
+        this.editorLayers = editorLayers;
+        this.playerSession = playerSession;
+        this.totalTick = totalTick;
+    }
+
+    public void play(float fromTick) {
+        currentTick = fromTick;
+        playing = true;
+    }
+
+    public void pause() {
+        playing = false;
+        playerSession.getCutsceneDataSession().setFov(-1f);
+        playerSession.getCutsceneDataSession().setKeyframePosition(null);
+    }
+
+    public void tick(DeltaTracker delta) {
+        if (!playing || dragPause || totalTick <= 0 || Minecraft.getInstance().isPaused()) return;
+
+        currentTick += delta.getGameTimeDeltaTicks();
+
+        if (currentTick >= totalTick) {
+            currentTick = totalTick;
+            pause();
+            return;
+        }
+
+        executeKeyframes();
+    }
+
+    private void executeKeyframes() {
+        Set<String> executedTypes = new HashSet<>();
+        for (CutsceneMakerEditorLayer editorLayer : editorLayers) {
+            String typeId = editorLayer.getLayer().getTypeId();
+            if (executedTypes.contains(typeId)) continue;
+            if (editorLayer.getLayer().execute(currentTick)) {
+                executedTypes.add(typeId);
+            }
+        }
+    }
+
+    public void seekTo(float tick) {
+        currentTick = tick;
+    }
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public float getCurrentTick() {
+        return currentTick;
+    }
+
+    public boolean isDragPause() {
+        return dragPause;
+    }
+
+    public void setDragPause(boolean dragPause) {
+        this.dragPause = dragPause;
+    }
+
+    public void setTotalTick(int totalTick) {
+        this.totalTick = totalTick;
+    }
+}

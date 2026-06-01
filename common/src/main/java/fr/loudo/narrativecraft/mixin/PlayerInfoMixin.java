@@ -25,18 +25,19 @@ package fr.loudo.narrativecraft.mixin;
 
 import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
-import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.util.Util;
-import java.io.File;
-import java.util.ArrayList;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,83 +47,92 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerInfo.class)
-public class PlayerInfoMixin {
+public abstract class PlayerInfoMixin {
+
+    @Shadow
+    public abstract GameProfile getProfile();
 
     @Shadow
     @Final
     private GameProfile profile;
 
-    @Inject(method = "getProfile", at = @At("RETURN"), cancellable = true)
-    private void narrativecraft$getProfile(CallbackInfoReturnable<GameProfile> callbackInfo) {
-        if (!"_username_".equals(this.profile.name())) return;
-        GameProfile originalProfile = callbackInfo.getReturnValue();
-        String playerName = Minecraft.getInstance().player.getName().getString();
-        callbackInfo.setReturnValue(new GameProfile(originalProfile.id(), playerName));
+    @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
+    private void narrativecraft$getCharacterSkin(CallbackInfoReturnable<PlayerSkin> cir) {
+        GameProfile profile = getProfile();
+
+        List<ICharacterStory> charactersInWorld =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
+        for (ICharacterStory characterStory : charactersInWorld) {
+            if (!profile.id().equals(characterStory.getId())) continue;
+
+            if (narrativecraft$isMainCharacterWithPlayerSkin(characterStory)) {
+                cir.setReturnValue(Minecraft.getInstance().player.getSkin());
+                continue;
+            }
+
+            narrativecraft$buildCharacterSkin(characterStory).ifPresent(cir::setReturnValue);
+        }
+
+        if (profile.id().equals(Minecraft.getInstance().player.getUUID())) {
+            narrativecraft$resolveLocalPlayerSkin().ifPresent(cir::setReturnValue);
+        }
     }
 
-    @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
-    private void narrativecraft$getSkin(CallbackInfoReturnable<PlayerSkin> callbackInfo) {
-        Minecraft minecraft = Minecraft.getInstance();
-        PlayerSession playerSession =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
-        if (playerSession == null) return;
-        if (minecraft.player.getGameProfile().equals(this.profile) && playerSession.getStoryHandler() != null) {
-            CharacterStory mainCharacter =
-                    NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
-            if (mainCharacter != null
-                    && mainCharacter.getMainCharacterAttribute().isSameSkinAsTheir()) {
-                Identifier mainCharacterSkin = NarrativeCraftFile.getMainCharacterSkin();
-                PlayerModelType playerModelType;
-                if (mainCharacterSkin != null) {
-                    try {
-                        playerModelType =
-                                PlayerModelType.valueOf(mainCharacter.getModel().name());
-                    } catch (IllegalArgumentException exception) {
-                        playerModelType = PlayerModelType.WIDE;
-                    }
-                    PlayerSkin playerSkin = PlayerSkin.insecure(
-                            new ClientAsset.ResourceTexture(mainCharacterSkin, mainCharacterSkin),
-                            null,
-                            null,
-                            playerModelType);
-                    callbackInfo.setReturnValue(playerSkin);
-                    return;
-                }
-            }
+    @Inject(method = "getProfile", at = @At("RETURN"), cancellable = true)
+    private void narrativecraft$getProfile(CallbackInfoReturnable<GameProfile> cir) {
+        CharacterStory mainCharacter =
+                ClientNarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
+        if (mainCharacter == null) return;
+
+        GameProfile gameProfile = cir.getReturnValue();
+
+        List<ICharacterStory> charactersInWorld =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
+        for (ICharacterStory characterStory : charactersInWorld) {
+            if (!gameProfile.id().equals(mainCharacter.getId())) continue;
+            if (!gameProfile.name().equalsIgnoreCase(CharacterStory.USERNAME_VARIABLE)) continue;
+
+            cir.setReturnValue(new GameProfile(
+                    gameProfile.id(), Minecraft.getInstance().player.getName().getString()));
+            return;
         }
+    }
 
-        for (CharacterRuntime characterRuntime : new ArrayList<>(playerSession.getCharacterRuntimes())) {
-            if (characterRuntime.getEntity() == null) continue;
+    private boolean narrativecraft$isMainCharacterWithPlayerSkin(ICharacterStory characterStory) {
+        if (!(characterStory instanceof CharacterStory concreteCharacter)) return false;
 
-            CharacterStory characterStory = characterRuntime.getCharacterStory();
-            var mainCharacterAttribute = characterStory.getMainCharacterAttribute();
+        MainCharacterAttribute attr = concreteCharacter.getMainCharacterAttribute();
+        return attr.isMainCharacter() && attr.getSkin() == MainCharacterAttribute.SkinMode.SKIN_OF_PLAYER;
+    }
 
-            PlayerModelType playerModelType;
-            try {
-                playerModelType =
-                        PlayerModelType.valueOf(characterStory.getModel().name());
-            } catch (IllegalArgumentException exception) {
-                playerModelType = PlayerModelType.WIDE;
-            }
+    private Optional<PlayerSkin> narrativecraft$buildCharacterSkin(ICharacterStory characterStory) {
+        Identifier skinPath = narrativecraft$getSkinIdentifier(characterStory.getId());
 
-            File currentSkinFile = characterRuntime.getCharacterSkinController().getCurrentSkin();
-            if (currentSkinFile == null) continue;
+        if (!narrativecraft$isDynamicTextureLoaded(skinPath)) return Optional.empty();
 
-            Identifier skinLocation = Identifier.fromNamespaceAndPath(
-                    NarrativeCraftMod.MOD_ID,
-                    "character/" + Util.snakeCase(characterStory.getName()) + "/"
-                            + Util.snakeCase(currentSkinFile.getName()));
+        return Optional.of(PlayerSkin.insecure(
+                new ClientAsset.ResourceTexture(skinPath, skinPath), null, null, characterStory.getModelType()));
+    }
 
-            PlayerSkin playerSkin = PlayerSkin.insecure(
-                    new ClientAsset.ResourceTexture(skinLocation, skinLocation), null, null, playerModelType);
+    private Optional<PlayerSkin> narrativecraft$resolveLocalPlayerSkin() {
+        CharacterStory mainCharacter =
+                ClientNarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
 
-            if (this.profile.name().equals(characterStory.getName())) {
-                if (mainCharacterAttribute.isMainCharacter() && mainCharacterAttribute.isSameSkinAsPlayer()) {
-                    callbackInfo.setReturnValue(minecraft.player.getSkin());
-                    return;
-                }
-                callbackInfo.setReturnValue(playerSkin);
-            }
-        }
+        if (mainCharacter == null
+                || !ClientNarrativeCraftMod.getInstance().getPlayerSession().isInStory()) return Optional.empty();
+
+        MainCharacterAttribute attr = mainCharacter.getMainCharacterAttribute();
+        if (attr.getSkin() != MainCharacterAttribute.SkinMode.CLIENT_HAS_CHARACTER_SKIN) return Optional.empty();
+
+        return narrativecraft$buildCharacterSkin(mainCharacter);
+    }
+
+    private Identifier narrativecraft$getSkinIdentifier(UUID characterId) {
+        return Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character/" + characterId);
+    }
+
+    private boolean narrativecraft$isDynamicTextureLoaded(Identifier skinPath) {
+        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(skinPath);
+        return texture instanceof DynamicTexture;
     }
 }

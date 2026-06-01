@@ -24,12 +24,14 @@
 package fr.loudo.narrativecraft.platform;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.platform.services.IPacketSender;
 import fr.loudo.narrativecraft.platform.services.IPlatformHelper;
 import java.util.ServiceLoader;
 
 public class Services {
 
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
+    public static final IPacketSender PACKET = load(IPacketSender.class);
 
     public static <T> T load(Class<T> clazz) {
         final T loadedService = ServiceLoader.load(clazz)
