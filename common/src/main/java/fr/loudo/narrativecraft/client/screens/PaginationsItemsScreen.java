@@ -23,10 +23,10 @@
 
 package fr.loudo.narrativecraft.client.screens;
 
+import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsClient;
-import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -34,9 +34,14 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public abstract class PaginationsItemsScreen<T> extends Screen {
 
     protected List<T> list;
+    protected List<T> displayList;
+    protected String searchQuery = "";
     protected int page = 1;
     protected int maxItemsPerPage = 5;
     protected int gap = 10;
@@ -57,6 +62,11 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
         this.page = page;
     }
 
+    public void reload() {
+        this.clearWidgets();
+        init();
+    }
+
     protected abstract String getItemName(T item);
 
     protected abstract void onItemClicked(T item);
@@ -65,27 +75,67 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
 
     @Override
     protected void init() {
-        int maxPage = Math.max(1, (list.size() + maxItemsPerPage - 1) / maxItemsPerPage);
+        this.displayList = searchQuery.isEmpty()
+                ? list
+                : list.stream()
+                        .filter(item -> getItemName(item).toLowerCase().contains(searchQuery.toLowerCase()))
+                        .collect(Collectors.toList());
+
+        int maxPage = Math.max(1, (displayList.size() + maxItemsPerPage - 1) / maxItemsPerPage);
         this.page = Math.max(1, Math.min(this.page, maxPage));
 
         int startIndex = (page - 1) * maxItemsPerPage;
-        int endIndex = Math.min(startIndex + maxItemsPerPage, list.size());
+        int endIndex = Math.min(startIndex + maxItemsPerPage, displayList.size());
 
-        List<T> itemsToDisplay = list.subList(startIndex, endIndex);
+        List<T> itemsToDisplay = displayList.subList(startIndex, endIndex);
 
-        int totalContentHeight = itemsToDisplay.isEmpty()
-                ? 0
-                : (itemsToDisplay.size() * buttonHeight) + ((itemsToDisplay.size() - 1) * gap);
-        int startY = itemsToDisplay.isEmpty() ? (this.height / 2) : (this.height - totalContentHeight) / 2;
-
-        int currentY = startY;
         int middleX = (this.width - this.buttonWidth) / 2;
-        int listBottomY = startY + totalContentHeight;
 
         // Title
         StringWidget title = new StringWidget(this.title, this.font);
         title.setPosition(this.width / 2 - title.getWidth() / 2, 20 + this.font.lineHeight / 2 + 2);
         this.addRenderableWidget(title);
+
+        // Search bar
+        int searchY = 30 + this.font.lineHeight + 12;
+        int searchInputWidth = buttonWidth - 25;
+
+        EditBox searchBox = new EditBox(this.font, searchInputWidth, 20, Component.empty());
+        searchBox.setValue(searchQuery);
+        searchBox.setPosition(middleX, searchY);
+        this.addRenderableWidget(searchBox);
+
+        Button searchButton = Button.builder(Component.literal(CustomFont.SEARCH), b -> {
+                    searchQuery = searchBox.getValue();
+                    page = 1;
+                    reload();
+                })
+                .bounds(middleX + searchInputWidth + 5, searchY, 20, 20)
+                .build();
+        this.addRenderableWidget(searchButton);
+
+        if (!searchQuery.isEmpty()) {
+            Button resetButton = Button.builder(Component.literal(CustomFont.CROSS), b -> {
+                        searchQuery = "";
+                        page = 1;
+                        reload();
+                    })
+                    .bounds(middleX + buttonWidth + 10, searchY, 20, 20)
+                    .build();
+            this.addRenderableWidget(resetButton);
+        }
+
+        int searchBarBottom = searchY + 20 + gap;
+
+        int totalContentHeight = itemsToDisplay.isEmpty()
+                ? 0
+                : (itemsToDisplay.size() * buttonHeight) + ((itemsToDisplay.size() - 1) * gap);
+        int startY = itemsToDisplay.isEmpty()
+                ? Math.max(this.height / 2, searchBarBottom)
+                : Math.max((this.height - totalContentHeight) / 2, searchBarBottom);
+
+        int currentY = startY;
+        int listBottomY = startY + totalContentHeight;
 
         for (T item : itemsToDisplay) {
             addWidgetsForItem(middleX, currentY, item);
@@ -166,7 +216,7 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
     }
 
     private void changePage(int page) {
-        int maxPage = Math.max(1, (list.size() + maxItemsPerPage - 1) / maxItemsPerPage);
+        int maxPage = Math.max(1, (displayList.size() + maxItemsPerPage - 1) / maxItemsPerPage);
         this.page = Math.max(1, Math.min(page, maxPage));
         this.clearWidgets();
         this.init();

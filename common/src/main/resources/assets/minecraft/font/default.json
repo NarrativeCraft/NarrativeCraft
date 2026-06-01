@@ -62,6 +62,15 @@
       "chars": [
         "\uE206"
       ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/search.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE207"
+      ]
     }
   ]
 }

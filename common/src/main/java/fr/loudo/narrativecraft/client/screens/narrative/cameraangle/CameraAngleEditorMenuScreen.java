@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -207,7 +208,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
         addRenderableWidget(modifyButton);
 
         int deleteX = modifyX + ACTION_SMALL_WIDTH + ROW_GAP;
-        Button deleteButton = Button.builder(Component.literal("✖"), b -> {
+        Button deleteButton = Button.builder(Component.literal(CustomFont.CROSS), b -> {
                     editor.removeCamera(cameraView);
                     rebuild();
                 })
@@ -222,7 +223,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
                 .build();
         addRenderableWidget(nameLabel);
 
-        Button deleteButton = Button.builder(Component.literal("✖"), b -> onDelete.run())
+        Button deleteButton = Button.builder(Component.literal(CustomFont.CROSS), b -> onDelete.run())
                 .bounds(x + NAME_WIDTH + ROW_GAP, y, ACTION_SMALL_WIDTH, ROW_HEIGHT)
                 .build();
         addRenderableWidget(deleteButton);

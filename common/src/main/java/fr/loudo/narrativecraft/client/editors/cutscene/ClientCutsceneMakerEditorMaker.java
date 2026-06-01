@@ -116,7 +116,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void init() {
-        buttons.add(Button.builder(Component.literal("✖"), button -> {
+        buttons.add(Button.builder(Component.literal(CustomFont.CROSS), button -> {
                     ConfirmScreen confirmScreen = new ConfirmScreen(
                             b -> {
                                 if (b) {

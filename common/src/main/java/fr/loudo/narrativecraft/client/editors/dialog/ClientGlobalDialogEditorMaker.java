@@ -71,7 +71,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
 
     @Override
     public void init() {
-        closeButton = Button.builder(Component.literal("✖"), b -> openCloseConfirm())
+        closeButton = Button.builder(Component.literal(CustomFont.CROSS), b -> openCloseConfirm())
                 .bounds(5, 5, 20, 20)
                 .build();
         saveButton = Button.builder(Component.literal(CustomFont.SAVE), b -> save())

@@ -132,7 +132,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                 .tooltip(Tooltip.create(Translation.message("screen.camera_angle_editor.open_menu")))
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
-        buttons.add(Button.builder(Component.literal("✖"), b -> openQuitConfirm())
+        buttons.add(Button.builder(Component.literal(CustomFont.CROSS), b -> openQuitConfirm())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
         buttons.add(Button.builder(Component.literal(CustomFont.SAVE), b -> save())

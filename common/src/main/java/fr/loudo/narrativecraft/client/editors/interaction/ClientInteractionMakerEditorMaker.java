@@ -90,7 +90,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     @Override
     public void init() {
         buttons.clear();
-        buttons.add(Button.builder(Component.literal("✖"), b -> openQuitConfirm())
+        buttons.add(Button.builder(Component.literal(CustomFont.CROSS), b -> openQuitConfirm())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
         buttons.add(Button.builder(Component.literal(CustomFont.SAVE), b -> save())
@@ -110,7 +110,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         cornerPlacementButtons.add(Button.builder(Component.literal("2"), b -> placeCorner(2))
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
-        cornerPlacementButtons.add(Button.builder(Component.literal("✖"), b -> cancelCornersAndExit())
+        cornerPlacementButtons.add(Button.builder(Component.literal(CustomFont.CROSS), b -> cancelCornersAndExit())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
         cornerPlacementButtons.add(Button.builder(Component.literal(CustomFont.SAVE), b -> saveCornersAndExit())
@@ -121,7 +121,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         pointPlacementButtons.add(Button.builder(Component.literal("+"), b -> placePoint())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
-        pointPlacementButtons.add(Button.builder(Component.literal("✖"), b -> cancelPointAndExit())
+        pointPlacementButtons.add(Button.builder(Component.literal(CustomFont.CROSS), b -> cancelPointAndExit())
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
         pointPlacementButtons.add(Button.builder(Component.literal(CustomFont.SAVE), b -> savePointAndExit())

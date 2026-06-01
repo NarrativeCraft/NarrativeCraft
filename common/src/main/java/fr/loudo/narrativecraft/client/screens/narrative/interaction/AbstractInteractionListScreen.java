@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.client.screens.narrative.interaction;
 
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
+import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
@@ -106,7 +107,7 @@ public abstract class AbstractInteractionListScreen<T> extends Screen {
         addRenderableWidget(Button.builder(Component.literal("✎"), b -> onEdit.run())
                 .bounds(rowX + NAME_WIDTH + ROW_GAP, y, 20, ROW_HEIGHT)
                 .build());
-        addRenderableWidget(Button.builder(Component.literal("✖"), b -> onDelete.run())
+        addRenderableWidget(Button.builder(Component.literal(CustomFont.CROSS), b -> onDelete.run())
                 .bounds(rowX + NAME_WIDTH + ROW_GAP + 20 + ROW_GAP, y, 20, ROW_HEIGHT)
                 .build());
     }

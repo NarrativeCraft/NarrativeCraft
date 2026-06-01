@@ -137,11 +137,6 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
         }
     }
 
-    public void reload() {
-        this.clearWidgets();
-        init();
-    }
-
     @Override
     public void onClose() {
         minecraft.setScreen(lastScreen);
@@ -176,7 +171,8 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.delete", item.getName()));
 
-        Button deleteButton = Button.builder(Component.literal("✖"), b -> minecraft.setScreen(confirmScreen))
+        Button deleteButton = Button.builder(
+                        Component.literal(CustomFont.CROSS), b -> minecraft.setScreen(confirmScreen))
                 .bounds(x, y, 20, 20)
                 .build();
         this.addRenderableWidget(deleteButton);

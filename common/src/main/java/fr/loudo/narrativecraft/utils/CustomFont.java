@@ -27,10 +27,12 @@ public class CustomFont {
 
     public static final String SAVE = "\uE200";
     public static final String UNDO = "\uE201";
+    public static final String CROSS = "✖";
     public static final String CHECK = "\uE202";
     public static final String CAMERA = "\uE203";
     public static final String CHARACTER = "\uE204";
     public static final String CHARACTER_TEMPLATE = "\uE205";
     public static final String BURGER_MENU = "\uE206";
     public static final String SETTINGS = "⚙";
+    public static final String SEARCH = "\uE207";
 }
