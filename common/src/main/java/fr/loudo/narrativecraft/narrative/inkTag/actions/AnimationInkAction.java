@@ -38,9 +38,11 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import javax.annotation.Nullable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+
+import javax.annotation.Nullable;
+import java.util.Collections;
 
 @InkCommand(
         keyword = "animation",
@@ -144,7 +146,7 @@ public class AnimationInkAction extends InkAction {
                 entity.remove(Entity.RemovalReason.KILLED);
             }
         }
-        playback.start();
+        playback.start(Collections.singleton(playerSession.getPlayer()));
         NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
 
         ICharacterStory characterStory = animation.getCharacterStory();
