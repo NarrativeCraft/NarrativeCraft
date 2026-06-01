@@ -1,4 +1,3 @@
-# The mod is being rewritten from scratch. Track progress on https://blog.loudo.dev ([dev branch](https://github.com/LOUDO56/NarrativeCraft/tree/rerewrite)) And yes, multiplayer support is planned on it.
 # NarrativeCraft
 <div align="center">
     Create your own stories, easily and freely, in Minecraft.
