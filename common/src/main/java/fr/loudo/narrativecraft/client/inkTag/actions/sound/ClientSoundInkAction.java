@@ -21,15 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.inkTag.actions.sound;
+package fr.loudo.narrativecraft.client.inkTag.actions.sound;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
-import fr.loudo.narrativecraft.api.inkAction.InkCommand;
-import fr.loudo.narrativecraft.api.inkAction.Side;
-import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
-import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.narrative.inkTag.actions.SoundInkAction;
 import fr.loudo.narrativecraft.utils.VolumeAudio;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -38,31 +35,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 
-@InkCommand(
-        keyword = "sound",
-        description = "Plays, stops, or fades a sound effect or music track on the client, with optional looping.",
-        syntax =
-                "sound <type:string> <action:string> <name:string> [volume:float=1.0] [pitch:float=1.0] [--loop] [fadeTime:float=0]",
-        side = Side.CLIENT)
-public class SoundInkAction extends InkAction {
+public class ClientSoundInkAction extends SoundInkAction {
 
     private SoundManager soundManager;
     private SoundInkInstance soundInstance;
-    private String soundAction;
-    private String identifier;
-    private String soundName;
-    private float volume;
     private float currentVolume;
-    private float pitch;
-    private boolean looping;
-
-    public enum SoundType {
-        SFX,
-        SONG,
-        STOP
-    }
-
-    private SoundType soundType;
 
     @Override
     public void tick() {
@@ -106,46 +83,14 @@ public class SoundInkAction extends InkAction {
     }
 
     @Override
-    protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        String rawType = cmd.getString("type").toUpperCase();
-        try {
-            soundType = SoundType.valueOf(rawType);
-        } catch (IllegalArgumentException e) {
-            return InkActionResult.error("Unknown sound type '" + rawType + "'. Use: sfx, song, or sound.");
-        }
-
-        soundAction = cmd.getString("action");
-        if (!soundAction.equals("play") && !soundAction.equals("stop")) {
-            return InkActionResult.error("Sound action must be 'play' or 'stop'.");
-        }
-
-        String rawName = cmd.getString("name");
-        if (rawName.contains(":")) {
-            String[] parts = rawName.split(":", 2);
-            identifier = parts[0];
-            soundName = parts[1];
-        } else {
-            identifier = "minecraft";
-            soundName = rawName;
-        }
-
-        volume = cmd.getFloat("volume");
-        pitch = cmd.getFloat("pitch");
-        looping = cmd.flag("loop");
-        double fadeTime = cmd.getFloat("fadeTime");
-        totalTick = (int) (fadeTime * 20.0);
-        return InkActionResult.ok();
-    }
-
-    @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
         soundManager = Minecraft.getInstance().getSoundManager();
         soundInstance = createSoundInstance();
 
         if (soundType == SoundType.STOP && soundName.equals("all")) {
             for (InkAction inkAction : playerSession.getActiveClientInkActions()) {
-                if (!(inkAction instanceof SoundInkAction soundInkAction)) continue;
-                soundInkAction.stop();
+                if (!(inkAction instanceof ClientSoundInkAction clientSoundInkAction)) continue;
+                clientSoundInkAction.stop();
             }
             isRunning = false;
             return InkActionResult.ok();
@@ -155,17 +100,17 @@ public class SoundInkAction extends InkAction {
             case "play" -> soundManager.play(soundInstance);
             case "stop" -> {
                 for (InkAction inkAction : playerSession.getActiveClientInkActions()) {
-                    if (!(inkAction instanceof SoundInkAction soundInkAction)) continue;
+                    if (!(inkAction instanceof ClientSoundInkAction clientSoundInkAction)) continue;
 
-                    if (soundName.equals("all") && soundInkAction.soundType == this.soundType) {
-                        soundInkAction.stop();
-                    } else if (soundInkAction
+                    if (soundName.equals("all") && clientSoundInkAction.soundType == this.soundType) {
+                        clientSoundInkAction.stop();
+                    } else if (clientSoundInkAction
                                     .soundInstance
                                     .getIdentifier()
                                     .compareTo(this.soundInstance.getIdentifier())
                             == 0) {
-                        this.volume = soundInkAction.currentVolume;
-                        soundInkAction.totalTick = 0;
+                        this.volume = clientSoundInkAction.currentVolume;
+                        clientSoundInkAction.totalTick = 0;
                     }
                 }
             }

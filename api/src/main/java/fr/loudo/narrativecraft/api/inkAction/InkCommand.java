@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.api.inkAction;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -53,6 +54,7 @@ import java.lang.annotation.Target;
  *   <li>Supported types: {@code string}, {@code int}, {@code float}, {@code boolean}</li>
  * </ul>
  */
+@Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface InkCommand {

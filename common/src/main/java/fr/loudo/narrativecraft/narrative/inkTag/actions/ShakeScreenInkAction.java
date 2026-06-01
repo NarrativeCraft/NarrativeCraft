@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -31,9 +30,6 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
 @InkCommand(
         keyword = "shake",
@@ -42,61 +38,9 @@ import net.minecraft.world.level.levelgen.synth.SimplexNoise;
         side = Side.CLIENT)
 public class ShakeScreenInkAction extends InkAction {
 
-    private static final float PIXEL = 0.025f;
-
-    private float noiseShakeStrength;
-    private float shakeDecayRate;
-    private float noiseShakeSpeed;
-
-    private SimplexNoise noise;
-    private float noiseIndex = 0.0f;
-    private float shakeStrength = 0.0f;
-
-    private float lastOffsetX = 0.0f;
-    private float lastOffsetY = 0.0f;
-    private float currentOffsetX = 0.0f;
-    private float currentOffsetY = 0.0f;
-
-    @Override
-    public void stop() {
-        super.stop();
-        shakeStrength = 0.0f;
-        noiseIndex = 0.0f;
-        currentOffsetX = currentOffsetY = lastOffsetX = lastOffsetY = 0.0f;
-    }
-
-    @Override
-    public void tick() {
-        if (!isRunning) return;
-
-        noiseIndex += (1.0f / 20.0f) * noiseShakeSpeed;
-
-        float decayFactor = Mth.clamp(shakeDecayRate * (1.0f / 20.0f), 0.0f, 1.0f);
-        shakeStrength = Mth.lerp(decayFactor, shakeStrength, 0.0f);
-
-        lastOffsetX = currentOffsetX;
-        lastOffsetY = currentOffsetY;
-        currentOffsetX = (float) noise.getValue(1, noiseIndex) * shakeStrength;
-        currentOffsetY = (float) noise.getValue(100, noiseIndex) * shakeStrength;
-
-        if (Math.abs(shakeStrength) < 0.001f) {
-            isRunning = false;
-            currentOffsetX = currentOffsetY = lastOffsetX = lastOffsetY = 0.0f;
-        }
-    }
-
-    /**
-     * Empty to not be called twice
-     * @see #shakeScreen(PoseStack, float)
-     */
-    @Override
-    public void render(PoseStack poseStack, float partialTick) {}
-
-    public void shakeScreen(PoseStack poseStack, float partialTick) {
-        float interpolatedX = Mth.lerp(partialTick, lastOffsetX, currentOffsetX);
-        float interpolatedY = Mth.lerp(partialTick, lastOffsetY, currentOffsetY);
-        poseStack.translate(interpolatedX, interpolatedY, 0);
-    }
+    protected float noiseShakeStrength;
+    protected float shakeDecayRate;
+    protected float noiseShakeSpeed;
 
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
@@ -108,14 +52,6 @@ public class ShakeScreenInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        if (noiseShakeStrength == 0 && shakeDecayRate == 0 && noiseShakeSpeed == 0) {
-            isRunning = false;
-            return InkActionResult.ok();
-        }
-        noise = new SimplexNoise(RandomSource.create());
-        shakeStrength = noiseShakeStrength * PIXEL;
-        noiseIndex = 0.0f;
-        lastOffsetX = lastOffsetY = currentOffsetX = currentOffsetY = 0.0f;
-        return InkActionResult.ok();
+        return InkActionResult.ignored();
     }
 }

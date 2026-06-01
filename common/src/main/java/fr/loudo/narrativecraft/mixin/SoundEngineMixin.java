@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.mixin;
 
 import com.google.common.collect.Multimap;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.sound.SoundInkInstance;
+import fr.loudo.narrativecraft.client.inkTag.actions.sound.SoundInkInstance;
 import fr.loudo.narrativecraft.utils.VolumeAudio;
 import java.util.Map;
 import java.util.function.BiConsumer;

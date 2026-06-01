@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
+import fr.loudo.narrativecraft.client.inkTag.ClientInkActionRegister;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegister;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
@@ -45,6 +46,7 @@ public class ClientNarrativeCraftMod {
     public static void commonInit() {
         ClientNarrativeEditorsRegister.register();
         ClientNarrativeUIActionRegister.register();
+        ClientInkActionRegister.register();
     }
 
     public ChapterManager getChapterManager() {

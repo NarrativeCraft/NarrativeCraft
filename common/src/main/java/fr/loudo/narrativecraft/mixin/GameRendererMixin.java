@@ -26,8 +26,8 @@ package fr.loudo.narrativecraft.mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.ShakeScreenInkAction;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -46,8 +46,8 @@ public class GameRendererMixin {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         DeltaTracker deltaTracker = Minecraft.getInstance().getDeltaTracker();
         for (InkAction action : session.getActiveClientInkActions()) {
-            if (!(action instanceof ShakeScreenInkAction shakeScreenInkAction)) continue;
-            shakeScreenInkAction.shakeScreen(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
+            if (!(action instanceof ClientShakeScreenInkAction clientShakeScreenInkAction)) continue;
+            clientShakeScreenInkAction.shakeScreen(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
         }
     }
 }

@@ -30,39 +30,58 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
-import fr.loudo.narrativecraft.utils.FadeState;
 
 @InkCommand(
-        keyword = "fade",
-        description = "Fades the screen to a solid color, holds for a duration, then fades back out.",
-        syntax = "fade <fadeIn:float> <stay:float> <fadeOut:float> [color:string=000000]",
+        keyword = "sound",
+        description = "Plays, stops, or fades a sound effect or music track on the client, with optional looping.",
+        syntax =
+                "sound <type:string> <action:string> <name:string> [volume:float=1.0] [pitch:float=1.0] [--loop] [fadeTime:float=0]",
         side = Side.CLIENT)
-public class FadeInkAction extends InkAction {
+public class SoundInkAction extends InkAction {
 
-    protected double fadeInSeconds;
-    protected double staySeconds;
-    protected double fadeOutSeconds;
-    protected int color;
-    protected FadeState currentFadeState;
+    public enum SoundType {
+        SFX,
+        SONG,
+        STOP
+    }
+
+    protected SoundType soundType;
+    protected String soundAction;
+    protected String identifier;
+    protected String soundName;
+    protected float volume;
+    protected float pitch;
+    protected boolean looping;
 
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        fadeInSeconds = cmd.getFloat("fadeIn");
-        staySeconds = cmd.getFloat("stay");
-        fadeOutSeconds = cmd.getFloat("fadeOut");
-
-        String colorHex = cmd.getString("color");
+        String rawType = cmd.getString("type").toUpperCase();
         try {
-            color = Integer.parseInt(colorHex, 16);
-        } catch (NumberFormatException e) {
-            return InkActionResult.error("Invalid hex color '" + colorHex + "'.");
+            soundType = SoundType.valueOf(rawType);
+        } catch (IllegalArgumentException e) {
+            return InkActionResult.error("Unknown sound type '" + rawType + "'. Use: sfx, song, or sound.");
         }
 
-        if (fadeInSeconds > 2) fadeInSeconds -= 1;
-        if (staySeconds > 2) staySeconds -= 1;
-        if (fadeOutSeconds > 2) fadeOutSeconds -= 1;
+        soundAction = cmd.getString("action");
+        if (!soundAction.equals("play") && !soundAction.equals("stop")) {
+            return InkActionResult.error("Sound action must be 'play' or 'stop'.");
+        }
 
-        blocking = true;
+        String rawName = cmd.getString("name");
+        if (rawName.contains(":")) {
+            String[] parts = rawName.split(":", 2);
+            identifier = parts[0];
+            soundName = parts[1];
+        } else {
+            identifier = "minecraft";
+            soundName = rawName;
+        }
+
+        volume = cmd.getFloat("volume");
+        pitch = cmd.getFloat("pitch");
+        looping = cmd.flag("loop");
+        double fadeTime = cmd.getFloat("fadeTime");
+        totalTick = (int) (fadeTime * 20.0);
         return InkActionResult.ok();
     }
 

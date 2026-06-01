@@ -38,10 +38,10 @@ import fr.loudo.narrativecraft.narrative.inkTag.actions.MinecraftCommandInkActio
 import fr.loudo.narrativecraft.narrative.inkTag.actions.OnEnterInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.SaveInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.ShakeScreenInkAction;
+import fr.loudo.narrativecraft.narrative.inkTag.actions.SoundInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.SubsceneInkAction;
+import fr.loudo.narrativecraft.narrative.inkTag.actions.TextInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.WeatherInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.sound.SoundInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.text.TextInkAction;
 
 public final class InkActionRegister {
 

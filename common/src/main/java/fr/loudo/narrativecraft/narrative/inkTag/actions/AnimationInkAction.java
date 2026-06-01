@@ -38,11 +38,10 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.Collections;
+import javax.annotation.Nullable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
 
 @InkCommand(
         keyword = "animation",
