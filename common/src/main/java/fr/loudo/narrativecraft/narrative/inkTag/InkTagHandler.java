@@ -23,9 +23,11 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag;
 
+import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl.DispatchResult;
@@ -79,12 +81,19 @@ public final class InkTagHandler {
     private final List<InkAction> runningServerActions = new ArrayList<>();
 
     private InkAction blockingAction = null;
+    private Story story;
 
     private final Map<Long, ClientActionStub> pendingClientAcks = new HashMap<>();
 
     public InkTagHandler(PlayerSession playerSession, Lifecycle lifecycle) {
         this.playerSession = playerSession;
         this.lifecycle = lifecycle;
+    }
+
+    public InkTagHandler(PlayerSession playerSession, Lifecycle lifecycle, Story story) {
+        this.playerSession = playerSession;
+        this.lifecycle = lifecycle;
+        this.story = story;
     }
 
     public void enqueue(List<String> tags) {
@@ -136,6 +145,7 @@ public final class InkTagHandler {
 
         while (!pendingTags.isEmpty()) {
             String rawTag = pendingTags.poll();
+            rawTag = InkActionUtil.parseVariables(story, rawTag);
 
             DispatchResult dispatchResult;
             try {

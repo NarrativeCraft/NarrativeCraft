@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.story;
 import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
@@ -43,12 +44,11 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle {
 
@@ -72,13 +72,13 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     public StoryHandler(PlayerSession playerSession) throws Exception {
         this.playerSession = playerSession;
         this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
-        this.inkTagHandler = new InkTagHandler(playerSession, this);
+        this.inkTagHandler = new InkTagHandler(playerSession, this, story);
     }
 
     public StoryHandler(PlayerSession playerSession, String saveJson) throws Exception {
         this.playerSession = playerSession;
         this.story = new Story(saveJson);
-        this.inkTagHandler = new InkTagHandler(playerSession, this);
+        this.inkTagHandler = new InkTagHandler(playerSession, this, story);
     }
 
     StoryHandler(
@@ -95,7 +95,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         this.playerSession = playerSession;
         this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
         this.story.getState().loadJson(storyState);
-        this.inkTagHandler = new InkTagHandler(playerSession, this);
+        this.inkTagHandler = new InkTagHandler(playerSession, this, story);
         this.characterDialogData.putAll(characterDialogData);
         this.interactionIds.addAll(interactionIds);
         this.lastCharacterSpoke = lastCharacterSpoke;
@@ -302,6 +302,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         String[] parts = parseSpeaker(text);
         String speaker = parts[0].isEmpty() ? TAG_2D : parts[0];
         String dialogueText = parts[1];
+        dialogueText = InkActionUtil.parseVariables(story, dialogueText);
         if (!text.isEmpty()) {
             int entityId = S2CShowDialogue.NO_ENTITY;
             Entity entity = characterEntities.get(speaker.toLowerCase());

@@ -23,7 +23,13 @@
 
 package fr.loudo.narrativecraft.api.inkAction;
 
+import com.bladecoder.ink.runtime.Story;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class InkActionUtil {
+
+    public static final Pattern VARIABLE_NAME = Pattern.compile("%([A-Za-z0-9_]+)%");
 
     private InkActionUtil() {}
 
@@ -37,5 +43,32 @@ public final class InkActionUtil {
         if (unit.contains("minute")) return value * 60.0;
         if (unit.contains("hour")) return value * 3600.0;
         return -1;
+    }
+
+    /**
+     * Searches for variable names in a text and parses them by retrieving their value from the story.
+     *
+     * <p>Variable placeholders follow the pattern {@code %variable_name%}. For example:
+     * <pre>{@code
+     * I went %place_time_value% times here!
+     * }</pre>
+     * If the story has {@code place_time_value} assigned (e.g. {@code 3}), the method will return:
+     * <pre>{@code
+     * I went 3 times here!
+     * }</pre>
+     *
+     * @param story the main story instance
+     * @param text  the text to parse
+     * @return the text with the variable parsed if found
+     */
+    public static String parseVariables(Story story, String text) {
+        if (story == null) return text;
+        Matcher matcher = VARIABLE_NAME.matcher(text);
+        while (matcher.find()) {
+            Object variable = story.getVariablesState().get(matcher.group(1));
+            if (variable == null) continue;
+            text = text.replace("%" + matcher.group(1) + "%", variable.toString());
+        }
+        return text;
     }
 }
