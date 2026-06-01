@@ -27,15 +27,14 @@ import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class PaginationsItemsScreen<T> extends Screen {
 

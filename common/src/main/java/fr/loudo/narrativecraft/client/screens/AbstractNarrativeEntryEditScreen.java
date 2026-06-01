@@ -64,16 +64,20 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
     @Override
     protected void init() {
+        String savedName = nameBox != null ? nameBox.getValue() : (entry != null ? entry.getName() : "");
+        String savedDescription =
+                descriptionBox != null ? descriptionBox.getValue() : (entry != null ? entry.getDescription() : "");
+
         widgets.clear();
 
         nameText = new StringWidget(Translation.message("name"), this.font);
         nameBox = new EditBox(this.font, GLOBAL_WIDTH, 20, Translation.message("name"));
-        nameBox.setValue(entry != null ? entry.getName() : "");
+        nameBox.setValue(savedName);
 
         descriptionText = new StringWidget(Translation.message("description"), this.font);
         descriptionBox =
                 new MultiLineEditBox.Builder().build(this.font, GLOBAL_WIDTH, 90, Translation.message("description"));
-        if (entry != null) descriptionBox.setValue(entry.getDescription());
+        descriptionBox.setValue(savedDescription);
 
         sendButton = Button.builder(Translation.message("send"), (b) -> {
                     boolean validated = hasValidated();
