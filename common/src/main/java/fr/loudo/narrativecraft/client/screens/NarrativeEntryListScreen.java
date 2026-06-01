@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
+import fr.loudo.narrativecraft.client.screens.narrative.character.CharacterEntryListScreen;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
@@ -34,11 +35,12 @@ import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
+import java.util.List;
 
 public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends PaginationsItemsScreen<E> {
 
@@ -103,13 +105,10 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
             this.addRenderableWidget(storiesButton);
         } else {
             Button charactersButton = Button.builder(Component.literal("C"), b -> {
-                        minecraft.setScreen(new NarrativeEntryListScreen<>(
-                                Translation.message("character"),
+                        minecraft.setScreen(new CharacterEntryListScreen(
                                 ClientNarrativeCraftMod.getInstance()
                                         .getCharacterManager()
                                         .getList(),
-                                this,
-                                CharacterStory.class,
                                 ""));
                     })
                     .bounds(10, 10, 20, 20)

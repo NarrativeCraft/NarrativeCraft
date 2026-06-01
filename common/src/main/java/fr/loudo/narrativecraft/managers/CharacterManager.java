@@ -35,8 +35,7 @@ import javax.annotation.Nullable;
 
 public class CharacterManager extends NarrativeManager<CharacterStory> {
 
-    @Override
-    public List<CharacterStory> getList() {
+    public List<CharacterStory> getSortedList() {
         List<CharacterStory> sorted = new ArrayList<>(list);
         sorted.sort(Comparator.comparingInt(c -> c.getMainCharacterAttribute().isMainCharacter() ? 0 : 1));
         return sorted;
