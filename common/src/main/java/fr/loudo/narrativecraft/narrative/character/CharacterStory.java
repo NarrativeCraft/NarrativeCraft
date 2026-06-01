@@ -31,13 +31,16 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.PlayerModelType;
 
+import java.io.File;
+import java.util.UUID;
+
 public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implements ICharacterStory {
+
+    public static final String USERNAME_VARIABLE = "user";
 
     private final CharacterType characterType = CharacterType.NORMAL;
     private DialogData dialogData = new DialogData();
