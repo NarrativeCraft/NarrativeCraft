@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  * Parses an {@link fr.loudo.narrativecraft.api.inkAction.InkCommand#syntax()} string into a
  * {@link CommandSpec} once at startup.
  *
- * <h3>Supported token forms</h3>
+ * <h2>Supported token forms</h2>
  * <ul>
  *   <li>{@code <name:type>}, required positional argument</li>
  *   <li>{@code [name:type=default]}, optional named argument with a default value</li>

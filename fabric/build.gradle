@@ -9,6 +9,7 @@ dependencies {
     include(implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}")
     include(implementation "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}")
     include(implementation project(':api'))
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 loom {

@@ -46,7 +46,7 @@ import java.lang.annotation.Target;
  * public class SoundInkAction extends InkAction { ... }
  * }</pre>
  *
- * <h3>Syntax grammar</h3>
+ * <h2>Syntax grammar</h2>
  * <ul>
  *   <li>{@code <name:type>}, required positional argument</li>
  *   <li>{@code [name:type=default]}, optional named argument with default value</li>
