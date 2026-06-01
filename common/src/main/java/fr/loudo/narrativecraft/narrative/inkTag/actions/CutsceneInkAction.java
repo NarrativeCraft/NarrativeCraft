@@ -23,6 +23,9 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.cutscene.CutsceneEndEvent;
+import fr.loudo.narrativecraft.api.events.cutscene.CutsceneStartEvent;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -72,6 +75,7 @@ public class CutsceneInkAction extends InkAction {
     public void tick() {
         if (editorMaker.isFinished()) {
             isRunning = false;
+            NarrativeCraftMod.EVENT_BUS.post(new CutsceneEndEvent(editorMaker.getPlayerSession(), cutscene));
         }
     }
 
@@ -110,6 +114,7 @@ public class CutsceneInkAction extends InkAction {
                 storyHandler.registerEntity(characterStory, playback.getMasterEntity());
             }
         }
+        NarrativeCraftMod.EVENT_BUS.post(new CutsceneStartEvent(playerSession, cutscene));
         playerSession.setGameplayMode(false);
         return InkActionResult.block();
     }

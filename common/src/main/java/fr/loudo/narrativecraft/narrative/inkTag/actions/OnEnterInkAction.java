@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.story.ChapterSceneChangeEvent;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -71,6 +73,7 @@ public class OnEnterInkAction extends InkAction {
             return InkActionResult.ignored();
         }
         session.apply(chapter, scene);
+        NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneChangeEvent(playerSession, chapter, scene));
 
         storyHandler.triggerChangeScene();
         Services.PACKET.sendToPlayer(session.getPlayer(), new S2CPlayerSession(chapter.getId(), scene.getId()));

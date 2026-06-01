@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.interaction.InteractionTriggerEvent;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -75,6 +77,7 @@ public class InteractionInkAction extends InkAction {
             if (lastEditorMaker != null) {
                 lastEditorMaker.stop();
             }
+            NarrativeCraftMod.EVENT_BUS.post(new InteractionTriggerEvent(playerSession, interaction));
             InteractionMakerEditorMaker editorMaker =
                     new InteractionMakerEditorMaker(interaction, session, NarrativeEnvironment.PRODUCTION);
             session.setEditor(editorMaker);

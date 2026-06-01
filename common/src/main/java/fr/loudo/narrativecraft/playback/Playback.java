@@ -23,6 +23,11 @@
 
 package fr.loudo.narrativecraft.playback;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.playback.PlaybackEndEvent;
+import fr.loudo.narrativecraft.api.events.playback.PlaybackPauseEvent;
+import fr.loudo.narrativecraft.api.events.playback.PlaybackResumeEvent;
+import fr.loudo.narrativecraft.api.events.playback.PlaybackStartEvent;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
@@ -86,6 +91,7 @@ public class Playback implements IPlaybackSession {
                             animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
         }
         UtilsServer.broadcastCharacterSkin(requester.level().players(), animation.getCharacterStory());
+        NarrativeCraftMod.EVENT_BUS.post(new PlaybackStartEvent(this));
     }
 
     public Entity getMasterEntity() {
@@ -113,6 +119,7 @@ public class Playback implements IPlaybackSession {
         for (PlaybackContext context : contexts) {
             context.play();
         }
+        NarrativeCraftMod.EVENT_BUS.post(new PlaybackResumeEvent(this));
     }
 
     public void pause() {
@@ -120,6 +127,7 @@ public class Playback implements IPlaybackSession {
         for (PlaybackContext context : contexts) {
             context.pause();
         }
+        NarrativeCraftMod.EVENT_BUS.post(new PlaybackPauseEvent(this));
     }
 
     public void stop() {
@@ -140,6 +148,7 @@ public class Playback implements IPlaybackSession {
                 context.pause();
             }
         }
+        NarrativeCraftMod.EVENT_BUS.post(new PlaybackEndEvent(this));
     }
 
     public void stopAndKill() {

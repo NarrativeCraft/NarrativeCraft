@@ -26,6 +26,12 @@ package fr.loudo.narrativecraft.narrative.story;
 import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.character.CharacterDespawnEvent;
+import fr.loudo.narrativecraft.api.events.character.CharacterSpawnEvent;
+import fr.loudo.narrativecraft.api.events.dialog.DialogChoiceEvent;
+import fr.loudo.narrativecraft.api.events.dialog.DialogEndEvent;
+import fr.loudo.narrativecraft.api.events.dialog.DialogStartEvent;
+import fr.loudo.narrativecraft.api.events.story.*;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
@@ -108,6 +114,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     public void start() throws Exception {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CNotifyClientPlayStory());
+        NarrativeCraftMod.EVENT_BUS.post(new StoryStartEvent(playerSession));
         if (!loadedFromSave) {
             Chapter firstChapter =
                     NarrativeCraftMod.getInstance().getChapterManager().get(0);
@@ -116,12 +123,14 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
             playerSession.setScene(firstScene);
             Services.PACKET.sendToPlayer(
                     playerSession.getPlayer(), new S2CPlayerSession(firstChapter.getId(), firstScene.getId()));
+            NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneStartEvent(playerSession, firstChapter, firstScene));
         }
         advance();
     }
 
     public void start(String knotPath) throws Exception {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CNotifyClientPlayStory());
+        NarrativeCraftMod.EVENT_BUS.post(new StoryStartEvent(playerSession));
         story.choosePathString(knotPath);
         Chapter chapter = getChapterFromKnotName(knotPath);
         if (chapter == null) {
@@ -135,6 +144,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         }
         playerSession.setChapter(chapter);
         playerSession.setScene(scene);
+        NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneStartEvent(playerSession, chapter, scene));
         advance();
     }
 
@@ -151,12 +161,19 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
                 playerSession.getPlayer(),
                 new S2CCharacterStoryAction(UUID.randomUUID(), S2CCharacterStoryAction.Action.CLEAR));
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopStory());
+        if (playerSession.getScene() != null) {
+            NarrativeCraftMod.EVENT_BUS.post(new SceneEndEvent(playerSession, playerSession.getScene()));
+        }
+        NarrativeCraftMod.EVENT_BUS.post(new StoryEndEvent(playerSession));
         playerSession.clear();
     }
 
     public void onChoiceSelected(int index) {
         if (ended) return;
         try {
+            List<Choice> choices = story.getCurrentChoices();
+            List<String> choiceTexts = choices.stream().map(Choice::getText).toList();
+            NarrativeCraftMod.EVENT_BUS.post(new DialogChoiceEvent(playerSession, choiceTexts, index));
             story.chooseChoiceIndex(index);
             advance();
         } catch (Exception exception) {
@@ -165,6 +182,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
     }
 
     public void onDialogueAck() {
+        NarrativeCraftMod.EVENT_BUS.post(new DialogEndEvent(playerSession));
         if (ended) {
             stop();
         } else {
@@ -304,6 +322,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         String dialogueText = parts[1];
         dialogueText = InkActionUtil.parseVariables(story, dialogueText);
         if (!text.isEmpty()) {
+            NarrativeCraftMod.EVENT_BUS.post(new DialogStartEvent(playerSession, speaker, dialogueText));
             int entityId = S2CShowDialogue.NO_ENTITY;
             Entity entity = characterEntities.get(speaker.toLowerCase());
             if (entity != null) {
@@ -336,14 +355,23 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
 
     public void registerEntity(ICharacterStory characterStory, Entity entity) {
         characterEntities.put(characterStory.getName().toLowerCase(), entity);
+        if (playerSession.getScene() != null) {
+            NarrativeCraftMod.EVENT_BUS.post(new CharacterSpawnEvent(characterStory, playerSession.getScene()));
+        }
     }
 
     public void unregisterEntity(ICharacterStory characterStory, Entity entity) {
         characterEntities.remove(characterStory.getName().toLowerCase(), entity);
+        if (playerSession.getScene() != null) {
+            NarrativeCraftMod.EVENT_BUS.post(new CharacterDespawnEvent(characterStory, playerSession.getScene()));
+        }
     }
 
     public void unregisterEntity(ICharacterStory characterStory) {
         characterEntities.remove(characterStory.getName().toLowerCase());
+        if (playerSession.getScene() != null) {
+            NarrativeCraftMod.EVENT_BUS.post(new CharacterDespawnEvent(characterStory, playerSession.getScene()));
+        }
     }
 
     public Entity getEntityFromCharacter(ICharacterStory characterStory) {
@@ -382,6 +410,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         NarrativeCraftMod.LOGGER.info(
                 "Story finished for player {}.",
                 playerSession.getPlayer().getName().getString());
+        if (playerSession.getScene() != null) {
+            NarrativeCraftMod.EVENT_BUS.post(new SceneEndEvent(playerSession, playerSession.getScene()));
+        }
+        NarrativeCraftMod.EVENT_BUS.post(new StoryEndEvent(playerSession));
         playerSession.clear();
     }
 

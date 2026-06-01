@@ -23,13 +23,14 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
+import fr.loudo.narrativecraft.api.narrative.interaction.IInteraction;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Interaction extends NarrativeEntry<InteractionPayload> {
+public class Interaction extends NarrativeEntry<InteractionPayload> implements IInteraction {
 
     private final Scene scene;
     private final List<InteractionZone> zones = new ArrayList<>();

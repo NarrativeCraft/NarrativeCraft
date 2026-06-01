@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene;
 
+import fr.loudo.narrativecraft.api.narrative.cutscene.ICutscene;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Cutscene extends NarrativeEntry<CutscenePayload> {
+public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutscene {
 
     private final Scene scene;
     private List<Animation> animations;

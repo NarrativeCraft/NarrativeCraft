@@ -21,29 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.api.events.story;
 
-import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
+import fr.loudo.narrativecraft.api.events.Event;
+import fr.loudo.narrativecraft.api.narrative.chapter.IChapter;
+import fr.loudo.narrativecraft.api.narrative.scene.IScene;
+import fr.loudo.narrativecraft.api.session.IPlayerSession;
 
-public interface ICharacterStory extends fr.loudo.narrativecraft.api.narrative.character.ICharacterStory {
-
-    String getDescription();
-
-    DialogData getDialogData();
-
-    void setDialogData(DialogData dialogData);
-
-    Scene getScene();
-
-    File getSkinFile();
-
-    EntityType<?> getEntityType();
-
-    PlayerModelType getModelType();
-
-    CharacterType getCharacterType();
-}
+public record ChapterSceneChangeEvent(IPlayerSession session, IChapter chapter, IScene scene) implements Event {}

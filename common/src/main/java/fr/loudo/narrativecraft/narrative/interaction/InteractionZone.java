@@ -23,11 +23,12 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
+import fr.loudo.narrativecraft.api.narrative.interaction.IInteractionZone;
 import java.util.UUID;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public class InteractionZone {
+public class InteractionZone implements IInteractionZone {
 
     private final UUID id;
     private String name;

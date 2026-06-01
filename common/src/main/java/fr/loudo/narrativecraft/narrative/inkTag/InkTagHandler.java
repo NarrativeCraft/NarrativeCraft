@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.narrative.inkTag;
 
 import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.inkAction.InkActionStopEvent;
+import fr.loudo.narrativecraft.api.events.inkAction.InkTagProcessedEvent;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
@@ -35,12 +37,7 @@ import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -103,13 +100,20 @@ public final class InkTagHandler {
 
     public void tick() {
         if (blockingAction != null && !blockingAction.isRunning()) {
+            if (blockingAction instanceof InkAction finished) {
+                NarrativeCraftMod.EVENT_BUS.post(new InkActionStopEvent(playerSession, finished.getKeyword()));
+            }
             blockingAction = null;
             drain();
         }
 
         runningServerActions.removeIf(action -> {
             action.tick();
-            return !action.isRunning();
+            if (!action.isRunning()) {
+                NarrativeCraftMod.EVENT_BUS.post(new InkActionStopEvent(playerSession, action.getKeyword()));
+                return true;
+            }
+            return false;
         });
     }
 
@@ -159,6 +163,8 @@ public final class InkTagHandler {
 
             InkAction action = dispatchResult.action();
             ParsedCommand cmd = dispatchResult.cmd();
+
+            NarrativeCraftMod.EVENT_BUS.post(new InkTagProcessedEvent(playerSession, action.getKeyword(), rawTag));
 
             InkActionResult result = runOrSend(action, cmd);
 

@@ -21,29 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.character;
+package fr.loudo.narrativecraft.api.events.playback;
 
-import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
+import fr.loudo.narrativecraft.api.events.Event;
+import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 
-public interface ICharacterStory extends fr.loudo.narrativecraft.api.narrative.character.ICharacterStory {
-
-    String getDescription();
-
-    DialogData getDialogData();
-
-    void setDialogData(DialogData dialogData);
-
-    Scene getScene();
-
-    File getSkinFile();
-
-    EntityType<?> getEntityType();
-
-    PlayerModelType getModelType();
-
-    CharacterType getCharacterType();
-}
+public record PlaybackStartEvent(IPlaybackSession playback) implements Event {}

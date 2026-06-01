@@ -23,6 +23,9 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.session.PlayerSessionEndEvent;
+import fr.loudo.narrativecraft.api.events.session.PlayerSessionStartEvent;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
@@ -35,6 +38,13 @@ public class PlayerSessionManager extends Manager<PlayerSession> {
         // Fake player trying to fit in loool
         if (item.getPlayer() instanceof FakePlayer) return;
         super.add(item);
+        NarrativeCraftMod.EVENT_BUS.post(new PlayerSessionStartEvent(item));
+    }
+
+    @Override
+    public void remove(PlayerSession item) {
+        NarrativeCraftMod.EVENT_BUS.post(new PlayerSessionEndEvent(item));
+        super.remove(item);
     }
 
     public PlayerSession getByPlayer(Player player) {
