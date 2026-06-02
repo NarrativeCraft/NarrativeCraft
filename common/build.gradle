@@ -1,6 +1,11 @@
 plugins {
     id 'multiloader-common'
     id 'net.neoforged.moddev'
+    id 'maven-publish'
+}
+
+base {
+    archivesName = 'narrativecraft-common'
 }
 
 neoForge {
@@ -53,6 +58,28 @@ sourceSets.configureEach {
         configurations.named("$variant") {
             attributes {
                 attribute(loaderAttribute, 'common')
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifactId base.archivesName.get()
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = 'Reposilite'
+            url = 'https://maven.loudo.dev'
+            credentials {
+                username = findProperty('reposiliteUser') ?: ''
+                password = findProperty('reposilitePassword') ?: ''
+            }
+            authentication {
+                basic(BasicAuthentication)
             }
         }
     }

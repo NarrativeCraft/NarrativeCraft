@@ -1,6 +1,11 @@
 plugins {
     id 'multiloader-common'
     id 'net.neoforged.moddev'
+    id 'maven-publish'
+}
+
+base {
+    archivesName = 'narrativecraft-api'
 }
 
 neoForge {
@@ -29,5 +34,27 @@ configurations {
 artifacts {
     apiJava sourceSets.main.java.sourceDirectories.singleFile
     apiResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifactId base.archivesName.get()
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = 'Reposilite'
+            url = 'https://maven.loudo.dev'
+            credentials {
+                username = findProperty('reposiliteUser') ?: ''
+                password = findProperty('reposilitePassword') ?: ''
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
 }
 
