@@ -2,7 +2,7 @@
 <div align="center">
     Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
 </div>
-
+&nbsp;&nbsp;&nbsp;
 <p align="center">
   <a href="https://discord.com/invite/E3zzNv79DN">
     <img width="250" height="150" alt="join_disord" src="https://github.com/user-attachments/assets/075953b6-de64-4f55-a9c8-fb407e50458b" />
@@ -44,6 +44,36 @@ NarrativeCraft is singleplayer first, meaning that it is mainly developed for si
 ## Getting started
 
 If you want to start learning **NarrativeCraft**, take a look at the [documentation](https://narrativecraft.loudo.dev); you'll be guided there to start your first story and learn the fundamentals of the mod.
+
+## API
+
+An API is available for use
+
+### Gradle
+```
+maven {
+    name "loudo"
+    url "https://maven.loudo.dev"
+}
+```
+```
+compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.0
+```
+
+### Maven
+```
+<repository>
+    <id>loudo</id>
+    <url>https://maven.loudo.dev</url>
+</repository>
+```
+```
+<dependency>
+    <groupId>fr.loudo.narrativecraft</groupId>
+    <artifactId>narrativecraft-api</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
 
 ## Contributing
 
