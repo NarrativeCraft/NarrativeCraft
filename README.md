@@ -1,68 +1,55 @@
 # NarrativeCraft
 <div align="center">
-    Create your own stories, easily and freely, in Minecraft.
+    Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
 </div>
-&nbsp;&nbsp;&nbsp;
+
 <p align="center">
   <a href="https://discord.com/invite/E3zzNv79DN">
     <img width="250" height="150" alt="join_disord" src="https://github.com/user-attachments/assets/075953b6-de64-4f55-a9c8-fb407e50458b" />
   </a>
    &nbsp;&nbsp;&nbsp;
-  <a href="https://loudo56.github.io/NarrativeCraft-docs/">
+  <a href="https://narrativecraft.loudo.dev/">
     <img width="250" height="150" alt="documentation" src="https://github.com/user-attachments/assets/7eaaca5f-52ef-4a5f-bb2d-9320ffc247b5" />
   </a>
 </p>
 
-## Tutorial video
-<a href="https://youtu.be/QUZUdqEoVRU">
-   <img width="1400" height="789" src="https://github.com/user-attachments/assets/33024ef3-eeef-4bee-aa94-a108a45c0866" />
-</a>
+<hr />
 
+**NarrativeCraft** is a Minecraft mod to create your own narrative games in Minecraft. If you don't want to learn a game engine to create stories with branching patterns, this mod does all the work for you.
 
-## Concept
-NarrativeCraft is a Minecraft mod that turns the game into a space for building interactive stories, with choices and branching narratives that react to the player’s decisions.
+## How does this work
 
-It's mostly for creating a game in a game and is highly inspired from games I love like Life Is Strange and Until Then.
-
-It's all-in-one (recording, cutscene, rendering dialogs, story management) and is designed to be easy to use.
-
-Create your own unique stories with endearing characters, let your imagination take form in a 3D sandbox, with shaders, music, and cutscenes.
-
-This mod is mainly written to be singleplayer-only, to create adventure maps. Multiplayer is not supported yet.
+NarrativeCraft works thanks to the amazing open source project [Ink](https://www.inklestudios.com/ink/), a narrative scripting language to write dialogs and create branching patterns. Text first, logic later.
 
 ## Features
 
-- Ink integration
-- Support for custom triggers and commands
-- Made to be accessible to anybody
-- Organized structure
-- Customizable (main screen, credits, dialogues...)
-- All-in-one system (player recording, cutscenes, multiple recordings at the same time)
+NarrativeCraft is an all-in-one system, meaning that you have everything by default, no addons required.
 
-## Mod compatibility
-- EmoteCraft: Emotes will be recorded, and you can play them from ink script.
+- Cutscenes
+- Player recording
+- Dialogs rendering (on screen or a character speaking)
+- Camera angles for character dialog focus
+- Interactions with trigger zones and clickable points
+- Characters and NPCs
+- Full management of your story
+- Choices
+- Saves
+- Main screen (new game, continue...)
+- Multiplayer
 
-## How does it work?
+## About Multiplayer
 
-NarrativeCraft uses a narrative scripting language called [Ink](https://www.inklestudios.com/ink/), which is open-source and highly scalable for integration into other projects. The Java integration was made by [bladecoder](https://github.com/bladecoder/).
+NarrativeCraft is singleplayer first, meaning that it is mainly developed for singleplayer. However, multiplayer is supported, but it does not mean **co-op**, it means that you can play a story, show cutscenes, display characters or NPCs to a single player, so you can create more immersion for your server.
 
-Ink is a great narrative scripting language because:
-- It's easy to learn.
-- Dialogues come first, logic later.
-- It has enough advanced features to create complex stories.
+## Getting started
 
-NarrativeCraft is the middleman that interprets your dialogues and events as in-game actions.  
-By events, I mean custom lines you can write to trigger in-game actions. For example, changing the time, weather, playing cutscenes...
+If you want to start learning **NarrativeCraft**, take a look at the [documentation](https://narrativecraft.loudo.dev); you'll be guided there to start your first story and learn the fundamentals of the mod.
 
-## What does it look like in-game?
+## Contributing
 
-I'm glad you asked! I made a small showcase to demonstrate what this mod is capable of:  
-<a href="https://youtu.be/4VunlM_XCms">
-<img src="https://github.com/user-attachments/assets/a1c5a664-dbf4-4782-aa4e-d18ca1462579"/>
-</a>
+Thank you for your interest in the project and for helping to make it better, take a look at [CONTRIBUTING.MD](CONTRIBUTING.MD) before making a pull request.
 
-## Contribution
+## Credits
 
-This mod is meant to be developed and used with the community. My goal is to make story creation easily accessible to as many people as possible.
-
-If you're experienced in Minecraft modding or Java in general, any suggestions to refactor or improve the code are greatly appreciated.
+- [ink](https://github.com/inkle/ink) - Scripting language
+- [blade-ink-java](https://github.com/bladecoder/blade-ink-java) - Java adaptation of ink
