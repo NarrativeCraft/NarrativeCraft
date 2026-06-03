@@ -47,7 +47,10 @@ If you want to start learning **NarrativeCraft**, take a look at the [documentat
 
 ## API
 
-An API is available for use
+An API is available for use if you want to create comptability for other mod or if you want to take your story a step further.
+
+There's an [documentation](https://narrativecraft.loudo.dev/api) documentation for the API.
+
 
 ### Gradle
 ```
