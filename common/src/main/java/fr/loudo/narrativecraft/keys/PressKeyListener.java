@@ -25,7 +25,10 @@ package fr.loudo.narrativecraft.keys;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.client.screens.narrative.scene.SceneMenuScreen;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
@@ -34,12 +37,21 @@ public class PressKeyListener {
 
     public static void onKeyPressed(Minecraft minecraft) {
         if (ModKeys.STORY_MANAGER.consumeClick()) {
-            NarrativeEntryListScreen<Chapter> screen = new NarrativeEntryListScreen<>(
+            ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+            NarrativeEntryListScreen<Chapter> entryListScreen = new NarrativeEntryListScreen<>(
                     Translation.message("chapter"),
                     ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
                     Chapter.class,
                     "");
-            minecraft.setScreen(screen);
+            if (session.sessionSet()) {
+                SceneMenuScreen screen = new SceneMenuScreen(
+                        session.getScene(),
+                        ClientNarrativeUIActionRegistry.getInstance()
+                                .showListSubScreen(session.getChapter(), entryListScreen));
+                minecraft.setScreen(screen);
+            } else {
+                minecraft.setScreen(entryListScreen);
+            }
         }
 
         if (ModKeys.HIDE_EDITOR_MAKER_HUD.consumeClick()) {

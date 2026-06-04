@@ -144,5 +144,8 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CNotifyClientPlayStory.TYPE, (packet, context) -> {
             ClientPacketHandler.notifyClientPlayStory();
         });
+        ClientPlayNetworking.registerGlobalReceiver(S2CSessionClear.TYPE, (packet, context) -> {
+            ClientPacketHandler.sessionClear();
+        });
     }
 }

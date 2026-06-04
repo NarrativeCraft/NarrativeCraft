@@ -482,4 +482,8 @@ public class ClientPacketHandler {
     public static void notifyClientPlayStory() {
         ClientNarrativeCraftMod.getInstance().getPlayerSession().setInStory(true);
     }
+
+    public static void sessionClear() {
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().clear();
+    }
 }

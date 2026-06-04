@@ -194,4 +194,8 @@ public class ClientPacketHandlerNeoForge {
     public static void notifyClientPlayStory(S2CNotifyClientPlayStory packet, IPayloadContext context) {
         context.enqueueWork(ClientPacketHandler::notifyClientPlayStory);
     }
+
+    public static void sessionClear(S2CSessionClear packet, IPayloadContext context) {
+        context.enqueueWork(ClientPacketHandler::sessionClear);
+    }
 }

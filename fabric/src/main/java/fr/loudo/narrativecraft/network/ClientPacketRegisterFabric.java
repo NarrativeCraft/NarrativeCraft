@@ -86,5 +86,6 @@ public class ClientPacketRegisterFabric {
                 .register(S2CDialogEditorEntitySpawned.TYPE, S2CDialogEditorEntitySpawned.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CNotifyClientPlayStory.TYPE, S2CNotifyClientPlayStory.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CSessionClear.TYPE, S2CSessionClear.STREAM_CODEC);
     }
 }

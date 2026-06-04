@@ -136,6 +136,8 @@ public class OnPacketRegisterEventNeoForge {
                 S2CNotifyClientPlayStory.TYPE,
                 S2CNotifyClientPlayStory.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::notifyClientPlayStory);
+        registrar.playToClient(
+                S2CSessionClear.TYPE, S2CSessionClear.STREAM_CODEC, ClientPacketHandlerNeoForge::sessionClear);
     }
 
     private static void registerC2SPackets(PayloadRegistrar registrar) {
