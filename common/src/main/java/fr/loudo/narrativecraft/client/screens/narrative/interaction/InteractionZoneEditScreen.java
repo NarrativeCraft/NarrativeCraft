@@ -102,7 +102,7 @@ public class InteractionZoneEditScreen extends Screen {
         y += FIELD_HEIGHT + GAP;
 
         Button oneTimeClickButton = Button.builder(
-                        Component.literal(Translation.message("screen.interaction.one_time_click")
+                        Component.literal(Translation.message("screen.interaction.one_time_enter")
                                         .getString() + ": "
                                 + Translation.message(oneTime ? "yes" : "no").getString()),
                         b -> {

@@ -148,6 +148,7 @@
   "narrativecraft.screen.interaction.place_point": "Place point",
   "narrativecraft.screen.interaction.never_show": "Never show",
   "narrativecraft.screen.interaction.one_time_click": "One time click",
+  "narrativecraft.screen.interaction.one_time_enter": "One time enter",
 
   "narrativecraft.story.no_main_file": "main.ink does not exists!",
   "narrativecraft.story.compiling": "Compiling...",
