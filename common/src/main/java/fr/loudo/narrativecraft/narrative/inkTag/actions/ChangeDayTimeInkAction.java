@@ -32,8 +32,12 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.clock.ServerClockManager;
+import net.minecraft.world.clock.WorldClock;
+import net.minecraft.world.level.dimension.DimensionType;
 
 @InkCommand(
         keyword = "time",
@@ -103,7 +107,7 @@ public class ChangeDayTimeInkAction extends InkAction {
         tick++;
         double t = Mth.clamp((double) tick / totalTick, 0.0, 1.0);
         t = Interpolation.applyEasing(easingType, t);
-        // level.setDayTime((long) Interpolation.lerp(fromTick, toTick, t));
+        changeTime((long) Interpolation.lerp(fromTick, toTick, t));
         if (tick >= totalTick) {
             isRunning = false;
         }
@@ -114,18 +118,32 @@ public class ChangeDayTimeInkAction extends InkAction {
         level = playerSession.getPlayer().level();
 
         if (action.equals("add")) {
-            // level.setDayTime(level.getDayTime() + fromTick);
+            changeTime(getDayTime() + fromTick);
             isRunning = false;
             return InkActionResult.ok();
         }
 
         if (totalTick == 0) {
-            // level.setDayTime(fromTick);
+            changeTime(fromTick);
             isRunning = false;
             return InkActionResult.ok();
         }
 
         return InkActionResult.ok();
+    }
+
+    private void changeTime(long tick) {
+        ServerClockManager clockManager = level.getServer().clockManager();
+        DimensionType dimensionType = level.dimensionType();
+        Holder<WorldClock> worldClock = dimensionType.defaultClock().get();
+        clockManager.setTotalTicks(worldClock, tick);
+    }
+
+    private long getDayTime() {
+        ServerClockManager clockManager = level.getServer().clockManager();
+        DimensionType dimensionType = level.dimensionType();
+        Holder<WorldClock> worldClock = dimensionType.defaultClock().get();
+        return clockManager.getTotalTicks(worldClock);
     }
 
     private static long parseDayTime(String dayTime) {

@@ -29,13 +29,12 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.S2CSessionClear;
 import fr.loudo.narrativecraft.platform.Services;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.GameType;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 
 public class PlayerSession extends AbstractPlayerSession {
 
