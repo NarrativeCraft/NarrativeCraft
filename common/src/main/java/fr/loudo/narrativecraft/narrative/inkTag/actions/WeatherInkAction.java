@@ -69,7 +69,7 @@ public class WeatherInkAction extends InkAction {
                     connection.send(
                             new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0F));
                 } else {
-                    // level.setWeatherParameters(999999, 0, false, false);
+                    level.getServer().setWeatherParameters(999999, 0, false, false);
                 }
             }
             case "rain" -> {
@@ -79,7 +79,7 @@ public class WeatherInkAction extends InkAction {
                     connection.send(
                             new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0F));
                 } else {
-                    // level.setWeatherParameters(0, 999999, true, false);
+                    level.getServer().setWeatherParameters(0, 999999, true, false);
                 }
             }
             case "thunder" -> {
@@ -89,7 +89,7 @@ public class WeatherInkAction extends InkAction {
                     connection.send(
                             new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 1.0F));
                 } else {
-                    // level.setWeatherParameters(0, 999999, true, true);
+                    level.getServer().setWeatherParameters(0, 999999, true, true);
                 }
             }
         }
