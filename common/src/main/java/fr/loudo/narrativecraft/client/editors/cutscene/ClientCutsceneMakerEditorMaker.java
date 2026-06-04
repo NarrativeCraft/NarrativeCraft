@@ -194,7 +194,14 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         playerSession.getCutsceneDataSession().reset();
     }
 
-    public void tick() {}
+    public void tick() {
+        boolean hideGui = Minecraft.getInstance().options.hideGui;
+        if (playback.isPlaying() && !hideGui) {
+            Minecraft.getInstance().options.hideGui = true;
+        } else if (!playback.isPlaying() && hideGui) {
+            Minecraft.getInstance().options.hideGui = false;
+        }
+    }
 
     @Override
     public void teleportToEditorOrigin() {}
