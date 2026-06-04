@@ -39,10 +39,6 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
 
     private File rootDirectory;
     private File mainDirectory;
-    private File chaptersDirectory;
-    private File charactersDirectory;
-    private File dataDirectory;
-    private File savesDirectory;
     private File mainInk;
     private File variablesInk;
     private File functionsInk;
@@ -51,10 +47,6 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
         this.rootDirectory = rootDirectory;
 
         mainDirectory = createDirectory(rootDirectory, DIRECTORY_NAME);
-        chaptersDirectory = createDirectory(mainDirectory, CHAPTERS_DIRECTORY_NAME);
-        charactersDirectory = createDirectory(mainDirectory, CHARACTERS_DIRECTORY_NAME);
-        dataDirectory = createDirectory(mainDirectory, DATA_DIRECTORY_NAME);
-        savesDirectory = createDirectory(mainDirectory, SAVES_DIRECTORY_NAME);
         mainInk = createFile(mainDirectory, MAIN_INK_NAME);
         variablesInk = createFile(mainDirectory, VARS_INK_NAME);
         functionsInk = createFile(mainDirectory, FUNCTIONS_INK_NAME);
@@ -69,11 +61,11 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
     }
 
     public File getChaptersDirectory() {
-        return chaptersDirectory;
+        return createDirectory(mainDirectory, CHAPTERS_DIRECTORY_NAME);
     }
 
     public File getCharactersDirectory() {
-        return charactersDirectory;
+        return createDirectory(mainDirectory, CHARACTERS_DIRECTORY_NAME);
     }
 
     public File getDataDirectory() {

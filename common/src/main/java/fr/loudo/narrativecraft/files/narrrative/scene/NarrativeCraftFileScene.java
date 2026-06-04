@@ -86,6 +86,12 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
             return OPERATION_FAILED;
         }
 
+        File interactionFolder = createDirectory(sceneFile, NPC_FOLDER_NAME);
+        if (interactionFolder == null) {
+            NarrativeCraftMod.LOGGER.error("Failed to create interaction directory of scene {}", entry.getName());
+            return OPERATION_FAILED;
+        }
+
         int result = edit(entry);
         if (result == OPERATION_SUCCESS) {
             InkFileGenerator.generateSceneInkFile(entry);

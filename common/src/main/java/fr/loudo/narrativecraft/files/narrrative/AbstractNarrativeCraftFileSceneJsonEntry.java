@@ -55,7 +55,7 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
 
     private File getEntryFolder(T entry) {
         Scene scene = getScene(entry);
-        return new File(NarrativeCraftFileUtil.getSceneFolder(scene), getSubFolderName());
+        return createDirectory(NarrativeCraftFileUtil.getSceneFolder(scene), getSubFolderName());
     }
 
     @Override
