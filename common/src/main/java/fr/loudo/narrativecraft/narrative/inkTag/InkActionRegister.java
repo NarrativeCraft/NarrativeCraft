@@ -36,7 +36,6 @@ import fr.loudo.narrativecraft.narrative.inkTag.actions.InteractionInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.KillCharacterInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.MinecraftCommandInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.OnEnterInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.SaveInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.ShakeScreenInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.SoundInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.SubsceneInkAction;
@@ -65,7 +64,6 @@ public final class InkActionRegister {
         dispatcher.register(KillCharacterInkAction.class, KillCharacterInkAction::new);
         dispatcher.register(GameplayInkAction.class, GameplayInkAction::new);
         dispatcher.register(OnEnterInkAction.class, OnEnterInkAction::new);
-        dispatcher.register(SaveInkAction.class, SaveInkAction::new);
         dispatcher.register(ChangeDayTimeInkAction.class, ChangeDayTimeInkAction::new);
         dispatcher.register(TextInkAction.class, TextInkAction::new);
     }

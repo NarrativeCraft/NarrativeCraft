@@ -155,7 +155,9 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
         // Make template character button not active if on main screen editor
         buttons.get(2).active = cameraAngle.getScene() != null;
-        buttons.get(2).setTooltip(Tooltip.create(Translation.message("screen.main_screen.disabled_template")));
+        if (cameraAngle.getScene() == null) {
+            buttons.get(2).setTooltip(Tooltip.create(Translation.message("screen.main_screen.disabled_template")));
+        }
     }
 
     @Override
