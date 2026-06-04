@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.session;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -102,5 +103,10 @@ public class AbstractPlayerSession implements IPlayerSession {
     @Override
     public List<InkAction> getActiveClientInkActions() {
         return List.of();
+    }
+
+    @Override
+    public IStoryHandler getStoryHandler() {
+        return null;
     }
 }

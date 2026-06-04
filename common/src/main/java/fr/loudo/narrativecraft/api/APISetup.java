@@ -37,5 +37,6 @@ public class APISetup {
         api.setEventBus(NarrativeCraftMod.EVENT_BUS);
         api.setInkTagDispatcher(mod.getInkTagDispatcher());
         api.setModId(NarrativeCraftMod.MOD_ID);
+        api.setStoryHandlerManager(mod.getStoryHandlerManager());
     }
 }

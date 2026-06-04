@@ -31,8 +31,12 @@ import fr.loudo.narrativecraft.api.events.character.CharacterSpawnEvent;
 import fr.loudo.narrativecraft.api.events.dialog.DialogChoiceEvent;
 import fr.loudo.narrativecraft.api.events.dialog.DialogEndEvent;
 import fr.loudo.narrativecraft.api.events.dialog.DialogStartEvent;
-import fr.loudo.narrativecraft.api.events.story.*;
+import fr.loudo.narrativecraft.api.events.story.ChapterSceneStartEvent;
+import fr.loudo.narrativecraft.api.events.story.SceneEndEvent;
+import fr.loudo.narrativecraft.api.events.story.StoryEndEvent;
+import fr.loudo.narrativecraft.api.events.story.StoryStartEvent;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
+import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
@@ -56,7 +60,7 @@ import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.entity.Entity;
 
-public final class StoryHandler implements InkTagHandler.Lifecycle {
+public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandler {
 
     private static final Pattern SPEAKER_PATTERN = Pattern.compile("^([^:]+?)\\s*:\\s*(.+)$", Pattern.DOTALL);
     private static final Pattern KNOT_CHAPTER_PATTERN = Pattern.compile("^chapter_(\\d+)");
@@ -403,7 +407,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle {
         inkTagHandler.stopAll();
     }
 
-    private void finish() {
+    public void finish() {
         if (playerSession.isGameplayMode()) return;
         ended = true;
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());

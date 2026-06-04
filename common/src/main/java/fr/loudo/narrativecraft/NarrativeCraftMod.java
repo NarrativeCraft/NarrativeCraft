@@ -42,6 +42,7 @@ import fr.loudo.narrativecraft.narrative.events.EventBus;
 import fr.loudo.narrativecraft.narrative.inkTag.InkActionRegister;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.narrative.save.SaveFileManager;
+import fr.loudo.narrativecraft.narrative.story.StoryHandlerManager;
 import fr.loudo.narrativecraft.playback.PlaybackManager;
 import fr.loudo.narrativecraft.recording.actions.ActionRegister;
 import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
@@ -63,6 +64,7 @@ public class NarrativeCraftMod {
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
+    private final StoryHandlerManager storyHandlerManager = new StoryHandlerManager();
     private final ActionRegistry actionRegistry = new ActionRegistry();
     private final CutsceneLayerRegistry cutsceneLayerRegistry = new CutsceneLayerRegistry();
     private final TextEffectRegistry textEffectRegistry = new TextEffectRegistry();
@@ -119,6 +121,10 @@ public class NarrativeCraftMod {
 
     public TextEffectRegistry getTextEffectRegistry() {
         return textEffectRegistry;
+    }
+
+    public StoryHandlerManager getStoryHandlerManager() {
+        return storyHandlerManager;
     }
 
     public DialogData getGlobalDialogData() {

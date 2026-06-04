@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.editors.ICutsceneLayerRegistry;
 import fr.loudo.narrativecraft.api.events.IEventBus;
 import fr.loudo.narrativecraft.api.inkAction.InkTagDispatcher;
 import fr.loudo.narrativecraft.api.managers.IRecordingManager;
+import fr.loudo.narrativecraft.api.narrative.IStoryHandlerManager;
 import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 
 public class NarrativeCraftAPI {
@@ -38,6 +39,7 @@ public class NarrativeCraftAPI {
     private IActionRegistry actionRegistry;
     private ICutsceneLayerRegistry cutsceneLayerRegistry;
     private ITextEffectRegistry textEffectRegistry;
+    private IStoryHandlerManager storyHandlerManager;
     private IEventBus eventBus;
     private IRecordingManager recordingManager;
     private InkTagDispatcher inkTagDispatcher;
@@ -64,6 +66,14 @@ public class NarrativeCraftAPI {
 
     void setActionRegistry(IActionRegistry actionRegistry) {
         this.actionRegistry = actionRegistry;
+    }
+
+    public IStoryHandlerManager getStoryHandlerManager() {
+        return storyHandlerManager;
+    }
+
+    void setStoryHandlerManager(IStoryHandlerManager storyHandlerManager) {
+        this.storyHandlerManager = storyHandlerManager;
     }
 
     public IEventBus getEventBus() {

@@ -21,24 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.session;
+package fr.loudo.narrativecraft.api.narrative;
 
-import fr.loudo.narrativecraft.api.inkAction.InkAction;
-import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
-import java.util.List;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.api.session.IPlayerSession;
 
-public interface IPlayerSession {
+public interface IStoryHandlerManager {
 
-    ServerPlayer getPlayer();
+    void start(IPlayerSession playerSession) throws Exception;
 
-    boolean isGameplayMode();
+    void start(String path, IPlayerSession playerSession) throws Exception;
 
-    void setGameplayMode(boolean gameplayMode);
-
-    boolean isClientSide();
-
-    List<InkAction> getActiveClientInkActions();
-
-    IStoryHandler getStoryHandler();
+    void stop(IPlayerSession playerSession);
 }

@@ -21,24 +21,45 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.session;
+package fr.loudo.narrativecraft.api.narrative;
 
-import fr.loudo.narrativecraft.api.inkAction.InkAction;
-import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
-import java.util.List;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import net.minecraft.world.entity.Entity;
 
-public interface IPlayerSession {
+public interface IStoryHandler {
 
-    ServerPlayer getPlayer();
+    void start(String knotPath) throws Exception;
 
-    boolean isGameplayMode();
+    void stop();
 
-    void setGameplayMode(boolean gameplayMode);
+    void onChoiceSelected(int index);
 
-    boolean isClientSide();
+    void onTagsDrained();
 
-    List<InkAction> getActiveClientInkActions();
+    void playStitch(String stitchName);
 
-    IStoryHandler getStoryHandler();
+    IPlayerSession getPlayerSession();
+
+    boolean isEnded();
+
+    Entity getMainCharacterEntity();
+
+    void finish();
+
+    Map<String, Entity> getCharacterEntities();
+
+    String getLastCharacterSpoke();
+
+    Set<UUID> getInteractionIds();
+
+    boolean hasAlreadyInteracted(UUID interactionId);
+
+    void addInteractionId(UUID interactionId);
+
+    boolean hasFinishedStory();
+
+    void setFinishedStory(boolean finishedStory);
 }

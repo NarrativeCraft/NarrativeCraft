@@ -21,24 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.session;
+package fr.loudo.narrativecraft.narrative.story;
 
-import fr.loudo.narrativecraft.api.inkAction.InkAction;
-import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
-import java.util.List;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.api.narrative.IStoryHandlerManager;
+import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.session.PlayerSession;
 
-public interface IPlayerSession {
+public class StoryHandlerManager implements IStoryHandlerManager {
+    @Override
+    public void start(IPlayerSession playerSession) throws Exception {
+        StoryHandler storyHandler = new StoryHandler((PlayerSession) playerSession);
+        storyHandler.start();
+        ((PlayerSession) playerSession).setStoryHandler(storyHandler);
+    }
 
-    ServerPlayer getPlayer();
+    @Override
+    public void start(String path, IPlayerSession playerSession) throws Exception {
+        StoryHandler storyHandler = new StoryHandler((PlayerSession) playerSession);
+        storyHandler.start(path);
+        ((PlayerSession) playerSession).setStoryHandler(storyHandler);
+    }
 
-    boolean isGameplayMode();
-
-    void setGameplayMode(boolean gameplayMode);
-
-    boolean isClientSide();
-
-    List<InkAction> getActiveClientInkActions();
-
-    IStoryHandler getStoryHandler();
+    @Override
+    public void stop(IPlayerSession playerSession) {
+        StoryHandler storyHandler = (StoryHandler) playerSession.getStoryHandler();
+        if (storyHandler == null) return;
+        storyHandler.stop();
+    }
 }
