@@ -29,14 +29,15 @@ import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
+import net.minecraft.client.gui.screens.Screen;
 
 public class CharacterEntryListScreen extends NarrativeEntryListScreen<CharacterStory> {
 
     private static final CharacterManager CHARACTER_MANAGER =
             ClientNarrativeCraftMod.getInstance().getCharacterManager();
 
-    public CharacterEntryListScreen(List<CharacterStory> entries, String breadCrumb) {
-        super(Translation.message("character"), entries, CharacterStory.class, breadCrumb);
+    public CharacterEntryListScreen(List<CharacterStory> entries, Screen lastScreen, String breadCrumb) {
+        super(Translation.message("character"), entries, lastScreen, CharacterStory.class, breadCrumb);
     }
 
     @Override

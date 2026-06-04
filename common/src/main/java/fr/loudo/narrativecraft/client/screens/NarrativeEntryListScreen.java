@@ -108,6 +108,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                                 ClientNarrativeCraftMod.getInstance()
                                         .getCharacterManager()
                                         .getList(),
+                                this,
                                 ""));
                     })
                     .bounds(10, 10, 20, 20)
