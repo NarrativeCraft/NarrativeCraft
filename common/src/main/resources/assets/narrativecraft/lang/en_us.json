@@ -104,6 +104,7 @@
   "narrativecraft.error.story": "An error occurred on the story!",
   "narrativecraft.error.start_story": "Failed to start story!",
   "narrativecraft.error.save_settings": "Failed to save your settings!",
+  "narrativecraft.error.no_on_enter": "You must have the tag \"# on_enter\" after your knot!",
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",

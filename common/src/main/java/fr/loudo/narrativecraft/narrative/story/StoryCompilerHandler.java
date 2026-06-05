@@ -35,6 +35,11 @@ import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,10 +48,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 
 public class StoryCompilerHandler {
 
@@ -105,6 +106,11 @@ public class StoryCompilerHandler {
         }
 
         String[] lines = content.split("\n", -1);
+
+        if (scene != null) {
+            validateOnEnterTag(lines, chapter, scene, inkFile.getName(), errors);
+        }
+
         for (int lineIndex = 0; lineIndex < lines.length; lineIndex++) {
             String line = lines[lineIndex];
             if (line.trim().startsWith("//")) continue;
@@ -119,6 +125,41 @@ public class StoryCompilerHandler {
                 }
             }
         }
+    }
+
+    private static void validateOnEnterTag(
+            String[] lines, Chapter chapter, Scene scene, String fileName, List<TagError> errors) {
+        String knotName = scene.knotName();
+        int knotLine = -1;
+
+        for (int i = 0; i < lines.length; i++) {
+            String t = lines[i].trim();
+            if (t.startsWith("===") && t.replace("=", "").trim().equals(knotName)) {
+                knotLine = i;
+                break;
+            }
+        }
+
+        if (knotLine == -1) return;
+
+        for (int i = knotLine; i < lines.length; i++) {
+            String trimmed = lines[i].trim();
+            if (trimmed.isEmpty() || trimmed.startsWith("//")) continue;
+            if (i > knotLine && trimmed.startsWith("=")) break;
+            if (lineContainsOnEnterTag(trimmed)) return;
+            if (i > knotLine) {
+                errors.add(new TagError(chapter, scene, fileName, i + 1, "#on_enter", Translation.message("error.no_on_enter").getString()));
+                return;
+            }
+        }
+
+        errors.add(new TagError(chapter, scene, fileName, knotLine + 1, "#on_enter", Translation.message("error.no_on_enter").getString()));
+    }
+
+    private static boolean lineContainsOnEnterTag(String line) {
+        return TAG_PATTERN.matcher(line).results().anyMatch(m -> m.group(1)
+                .trim()
+                .equals("on_enter"));
     }
 
     static class FileHandler implements IFileHandler {
