@@ -62,7 +62,6 @@ public class FadeInkAction extends InkAction {
         if (staySeconds > 2) staySeconds -= 1;
         if (fadeOutSeconds > 2) fadeOutSeconds -= 1;
 
-        blocking = true;
         return InkActionResult.ok();
     }
 

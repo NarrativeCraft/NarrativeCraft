@@ -72,6 +72,6 @@ public class ClientFadeInkAction extends FadeInkAction {
         }
         currentFadeState = FadeState.FADE_IN;
         totalTick = (int) (fadeInSeconds * 20.0);
-        return InkActionResult.block();
+        return InkActionResult.ok();
     }
 }
