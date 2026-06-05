@@ -60,7 +60,7 @@ maven {
 }
 ```
 ```
-compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.0
+compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.0'
 ```
 
 ### Maven
