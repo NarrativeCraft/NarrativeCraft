@@ -31,6 +31,8 @@ import fr.loudo.narrativecraft.api.inkAction.syntax.CommandSpec;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.inkAction.syntax.SyntaxParser;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,7 +40,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 
 /**
  * Routes raw Ink tag strings to the matching {@link InkAction} subclass.
@@ -148,9 +149,23 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
      */
     private static final Pattern TOKEN_PATTERN = Pattern.compile("(\\w+):\"([^\"]*)\"|\"([^\"]*)\"|([\\S]+)");
 
+    /** Strips everything from the first {@code //} not inside a quoted string. */
+    private static String stripComment(String s) {
+        boolean inQuote = false;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '"') {
+                inQuote = !inQuote;
+            } else if (!inQuote && c == '/' && i + 1 < s.length() && s.charAt(i + 1) == '/') {
+                return s.substring(0, i).trim();
+            }
+        }
+        return s;
+    }
+
     /** Splits a raw tag into tokens, treating double-quoted spans as single tokens. */
     private static List<String> tokenize(String rawTag) {
-        String trimmed = rawTag.trim();
+        String trimmed = stripComment(rawTag.trim());
         if (trimmed.isEmpty()) return List.of();
         List<String> tokens = new ArrayList<>();
         Matcher matcher = TOKEN_PATTERN.matcher(trimmed);

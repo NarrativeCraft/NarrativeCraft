@@ -54,11 +54,12 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandler {
 
@@ -249,6 +250,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     private void advance() {
         if (ended) return;
+        playerSession.setGameplayMode(false);
         try {
             while (story.canContinue()) {
                 String text;
@@ -266,9 +268,15 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                     tags = story.getCurrentTags();
                 }
 
+                String speaker = parseSpeaker(text)[0];
+                if (lastCharacterSpoke.equalsIgnoreCase(TAG_2D) && text.isEmpty()) {
+                    pendingDialogueText = text; // buffer B's text avant de return
+                    Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+                    snapshot = new Snapshot(text, tags);
+                    return;
+                }
                 // If the speaker is not the same as last speaker, stop dialog client-side FIRST before advance the
                 // story.
-                String speaker = parseSpeaker(text)[0];
                 if (!lastCharacterSpoke.isEmpty()
                         && !lastCharacterSpoke.equalsIgnoreCase(speaker)
                         && snapshot == null) {
@@ -408,7 +416,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     public void finish() {
-        if (playerSession.isGameplayMode()) return;
         ended = true;
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
         NarrativeCraftMod.LOGGER.info(
@@ -419,6 +426,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         }
         NarrativeCraftMod.EVENT_BUS.post(new StoryEndEvent(playerSession));
         playerSession.clear();
+        stop();
     }
 
     private static String[] parseSpeaker(String text) {
