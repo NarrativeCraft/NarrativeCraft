@@ -35,11 +35,6 @@ import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,6 +43,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class StoryCompilerHandler {
 
@@ -148,12 +147,24 @@ public class StoryCompilerHandler {
             if (i > knotLine && trimmed.startsWith("=")) break;
             if (lineContainsOnEnterTag(trimmed)) return;
             if (i > knotLine) {
-                errors.add(new TagError(chapter, scene, fileName, i + 1, "#on_enter", Translation.message("error.no_on_enter").getString()));
+                errors.add(new TagError(
+                        chapter,
+                        scene,
+                        fileName,
+                        i + 1,
+                        "#on_enter",
+                        Translation.message("error.no_on_enter").getString()));
                 return;
             }
         }
 
-        errors.add(new TagError(chapter, scene, fileName, knotLine + 1, "#on_enter", Translation.message("error.no_on_enter").getString()));
+        errors.add(new TagError(
+                chapter,
+                scene,
+                fileName,
+                knotLine + 1,
+                "#on_enter",
+                Translation.message("error.no_on_enter").getString()));
     }
 
     private static boolean lineContainsOnEnterTag(String line) {
