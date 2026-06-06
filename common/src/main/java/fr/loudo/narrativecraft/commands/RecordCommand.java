@@ -154,26 +154,6 @@ public class RecordCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static List<String> parseSubscenesName(String raw) {
-        List<String> tokens = new ArrayList<>();
-        int i = 0;
-        while (i < raw.length()) {
-            while (i < raw.length() && raw.charAt(i) == ' ') i++;
-            if (i >= raw.length()) break;
-            if (raw.charAt(i) == '"') {
-                int start = ++i;
-                while (i < raw.length() && raw.charAt(i) != '"') i++;
-                tokens.add(raw.substring(start, i));
-                if (i < raw.length()) i++;
-            } else {
-                int start = i;
-                while (i < raw.length() && raw.charAt(i) != ' ') i++;
-                tokens.add(raw.substring(start, i));
-            }
-        }
-        return tokens;
-    }
-
     private static CompletableFuture<Suggestions> suggestSubscenes(
             CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         ServerPlayer player = context.getSource().getPlayer();
@@ -305,4 +285,25 @@ public class RecordCommand {
 
         return Command.SINGLE_SUCCESS;
     }
+
+    private static List<String> parseSubscenesName(String raw) {
+        List<String> tokens = new ArrayList<>();
+        int i = 0;
+        while (i < raw.length()) {
+            while (i < raw.length() && raw.charAt(i) == ' ') i++;
+            if (i >= raw.length()) break;
+            if (raw.charAt(i) == '"') {
+                int start = ++i;
+                while (i < raw.length() && raw.charAt(i) != '"') i++;
+                tokens.add(raw.substring(start, i));
+                if (i < raw.length()) i++;
+            } else {
+                int start = i;
+                while (i < raw.length() && raw.charAt(i) != ' ') i++;
+                tokens.add(raw.substring(start, i));
+            }
+        }
+        return tokens;
+    }
+
 }
