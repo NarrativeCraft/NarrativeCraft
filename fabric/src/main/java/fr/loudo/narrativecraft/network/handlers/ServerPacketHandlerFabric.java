@@ -46,6 +46,7 @@ import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
+import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 public class ServerPacketHandlerFabric {
@@ -119,6 +120,9 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SEnterDialogEditor.TYPE, (packet, context) -> {
             ServerPacketHandler.enterDialogEditor(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SStopStory.TYPE, (packet, context) -> {
+            ServerPacketHandler.stopStory(packet, context.player());
         });
     }
 }

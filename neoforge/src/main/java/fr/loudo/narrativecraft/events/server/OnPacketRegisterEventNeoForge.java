@@ -195,6 +195,7 @@ public class OnPacketRegisterEventNeoForge {
                 C2SEnterDialogEditor.TYPE,
                 C2SEnterDialogEditor.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::enterDialogEditor);
+        registrar.playToServer(C2SStopStory.TYPE, C2SStopStory.STREAM_CODEC, ServerPacketHandlerNeoForge::stopStory);
     }
 
     private static void registerBiPackets(PayloadRegistrar registrar) {

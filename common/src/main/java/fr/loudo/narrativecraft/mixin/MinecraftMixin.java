@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.screens.ClearScreen;
+import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import net.minecraft.client.Minecraft;
@@ -53,5 +55,14 @@ public abstract class MinecraftMixin {
         ClearScreen screen = new ClearScreen();
         setScreen(screen);
         ci.cancel();
+    }
+
+    @Inject(method = "pauseGame", at = @At(value = "HEAD"))
+    private void narrativecraft$pauseGame(boolean suppressPauseMenuIfWeReallyArePausing, CallbackInfo ci) {
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (!playerSession.isInStory()) return;
+
+        setScreen(new MainScreen(true));
     }
 }

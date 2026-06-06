@@ -31,8 +31,6 @@ import fr.loudo.narrativecraft.api.inkAction.syntax.CommandSpec;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.inkAction.syntax.SyntaxParser;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +38,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 
 /**
  * Routes raw Ink tag strings to the matching {@link InkAction} subclass.

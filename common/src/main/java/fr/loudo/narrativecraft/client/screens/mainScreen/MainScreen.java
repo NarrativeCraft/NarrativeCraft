@@ -28,11 +28,9 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
+import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -44,6 +42,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import org.lwjgl.glfw.GLFW;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 
 public class MainScreen extends Screen {
 
@@ -62,8 +64,9 @@ public class MainScreen extends Screen {
     private static final SimpleSoundInstance MAIN_MUSIC_INSTANCE =
             SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(BACKGROUND_MUSIC), 1);
 
-    private final boolean canContinue;
-    private final boolean finishedStory;
+    private boolean canContinue;
+    private boolean finishedStory;
+    private boolean isPause;
 
     private int ctrlPressCount = 0;
     private Button leaveScreenButton;
@@ -76,6 +79,11 @@ public class MainScreen extends Screen {
         super(Component.empty());
         this.canContinue = canContinue;
         this.finishedStory = finishedStory;
+    }
+
+    public MainScreen(boolean isPause) {
+        super(Component.empty());
+        this.isPause = isPause;
     }
 
     @Override
@@ -97,25 +105,31 @@ public class MainScreen extends Screen {
 
         int currentY = buttonStartY;
 
-        if (canContinue) {
+        if (canContinue || isPause) {
             addRenderableWidget(Button.builder(Translation.message("screen.main.continue"), button -> {
-                        close();
-                        Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), true));
+                        if (isPause) {
+                            minecraft.setScreen(null);
+                        } else {
+                            close();
+                            Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), true));
+                        }
                     })
                     .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                     .build());
             currentY += BUTTON_HEIGHT + BUTTON_GAP;
         }
 
-        addRenderableWidget(Button.builder(Translation.message("screen.main.new_game"), button -> {
-                    close();
-                    Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false));
-                })
-                .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
-                .build());
-        currentY += BUTTON_HEIGHT + BUTTON_GAP;
+        if (!isPause) {
+            addRenderableWidget(Button.builder(Translation.message("screen.main.new_game"), button -> {
+                        close();
+                        Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false));
+                    })
+                    .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build());
+            currentY += BUTTON_HEIGHT + BUTTON_GAP;
+        }
 
-        if (finishedStory) {
+        if (finishedStory && !isPause) {
             addRenderableWidget(Button.builder(
                             Translation.message("screen.main.select_scene"),
                             button -> minecraft.setScreen(new SelectChaptersScreen(this)))
@@ -136,21 +150,27 @@ public class MainScreen extends Screen {
                             .getPlayerSession()
                             .getEditor()
                             .stop();
-                    close();
-                    minecraft.disconnectFromWorld(Component.empty());
+                    if (!isPause) {
+                        close();
+                        minecraft.disconnectFromWorld(Component.empty());
+                    } else {
+                        Services.PACKET.sendToServer(new C2SStopStory(true));
+                    }
                 })
                 .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
 
-        leaveScreenButton = Button.builder(Translation.message("screen.main.leave_screen"), button -> {
-                    Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
-                })
-                .bounds(width - BUTTON_WIDTH - 10, 10, BUTTON_WIDTH, BUTTON_HEIGHT)
-                .build();
-        leaveScreenButton.visible = ctrlPressCount >= SECRET_CTRL_PRESSES;
-        addRenderableWidget(leaveScreenButton);
+        if (!isPause) {
+            leaveScreenButton = Button.builder(Translation.message("screen.main.leave_screen"), button -> {
+                        Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
+                    })
+                    .bounds(width - BUTTON_WIDTH - 10, 10, BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            leaveScreenButton.visible = ctrlPressCount >= SECRET_CTRL_PRESSES;
+            addRenderableWidget(leaveScreenButton);
+        }
 
-        if (!minecraft.getSoundManager().isActive(MAIN_MUSIC_INSTANCE)) {
+        if (!minecraft.getSoundManager().isActive(MAIN_MUSIC_INSTANCE) && !isPause) {
             minecraft.getSoundManager().play(MAIN_MUSIC_INSTANCE);
         }
     }
@@ -191,11 +211,13 @@ public class MainScreen extends Screen {
     protected void extractBlurredBackground(GuiGraphicsExtractor graphics) {}
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {}
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        if (isPause) super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    }
 
     @Override
     public boolean isPauseScreen() {
-        return false;
+        return isPause;
     }
 
     @Override
@@ -210,7 +232,9 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    public void onClose() {}
+    public void onClose() {
+        if (isPause) super.onClose();
+    }
 
     private void loadLogoInfo() {
         Optional<Resource> resource = minecraft.getResourceManager().getResource(LOGO_FILE);
