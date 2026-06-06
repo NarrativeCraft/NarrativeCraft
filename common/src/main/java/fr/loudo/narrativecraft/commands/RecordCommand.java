@@ -39,13 +39,12 @@ import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class RecordCommand {
 
@@ -137,8 +136,11 @@ public class RecordCommand {
             }
         }
 
-        Recording recording = new Recording(playerSession);
-        RECORDING_MANAGER.add(recording);
+        Recording recording = RECORDING_MANAGER.getRecording(player);
+        if (recording == null) {
+            recording = new Recording(playerSession);
+            RECORDING_MANAGER.add(recording);
+        }
 
         for (Animation animation : animationsToPlay) {
             Playback playback = new Playback(animation, player);
@@ -197,7 +199,7 @@ public class RecordCommand {
 
         Recording recording = RECORDING_MANAGER.getRecording(player);
 
-        if (recording == null) {
+        if (recording == null || !recording.isRecording()) {
             context.getSource().sendFailure(Translation.message("record.not_recording"));
             return 0;
         }
@@ -305,5 +307,4 @@ public class RecordCommand {
         }
         return tokens;
     }
-
 }
