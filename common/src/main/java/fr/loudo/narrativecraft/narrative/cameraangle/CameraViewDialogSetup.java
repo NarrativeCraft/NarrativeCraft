@@ -28,8 +28,6 @@ import java.util.UUID;
 
 public class CameraViewDialogSetup {
 
-    private static final float DEFAULT_OFFSET_Y = 1.0f;
-
     private final UUID id;
     private final UUID characterPlacementId;
     private transient String previewText = "";
@@ -39,7 +37,6 @@ public class CameraViewDialogSetup {
         this.id = UUID.randomUUID();
         this.characterPlacementId = characterPlacementId;
         this.dialogData = new DialogData();
-        this.dialogData.setOffsetY(DEFAULT_OFFSET_Y);
     }
 
     public CameraViewDialogSetup(UUID id, UUID characterPlacementId, DialogData dialogData) {

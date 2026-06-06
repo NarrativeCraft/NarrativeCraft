@@ -114,7 +114,9 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
 
     @Override
     protected Npc createInstance() {
-        Npc npc = new Npc(getName(), scene);
+        if (entry == null) return new Npc(getName(), scene);
+        Npc npc = scene.getNpcManager().getById(entry.getId());
+        npc.setName(getName());
         npc.setEntityType(selectedEntityType);
         npc.setModelType(selectedModelType);
         return npc;

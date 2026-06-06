@@ -68,6 +68,10 @@ public class SubsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Su
 
     @Override
     protected Subscene createInstance() {
-        return new Subscene(getName(), getDescription(), scene);
+        if (entry == null) return new Subscene(getName(), getDescription(), scene);
+        Subscene subscene = scene.getSubsceneManager().getById(entry.getId());
+        subscene.setName(getName());
+        subscene.setDescription(getDescription());
+        return subscene;
     }
 }

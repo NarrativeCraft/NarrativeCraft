@@ -55,9 +55,11 @@ public class AnimationEntryEditScreen extends AbstractNarrativeEntryEditScreen<A
     @Override
     protected void addCustomFields() {}
 
-    // Not used
     @Override
     protected Animation createInstance() {
-        return null;
+        if (entry == null) return null;
+        Animation animation = scene.getAnimationManager().getById(entry.getId());
+        animation.setName(getName());
+        return animation;
     }
 }

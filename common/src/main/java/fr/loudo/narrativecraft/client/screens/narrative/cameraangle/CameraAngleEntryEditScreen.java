@@ -68,6 +68,12 @@ public class CameraAngleEntryEditScreen extends AbstractNarrativeEntryEditScreen
 
     @Override
     protected CameraAngle createInstance() {
-        return new CameraAngle(getName(), getDescription(), scene);
+        if (entry == null) {
+            return new CameraAngle(getName(), getDescription(), scene);
+        }
+        CameraAngle cameraAngle = scene.getCameraAngleManager().getById(entry.getId());
+        cameraAngle.setName(getName());
+        cameraAngle.setDescription(getDescription());
+        return cameraAngle;
     }
 }

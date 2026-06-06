@@ -68,6 +68,12 @@ public class CutsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cu
 
     @Override
     protected Cutscene createInstance() {
-        return new Cutscene(getName(), getDescription(), scene);
+        if (entry == null) {
+            return new Cutscene(getName(), getDescription(), scene);
+        }
+        Cutscene cutscene = scene.getCutsceneManager().getById(entry.getId());
+        cutscene.setName(getName());
+        cutscene.setName(getDescription());
+        return cutscene;
     }
 }

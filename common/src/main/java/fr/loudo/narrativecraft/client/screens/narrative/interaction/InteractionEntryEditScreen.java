@@ -68,6 +68,10 @@ public class InteractionEntryEditScreen extends AbstractNarrativeEntryEditScreen
 
     @Override
     protected Interaction createInstance() {
+        if (entry == null) return new Interaction(getName(), getDescription(), scene);
+        Interaction interaction = scene.getInteractionManager().getById(entry.getId());
+        interaction.setName(getName());
+        interaction.setDescription(getDescription());
         return new Interaction(getName(), getDescription(), scene);
     }
 }

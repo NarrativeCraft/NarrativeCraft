@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
@@ -36,6 +37,7 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import net.minecraft.server.level.ServerPlayer;
@@ -83,16 +85,19 @@ public class CutsceneEditor implements NarrativeEntryEditor<CutscenePayload, Cut
 
         List<Animation> animations = payload.getAnimationIds().stream()
                 .map(id -> oldCutscene.getScene().getAnimationManager().getById(id))
-                .filter(a -> a != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         List<Subscene> subscenes = payload.getSubsceneIds().stream()
                 .map(id -> oldCutscene.getScene().getSubsceneManager().getById(id))
-                .filter(s -> s != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
+        List<CutsceneMakerEditorLayer> editorLayers = oldCutscene.getEditorLayers();
 
         Cutscene newCutscene = new Cutscene(
                 entryId, payload.getName(), payload.getDescription(), oldCutscene.getScene(), animations, subscenes);
+        newCutscene.setEditorLayers(editorLayers);
         int result = NarrativeCraftFileRegistry.getInstance().edit(newCutscene);
 
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
@@ -105,6 +110,7 @@ public class CutsceneEditor implements NarrativeEntryEditor<CutscenePayload, Cut
         oldCutscene.setDescription(payload.getDescription());
         oldCutscene.setAnimations(animations);
         oldCutscene.setSubscenes(subscenes);
+        oldCutscene.setEditorLayers(editorLayers);
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }
