@@ -21,27 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.client.*;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.events.client.OnHudRender;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class ClientFabricEventList {
+@Mixin(Gui.class)
+public class GuiMixinFabric {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public ClientFabricEventList() {
-        events.add(new OnClientTickEventFabric());
-        events.add(new OnKeyRegisterEventFabric());
-        events.add(new OnClientDisconnectEventFabric());
-        events.add(new OnEntityRightClickFabric());
-    }
-
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+    @Inject(method = "extractRenderState", at = @At("RETURN"))
+    private void narrativecraft$renderHud(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
+        OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
+        OnHudRender.interactionHudRender(graphics, deltaTracker);
+        OnHudRender.dialogHudRender(graphics, deltaTracker);
+        OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
+        OnHudRender.saveIconHudRender(graphics, deltaTracker);
     }
 }
