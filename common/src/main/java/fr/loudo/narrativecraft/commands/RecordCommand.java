@@ -39,12 +39,13 @@ import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class RecordCommand {
 
@@ -103,7 +104,7 @@ public class RecordCommand {
 
         String subsceneNamesRaw = StringArgumentType.getString(context, "subscene_names");
         List<Subscene> subscenes = new ArrayList<>();
-        for (String name : subsceneNamesRaw.trim().split("\\s+")) {
+        for (String name : parseSubscenesName(subsceneNamesRaw)) {
             if (name.isEmpty()) continue;
             Subscene subscene = playerSession.getScene().getSubsceneManager().getByName(name);
             if (subscene == null) {
@@ -151,6 +152,26 @@ public class RecordCommand {
         context.getSource().sendSuccess(() -> Translation.message("record.start"), false);
 
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static List<String> parseSubscenesName(String raw) {
+        List<String> tokens = new ArrayList<>();
+        int i = 0;
+        while (i < raw.length()) {
+            while (i < raw.length() && raw.charAt(i) == ' ') i++;
+            if (i >= raw.length()) break;
+            if (raw.charAt(i) == '"') {
+                int start = ++i;
+                while (i < raw.length() && raw.charAt(i) != '"') i++;
+                tokens.add(raw.substring(start, i));
+                if (i < raw.length()) i++;
+            } else {
+                int start = i;
+                while (i < raw.length() && raw.charAt(i) != ' ') i++;
+                tokens.add(raw.substring(start, i));
+            }
+        }
+        return tokens;
     }
 
     private static CompletableFuture<Suggestions> suggestSubscenes(
