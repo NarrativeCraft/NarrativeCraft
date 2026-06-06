@@ -70,7 +70,6 @@ public class Recording implements IRecording {
 
     public Recording(PlayerSession playerSession) {
         this.playerSession = playerSession;
-        recordingEntityDataList.add(new RecordingEntityData(0, playerSession.getPlayer(), true, 0, this));
     }
 
     public void tick() {
@@ -142,6 +141,8 @@ public class Recording implements IRecording {
 
     public void start() {
         isRecording = true;
+        recordingEntityDataList.clear();
+        recordingEntityDataList.add(new RecordingEntityData(0, playerSession.getPlayer(), true, 0, this));
 
         for (RecordingEntityData data : recordingEntityDataList) {
             seedActions(data);

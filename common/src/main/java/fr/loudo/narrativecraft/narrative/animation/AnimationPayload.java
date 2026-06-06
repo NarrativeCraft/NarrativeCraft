@@ -32,8 +32,8 @@ import net.minecraft.network.codec.StreamCodec;
 
 public class AnimationPayload extends NarrativeEntryPayload {
 
-    private final UUID chapterId;
     private final UUID sceneId;
+    private final UUID chapterId;
     private final int totalTick;
     private final UUID characterId;
 
@@ -53,10 +53,10 @@ public class AnimationPayload extends NarrativeEntryPayload {
             AnimationPayload::new);
 
     public AnimationPayload(
-            String name, String description, UUID chapterId, UUID sceneId, int totalTick, UUID characterId) {
+            String name, String description, UUID sceneId, UUID chapterId, int totalTick, UUID characterId) {
         super(name, description);
-        this.chapterId = chapterId;
         this.sceneId = sceneId;
+        this.chapterId = chapterId;
         this.totalTick = totalTick;
         this.characterId = characterId;
     }
