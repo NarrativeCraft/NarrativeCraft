@@ -24,7 +24,7 @@ jobs:
           java-version: 25
 
       - name: Setup Gradle
-        uses: actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v4.4.4
 
       - name: Extract variables
         id: vars
@@ -59,7 +59,7 @@ jobs:
             neoforge/build/libs/narrativecraft-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
 
       - name: Publish Fabric jar to Modrinth
-        uses: modrinth/minotaur@v2
+        uses: modrinth/minotaur@v2.9.0
         with:
           token: ${{ secrets.MODRINTH_TOKEN }}
           project-id: narrativecraft
@@ -74,7 +74,7 @@ jobs:
             P7dR8mSH|required
 
       - name: Publish NeoForge jar to Modrinth
-        uses: modrinth/minotaur@v2
+        uses: modrinth/minotaur@v2.9.0
         with:
           token: ${{ secrets.MODRINTH_TOKEN }}
           project-id: narrativecraft
