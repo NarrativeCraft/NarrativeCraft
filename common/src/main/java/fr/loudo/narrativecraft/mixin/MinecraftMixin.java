@@ -45,6 +45,9 @@ public abstract class MinecraftMixin {
     @Shadow
     public abstract void setScreen(@Nullable Screen screen);
 
+    @Shadow
+    public abstract boolean isSingleplayer();
+
     @Inject(method = "openChatScreen", at = @At(value = "HEAD"), cancellable = true)
     private void narrativecraft$openChat(ChatComponent.ChatMethod chatMethod, CallbackInfo ci) {
         if (chatMethod != ChatComponent.ChatMethod.MESSAGE) return;
@@ -62,6 +65,7 @@ public abstract class MinecraftMixin {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (!playerSession.isInStory()) return;
+        if (!isSingleplayer()) return;
 
         setScreen(new MainScreen(true));
     }
