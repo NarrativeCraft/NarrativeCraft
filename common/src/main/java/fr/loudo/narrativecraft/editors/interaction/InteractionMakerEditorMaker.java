@@ -33,6 +33,8 @@ import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
@@ -43,7 +45,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
     private final Interaction interaction;
     private final PlayerSession playerSession;
     private final NarrativeEnvironment environment;
-    private UUID insideZoneId = null;
+    private final Set<UUID> insideZoneIds = new HashSet<>();
 
     public InteractionMakerEditorMaker(Interaction interaction, PlayerSession playerSession) {
         this.interaction = interaction;
@@ -74,16 +76,18 @@ public class InteractionMakerEditorMaker implements EditorMaker {
         for (InteractionZone zone : interaction.getZones()) {
             boolean isInside = new AABB(zone.getCorner1(), zone.getCorner2())
                     .contains(playerSession.getPlayer().position());
-            if (isInside && insideZoneId == null) {
-                if (zone.isOneTime() && storyHandler.hasAlreadyInteracted(zone.getId())) return;
-                storyHandler.playStitch(zone.getStitchName());
-                insideZoneId = zone.getId();
-                if (zone.isOneTime()) storyHandler.addInteractionId(zone.getId());
-            }
-            if (isInside) return;
-        }
+            boolean wasInside = insideZoneIds.contains(zone.getId());
 
-        insideZoneId = null;
+            if (isInside && !wasInside) {
+                if (!(zone.isOneTime() && storyHandler.hasAlreadyInteracted(zone.getId()))) {
+                    storyHandler.playStitch(zone.getStitchName());
+                    if (zone.isOneTime()) storyHandler.addInteractionId(zone.getId());
+                }
+                insideZoneIds.add(zone.getId());
+            } else if (!isInside) {
+                insideZoneIds.remove(zone.getId());
+            }
+        }
     }
 
     @Override
