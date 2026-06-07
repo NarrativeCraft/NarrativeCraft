@@ -10,6 +10,7 @@
 - Sprint and camera control are disabled outside of gameplay sequences
 - The scene menu opens automatically when a session is configured
 - Clear error messages when a story script is missing required tags
+- Secured server packet
 
 ### Fixes
 - Stories are correctly marked as finished when completed

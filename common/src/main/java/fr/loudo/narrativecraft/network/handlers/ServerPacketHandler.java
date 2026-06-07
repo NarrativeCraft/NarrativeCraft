@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
@@ -63,18 +64,21 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class ServerPacketHandler {
 
     public static void narrativeEntry(BiSyncNarrativeEntryPacket packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         switch (packet.action()) {
             case ADD ->
                 NarrativeEntryEditorRegistry.getInstance().add(packet.entryId(), packet.entry(), player.getUUID());
@@ -86,6 +90,8 @@ public class ServerPacketHandler {
     }
 
     public static void cutsceneState(BiCutsceneEnter packet, Player player) {
+        if (packet.getEnvironment() == NarrativeEnvironment.DEVELOPMENT
+                && !player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
         if (session == null) return;
@@ -120,6 +126,7 @@ public class ServerPacketHandler {
     }
 
     public static void cutsceneSave(C2SCutsceneSave packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
@@ -155,6 +162,8 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleEnter(BiCameraAngleEnter packet, Player player) {
+        if (packet.getEnvironment() == NarrativeEnvironment.DEVELOPMENT
+                && !player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
         if (session == null) return;
@@ -181,6 +190,7 @@ public class ServerPacketHandler {
     }
 
     public static void enterDialogEditor(C2SEnterDialogEditor packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
         if (session == null) return;
@@ -221,6 +231,7 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleSave(C2SCameraAngleSave packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
@@ -245,6 +256,7 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleRemovePlacement(C2SCameraAngleRemovePlacement packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.chapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.sceneId());
@@ -261,6 +273,7 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleAddTemplateReference(C2SCameraAngleAddTemplateReference packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.chapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.sceneId());
@@ -286,6 +299,7 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleTeleportToTemplate(C2SCameraAngleTeleportToTemplate packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         CameraAngleMakerEditorMaker editor = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()
                 .getEditor(player, CameraAngleMakerEditorMaker.class);
@@ -294,6 +308,7 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleRemoveTemplateReference(C2SCameraAngleRemoveTemplateReference packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.chapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.sceneId());
@@ -310,6 +325,8 @@ public class ServerPacketHandler {
     }
 
     public static void interactionEnter(BiInteractionEnter packet, Player player) {
+        if (packet.getEnvironment() == NarrativeEnvironment.DEVELOPMENT
+                && !player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
         if (session == null) return;
@@ -385,6 +402,7 @@ public class ServerPacketHandler {
     }
 
     public static void interactionSave(C2SInteractionSave packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
@@ -409,6 +427,7 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleSetEntityPose(C2SCameraAngleSetEntityPose packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         if (session == null) return;
@@ -418,6 +437,7 @@ public class ServerPacketHandler {
     }
 
     public static void cameraAngleCaptureCharacter(C2SCameraAngleCaptureCharacter packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.chapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.sceneId());
@@ -457,6 +477,7 @@ public class ServerPacketHandler {
     }
 
     public static void mainScreenCaptureCharacter(C2SMainScreenCaptureCharacter packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         CameraAngle mainScreenAngle = NarrativeCraftMod.getInstance().getMainScreenData();
         if (mainScreenAngle == null) return;
 
@@ -492,6 +513,7 @@ public class ServerPacketHandler {
     }
 
     public static void mainScreenSave(C2SMainScreenSave packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         CameraAngle mainScreenData = NarrativeCraftMod.getInstance().getMainScreenData();
         if (mainScreenData == null) return;
         CameraAngleDeserializer.deserializeInto(packet.dataJson(), mainScreenData);

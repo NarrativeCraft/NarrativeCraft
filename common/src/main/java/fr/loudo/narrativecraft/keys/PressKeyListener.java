@@ -34,12 +34,15 @@ import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.permissions.Permissions;
 
 public class PressKeyListener {
 
     public static void onKeyPressed(Minecraft minecraft) {
         if (ModKeys.STORY_MANAGER.consumeClick()) {
             ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+            if (session.isInStory()) return;
+            if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
             NarrativeEntryListScreen<Chapter> entryListScreen = new NarrativeEntryListScreen<>(
                     Translation.message("chapter"),
                     ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),

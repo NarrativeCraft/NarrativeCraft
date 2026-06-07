@@ -52,7 +52,6 @@ import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CRenderSaveIcon;
 import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.*;
