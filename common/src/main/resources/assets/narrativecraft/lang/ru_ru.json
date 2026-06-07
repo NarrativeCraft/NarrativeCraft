@@ -104,7 +104,7 @@
   "narrativecraft.error.story": "Ошибка сюжета!",
   "narrativecraft.error.start_story": "Не удалось запустить сюжет!",
   "narrativecraft.error.save_settings": "Не удалось сохранить настройки!",
-  "narrativecraft.error.no_on_enter": "После knot должен быть тег "# on_enter"!",
+  "narrativecraft.error.no_on_enter": "После knot должен быть тег \"# on_enter\"!",
 
   "narrativecraft.record.start": "Запись началась...",
   "narrativecraft.record.stop": "Запись остановлена.",
