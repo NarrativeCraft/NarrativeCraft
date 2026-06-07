@@ -37,7 +37,6 @@ public class NarrativeWorldSettingsScreen extends Screen {
 
     private static final int BUTTON_WIDTH = 200;
     private static final int BUTTON_HEIGHT = 20;
-    private static final int BUTTON_GAP = 5;
 
     private final Screen lastScreen;
 
@@ -62,8 +61,6 @@ public class NarrativeWorldSettingsScreen extends Screen {
                     Tooltip.create(Translation.message("screen.world_settings.tooltip.main_screen")));
         }
         addRenderableWidget(showMainScreenOnJoin);
-
-        currentY += BUTTON_HEIGHT + BUTTON_GAP;
 
         addRenderableWidget(Button.builder(Translation.message("screen.world_settings.done"), button -> {
                     try {

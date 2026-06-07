@@ -114,7 +114,7 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutsce
     }
 
     public void setEditorLayers(List<CutsceneMakerEditorLayer> editorLayers) {
-        this.editorLayers = new ArrayList<>(editorLayers);
+        this.editorLayers = editorLayers;
     }
 
     @Override

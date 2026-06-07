@@ -73,7 +73,7 @@ public class CutsceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cu
         }
         Cutscene cutscene = scene.getCutsceneManager().getById(entry.getId());
         cutscene.setName(getName());
-        cutscene.setName(getDescription());
+        cutscene.setDescription(getDescription());
         return cutscene;
     }
 }
