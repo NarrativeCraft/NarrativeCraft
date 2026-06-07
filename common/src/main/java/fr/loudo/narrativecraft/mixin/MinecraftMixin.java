@@ -38,6 +38,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
@@ -68,5 +69,14 @@ public abstract class MinecraftMixin {
         if (!isSingleplayer()) return;
 
         setScreen(new MainScreen(true));
+    }
+
+    @Inject(method = "startAttack", at = @At(value = "HEAD"), cancellable = true)
+    private void narrativecraft$spectate(CallbackInfoReturnable<Boolean> cir) {
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (playerSession.isInStory() && playerSession.inCamera()) {
+            cir.cancel();
+        }
     }
 }

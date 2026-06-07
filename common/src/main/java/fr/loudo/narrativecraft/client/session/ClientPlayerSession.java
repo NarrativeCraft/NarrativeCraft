@@ -171,4 +171,8 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     public StorySaveIconRenderer getSaveIconRenderer() {
         return saveIconRenderer;
     }
+
+    public boolean inCamera() {
+        return cameraView != null || cutsceneDataSession.getKeyframePosition() != null;
+    }
 }
