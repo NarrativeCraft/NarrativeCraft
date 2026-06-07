@@ -47,8 +47,10 @@ import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.UUID;
+import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.world.entity.Entity;
+
+import java.util.UUID;
 
 @InkCommand(
         keyword = "camera",
@@ -68,11 +70,15 @@ public class CameraAngleInkAction extends InkAction {
         Scene concreteScene = (Scene) scene;
         cameraAngle = concreteScene.getCameraAngleManager().getByName(parentName);
         if (cameraAngle == null) {
-            return InkActionResult.error(NOT_EXISTS_KEY);
+            return InkActionResult.error(Translation.message(
+                            NOT_EXISTS_KEY, Translation.message("camera_angle").getString(), parentName)
+                    .getString());
         }
         cameraView = cameraAngle.getCameraByName(childName);
         if (cameraView == null) {
-            return InkActionResult.error(NOT_EXISTS_KEY);
+            return InkActionResult.error(Translation.message(
+                            NOT_EXISTS_KEY, Translation.message("camera_angle").getString(), childName)
+                    .getString());
         }
         return InkActionResult.ok();
     }
