@@ -144,7 +144,7 @@ public class InteractionPoint {
         this.oneTimeClick = oneTimeClick;
     }
 
-    public boolean isConditionMet(Player player) {
+    public boolean canSee(Player player) {
         if (player == null || position == null) return false;
         double distance = player.position().distanceTo(position);
         if (distance > maxDistance) return false;
@@ -156,5 +156,11 @@ public class InteractionPoint {
         if (projection <= 0) return false;
         Vec3 perpendicular = toPoint.subtract(lookDir.scale(projection));
         return perpendicular.length() <= aimRadius;
+    }
+
+    public boolean canClick(Player player) {
+        if (player == null || position == null) return false;
+        double distance = player.position().distanceTo(position);
+        return distance <= 3.0;
     }
 }

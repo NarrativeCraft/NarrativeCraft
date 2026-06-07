@@ -24,11 +24,13 @@
 package fr.loudo.narrativecraft.keys;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.scene.SceneMenuScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
@@ -55,11 +57,15 @@ public class PressKeyListener {
         }
 
         if (ModKeys.HIDE_EDITOR_MAKER_HUD.consumeClick()) {
-            ClientCutsceneMakerEditorMaker editor =
-                    ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
+            EditorMaker editor =
+                    ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
             if (editor == null) return;
-
-            editor.toggleHud();
+            if (editor instanceof ClientCutsceneMakerEditorMaker clientCutsceneMakerEditorMaker) {
+                clientCutsceneMakerEditorMaker.toggleHud();
+            }
+            if (editor instanceof ClientCameraAngleMakerEditorMaker cameraAngleMakerEditorMaker) {
+                cameraAngleMakerEditorMaker.toggleHud();
+            }
         }
 
         if (ModKeys.TOGGLE_CAMERA_ROLL.consumeClick()) {

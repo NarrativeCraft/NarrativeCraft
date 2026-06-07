@@ -657,9 +657,10 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                 exitDialogMode();
             }
         }
-        if (event.key() == ModKeys.HIDE_EDITOR_MAKER_HUD.getDefaultKey().getValue()) {
-            renderingHud = !renderingHud;
-        }
+    }
+
+    public void toggleHud() {
+        renderingHud = !renderingHud;
     }
 
     public void charTyped(CharacterEvent event) {

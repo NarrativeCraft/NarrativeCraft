@@ -138,7 +138,7 @@ public class InteractionMakerEditorRenderer {
     }
 
     private static boolean isPointConditionMet(InteractionPoint point, LocalPlayer player) {
-        return point.isConditionMet(player);
+        return point.canSee(player);
     }
 
     private static Vec3 resolvePointPosition(InteractionPoint point, ClientInteractionMakerEditorMaker editor) {

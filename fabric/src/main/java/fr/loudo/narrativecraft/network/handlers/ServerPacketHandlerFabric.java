@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.network.handlers;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
+import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
@@ -87,6 +88,9 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleSetEntityPose.TYPE, (packet, context) -> {
             ServerPacketHandler.cameraAngleSetEntityPose(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleAddTemplateReference.TYPE, (packet, context) -> {
+            ServerPacketHandler.cameraAngleAddTemplateReference(packet, context.player());
         });
         ServerPlayNetworking.registerGlobalReceiver(BiInteractionEnter.TYPE, (packet, context) -> {
             ServerPacketHandler.interactionEnter(packet, context.player());

@@ -49,7 +49,7 @@ public class OnPressButtonEvent {
         if (player == null) return;
         for (InteractionPoint point : interactionEditor.getInteraction().getPoints()) {
             if (point.isOneTimeClick() && session.hasClickedInteractionPoint(point.getId())) continue;
-            if (point.isConditionMet(player)) {
+            if (point.canSee(player) && point.canClick(player)) {
                 if (point.isOneTimeClick()) session.addClickedInteractionPoint(point.getId());
                 Services.PACKET.sendToServer(
                         new C2SPlayStitchStory(point.getStitchName(), point.getId(), point.isOneTimeClick()));
