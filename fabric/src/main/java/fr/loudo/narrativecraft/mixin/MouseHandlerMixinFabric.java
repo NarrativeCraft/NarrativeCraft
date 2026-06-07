@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.events.client.OnPressButtonEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseDragEvent;
@@ -49,7 +50,8 @@ public abstract class MouseHandlerMixinFabric {
 
     @Inject(method = "onButton", at = @At("RETURN"))
     private void narrativecraft$onButtonPress(long handle, MouseButtonInfo rawButtonInfo, int action, CallbackInfo ci) {
-        OnPressButtonEvent.pressButton(action);
+        if (action != InputConstants.PRESS) return;
+        OnPressButtonEvent.pressButton(rawButtonInfo.button());
     }
 
     @Redirect(

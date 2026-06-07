@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.events.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -37,6 +38,7 @@ public class OnPressButtonEventNeoForge {
     }
 
     private static void onPressButton(InputEvent.MouseButton.Post event) {
+        if (event.getAction() != InputConstants.PRESS) return;
         OnPressButtonEvent.pressButton(event.getButton());
     }
 }
