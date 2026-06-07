@@ -30,12 +30,12 @@ import com.google.gson.JsonParseException;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.lang.reflect.Type;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
 
 public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterStory> {
 
@@ -47,7 +47,7 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
 
         String modelTypeName = jsonObject.get("modelType").getAsString();
         if (!modelTypeName.isEmpty()) {
-            character.setModelType(PlayerModelType.valueOf(modelTypeName));
+            character.setModelType(Utils.parsePlayerModelType(modelTypeName));
         }
 
         String entityTypeId = jsonObject.get("entityTypeId").getAsString();

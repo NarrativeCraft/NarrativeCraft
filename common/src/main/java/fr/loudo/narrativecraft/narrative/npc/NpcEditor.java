@@ -36,13 +36,13 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
 
 public class NpcEditor implements NarrativeEntryEditor<NpcPayload, Npc> {
 
@@ -97,7 +97,7 @@ public class NpcEditor implements NarrativeEntryEditor<NpcPayload, Npc> {
 
         oldNpc.setName(payload.getName());
         if (!payload.getModelType().isEmpty()) {
-            oldNpc.setModelType(PlayerModelType.valueOf(payload.getModelType()));
+            oldNpc.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
         }
         oldNpc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         oldNpc.setDialogData(newNpc.getDialogData());
@@ -125,7 +125,7 @@ public class NpcEditor implements NarrativeEntryEditor<NpcPayload, Npc> {
     private Npc buildFromPayload(UUID entryId, NpcPayload payload, Scene scene) {
         Npc npc = new Npc(entryId, payload.getName(), scene);
         if (!payload.getModelType().isEmpty()) {
-            npc.setModelType(PlayerModelType.valueOf(payload.getModelType()));
+            npc.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
         }
         npc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         String dialogDataJson = payload.getDialogDataJson();

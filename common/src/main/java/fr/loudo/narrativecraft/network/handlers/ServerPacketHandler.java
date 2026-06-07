@@ -88,6 +88,7 @@ public class ServerPacketHandler {
     public static void cutsceneState(BiCutsceneEnter packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
+        if (session == null) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
@@ -104,6 +105,7 @@ public class ServerPacketHandler {
     public static void cutsceneControl(C2SCutsceneControl packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
+        if (session == null) return;
         CutsceneMakerEditorMaker editor = sessionManager.getEditor(player, CutsceneMakerEditorMaker.class);
         if (editor == null) return;
 
@@ -155,6 +157,7 @@ public class ServerPacketHandler {
     public static void cameraAngleEnter(BiCameraAngleEnter packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
+        if (session == null) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
@@ -170,6 +173,7 @@ public class ServerPacketHandler {
     public static void stopEditorMaker(BiStopEditorMaker packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (session == null) return;
         EditorMaker editor = session.getEditor();
         if (editor == null) return;
         editor.stop();
@@ -179,10 +183,16 @@ public class ServerPacketHandler {
     public static void enterDialogEditor(C2SEnterDialogEditor packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
+        if (session == null) return;
 
         ICharacterStory character = null;
         if (!packet.targetId().isEmpty()) {
-            UUID targetId = UUID.fromString(packet.targetId());
+            UUID targetId;
+            try {
+                targetId = UUID.fromString(packet.targetId());
+            } catch (IllegalArgumentException e) {
+                return;
+            }
             if ("character".equals(packet.editorType())) {
                 character =
                         NarrativeCraftMod.getInstance().getCharacterManager().getById(targetId);
@@ -302,6 +312,7 @@ public class ServerPacketHandler {
     public static void interactionEnter(BiInteractionEnter packet, Player player) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         PlayerSession session = sessionManager.getByPlayer(player);
+        if (session == null) return;
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
         if (chapter == null) return;
         Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
@@ -321,6 +332,7 @@ public class ServerPacketHandler {
     public static void inkActionFinished(C2SInkActionFinished packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (session == null) return;
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler != null) {
             storyHandler.getInkTagHandler().onClientActionFinished(packet.instanceId());
@@ -330,6 +342,7 @@ public class ServerPacketHandler {
     public static void stopStory(C2SStopStory packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (session == null) return;
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler != null) {
             storyHandler.stop();
@@ -342,6 +355,7 @@ public class ServerPacketHandler {
     public static void dialogueFinished(C2SDialogueFinished packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (session == null) return;
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler != null) {
             storyHandler.onDialogueAck();
@@ -351,6 +365,7 @@ public class ServerPacketHandler {
     public static void choiceSelected(C2SChoiceSelected packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (session == null) return;
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler != null) {
             storyHandler.onChoiceSelected(packet.index());
@@ -360,6 +375,7 @@ public class ServerPacketHandler {
     public static void playStitch(C2SPlayStitchStory packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (session == null) return;
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler != null) {
             if (packet.oneTime() && storyHandler.hasAlreadyInteracted(packet.interactionId())) return;
@@ -395,6 +411,7 @@ public class ServerPacketHandler {
     public static void cameraAngleSetEntityPose(C2SCameraAngleSetEntityPose packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (session == null) return;
         EditorMaker editor = session.getEditor();
         if (!(editor instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditorMaker)) return;
         cameraAngleMakerEditorMaker.setEntityPose(packet.placementId(), packet.pose());
@@ -410,6 +427,7 @@ public class ServerPacketHandler {
 
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (playerSession == null) return;
         EditorMaker editorMaker = playerSession.getEditor();
         if (!(editorMaker instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditor)) return;
 
@@ -444,6 +462,7 @@ public class ServerPacketHandler {
 
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (playerSession == null) return;
         EditorMaker editorMaker = playerSession.getEditor();
         if (!(editorMaker instanceof MainScreenMakerEditor editor)) return;
 
@@ -474,6 +493,7 @@ public class ServerPacketHandler {
 
     public static void mainScreenSave(C2SMainScreenSave packet, Player player) {
         CameraAngle mainScreenData = NarrativeCraftMod.getInstance().getMainScreenData();
+        if (mainScreenData == null) return;
         CameraAngleDeserializer.deserializeInto(packet.dataJson(), mainScreenData);
         try {
             NarrativeCraftMod.getInstance().getFile().saveMainScreenData(mainScreenData);
@@ -519,6 +539,7 @@ public class ServerPacketHandler {
         CameraAngle mainScreenAngle = NarrativeCraftMod.getInstance().getFile().getMainScreenData();
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (playerSession == null) return;
         MainScreenMakerEditor editor = new MainScreenMakerEditor(mainScreenAngle, playerSession, packet.environment());
         playerSession.setEditor(editor);
         editor.init();

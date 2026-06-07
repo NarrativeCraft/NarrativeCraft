@@ -288,10 +288,14 @@ public class DialogScrollText {
         String currentEffect = null;
         Map<String, String> currentParams = new HashMap<>();
         int i = 0;
+        int length = rawText.length();
+        // Reuse the matchers and slide a region instead of allocating a substring per character.
+        Matcher openMatcher = OPEN_TAG.matcher(rawText);
+        Matcher closeMatcher = CLOSE_TAG.matcher(rawText);
 
-        while (i < rawText.length()) {
-            Matcher openMatcher = OPEN_TAG.matcher(rawText.substring(i));
-            Matcher closeMatcher = CLOSE_TAG.matcher(rawText.substring(i));
+        while (i < length) {
+            openMatcher.region(i, length);
+            closeMatcher.region(i, length);
 
             if (openMatcher.lookingAt()) {
                 String effectName = openMatcher.group(1).toLowerCase();
@@ -306,14 +310,14 @@ public class DialogScrollText {
                     currentParams = params;
                 }
 
-                i += openMatcher.end();
+                i = openMatcher.end();
                 continue;
             }
 
             if (closeMatcher.lookingAt()) {
                 currentEffect = null;
                 currentParams = new HashMap<>();
-                i += closeMatcher.end();
+                i = closeMatcher.end();
                 continue;
             }
 

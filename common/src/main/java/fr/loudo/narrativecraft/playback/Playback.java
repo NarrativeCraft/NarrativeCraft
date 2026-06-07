@@ -95,10 +95,12 @@ public class Playback implements IPlaybackSession {
     }
 
     public Entity getMasterEntity() {
+        if (contexts.isEmpty()) return null;
         return contexts.getFirst().getEntity();
     }
 
     public void setMasterEntity(Entity entity) {
+        if (contexts.isEmpty()) return;
         contexts.getFirst().setEntity(entity);
     }
 
@@ -176,6 +178,7 @@ public class Playback implements IPlaybackSession {
         for (ServerPlayer serverPlayer : requester.level().players()) {
             if (targetedPlayers.contains(serverPlayer)) continue;
             for (PlaybackContext context : contexts) {
+                if (context.getEntity() == null) continue;
                 serverPlayer.connection.send(
                         new ClientboundRemoveEntitiesPacket(context.getEntity().getId()));
             }
@@ -184,6 +187,7 @@ public class Playback implements IPlaybackSession {
 
     public void hideEntitiesToPlayer(ServerPlayer player) {
         for (PlaybackContext context : contexts) {
+            if (context.getEntity() == null) continue;
             player.connection.send(
                     new ClientboundRemoveEntitiesPacket(context.getEntity().getId()));
         }
@@ -191,6 +195,7 @@ public class Playback implements IPlaybackSession {
 
     public boolean entityFromPlayback(Entity entity) {
         for (PlaybackContext context : contexts) {
+            if (context.getEntity() == null) continue;
             if (context.getEntity().getUUID().equals(entity.getUUID())) {
                 return true;
             }

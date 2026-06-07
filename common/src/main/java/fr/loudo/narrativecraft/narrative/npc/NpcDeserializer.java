@@ -33,12 +33,12 @@ import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.lang.reflect.Type;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
 
 public class NpcDeserializer extends NarrativeDeserializer<Npc> {
 
@@ -72,7 +72,7 @@ public class NpcDeserializer extends NarrativeDeserializer<Npc> {
 
         String modelTypeName = jsonObject.get("modelType").getAsString();
         if (!modelTypeName.isEmpty()) {
-            npc.setModelType(PlayerModelType.valueOf(modelTypeName));
+            npc.setModelType(Utils.parsePlayerModelType(modelTypeName));
         }
 
         String entityTypeId = jsonObject.get("entityTypeId").getAsString();

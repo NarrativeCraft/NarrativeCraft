@@ -185,7 +185,11 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
                         return;
                     }
                     if (value.isEmpty()) return;
-                    changePage(Integer.parseInt(skipToPageBox.getValue()));
+                    try {
+                        changePage(Integer.parseInt(value));
+                    } catch (NumberFormatException e) {
+                        UtilsClient.sendToast(Translation.message("error"), Translation.message("error.only_numbers"));
+                    }
                 })
                 .bounds(this.width / 2, navigationPageY + 25, 20, 20)
                 .build();

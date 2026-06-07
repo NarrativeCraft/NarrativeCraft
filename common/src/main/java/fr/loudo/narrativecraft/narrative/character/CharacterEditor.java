@@ -34,13 +34,13 @@ import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
 
 public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPayload, CharacterStory> {
 
@@ -95,7 +95,7 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
         oldCharacter.setName(payload.getName());
         oldCharacter.setDescription(payload.getDescription());
         if (!payload.getModelType().isEmpty()) {
-            oldCharacter.setModelType(PlayerModelType.valueOf(payload.getModelType()));
+            oldCharacter.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
         }
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         oldCharacter.setMainCharacterAttribute(newAttribute);
@@ -134,7 +134,7 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
     private CharacterStory buildFromPayload(UUID entryId, CharacterStoryPayload payload) {
         CharacterStory character = new CharacterStory(entryId, payload.getName(), payload.getDescription());
         if (!payload.getModelType().isEmpty()) {
-            character.setModelType(PlayerModelType.valueOf(payload.getModelType()));
+            character.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
         }
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         character.setMainCharacterAttribute(new MainCharacterAttribute(payload.getMainCharacterAttribute()));

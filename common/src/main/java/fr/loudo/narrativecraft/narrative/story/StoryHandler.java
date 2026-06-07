@@ -54,12 +54,11 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandler {
 
@@ -121,8 +120,16 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CNotifyClientPlayStory());
         NarrativeCraftMod.EVENT_BUS.post(new StoryStartEvent(playerSession));
         if (!loadedFromSave) {
+            if (NarrativeCraftMod.getInstance().getChapterManager().getList().isEmpty()) {
+                stop();
+                throw new Exception("No chapter found to start the story!");
+            }
             Chapter firstChapter =
                     NarrativeCraftMod.getInstance().getChapterManager().get(0);
+            if (firstChapter.getSceneManager().getList().isEmpty()) {
+                stop();
+                throw new Exception("No scene found in the first chapter!");
+            }
             Scene firstScene = firstChapter.getSceneManager().get(0);
             playerSession.setChapter(firstChapter);
             playerSession.setScene(firstScene);
@@ -165,7 +172,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(),
                 new S2CCharacterStoryAction(UUID.randomUUID(), S2CCharacterStoryAction.Action.CLEAR));
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopStory());
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new SceneEndEvent(playerSession, playerSession.getScene()));
         }
@@ -388,11 +394,11 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     public Entity getEntityFromCharacter(ICharacterStory characterStory) {
-        return characterEntities.get(characterStory.getName());
+        return characterEntities.get(characterStory.getName().toLowerCase());
     }
 
     public boolean characterInStory(ICharacterStory characterStory) {
-        return characterEntities.get(characterStory.getName()) != null;
+        return characterEntities.get(characterStory.getName().toLowerCase()) != null;
     }
 
     public void registerDialogDataForCharacter(ICharacterStory characterStory, DialogData data) {
@@ -417,16 +423,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     public void finish() {
-        ended = true;
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
         NarrativeCraftMod.LOGGER.info(
                 "Story finished for player {}.",
                 playerSession.getPlayer().getName().getString());
-        if (playerSession.getScene() != null) {
-            NarrativeCraftMod.EVENT_BUS.post(new SceneEndEvent(playerSession, playerSession.getScene()));
-        }
-        NarrativeCraftMod.EVENT_BUS.post(new StoryEndEvent(playerSession));
-        playerSession.clear();
         stop();
     }
 
