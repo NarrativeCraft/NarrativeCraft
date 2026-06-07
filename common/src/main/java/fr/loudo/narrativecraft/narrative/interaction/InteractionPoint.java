@@ -161,6 +161,12 @@ public class InteractionPoint {
     public boolean canClick(Player player) {
         if (player == null || position == null) return false;
         double distance = player.position().distanceTo(position);
-        return distance <= 3.0;
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 lookDir = player.getLookAngle();
+        Vec3 toPoint = position.subtract(eyePos);
+        double projection = toPoint.dot(lookDir);
+        if (projection <= 0) return false;
+        Vec3 perpendicular = toPoint.subtract(lookDir.scale(projection));
+        return distance <= 5.0 && perpendicular.length() <= 0.5;
     }
 }
