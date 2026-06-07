@@ -163,6 +163,11 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
 
     public void spawnEntity(CharacterPlacement characterPlacement) {
         if (characterPlacement.isTemplate() && environment != NarrativeEnvironment.DEVELOPMENT) return;
+        UtilsServer.sendCharacterSkin(playerSession.getPlayer(), characterPlacement.getCharacterStory());
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(),
+                new S2CCharacterStoryAction(
+                        characterPlacement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
         ICharacterStory characterStory = characterPlacement.getCharacterStory();
         ServerPlayer player = playerSession.getPlayer();
         ServerLevel level = player.level();
@@ -211,6 +216,11 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
             Services.PACKET.sendToPlayer(
                     player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placementJson));
+            UtilsServer.sendCharacterSkin(player, placement.getCharacterStory());
+            Services.PACKET.sendToPlayer(
+                    player,
+                    new S2CCharacterStoryAction(
+                            placement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
         }
         placementsByTemplateReference.put(reference.id(), createdIds);
     }
