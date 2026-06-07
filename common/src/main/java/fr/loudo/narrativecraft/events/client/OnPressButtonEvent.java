@@ -26,8 +26,10 @@ package fr.loudo.narrativecraft.events.client;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.client.Minecraft;
@@ -37,6 +39,22 @@ public class OnPressButtonEvent {
 
     public static void pressButton(int button) {
         handleInteractionPoints(button);
+        handleAdvanceStory(button);
+    }
+
+    private static void handleAdvanceStory(int button) {
+        if (button != 0) return;
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        DialogRenderer dialogRenderer = session.getMainDialog();
+        if (dialogRenderer != null) {
+            if (dialogRenderer.isAnimating()) return;
+            if (!dialogRenderer.isTextFinished()) {
+                dialogRenderer.forceFinishText();
+                return;
+            }
+
+            Services.PACKET.sendToServer(new C2SDialogueFinished());
+        }
     }
 
     private static void handleInteractionPoints(int button) {
