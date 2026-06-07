@@ -52,6 +52,7 @@ import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CRenderSaveIcon;
 import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.*;
@@ -329,8 +330,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         }
     }
 
-    public void save() {
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CRenderSaveIcon(0.9, 3, 0.9));
+    public void save(boolean showIcon) {
+        if (showIcon) {
+            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CRenderSaveIcon(0.9, 3, 0.9));
+        }
         SaveFileManager saveFileManager = NarrativeCraftMod.getInstance().getSaveFileManager();
         saveFileManager.writeSave(playerSession);
     }
@@ -427,6 +430,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         NarrativeCraftMod.LOGGER.info(
                 "Story finished for player {}.",
                 playerSession.getPlayer().getName().getString());
+        finishedStory = true;
+        save(false);
         stop();
     }
 
