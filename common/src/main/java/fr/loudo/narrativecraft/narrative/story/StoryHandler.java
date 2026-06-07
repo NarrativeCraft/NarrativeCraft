@@ -54,11 +54,12 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandler {
 
@@ -277,9 +278,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 }
                 // If the speaker is not the same as last speaker, stop dialog client-side FIRST before advance the
                 // story.
-                if (!lastCharacterSpoke.isEmpty()
-                        && !lastCharacterSpoke.equalsIgnoreCase(speaker)
-                        && snapshot == null) {
+                if (snapshot == null
+                        && (!lastCharacterSpoke.isEmpty() && !lastCharacterSpoke.equalsIgnoreCase(speaker)
+                                || willTagsBlock(tags))) {
                     pendingDialogueText = text; // buffer B's text avant de return
                     Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
                     snapshot = new Snapshot(text, tags);
@@ -435,6 +436,13 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             return new String[] {matcher.group(1), matcher.group(2).trim()};
         }
         return new String[] {TAG_2D, text};
+    }
+
+    public boolean willTagsBlock(List<String> tags) {
+        for (String tag : tags) {
+            if (tag.contains("--block")) return true;
+        }
+        return false;
     }
 
     public Map<String, Entity> getCharacterEntities() {
