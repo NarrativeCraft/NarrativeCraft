@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Setup Gradle
+        uses: actions/setup-gradle@v4
+
+      - name: Extract variables
+        id: vars
+        run: |
+          MOD_VERSION="${GITHUB_REF_NAME#v}"
+          MINECRAFT_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
+
+          echo "MOD_VERSION=${MOD_VERSION}" >> $GITHUB_ENV
+          echo "MINECRAFT_VERSION=${MINECRAFT_VERSION}" >> $GITHUB_ENV
+
+          # Extract the changelog section for this version from CHANGELOG.md
+          CHANGELOG=$(awk "/^## \[${MOD_VERSION}\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Build jars
+        run: ./gradlew :fabric:build :neoforge:build
+
+      - name: Publish API and Common to Maven
+        run: ./gradlew :api:publish :common:publish
+        env:
+          ORG_GRADLE_PROJECT_reposiliteUser: ${{ secrets.REPOSILITE_USER }}
+          ORG_GRADLE_PROJECT_reposilitePassword: ${{ secrets.REPOSILITE_PASSWORD }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ env.CHANGELOG }}
+          files: |
+            fabric/build/libs/narrativecraft-fabric-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
+            neoforge/build/libs/narrativecraft-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
+
+      - name: Publish Fabric jar to Modrinth
+        uses: modrinth/minotaur@v2
+        with:
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project-id: narrativecraft
+          files: fabric/build/libs/narrativecraft-fabric-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
+          version: ${{ env.MOD_VERSION }}-fabric-${{ env.MINECRAFT_VERSION }}
+          name: NarrativeCraft - Fabric - ${{ env.MOD_VERSION }} - ${{ env.MINECRAFT_VERSION }}
+          version-type: release
+          game-versions: ${{ env.MINECRAFT_VERSION }}
+          loaders: fabric
+          changelog: ${{ env.CHANGELOG }}
+          dependencies: |
+            P7dR8mSH|required
+
+      - name: Publish NeoForge jar to Modrinth
+        uses: modrinth/minotaur@v2
+        with:
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project-id: narrativecraft
+          files: neoforge/build/libs/narrativecraft-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
+          version: ${{ env.MOD_VERSION }}-neoforge-${{ env.MINECRAFT_VERSION }}
+          name: NarrativeCraft - NeoForge - ${{ env.MOD_VERSION }} - ${{ env.MINECRAFT_VERSION }}
+          version-type: release
+          game-versions: ${{ env.MINECRAFT_VERSION }}
+          loaders: neoforge
+          changelog: ${{ env.CHANGELOG }}
