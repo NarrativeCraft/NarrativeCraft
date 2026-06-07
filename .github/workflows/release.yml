@@ -24,7 +24,7 @@ jobs:
           java-version: 25
 
       - name: Setup Gradle
-        uses: actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v4.4.4
 
       - name: Extract variables
         id: vars
@@ -59,29 +59,53 @@ jobs:
             neoforge/build/libs/narrativecraft-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
 
       - name: Publish Fabric jar to Modrinth
-        uses: modrinth/minotaur@v2
-        with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project-id: narrativecraft
-          files: fabric/build/libs/narrativecraft-fabric-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
-          version: ${{ env.MOD_VERSION }}-fabric-${{ env.MINECRAFT_VERSION }}
-          name: NarrativeCraft - Fabric - ${{ env.MOD_VERSION }} - ${{ env.MINECRAFT_VERSION }}
-          version-type: release
-          game-versions: ${{ env.MINECRAFT_VERSION }}
-          loaders: fabric
-          changelog: ${{ env.CHANGELOG }}
-          dependencies: |
-            P7dR8mSH|required
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          DATA=$(jq -n \
+            --arg name "NarrativeCraft - Fabric - ${MOD_VERSION} - ${MINECRAFT_VERSION}" \
+            --arg version "${MOD_VERSION}-fabric-${MINECRAFT_VERSION}" \
+            --arg changelog "${CHANGELOG}" \
+            --arg mc_version "${MINECRAFT_VERSION}" \
+            '{
+              name: $name,
+              version_number: $version,
+              changelog: $changelog,
+              dependencies: [{project_id: "P7dR8mSH", dependency_type: "required"}],
+              game_versions: [$mc_version],
+              version_type: "release",
+              loaders: ["fabric"],
+              featured: true,
+              project_id: "bR35WQGQ",
+              file_parts: ["file"]
+            }')
+          curl -sf -X POST "https://api.modrinth.com/v2/version" \
+            -H "Authorization: ${MODRINTH_TOKEN}" \
+            -F "data=${DATA}" \
+            -F "file=@fabric/build/libs/narrativecraft-fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
 
       - name: Publish NeoForge jar to Modrinth
-        uses: modrinth/minotaur@v2
-        with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project-id: narrativecraft
-          files: neoforge/build/libs/narrativecraft-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
-          version: ${{ env.MOD_VERSION }}-neoforge-${{ env.MINECRAFT_VERSION }}
-          name: NarrativeCraft - NeoForge - ${{ env.MOD_VERSION }} - ${{ env.MINECRAFT_VERSION }}
-          version-type: release
-          game-versions: ${{ env.MINECRAFT_VERSION }}
-          loaders: neoforge
-          changelog: ${{ env.CHANGELOG }}
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          DATA=$(jq -n \
+            --arg name "NarrativeCraft - NeoForge - ${MOD_VERSION} - ${MINECRAFT_VERSION}" \
+            --arg version "${MOD_VERSION}-neoforge-${MINECRAFT_VERSION}" \
+            --arg changelog "${CHANGELOG}" \
+            --arg mc_version "${MINECRAFT_VERSION}" \
+            '{
+              name: $name,
+              version_number: $version,
+              changelog: $changelog,
+              dependencies: [],
+              game_versions: [$mc_version],
+              version_type: "release",
+              loaders: ["neoforge"],
+              featured: true,
+              project_id: "bR35WQGQ",
+              file_parts: ["file"]
+            }')
+          curl -sf -X POST "https://api.modrinth.com/v2/version" \
+            -H "Authorization: ${MODRINTH_TOKEN}" \
+            -F "data=${DATA}" \
+            -F "file=@neoforge/build/libs/narrativecraft-neoforge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
