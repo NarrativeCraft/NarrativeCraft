@@ -11,6 +11,7 @@
 - The scene menu opens automatically when a session is configured
 - Clear error messages when a story script is missing required tags
 - Secured server packet
+- Added russian language #18
 
 ### Fixes
 - Stories are correctly marked as finished when completed
