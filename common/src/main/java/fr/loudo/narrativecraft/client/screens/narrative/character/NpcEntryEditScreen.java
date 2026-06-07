@@ -62,6 +62,24 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
     }
 
     @Override
+    protected boolean hasValidated() {
+        if (!super.hasValidated()) {
+            return false;
+        }
+
+        Npc existing = scene.getNpcManager().getByName(getName());
+        if (existing != null && (entry == null || !existing.getId().equals(entry.getId()))) {
+            sendToastError(
+                    Translation.message("error"),
+                    Translation.message(
+                            "error.already_exists", Translation.message("npc").getString(), existing.getName()));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     protected boolean showDescription() {
         return false;
     }

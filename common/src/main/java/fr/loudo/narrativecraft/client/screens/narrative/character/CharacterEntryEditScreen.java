@@ -52,6 +52,27 @@ public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<C
     }
 
     @Override
+    protected boolean hasValidated() {
+        if (!super.hasValidated()) {
+            return false;
+        }
+
+        CharacterStory existing =
+                ClientNarrativeCraftMod.getInstance().getCharacterManager().getByName(getName());
+        if (existing != null && (entry == null || !existing.getId().equals(entry.getId()))) {
+            sendToastError(
+                    Translation.message("error"),
+                    Translation.message(
+                            "error.already_exists",
+                            Translation.message("character").getString(),
+                            existing.getName()));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     protected void addCustomFields() {
         super.addCustomFields();
         Button mainCharacterSettingsButton = Button.builder(
