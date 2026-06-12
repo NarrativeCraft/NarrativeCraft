@@ -23,23 +23,32 @@
 
 package fr.loudo.narrativecraft.api.managers;
 
-import fr.loudo.narrativecraft.api.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
+
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
-public interface ICharacterManager extends INarrativeManager<ICharacterStory> {
+public interface ICharacterManager extends INarrativeManager<ICharacter> {
 
-    List<? extends ICharacterStory> getSortedList();
+    List<? extends ICharacter> getSortedList();
 
-    ICharacterStory getMainCharacter();
+    ICharacter getMainCharacter();
 
     /**
      * Retrieve a global character or a npc if you have a scene by his id.
      * @param characterId id of the character
      * @param scene scene of the npc if it is set
-     * @return instance of {@link ICharacterStory}
+     * @return instance of {@link ICharacter}
      */
-    ICharacterStory resolveCharacter(UUID characterId, @Nullable IScene scene);
+    ICharacter resolveCharacter(UUID characterId, @Nullable IScene scene);
+
+    /**
+     * Retrieve a global character or a npc if you have a scene by his name.
+     * @param characterName name of the character
+     * @param scene scene of the npc if it is set
+     * @return instance of {@link ICharacter}
+     */
+    ICharacter resolveCharacter(String characterName, @Nullable IScene scene);
 }

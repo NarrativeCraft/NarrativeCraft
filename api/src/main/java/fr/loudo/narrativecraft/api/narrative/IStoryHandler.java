@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.api.narrative;
 
+import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import java.util.Map;
 import java.util.Set;
@@ -62,4 +63,8 @@ public interface IStoryHandler {
     boolean hasFinishedStory();
 
     void setFinishedStory(boolean finishedStory);
+
+    Entity getEntityFromCharacter(ICharacter characterStory);
+
+    boolean characterInStory(ICharacter characterStory);
 }

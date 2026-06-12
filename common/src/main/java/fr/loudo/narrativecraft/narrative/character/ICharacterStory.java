@@ -23,13 +23,15 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
+import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.PlayerModelType;
 
-public interface ICharacterStory extends fr.loudo.narrativecraft.api.narrative.character.ICharacterStory {
+import java.io.File;
+
+public interface ICharacterStory extends ICharacter {
 
     String getDescription();
 

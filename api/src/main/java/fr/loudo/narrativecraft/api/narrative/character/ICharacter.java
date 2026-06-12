@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.api.narrative.character;
 
 import java.util.UUID;
 
-public interface ICharacterStory {
+public interface ICharacter {
 
     UUID getId();
 

@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.api.events.story.StoryEndEvent;
 import fr.loudo.narrativecraft.api.events.story.StoryStartEvent;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
+import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
@@ -54,11 +55,12 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Entity;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandler {
 
@@ -165,6 +167,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     public void stop() {
+        if (playerSession.getScene() != null) {
+            NarrativeCraftMod.EVENT_BUS.post(new SceneEndEvent(playerSession, playerSession.getScene()));
+        }
+        NarrativeCraftMod.EVENT_BUS.post(new StoryEndEvent(playerSession));
         ended = true;
         pendingDialogueText = null;
         inkTagHandler.stopAll();
@@ -172,10 +178,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(),
                 new S2CCharacterStoryAction(UUID.randomUUID(), S2CCharacterStoryAction.Action.CLEAR));
-        if (playerSession.getScene() != null) {
-            NarrativeCraftMod.EVENT_BUS.post(new SceneEndEvent(playerSession, playerSession.getScene()));
-        }
-        NarrativeCraftMod.EVENT_BUS.post(new StoryEndEvent(playerSession));
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopStory());
         playerSession.clear();
     }
@@ -395,11 +397,11 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         }
     }
 
-    public Entity getEntityFromCharacter(ICharacterStory characterStory) {
+    public Entity getEntityFromCharacter(ICharacter characterStory) {
         return characterEntities.get(characterStory.getName().toLowerCase());
     }
 
-    public boolean characterInStory(ICharacterStory characterStory) {
+    public boolean characterInStory(ICharacter characterStory) {
         return characterEntities.get(characterStory.getName().toLowerCase()) != null;
     }
 

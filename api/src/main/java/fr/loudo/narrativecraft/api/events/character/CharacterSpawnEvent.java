@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.api.events.character;
 
 import fr.loudo.narrativecraft.api.events.Event;
-import fr.loudo.narrativecraft.api.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 
-public record CharacterSpawnEvent(ICharacterStory character, IScene scene) implements Event {}
+public record CharacterSpawnEvent(ICharacter character, IScene scene) implements Event {}

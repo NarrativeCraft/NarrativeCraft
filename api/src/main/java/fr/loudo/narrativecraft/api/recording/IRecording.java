@@ -24,12 +24,12 @@
 package fr.loudo.narrativecraft.api.recording;
 
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import net.minecraft.world.entity.Entity;
-
 import java.util.UUID;
+import net.minecraft.world.entity.Entity;
 
 public interface IRecording {
     void addAction(AbstractAction action, Entity entity);
+
     void addAction(AbstractAction action, UUID entityId);
 
     /**

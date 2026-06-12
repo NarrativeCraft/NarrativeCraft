@@ -23,6 +23,6 @@
 
 package fr.loudo.narrativecraft.api.managers;
 
-import fr.loudo.narrativecraft.api.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 
-public interface INpcManager extends INarrativeManager<ICharacterStory> {}
+public interface INpcManager extends INarrativeManager<ICharacter> {}

@@ -29,12 +29,11 @@ import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 public class CharacterManager extends NarrativeManager<CharacterStory> implements ICharacterManager {
 
@@ -44,12 +43,6 @@ public class CharacterManager extends NarrativeManager<CharacterStory> implement
         return sorted;
     }
 
-    /**
-     * Retrieve a global character or a npc if you have a scene by his id.
-     * @param characterId id of the character
-     * @param scene scene of the npc if it is set
-     * @return instance of {@link ICharacterStory}
-     */
     public ICharacterStory resolveCharacter(UUID characterId, @Nullable IScene scene) {
         ICharacterStory characterStory = getById(characterId);
         Scene concreteScene = (Scene) scene;
@@ -59,12 +52,6 @@ public class CharacterManager extends NarrativeManager<CharacterStory> implement
         return characterStory;
     }
 
-    /**
-     * Retrieve a global character or a npc if you have a scene by his name.
-     * @param characterName name of the character
-     * @param scene scene of the npc if it is set
-     * @return instance of {@link ICharacterStory}
-     */
     public ICharacterStory resolveCharacter(String characterName, @Nullable IScene scene) {
         ICharacterStory characterStory = getByName(characterName);
         Scene concreteScene = (Scene) scene;
