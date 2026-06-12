@@ -44,15 +44,10 @@ artifacts {
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }
 
-// Implement mcgradleconventions loader attribute
+// Set loader attribute only on classpath configurations (not on published variants)
+// Publishing loader=common on apiElements/runtimeElements would break external consumers
+// (e.g. Fabric mods) whose Gradle configurations request loader=fabric
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
-['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
-    configurations.named("$variant") {
-        attributes {
-            attribute(loaderAttribute, 'common')
-        }
-    }
-}
 sourceSets.configureEach {
     [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
         configurations.named("$variant") {

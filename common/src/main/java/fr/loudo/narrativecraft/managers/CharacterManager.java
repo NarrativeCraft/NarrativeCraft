@@ -59,6 +59,21 @@ public class CharacterManager extends NarrativeManager<CharacterStory> implement
         return characterStory;
     }
 
+    /**
+     * Retrieve a global character or a npc if you have a scene by his name.
+     * @param characterName name of the character
+     * @param scene scene of the npc if it is set
+     * @return instance of {@link ICharacterStory}
+     */
+    public ICharacterStory resolveCharacter(String characterName, @Nullable IScene scene) {
+        ICharacterStory characterStory = getByName(characterName);
+        Scene concreteScene = (Scene) scene;
+        if (characterStory == null && scene != null) {
+            return concreteScene.getNpcManager().getByName(characterName);
+        }
+        return characterStory;
+    }
+
     public CharacterStory getMainCharacter() {
         for (CharacterStory characterStory : list) {
             if (characterStory.getMainCharacterAttribute().isMainCharacter()) return characterStory;

@@ -41,9 +41,6 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.actions.*;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
@@ -53,6 +50,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.AABB;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class Recording implements IRecording {
 
@@ -125,6 +126,12 @@ public class Recording implements IRecording {
         data.addAction(action);
     }
 
+    public void addAction(AbstractAction action, UUID entityId) {
+        RecordingEntityData data = getRecordingEntityData(entityId);
+        if (data == null) return;
+        data.addAction(action);
+    }
+
     public int markEntityAsTracked(Entity entity) {
         RecordingEntityData data = getRecordingEntityData(entity);
         if (data == null) return -1;
@@ -181,6 +188,13 @@ public class Recording implements IRecording {
         UUID uuid = entity.getUUID();
         for (RecordingEntityData data : recordingEntityDataList) {
             if (data.getEntity().getUUID().equals(uuid)) return data;
+        }
+        return null;
+    }
+
+    public RecordingEntityData getRecordingEntityData(UUID entityId) {
+        for (RecordingEntityData data : recordingEntityDataList) {
+            if (data.getEntity().getUUID().equals(entityId)) return data;
         }
         return null;
     }

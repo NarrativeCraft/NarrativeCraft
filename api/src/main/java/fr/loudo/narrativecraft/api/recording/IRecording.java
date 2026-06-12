@@ -26,8 +26,11 @@ package fr.loudo.narrativecraft.api.recording;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import net.minecraft.world.entity.Entity;
 
+import java.util.UUID;
+
 public interface IRecording {
     void addAction(AbstractAction action, Entity entity);
+    void addAction(AbstractAction action, UUID entityId);
 
     /**
      * Marks the given entity as tracked (interacted with during recording).
@@ -43,6 +46,8 @@ public interface IRecording {
     void stop();
 
     IRecordingEntityData getRecordingEntityData(Entity entity);
+
+    IRecordingEntityData getRecordingEntityData(UUID entityId);
 
     int getTick();
 
