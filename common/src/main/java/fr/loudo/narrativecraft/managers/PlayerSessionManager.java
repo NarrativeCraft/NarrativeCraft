@@ -26,12 +26,13 @@ package fr.loudo.narrativecraft.managers;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.events.session.PlayerSessionEndEvent;
 import fr.loudo.narrativecraft.api.events.session.PlayerSessionStartEvent;
+import fr.loudo.narrativecraft.api.managers.IPlayerSessionManager;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import net.minecraft.world.entity.player.Player;
 
-public class PlayerSessionManager extends Manager<PlayerSession> {
+public class PlayerSessionManager extends Manager<PlayerSession> implements IPlayerSessionManager {
 
     @Override
     public void add(PlayerSession item) {

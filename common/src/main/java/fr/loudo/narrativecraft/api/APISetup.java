@@ -38,5 +38,8 @@ public class APISetup {
         api.setInkTagDispatcher(mod.getInkTagDispatcher());
         api.setModId(NarrativeCraftMod.MOD_ID);
         api.setStoryHandlerManager(mod.getStoryHandlerManager());
+        api.setPlayerSessionManager(mod.getPlayerSessionManager());
+        api.setChapterManager(mod.getChapterManager());
+        api.setCharacterManager(mod.getCharacterManager());
     }
 }

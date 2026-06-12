@@ -21,9 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.cameraangle;
+package fr.loudo.narrativecraft.api.managers;
 
-import fr.loudo.narrativecraft.api.managers.ICameraAngleManager;
-import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import java.util.List;
+import java.util.UUID;
 
-public class CameraAngleManager extends NarrativeManager<CameraAngle> implements ICameraAngleManager {}
+public interface INarrativeManager<T> {
+
+    T getById(UUID id);
+
+    T getByName(String name);
+
+    List<? extends T> getList();
+
+    int size();
+}

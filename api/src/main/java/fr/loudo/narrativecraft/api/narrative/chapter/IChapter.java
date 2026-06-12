@@ -23,10 +23,13 @@
 
 package fr.loudo.narrativecraft.api.narrative.chapter;
 
+import fr.loudo.narrativecraft.api.managers.ISceneManager;
 import java.util.UUID;
 
 public interface IChapter {
     UUID getId();
 
     String getName();
+
+    ISceneManager getSceneManager();
 }

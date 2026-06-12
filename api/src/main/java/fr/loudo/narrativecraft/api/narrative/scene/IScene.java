@@ -23,6 +23,12 @@
 
 package fr.loudo.narrativecraft.api.narrative.scene;
 
+import fr.loudo.narrativecraft.api.managers.IAnimationManager;
+import fr.loudo.narrativecraft.api.managers.ICameraAngleManager;
+import fr.loudo.narrativecraft.api.managers.ICutsceneManager;
+import fr.loudo.narrativecraft.api.managers.IInteractionManager;
+import fr.loudo.narrativecraft.api.managers.INpcManager;
+import fr.loudo.narrativecraft.api.managers.ISubsceneManager;
 import fr.loudo.narrativecraft.api.narrative.chapter.IChapter;
 import java.util.UUID;
 
@@ -33,4 +39,16 @@ public interface IScene {
     IChapter getChapter();
 
     String getName();
+
+    IAnimationManager getAnimationManager();
+
+    ISubsceneManager getSubsceneManager();
+
+    ICutsceneManager getCutsceneManager();
+
+    ICameraAngleManager getCameraAngleManager();
+
+    IInteractionManager getInteractionManager();
+
+    INpcManager getNpcManager();
 }

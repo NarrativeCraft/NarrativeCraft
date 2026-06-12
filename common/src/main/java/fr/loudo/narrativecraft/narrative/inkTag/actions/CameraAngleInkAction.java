@@ -48,9 +48,8 @@ import fr.loudo.narrativecraft.network.cameraangle.S2CEnterCameraView;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.world.entity.Entity;
-
 import java.util.UUID;
+import net.minecraft.world.entity.Entity;
 
 @InkCommand(
         keyword = "camera",

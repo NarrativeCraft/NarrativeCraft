@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.subscene;
 
+import fr.loudo.narrativecraft.api.managers.ISubsceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 
-public class SubsceneManager extends NarrativeManager<Subscene> {}
+public class SubsceneManager extends NarrativeManager<Subscene> implements ISubsceneManager {}

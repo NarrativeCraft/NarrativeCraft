@@ -23,12 +23,13 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.api.managers.ISceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.Comparator;
 import java.util.List;
 
-public class SceneManager extends NarrativeManager<Scene> {
+public class SceneManager extends NarrativeManager<Scene> implements ISceneManager {
 
     public Scene getByRank(int currentRank) {
         for (Scene scene : list) {

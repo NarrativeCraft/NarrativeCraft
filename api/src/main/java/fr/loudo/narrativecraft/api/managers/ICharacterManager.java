@@ -21,9 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.cameraangle;
+package fr.loudo.narrativecraft.api.managers;
 
-import fr.loudo.narrativecraft.api.managers.ICameraAngleManager;
-import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.api.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.api.narrative.scene.IScene;
+import java.util.List;
+import java.util.UUID;
+import javax.annotation.Nullable;
 
-public class CameraAngleManager extends NarrativeManager<CameraAngle> implements ICameraAngleManager {}
+public interface ICharacterManager extends INarrativeManager<ICharacterStory> {
+
+    List<? extends ICharacterStory> getSortedList();
+
+    ICharacterStory getMainCharacter();
+
+    /**
+     * Retrieve a global character or a npc if you have a scene by his id.
+     * @param characterId id of the character
+     * @param scene scene of the npc if it is set
+     * @return instance of {@link ICharacterStory}
+     */
+    ICharacterStory resolveCharacter(UUID characterId, @Nullable IScene scene);
+}

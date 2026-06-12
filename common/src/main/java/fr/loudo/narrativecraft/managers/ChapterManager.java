@@ -23,12 +23,13 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.api.managers.IChapterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import java.util.Comparator;
 import java.util.List;
 
-public class ChapterManager extends NarrativeManager<Chapter> {
+public class ChapterManager extends NarrativeManager<Chapter> implements IChapterManager {
 
     public Chapter getChapterByIndex(int index) {
         for (Chapter chapter : list) {

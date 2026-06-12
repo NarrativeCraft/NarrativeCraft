@@ -23,7 +23,8 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.api.managers.IAnimationManager;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 
-public class AnimationManager extends NarrativeManager<Animation> {}
+public class AnimationManager extends NarrativeManager<Animation> implements IAnimationManager {}

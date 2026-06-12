@@ -21,9 +21,8 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.cameraangle;
+package fr.loudo.narrativecraft.api.managers;
 
-import fr.loudo.narrativecraft.api.managers.ICameraAngleManager;
-import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.api.narrative.interaction.IInteraction;
 
-public class CameraAngleManager extends NarrativeManager<CameraAngle> implements ICameraAngleManager {}
+public interface IInteractionManager extends INarrativeManager<IInteraction> {}

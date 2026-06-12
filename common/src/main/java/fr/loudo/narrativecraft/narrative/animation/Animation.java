@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.animation;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.narrative.animation.IAnimation;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
@@ -40,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Animation extends NarrativeEntry<AnimationPayload> {
+public class Animation extends NarrativeEntry<AnimationPayload> implements IAnimation {
 
     private final Scene scene;
     private final List<RecordingData> recordingDataList = new ArrayList<>();

@@ -23,13 +23,14 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
+import fr.loudo.narrativecraft.api.narrative.cameraangle.ICameraAngle;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class CameraAngle extends NarrativeEntry<CameraAnglePayload> {
+public class CameraAngle extends NarrativeEntry<CameraAnglePayload> implements ICameraAngle {
 
     private final Scene scene;
     private final List<CameraView> cameraViews = new ArrayList<>();

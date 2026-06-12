@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene;
 
+import fr.loudo.narrativecraft.api.managers.ICutsceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 
-public class CutsceneManager extends NarrativeManager<Cutscene> {}
+public class CutsceneManager extends NarrativeManager<Cutscene> implements ICutsceneManager {}

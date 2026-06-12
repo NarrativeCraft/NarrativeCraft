@@ -23,17 +23,20 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.api.managers.ICharacterManager;
+import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
-public class CharacterManager extends NarrativeManager<CharacterStory> {
+public class CharacterManager extends NarrativeManager<CharacterStory> implements ICharacterManager {
 
     public List<CharacterStory> getSortedList() {
         List<CharacterStory> sorted = new ArrayList<>(list);
@@ -47,10 +50,11 @@ public class CharacterManager extends NarrativeManager<CharacterStory> {
      * @param scene scene of the npc if it is set
      * @return instance of {@link ICharacterStory}
      */
-    public ICharacterStory resolveCharacter(UUID characterId, @Nullable Scene scene) {
+    public ICharacterStory resolveCharacter(UUID characterId, @Nullable IScene scene) {
         ICharacterStory characterStory = getById(characterId);
+        Scene concreteScene = (Scene) scene;
         if (characterStory == null && scene != null) {
-            return scene.getNpcManager().getById(characterId);
+            return concreteScene.getNpcManager().getById(characterId);
         }
         return characterStory;
     }

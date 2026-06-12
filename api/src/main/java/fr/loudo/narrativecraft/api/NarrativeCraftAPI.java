@@ -27,6 +27,9 @@ import fr.loudo.narrativecraft.api.dialog.ITextEffectRegistry;
 import fr.loudo.narrativecraft.api.editors.ICutsceneLayerRegistry;
 import fr.loudo.narrativecraft.api.events.IEventBus;
 import fr.loudo.narrativecraft.api.inkAction.InkTagDispatcher;
+import fr.loudo.narrativecraft.api.managers.IChapterManager;
+import fr.loudo.narrativecraft.api.managers.ICharacterManager;
+import fr.loudo.narrativecraft.api.managers.IPlayerSessionManager;
 import fr.loudo.narrativecraft.api.managers.IRecordingManager;
 import fr.loudo.narrativecraft.api.narrative.IStoryHandlerManager;
 import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
@@ -42,6 +45,9 @@ public class NarrativeCraftAPI {
     private IStoryHandlerManager storyHandlerManager;
     private IEventBus eventBus;
     private IRecordingManager recordingManager;
+    private IPlayerSessionManager playerSessionManager;
+    private IChapterManager chapterManager;
+    private ICharacterManager characterManager;
     private InkTagDispatcher inkTagDispatcher;
 
     public IActionRegistry getActionRegistry() {
@@ -90,6 +96,30 @@ public class NarrativeCraftAPI {
 
     void setRecordingManager(IRecordingManager recordingManager) {
         this.recordingManager = recordingManager;
+    }
+
+    public IPlayerSessionManager getPlayerSessionManager() {
+        return playerSessionManager;
+    }
+
+    void setPlayerSessionManager(IPlayerSessionManager playerSessionManager) {
+        this.playerSessionManager = playerSessionManager;
+    }
+
+    public IChapterManager getChapterManager() {
+        return chapterManager;
+    }
+
+    void setChapterManager(IChapterManager chapterManager) {
+        this.chapterManager = chapterManager;
+    }
+
+    public ICharacterManager getCharacterManager() {
+        return characterManager;
+    }
+
+    void setCharacterManager(ICharacterManager characterManager) {
+        this.characterManager = characterManager;
     }
 
     public static NarrativeCraftAPI getInstance() {

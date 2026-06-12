@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
+import fr.loudo.narrativecraft.api.managers.IInteractionManager;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 
-public class InteractionManager extends NarrativeManager<Interaction> {}
+public class InteractionManager extends NarrativeManager<Interaction> implements IInteractionManager {}

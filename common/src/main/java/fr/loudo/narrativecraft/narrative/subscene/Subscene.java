@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.subscene;
 
+import fr.loudo.narrativecraft.api.narrative.subscene.ISubscene;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Subscene extends NarrativeEntry<SubscenePayload> {
+public class Subscene extends NarrativeEntry<SubscenePayload> implements ISubscene {
 
     private final Scene scene;
     private List<Animation> animations;
