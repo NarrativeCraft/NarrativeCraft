@@ -36,90 +36,69 @@ import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 
 public class NarrativeCraftAPI {
 
-    private static final NarrativeCraftAPI INSTANCE = new NarrativeCraftAPI();
+    private static volatile NarrativeCraftAPI INSTANCE;
 
-    private String modId;
-    private IActionRegistry actionRegistry;
-    private ICutsceneLayerRegistry cutsceneLayerRegistry;
-    private ITextEffectRegistry textEffectRegistry;
-    private IStoryHandlerManager storyHandlerManager;
-    private IEventBus eventBus;
-    private IRecordingManager recordingManager;
-    private IPlayerSessionManager playerSessionManager;
-    private IChapterManager chapterManager;
-    private ICharacterManager characterManager;
-    private InkTagDispatcher inkTagDispatcher;
+    private final String modId;
+    private final IActionRegistry actionRegistry;
+    private final ICutsceneLayerRegistry cutsceneLayerRegistry;
+    private final ITextEffectRegistry textEffectRegistry;
+    private final IStoryHandlerManager storyHandlerManager;
+    private final IEventBus eventBus;
+    private final IRecordingManager recordingManager;
+    private final IPlayerSessionManager playerSessionManager;
+    private final IChapterManager chapterManager;
+    private final ICharacterManager characterManager;
+    private final InkTagDispatcher inkTagDispatcher;
 
-    public IActionRegistry getActionRegistry() {
-        return actionRegistry;
-    }
-
-    public ICutsceneLayerRegistry getCutsceneLayerRegistry() {
-        return cutsceneLayerRegistry;
-    }
-
-    void setCutsceneLayerRegistry(ICutsceneLayerRegistry cutsceneLayerRegistry) {
-        this.cutsceneLayerRegistry = cutsceneLayerRegistry;
-    }
-
-    public ITextEffectRegistry getTextEffectRegistry() {
-        return textEffectRegistry;
-    }
-
-    void setTextEffectRegistry(ITextEffectRegistry textEffectRegistry) {
-        this.textEffectRegistry = textEffectRegistry;
-    }
-
-    void setActionRegistry(IActionRegistry actionRegistry) {
+    private NarrativeCraftAPI(
+            String modId,
+            IActionRegistry actionRegistry,
+            ICutsceneLayerRegistry cutsceneLayerRegistry,
+            ITextEffectRegistry textEffectRegistry,
+            IStoryHandlerManager storyHandlerManager,
+            IEventBus eventBus,
+            IRecordingManager recordingManager,
+            IPlayerSessionManager playerSessionManager,
+            IChapterManager chapterManager,
+            ICharacterManager characterManager,
+            InkTagDispatcher inkTagDispatcher) {
+        this.modId = modId;
         this.actionRegistry = actionRegistry;
-    }
-
-    public IStoryHandlerManager getStoryHandlerManager() {
-        return storyHandlerManager;
-    }
-
-    void setStoryHandlerManager(IStoryHandlerManager storyHandlerManager) {
+        this.cutsceneLayerRegistry = cutsceneLayerRegistry;
+        this.textEffectRegistry = textEffectRegistry;
         this.storyHandlerManager = storyHandlerManager;
-    }
-
-    public IEventBus getEventBus() {
-        return eventBus;
-    }
-
-    void setEventBus(IEventBus eventBus) {
         this.eventBus = eventBus;
-    }
-
-    public IRecordingManager getRecordingManager() {
-        return recordingManager;
-    }
-
-    void setRecordingManager(IRecordingManager recordingManager) {
         this.recordingManager = recordingManager;
-    }
-
-    public IPlayerSessionManager getPlayerSessionManager() {
-        return playerSessionManager;
-    }
-
-    void setPlayerSessionManager(IPlayerSessionManager playerSessionManager) {
         this.playerSessionManager = playerSessionManager;
-    }
-
-    public IChapterManager getChapterManager() {
-        return chapterManager;
-    }
-
-    void setChapterManager(IChapterManager chapterManager) {
         this.chapterManager = chapterManager;
-    }
-
-    public ICharacterManager getCharacterManager() {
-        return characterManager;
-    }
-
-    void setCharacterManager(ICharacterManager characterManager) {
         this.characterManager = characterManager;
+        this.inkTagDispatcher = inkTagDispatcher;
+    }
+
+    static void initialize(
+            String modId,
+            IActionRegistry actionRegistry,
+            ICutsceneLayerRegistry cutsceneLayerRegistry,
+            ITextEffectRegistry textEffectRegistry,
+            IStoryHandlerManager storyHandlerManager,
+            IEventBus eventBus,
+            IRecordingManager recordingManager,
+            IPlayerSessionManager playerSessionManager,
+            IChapterManager chapterManager,
+            ICharacterManager characterManager,
+            InkTagDispatcher inkTagDispatcher) {
+        INSTANCE = new NarrativeCraftAPI(
+                modId,
+                actionRegistry,
+                cutsceneLayerRegistry,
+                textEffectRegistry,
+                storyHandlerManager,
+                eventBus,
+                recordingManager,
+                playerSessionManager,
+                chapterManager,
+                characterManager,
+                inkTagDispatcher);
     }
 
     public static NarrativeCraftAPI getInstance() {
@@ -130,15 +109,43 @@ public class NarrativeCraftAPI {
         return modId;
     }
 
-    void setModId(String modId) {
-        this.modId = modId;
+    public IActionRegistry getActionRegistry() {
+        return actionRegistry;
+    }
+
+    public ICutsceneLayerRegistry getCutsceneLayerRegistry() {
+        return cutsceneLayerRegistry;
+    }
+
+    public ITextEffectRegistry getTextEffectRegistry() {
+        return textEffectRegistry;
+    }
+
+    public IStoryHandlerManager getStoryHandlerManager() {
+        return storyHandlerManager;
+    }
+
+    public IEventBus getEventBus() {
+        return eventBus;
+    }
+
+    public IRecordingManager getRecordingManager() {
+        return recordingManager;
+    }
+
+    public IPlayerSessionManager getPlayerSessionManager() {
+        return playerSessionManager;
+    }
+
+    public IChapterManager getChapterManager() {
+        return chapterManager;
+    }
+
+    public ICharacterManager getCharacterManager() {
+        return characterManager;
     }
 
     public InkTagDispatcher getInkTagDispatcher() {
         return inkTagDispatcher;
-    }
-
-    void setInkTagDispatcher(InkTagDispatcher inkTagDispatcher) {
-        this.inkTagDispatcher = inkTagDispatcher;
     }
 }

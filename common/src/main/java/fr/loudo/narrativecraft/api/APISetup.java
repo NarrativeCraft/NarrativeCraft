@@ -28,18 +28,17 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 public class APISetup {
 
     public static void init(NarrativeCraftMod mod) {
-        NarrativeCraftAPI api = NarrativeCraftAPI.getInstance();
-
-        api.setRecordingManager(mod.getRecordingManager());
-        api.setActionRegistry(mod.getActionRegistry());
-        api.setCutsceneLayerRegistry(mod.getCutsceneLayerRegistry());
-        api.setTextEffectRegistry(mod.getTextEffectRegistry());
-        api.setEventBus(NarrativeCraftMod.EVENT_BUS);
-        api.setInkTagDispatcher(mod.getInkTagDispatcher());
-        api.setModId(NarrativeCraftMod.MOD_ID);
-        api.setStoryHandlerManager(mod.getStoryHandlerManager());
-        api.setPlayerSessionManager(mod.getPlayerSessionManager());
-        api.setChapterManager(mod.getChapterManager());
-        api.setCharacterManager(mod.getCharacterManager());
+        NarrativeCraftAPI.initialize(
+                NarrativeCraftMod.MOD_ID,
+                mod.getActionRegistry(),
+                mod.getCutsceneLayerRegistry(),
+                mod.getTextEffectRegistry(),
+                mod.getStoryHandlerManager(),
+                NarrativeCraftMod.EVENT_BUS,
+                mod.getRecordingManager(),
+                mod.getPlayerSessionManager(),
+                mod.getChapterManager(),
+                mod.getCharacterManager(),
+                mod.getInkTagDispatcher());
     }
 }

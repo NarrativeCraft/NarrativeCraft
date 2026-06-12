@@ -25,10 +25,9 @@ package fr.loudo.narrativecraft.api.managers;
 
 import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
-
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 public interface ICharacterManager extends INarrativeManager<ICharacter> {
 
