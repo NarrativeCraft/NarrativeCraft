@@ -28,6 +28,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.concurrent.CompletableFuture;
@@ -41,6 +42,12 @@ public class CommandSuggestions {
                 NarrativeCraftMod.getInstance().getChapterManager().getList()) {
             builder.suggest(chapter.getChapterIndex());
         }
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestAddons(
+            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        NarrativeCraftAPI.getInstance().getAddonRegistry().getAll().forEach(addon -> builder.suggest(addon.getModId()));
         return builder.buildFuture();
     }
 

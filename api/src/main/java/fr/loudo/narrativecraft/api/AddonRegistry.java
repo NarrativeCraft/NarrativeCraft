@@ -21,31 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.api;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.commands.*;
-import fr.loudo.narrativecraft.platform.Services;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnCommandRegisterEventNeoForge {
+public class AddonRegistry {
 
-    public OnCommandRegisterEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(OnCommandRegisterEventNeoForge::registerCommand);
+    private final List<AddonContext> addons = new ArrayList<>();
+
+    void add(AddonContext context) {
+        addons.add(context);
     }
 
-    private static void registerCommand(RegisterCommandsEvent event) {
-        RecordCommand.register(event.getDispatcher());
-        PlayerSessionCommand.register(event.getDispatcher());
-        PlaybackCommand.register(event.getDispatcher());
-        StoryCommand.register(event.getDispatcher());
-        AddonsCommand.register(event.getDispatcher());
-        if (Services.PLATFORM.isDevelopmentEnvironment()) {
-            TestCommand.register(event.getDispatcher());
-        }
+    public List<AddonContext> getAll() {
+        return Collections.unmodifiableList(addons);
+    }
+
+    public List<AddonContext> getEnabled() {
+        return addons.stream()
+                .filter(a -> a.getState() == AddonContext.State.ENABLED)
+                .toList();
     }
 }

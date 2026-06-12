@@ -36,6 +36,8 @@ import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 
 public class NarrativeCraftAPI {
 
+    public static final int VERSION = 1;
+
     private static volatile NarrativeCraftAPI INSTANCE;
 
     private final String modId;
@@ -49,6 +51,7 @@ public class NarrativeCraftAPI {
     private final IChapterManager chapterManager;
     private final ICharacterManager characterManager;
     private final InkTagDispatcher inkTagDispatcher;
+    private final AddonRegistry addonRegistry;
 
     private NarrativeCraftAPI(
             String modId,
@@ -73,6 +76,7 @@ public class NarrativeCraftAPI {
         this.chapterManager = chapterManager;
         this.characterManager = characterManager;
         this.inkTagDispatcher = inkTagDispatcher;
+        this.addonRegistry = new AddonRegistry();
     }
 
     static void initialize(
@@ -102,22 +106,39 @@ public class NarrativeCraftAPI {
     }
 
     public static NarrativeCraftAPI getInstance() {
-        return INSTANCE;
+        NarrativeCraftAPI instance = INSTANCE;
+        if (instance == null) {
+            throw new IllegalStateException(
+                    "NarrativeCraft API is not initialized yet. "
+                            + "Make sure your mod declares a dependency on NarrativeCraft and accesses the API in your mod initializer.");
+        }
+        return instance;
+    }
+
+    public AddonContext createAddon(
+            String modId, String name, String description, String author, String homeLink, int apiVersion) {
+        AddonContext context = new AddonContext(modId, name, description, author, homeLink, apiVersion);
+        addonRegistry.add(context);
+        return context;
+    }
+
+    public AddonRegistry getAddonRegistry() {
+        return addonRegistry;
     }
 
     public String getModId() {
         return modId;
     }
 
-    public IActionRegistry getActionRegistry() {
+    IActionRegistry getActionRegistry() {
         return actionRegistry;
     }
 
-    public ICutsceneLayerRegistry getCutsceneLayerRegistry() {
+    ICutsceneLayerRegistry getCutsceneLayerRegistry() {
         return cutsceneLayerRegistry;
     }
 
-    public ITextEffectRegistry getTextEffectRegistry() {
+    ITextEffectRegistry getTextEffectRegistry() {
         return textEffectRegistry;
     }
 
@@ -125,7 +146,7 @@ public class NarrativeCraftAPI {
         return storyHandlerManager;
     }
 
-    public IEventBus getEventBus() {
+    IEventBus getEventBus() {
         return eventBus;
     }
 
@@ -145,7 +166,7 @@ public class NarrativeCraftAPI {
         return characterManager;
     }
 
-    public InkTagDispatcher getInkTagDispatcher() {
+    InkTagDispatcher getInkTagDispatcher() {
         return inkTagDispatcher;
     }
 }

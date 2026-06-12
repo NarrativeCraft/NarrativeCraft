@@ -4,7 +4,10 @@
 
 ### Features
 
-- Access to managers in API
+- Addons managers "/nc addon"
+- Edited way to register new items through registries in API
+- Incompatible addon are disabled if not matching right NarrativeCraft API version 
+
 
 ### Fixes
 

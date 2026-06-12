@@ -37,6 +37,7 @@ public class OnCommandRegisterEventFabric implements IFabricEventRegister {
             PlayerSessionCommand.register(commandDispatcher);
             PlaybackCommand.register(commandDispatcher);
             StoryCommand.register(commandDispatcher);
+            AddonsCommand.register(commandDispatcher);
             if (Services.PLATFORM.isDevelopmentEnvironment()) {
                 TestCommand.register(commandDispatcher);
             }
