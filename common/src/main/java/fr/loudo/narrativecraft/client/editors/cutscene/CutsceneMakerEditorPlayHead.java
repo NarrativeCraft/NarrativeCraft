@@ -23,17 +23,14 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 public class CutsceneMakerEditorPlayHead {
 
-    public static final Identifier playHeadLocation =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "playhead");
+    public static final ResourceLocation playHeadLocation =
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "playhead");
     private int y, width, height;
     private int space;
     private boolean isHovered;
@@ -46,16 +43,10 @@ public class CutsceneMakerEditorPlayHead {
         this.space = space;
     }
 
-    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int timelineStartX, int timelineWidth) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, int timelineStartX, int timelineWidth) {
         int x = timelineStartX + (int) (ratio * timelineWidth) - width / 2;
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, playHeadLocation, x, y, width, height);
+        graphics.blitSprite(playHeadLocation, x, y, width, height);
         isHovered = mouseX >= x - space && mouseX <= x + space + width && mouseY >= y && mouseY <= y + height;
-
-        if (isDragging) {
-            graphics.requestCursor(CursorTypes.RESIZE_EW);
-        } else if (isHovered) {
-            graphics.requestCursor(CursorTypes.POINTING_HAND);
-        }
     }
 
     public void onMouseDrag(double mouseX, int timelineStartX, int timelineWidth) {
@@ -63,14 +54,15 @@ public class CutsceneMakerEditorPlayHead {
         ratio = (float) Math.clamp((mouseX - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
     }
 
-    public void onClick(MouseButtonEvent event, int timelineStartX, int timelineWidth, int timelineY) {
+    public void onClick(
+            double mouseX, double mouseY, int button, int timelineStartX, int timelineWidth, int timelineY) {
         if (timelineWidth <= 0) return;
-        if (timelineY >= event.y() + 5) return;
-        if (event.x() <= timelineStartX) {
+        if (timelineY >= (mouseY) + 5) return;
+        if ((mouseX) <= timelineStartX) {
             return;
         }
         isDragging = true;
-        ratio = (float) Math.clamp((event.x() - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
+        ratio = (float) Math.clamp(((mouseX) - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
     }
 
     public void setY(int y) {

@@ -23,32 +23,32 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.events.client.OnScreenMouseScrollEvent;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.MouseHandler;
-import org.spongepowered.asm.mixin.Final;
+import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
+import fr.loudo.narrativecraft.events.client.OnScreenMouseDragEvent;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(MouseHandler.class)
-public abstract class MouseHandlerMixinFabric {
+@Mixin(ContainerEventHandler.class)
+public interface ContainerEventHandlerMixinFabric {
 
-    @Shadow
-    @Final
-    private Minecraft minecraft;
+    @Inject(method = "mouseClicked", at = @At("HEAD"))
+    private void narrativecraft$mouseClicked(
+            double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        OnScreenMouseClickEvent.cutsceneHudClick(mouseX, mouseY, button, false);
+    }
 
-    @Inject(
-            method = "onScroll",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseScrolled(DDDD)Z"))
-    private void narrativecraft$onMouseScroll(long windowPointer, double xOffset, double yOffset, CallbackInfo ci) {
-        boolean flag = this.minecraft.options.discreteMouseScroll().get();
-        double d0 = this.minecraft.options.mouseWheelSensitivity().get();
-        double deltaX = (flag ? Math.signum(xOffset) : xOffset) * d0;
-        double deltaY = (flag ? Math.signum(yOffset) : yOffset) * d0;
+    @Inject(method = "mouseReleased", at = @At("HEAD"))
+    private void narrativecraft$mouseReleased(
+            double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        OnScreenMouseClickEvent.cutsceneHudRelease(mouseX, mouseY, button);
+    }
 
-        OnScreenMouseScrollEvent.onCutsceneLayerMouseScroll(deltaX, deltaY);
+    @Inject(method = "mouseDragged", at = @At("HEAD"))
+    private void narrativecraft$mouseDragged(
+            double mouseX, double mouseY, int button, double dragX, double dragY, CallbackInfoReturnable<Boolean> cir) {
+        OnScreenMouseDragEvent.onCutsceneTimelineDrag(mouseX, mouseY, button, dragX, dragY);
     }
 }

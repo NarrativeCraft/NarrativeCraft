@@ -52,7 +52,7 @@ public class LivingEntityMixin {
     @Inject(method = "dropAllDeathLoot", at = @At("HEAD"), cancellable = true)
     private void narrativecraft$shouldDropLoot(ServerLevel level, DamageSource source, CallbackInfo ci) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
-        if (livingEntity.entityTags().contains(Playback.ENTITY_TAG)) {
+        if (livingEntity.getTags().contains(Playback.ENTITY_TAG)) {
             ci.cancel();
         }
     }

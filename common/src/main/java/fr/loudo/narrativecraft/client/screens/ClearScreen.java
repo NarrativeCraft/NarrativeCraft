@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.client.screens;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -33,13 +33,10 @@ public class ClearScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {}
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {}
 
     @Override
-    protected void extractBlurredBackground(GuiGraphicsExtractor graphics) {}
-
-    @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {}
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {}
 
     @Override
     public boolean isPauseScreen() {

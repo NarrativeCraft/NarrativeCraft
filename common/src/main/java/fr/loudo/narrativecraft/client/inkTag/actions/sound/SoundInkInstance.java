@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.client.inkTag.actions.sound;
 
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 
@@ -33,7 +33,7 @@ public class SoundInkInstance extends AbstractSoundInstance {
     private boolean isFading;
 
     public SoundInkInstance(
-            Identifier location,
+            ResourceLocation location,
             SoundSource source,
             float volume,
             float pitch,

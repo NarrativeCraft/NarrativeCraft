@@ -26,15 +26,16 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.item.ItemStack;
 
 public class OnUseItemEventFabric implements IFabricEventRegister {
     @Override
     public void register() {
         UseItemCallback.EVENT.register((player, level, hand) -> {
-            if (!(player instanceof ServerPlayer)) return InteractionResult.PASS;
+            if (!(player instanceof ServerPlayer)) return InteractionResultHolder.pass(ItemStack.EMPTY);
             OnUseItemEvent.onUseItem((ServerPlayer) player, hand);
-            return InteractionResult.PASS;
+            return InteractionResultHolder.pass(ItemStack.EMPTY);
         });
     }
 }

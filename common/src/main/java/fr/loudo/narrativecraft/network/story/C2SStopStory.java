@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SStopStory(boolean showMainScreen) implements CustomPacketPayload {
 
     public static final Type<C2SStopStory> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "c2s_stop_story"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "c2s_stop_story"));
 
     public static final StreamCodec<ByteBuf, C2SStopStory> STREAM_CODEC =
             StreamCodec.composite(ByteBufCodecs.BOOL, C2SStopStory::showMainScreen, C2SStopStory::new);

@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.dialog;
 
 import com.google.gson.JsonObject;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class DialogDataIO {
 
@@ -82,10 +82,11 @@ public final class DialogDataIO {
             if (json.has("textColor")) data.setTextColor(json.get("textColor").getAsInt());
             if (json.has("backgroundImage")) {
                 data.setBackgroundImage(
-                        Identifier.parse(json.get("backgroundImage").getAsString()));
+                        ResourceLocation.parse(json.get("backgroundImage").getAsString()));
             }
             if (json.has("letterSound")) {
-                data.setLetterSound(Identifier.parse(json.get("letterSound").getAsString()));
+                data.setLetterSound(
+                        ResourceLocation.parse(json.get("letterSound").getAsString()));
             }
             if (json.has("tailVisible")) {
                 data.setTailVisible(json.get("tailVisible").getAsBoolean());

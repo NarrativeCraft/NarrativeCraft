@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SEnterDialogEditor(String editorType, String targetId) implements CustomPacketPayload {
 
     public static final Type<C2SEnterDialogEditor> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "enter_dialog_editor"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "enter_dialog_editor"));
 
     public static final StreamCodec<ByteBuf, C2SEnterDialogEditor> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,

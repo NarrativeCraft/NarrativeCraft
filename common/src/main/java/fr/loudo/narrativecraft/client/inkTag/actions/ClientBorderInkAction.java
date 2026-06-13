@@ -27,10 +27,10 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
-import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.BorderInkAction;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 
 public class ClientBorderInkAction extends BorderInkAction {
@@ -50,7 +50,7 @@ public class ClientBorderInkAction extends BorderInkAction {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {
+    public void render(GuiGraphics guiGraphics, float partialTick) {
         if (!isRunning) return;
 
         float upRender = up;
@@ -79,15 +79,14 @@ public class ClientBorderInkAction extends BorderInkAction {
         downInterpolated = downRender;
         leftInterpolated = leftRender;
 
-        int width = guiGraphics.guiWidth();
-        int height = guiGraphics.guiHeight();
+        Minecraft mc = Minecraft.getInstance();
+        int width = mc.getWindow().getGuiScaledWidth();
+        int height = mc.getWindow().getGuiScaledHeight();
 
-        GuiGraphicsExtractorExtension graphicsExtension = new GuiGraphicsExtractorExtension(guiGraphics);
-
-        graphicsExtension.fill(0, 0, width, upRender, color);
-        graphicsExtension.fill(width - rightRender, 0, width, height, color);
-        graphicsExtension.fill(0, height - downRender, width, height, color);
-        graphicsExtension.fill(0, 0, leftRender, height, color);
+        guiGraphics.fill(0, 0, width, (int) upRender, color);
+        guiGraphics.fill(width - (int) rightRender, 0, width, height, color);
+        guiGraphics.fill(0, height - (int) downRender, width, height, color);
+        guiGraphics.fill(0, 0, (int) leftRender, height, color);
     }
 
     @Override

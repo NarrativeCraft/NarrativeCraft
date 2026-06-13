@@ -101,12 +101,10 @@ public class CameraWireframeRenderer {
         }
         vertexConsumer
                 .addVertex(matrix, from.x, from.y, from.z)
-                .setLineWidth(4.0f)
                 .setColor(red, green, blue, alpha)
                 .setNormal(dx, dy, dz);
         vertexConsumer
                 .addVertex(matrix, to.x, to.y, to.z)
-                .setLineWidth(4.0f)
                 .setColor(red, green, blue, alpha)
                 .setNormal(dx, dy, dz);
     }

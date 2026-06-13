@@ -30,11 +30,8 @@ import java.util.List;
 import java.util.Locale;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 
@@ -82,21 +79,21 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 
     @Override
     protected void renderContent(
-            GuiGraphicsExtractor graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
+            GuiGraphics graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
         String[] labels = {"X", "Y", "Z", "Pitch", "Yaw", "Rotate"};
         EditBox[] boxes = {fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate};
 
         int currentY = y;
         float partialTick = delta.getGameTimeDeltaTicks();
         for (int i = 0; i < FIELD_COUNT; i++) {
-            graphics.text(Minecraft.getInstance().font, labels[i], x, currentY - 2, 0xFFAAAAAA);
+            graphics.drawString(Minecraft.getInstance().font, labels[i], x, currentY - 2, 0xFFAAAAAA);
             currentY += FIELD_LABEL_HEIGHT;
             boxes[i].setPosition(x, currentY);
             boxes[i].setWidth(contentWidth);
-            boxes[i].extractRenderState(graphics, mouseX, mouseY, partialTick);
+            boxes[i].render(graphics, mouseX, mouseY, partialTick);
             currentY += FIELD_HEIGHT + FIELD_GAP;
         }
-        graphics.text(Minecraft.getInstance().font, "Easing", x, currentY - 2, 0xFFAAAAAA);
+        graphics.drawString(Minecraft.getInstance().font, "Easing", x, currentY - 2, 0xFFAAAAAA);
         currentY += FIELD_LABEL_HEIGHT;
         easingDropdown.setPosition(x, currentY);
         easingDropdown.setWidth(contentWidth);
@@ -105,20 +102,26 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 
     @Override
     protected void onContentMouseClicked(
-            MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
-        if (easingDropdown.mouseClicked(event)) {
+            double mouseX,
+            double mouseY,
+            int button,
+            boolean isDoubleClick,
+            int contentX,
+            int contentY,
+            int contentWidth) {
+        if (easingDropdown.mouseClicked(mouseX, mouseY, button)) {
             for (EditBox field : fields) field.setFocused(false);
             return;
         }
         easingDropdown.close();
         for (EditBox field : fields) {
-            boolean hovered = event.x() >= field.getX()
-                    && event.x() < field.getX() + field.getWidth()
-                    && event.y() >= field.getY()
-                    && event.y() < field.getY() + field.getHeight();
+            boolean hovered = (mouseX) >= field.getX()
+                    && (mouseX) < field.getX() + field.getWidth()
+                    && (mouseY) >= field.getY()
+                    && (mouseY) < field.getY() + field.getHeight();
             field.setFocused(hovered);
             if (hovered) {
-                field.mouseClicked(event, isDoubleClick);
+                field.mouseClicked(mouseX, mouseY, button);
             }
         }
     }
@@ -128,30 +131,30 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
         easingDropdown.mouseScrolled(amount);
     }
 
-    public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         for (EditBox field : fields) {
             if (field.isFocused()) {
-                field.mouseDragged(event, dragX, dragY);
+                field.mouseDragged(mouseX, mouseY, button, dragX, dragY);
                 return;
             }
         }
     }
 
     @Override
-    public void charTyped(CharacterEvent event) {
+    public void charTyped(char codePoint, int modifiers) {
         for (EditBox field : fields) {
             if (field.isFocused()) {
-                field.charTyped(event);
+                field.charTyped(codePoint, modifiers);
                 return;
             }
         }
     }
 
     @Override
-    public void keyPressed(KeyEvent event) {
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {
         for (EditBox field : fields) {
             if (field.isFocused()) {
-                field.keyPressed(event);
+                field.keyPressed(keyCode, scanCode, modifiers);
                 return;
             }
         }

@@ -32,7 +32,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleAddTemplateReference(
         UUID chapterId, UUID sceneId, UUID cameraAngleId, String sourceType, UUID refId, UUID templateReferenceId)
@@ -49,7 +49,7 @@ public record C2SCameraAngleAddTemplateReference(
     }
 
     public static final Type<C2SCameraAngleAddTemplateReference> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_add_template_reference"));
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_add_template_reference"));
 
     public static final StreamCodec<ByteBuf, C2SCameraAngleAddTemplateReference> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

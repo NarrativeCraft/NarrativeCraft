@@ -57,11 +57,9 @@ import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.Vec3;
 
 public class CameraAngleMakerEditorMaker implements EditorMaker {
@@ -97,7 +95,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                     new S2CCharacterStoryAction(
                             characterPlacement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
             UtilsServer.broadcastCharacterSkin(
-                    playerSession.getPlayer().level().players(), characterPlacement.getCharacterStory());
+                    playerSession.getPlayer().serverLevel().players(), characterPlacement.getCharacterStory());
             spawnEntity(characterPlacement);
             if (characterPlacement.isTemplate() && characterPlacement.getTemplateReferenceId() != null) {
                 placementsByTemplateReference
@@ -137,7 +135,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void hideEntitiesForOthers() {
-        for (ServerPlayer player : playerSession.getPlayer().level().players()) {
+        for (ServerPlayer player : playerSession.getPlayer().serverLevel().players()) {
             if (player.getId() == playerSession.getPlayer().getId()) continue;
             characterEntities
                     .values()
@@ -170,7 +168,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                         characterPlacement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
         ICharacterStory characterStory = characterPlacement.getCharacterStory();
         ServerPlayer player = playerSession.getPlayer();
-        ServerLevel level = player.level();
+        ServerLevel level = player.serverLevel();
         Entity entity;
         if (characterStory.getEntityType() == EntityType.PLAYER) {
             entity = new FakePlayer(
@@ -178,7 +176,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                     new GameProfile(characterPlacement.getCharacterStory().getId(), characterStory.getName()),
                     true);
         } else {
-            entity = characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
+            entity = characterStory.getEntityType().create(level);
         }
         entity.setPos(characterPlacement.getPosition());
         entity.setXRot((float) characterPlacement.getRotation().x);
@@ -196,7 +194,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             }
         }
 
-        entity.entityTags().add(ENTITY_TAG);
+        entity.getTags().add(ENTITY_TAG);
         characterPlacements.add(characterPlacement);
         characterEntities.put(characterPlacement.getId(), entity);
         Services.PACKET.sendToPlayer(
@@ -279,18 +277,18 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                 .orElse(null);
 
         ServerPlayer player = playerSession.getPlayer();
-        ServerLevel level = player.level();
+        ServerLevel level = player.serverLevel();
         Entity entity;
 
         if (characterStory.getEntityType() == EntityType.PLAYER) {
             entity = new FakePlayer(level, new GameProfile(characterStory.getId(), characterStory.getName()), true);
         } else {
-            entity = characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
+            entity = characterStory.getEntityType().create(level);
             if (entity == null) return;
             if (mainData != null) {
                 CompoundTag initialNbt = mainData.getInitialNbt();
                 if (initialNbt != null && !initialNbt.isEmpty()) {
-                    entity.load(TagValueInput.create(ProblemReporter.DISCARDING, entity.registryAccess(), initialNbt));
+                    entity.load(initialNbt);
                     entity.setUUID(UUID.randomUUID());
                 }
             }
@@ -310,7 +308,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         }
 
         addEntityToWorld(entity, player, level, characterStory);
-        entity.entityTags().add(ENTITY_TAG);
+        entity.getTags().add(ENTITY_TAG);
         characterPlacements.add(placement);
         characterEntities.put(placement.getId(), entity);
         Services.PACKET.sendToPlayer(

@@ -44,7 +44,6 @@ import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 
 public class RecordCommand {
 
@@ -54,8 +53,7 @@ public class RecordCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack ->
-                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("record")
                         .then(Commands.literal("start")
                                 .executes(RecordCommand::startRecord)

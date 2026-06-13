@@ -55,7 +55,7 @@ public class GameModeAction extends AbstractAction {
 
     public GameModeAction(int tick, ServerPlayer player) {
         super(tick);
-        this.gameMode = player.gameMode();
+        this.gameMode = player.gameMode.getGameModeForPlayer();
     }
 
     public GameModeAction(int tick) {
@@ -65,7 +65,7 @@ public class GameModeAction extends AbstractAction {
     @Override
     public List<AbstractAction> createRewindSnapshot(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof FakePlayer player)) return List.of();
-        GameType lastGameMode = player.gameMode();
+        GameType lastGameMode = player.gameMode.getGameModeForPlayer();
         return List.of(new GameModeAction(tick, lastGameMode));
     }
 

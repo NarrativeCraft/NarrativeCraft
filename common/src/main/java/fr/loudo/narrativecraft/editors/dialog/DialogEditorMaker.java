@@ -57,11 +57,11 @@ public class DialogEditorMaker implements EditorMaker {
     @Override
     public void init() {
         ServerPlayer player = playerSession.getPlayer();
-        ServerLevel level = player.level();
+        ServerLevel level = player.serverLevel();
 
         GameProfile profile = character != null
                 ? new GameProfile(character.getId(), character.getName())
-                : new GameProfile(UUID.randomUUID(), player.getGameProfile().name());
+                : new GameProfile(UUID.randomUUID(), player.getGameProfile().getName());
 
         FakePlayer entity = new FakePlayer(level, profile, true);
 
@@ -97,7 +97,7 @@ public class DialogEditorMaker implements EditorMaker {
     @Override
     public void tick() {
         if (fakePlayer == null) return;
-        for (ServerPlayer player : playerSession.getPlayer().level().players()) {
+        for (ServerPlayer player : playerSession.getPlayer().serverLevel().players()) {
             if (player.getId() == playerSession.getPlayer().getId()) continue;
             player.connection.send(new ClientboundRemoveEntitiesPacket(fakePlayer.getId()));
         }

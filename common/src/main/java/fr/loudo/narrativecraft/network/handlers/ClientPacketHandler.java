@@ -80,7 +80,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
 public class ClientPacketHandler {
@@ -425,11 +425,11 @@ public class ClientPacketHandler {
         UUID characterId = packet.characterId();
         try {
             NativeImage image = NativeImage.read(packet.skinBytes());
-            DynamicTexture texture = new DynamicTexture(characterId::toString, image);
+            DynamicTexture texture = new DynamicTexture(image);
             minecraft
                     .getTextureManager()
                     .register(
-                            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character/" + characterId),
+                            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character/" + characterId),
                             texture);
             session.getLoadedCharactersSkin().add(characterId);
         } catch (Exception e) {
@@ -447,7 +447,7 @@ public class ClientPacketHandler {
         TextureManager textureManager = minecraft.getTextureManager();
         for (UUID characterId : session.getLoadedCharactersSkin()) {
             textureManager.release(
-                    Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character" + characterId));
+                    ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character" + characterId));
         }
     }
 

@@ -28,12 +28,12 @@ import fr.loudo.narrativecraft.utils.Translation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 public abstract class AbstractAssignScreen<T> extends Screen {
 
@@ -214,7 +214,7 @@ public abstract class AbstractAssignScreen<T> extends Screen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {
         int leftListX = this.width / 4 - LIST_WIDTH / 2;
         int rightListX = 3 * this.width / 4 - LIST_WIDTH / 2;
         int totalListHeight = MAX_PER_PAGE * (ITEM_HEIGHT + ITEM_GAP);
@@ -224,15 +224,15 @@ public abstract class AbstractAssignScreen<T> extends Screen {
                 LIST_START_Y - 17,
                 leftListX + LIST_WIDTH + 3,
                 LIST_START_Y + totalListHeight + 2,
-                ARGB.color(70, 31, 30, 30));
+                FastColor.ARGB32.color(70, 31, 30, 30));
         graphics.fill(
                 rightListX - 3,
                 LIST_START_Y - 17,
                 rightListX + LIST_WIDTH + 3,
                 LIST_START_Y + totalListHeight + 2,
-                ARGB.color(70, 31, 30, 30));
+                FastColor.ARGB32.color(70, 31, 30, 30));
 
-        super.extractBackground(graphics, mouseX, mouseY, a);
+        super.renderBackground(graphics, mouseX, mouseY, a);
     }
 
     @Override

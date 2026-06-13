@@ -8,23 +8,22 @@
     "EntityMixin",
     "LivingEntityMixin",
     "ServerLevelMixin",
-    "accessor.AbstractBoatAccessor",
+    "accessor.BoatAccessor",
     "accessor.AbstractHorseAccessor",
-    "accessor.AvatarAccessor",
+    "accessor.PlayerAccessor",
     "accessor.EntityAccessor",
-    "accessor.LivingEntityAccessor"
+    "accessor.LivingEntityAccessor",
+    "accessor.TextureManagerAccessor"
   ],
   "client": [
     "CameraMixin",
     "GameRendererMixin",
-    "GuiTextRenderStateMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",
     "MouseHandlerMixin",
     "PlayerInfoMixin",
     "SoundEngineMixin",
-    "SoundManagerMixin",
-    "accessor.GuiGraphicsExtractorAccessor"
+    "SoundManagerMixin"
   ],
   "server": [],
   "injectors": {

@@ -29,12 +29,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record BiMainScreenEnter(NarrativeEnvironment environment) implements CustomPacketPayload {
 
     public static final Type<BiMainScreenEnter> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_enter"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_enter"));
 
     public static final StreamCodec<ByteBuf, BiMainScreenEnter> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.idMapper(i -> NarrativeEnvironment.values()[i], NarrativeEnvironment::ordinal),

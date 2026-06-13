@@ -23,24 +23,27 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import fr.loudo.narrativecraft.events.client.OnRenderWorldEvent;
+import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.util.profiling.Profiler;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.util.profiling.ProfilerFiller;
-import org.joml.Matrix4fc;
-import org.joml.Vector4f;
+import org.joml.Matrix4f;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixinFabric {
+
+    @Shadow
+    @Final
+    private Minecraft minecraft;
 
     @Redirect(
             method = "renderLevel",
@@ -48,30 +51,20 @@ public class GameRendererMixinFabric {
                     @At(
                             value = "INVOKE",
                             target =
-                                    "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lorg/joml/Matrix4fc;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;ZLnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;)V"))
+                                    "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V"))
     private void narrativecraft$renderLevel(
             LevelRenderer instance,
-            GraphicsResourceAllocator resourceAllocator,
             DeltaTracker deltaTracker,
-            boolean renderOutline,
-            CameraRenderState cameraState,
-            Matrix4fc modelViewMatrix,
-            GpuBufferSlice terrainFog,
-            Vector4f fogColor,
-            boolean shouldRenderSky,
-            ChunkSectionsToRender chunkSectionsToRender) {
+            boolean renderBlockOutline,
+            Camera camera,
+            GameRenderer gameRenderer,
+            LightTexture lightTexture,
+            Matrix4f frustumMatrix,
+            Matrix4f projectionMatrix) {
         instance.renderLevel(
-                resourceAllocator,
-                deltaTracker,
-                renderOutline,
-                cameraState,
-                modelViewMatrix,
-                terrainFog,
-                fogColor,
-                shouldRenderSky,
-                chunkSectionsToRender);
-        ProfilerFiller profiler = Profiler.get();
+                deltaTracker, renderBlockOutline, camera, gameRenderer, lightTexture, frustumMatrix, projectionMatrix);
+        ProfilerFiller profiler = this.minecraft.getProfiler();
         profiler.popPush("nc_render_world_fabric");
-        OnRenderWorldEvent.renderWorld(modelViewMatrix, deltaTracker);
+        OnRenderWorldEvent.renderWorld(frustumMatrix, deltaTracker);
     }
 }

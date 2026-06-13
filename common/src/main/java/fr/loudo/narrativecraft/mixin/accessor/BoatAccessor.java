@@ -21,24 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.client;
+package fr.loudo.narrativecraft.mixin.accessor;
 
-import com.mojang.blaze3d.platform.InputConstants;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.world.entity.vehicle.Boat;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnPressButtonEventNeoForge {
-
-    public OnPressButtonEventNeoForge(IEventBus bus) {
-        NeoForge.EVENT_BUS.addListener(OnPressButtonEventNeoForge::onPressButton);
+@Mixin(Boat.class)
+public interface BoatAccessor {
+    @Accessor
+    static EntityDataAccessor<Boolean> getDATA_ID_PADDLE_LEFT() {
+        return null;
     }
 
-    private static void onPressButton(InputEvent.MouseButton.Post event) {
-        if (event.getAction() != InputConstants.PRESS) return;
-        OnPressButtonEvent.pressButton(event.getButton());
+    @Accessor
+    static EntityDataAccessor<Boolean> getDATA_ID_PADDLE_RIGHT() {
+        return null;
+    }
+
+    @Accessor
+    static EntityDataAccessor<Integer> getDATA_ID_BUBBLE_TIME() {
+        return null;
     }
 }

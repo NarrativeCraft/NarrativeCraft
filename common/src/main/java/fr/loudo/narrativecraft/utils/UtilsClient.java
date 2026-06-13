@@ -45,13 +45,17 @@ public class UtilsClient {
 
     public static int[] getScaledMousePos() {
         Window window = minecraft.getWindow();
-        int mouseX = (int) minecraft.mouseHandler.getScaledXPos(window);
-        int mouseY = (int) minecraft.mouseHandler.getScaledYPos(window);
+        int mouseX = (int) (minecraft.mouseHandler.xpos()
+                * (double) window.getGuiScaledWidth()
+                / (double) window.getScreenWidth());
+        int mouseY = (int) (minecraft.mouseHandler.ypos()
+                * (double) window.getGuiScaledHeight()
+                / (double) window.getScreenHeight());
         return new int[] {mouseX, mouseY};
     }
 
     public static void sendToast(Component title, Component message) {
-        minecraft.getToastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
+        minecraft.getToasts().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
     }
 
     public static void teleportPlayerTo(Vec3 position, Vec3 rotation) {
@@ -61,6 +65,6 @@ public class UtilsClient {
         player.setYRot((float) rotation.y);
         player.setYHeadRot((float) rotation.y);
         player.connection.send(new ServerboundMovePlayerPacket.PosRot(
-                position, (float) rotation.x, (float) rotation.y, player.onGround(), false));
+                position.x, position.y, position.z, (float) rotation.x, (float) rotation.y, player.onGround()));
     }
 }

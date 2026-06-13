@@ -73,7 +73,7 @@ public class Playback implements IPlaybackSession {
         blockStateLog.clear();
 
         for (RecordingData recordingData : animation.getRecordingDataList()) {
-            contexts.add(new PlaybackContext(this, recordingData, requester.level()));
+            contexts.add(new PlaybackContext(this, recordingData, requester.serverLevel()));
         }
 
         maxTick = animation.getTotalTick();
@@ -84,13 +84,14 @@ public class Playback implements IPlaybackSession {
         if (forSpecificPlayers()) {
             hideEntitiesToOtherPlayers();
         }
-        for (ServerPlayer player : requester.level().players()) {
+        for (ServerPlayer player : requester.level().getServer().getPlayerList().getPlayers()) {
             Services.PACKET.sendToPlayer(
                     player,
                     new S2CCharacterStoryAction(
                             animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
         }
-        UtilsServer.broadcastCharacterSkin(requester.level().players(), animation.getCharacterStory());
+        UtilsServer.broadcastCharacterSkin(
+                requester.level().getServer().getPlayerList().getPlayers(), animation.getCharacterStory());
         NarrativeCraftMod.EVENT_BUS.post(new PlaybackStartEvent(this));
     }
 
@@ -140,7 +141,8 @@ public class Playback implements IPlaybackSession {
         for (PlaybackContext context : contexts) {
             if (killOnEnd) {
                 context.stop();
-                for (ServerPlayer player : requester.level().players()) {
+                for (ServerPlayer player :
+                        requester.level().getServer().getPlayerList().getPlayers()) {
                     Services.PACKET.sendToPlayer(
                             player,
                             new S2CCharacterStoryAction(
@@ -175,7 +177,8 @@ public class Playback implements IPlaybackSession {
     }
 
     public void hideEntitiesToOtherPlayers() {
-        for (ServerPlayer serverPlayer : requester.level().players()) {
+        for (ServerPlayer serverPlayer :
+                requester.level().getServer().getPlayerList().getPlayers()) {
             if (targetedPlayers.contains(serverPlayer)) continue;
             for (PlaybackContext context : contexts) {
                 if (context.getEntity() == null) continue;
@@ -222,7 +225,7 @@ public class Playback implements IPlaybackSession {
 
     @Override
     public ServerLevel getLevel() {
-        return requester.level();
+        return requester.serverLevel();
     }
 
     @Override

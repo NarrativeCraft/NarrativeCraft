@@ -28,8 +28,8 @@ import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.RideEntityAction;
 import fr.loudo.narrativecraft.recording.actions.StopRideEntityAction;
+import javax.annotation.Nullable;
 import net.minecraft.world.entity.Entity;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,9 +43,8 @@ public class EntityMixin {
     @Shadow
     private @Nullable Entity vehicle;
 
-    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z", at = @At("HEAD"))
-    private void narrativecraft$startRiding(
-            Entity vehicle, boolean force, boolean sendGameEvent, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"))
+    private void narrativecraft$startRiding(Entity p_20330_, CallbackInfoReturnable<Boolean> cir) {
 
         Entity entity = (Entity) (Object) this;
         Recording recording =

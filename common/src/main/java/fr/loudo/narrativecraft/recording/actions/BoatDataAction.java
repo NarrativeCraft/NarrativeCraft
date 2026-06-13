@@ -27,10 +27,10 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import fr.loudo.narrativecraft.mixin.accessor.AbstractBoatAccessor;
+import fr.loudo.narrativecraft.mixin.accessor.BoatAccessor;
 import java.io.IOException;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 
 public class BoatDataAction extends AbstractAction {
 
@@ -40,11 +40,11 @@ public class BoatDataAction extends AbstractAction {
     private boolean movingRightPaddle;
     private int bubbleTime;
 
-    public BoatDataAction(int tick, AbstractBoat boat) {
+    public BoatDataAction(int tick, Boat boat) {
         super(tick);
-        this.movingLeftPaddle = boat.getEntityData().get(AbstractBoatAccessor.getDATA_ID_PADDLE_LEFT());
-        this.movingRightPaddle = boat.getEntityData().get(AbstractBoatAccessor.getDATA_ID_PADDLE_RIGHT());
-        this.bubbleTime = boat.getEntityData().get(AbstractBoatAccessor.getDATA_ID_BUBBLE_TIME());
+        this.movingLeftPaddle = boat.getEntityData().get(BoatAccessor.getDATA_ID_PADDLE_LEFT());
+        this.movingRightPaddle = boat.getEntityData().get(BoatAccessor.getDATA_ID_PADDLE_RIGHT());
+        this.bubbleTime = boat.getEntityData().get(BoatAccessor.getDATA_ID_BUBBLE_TIME());
     }
 
     public BoatDataAction(int tick) {
@@ -80,12 +80,12 @@ public class BoatDataAction extends AbstractAction {
 
     @Override
     public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
-        if (!(context.getEntity() instanceof AbstractBoat boat)) return ActionResult.IGNORED;
+        if (!(context.getEntity() instanceof Boat boat)) return ActionResult.IGNORED;
 
         SynchedEntityData entityData = boat.getEntityData();
-        entityData.set(AbstractBoatAccessor.getDATA_ID_PADDLE_LEFT(), movingLeftPaddle);
-        entityData.set(AbstractBoatAccessor.getDATA_ID_PADDLE_RIGHT(), movingRightPaddle);
-        entityData.set(AbstractBoatAccessor.getDATA_ID_BUBBLE_TIME(), bubbleTime);
+        entityData.set(BoatAccessor.getDATA_ID_PADDLE_LEFT(), movingLeftPaddle);
+        entityData.set(BoatAccessor.getDATA_ID_PADDLE_RIGHT(), movingRightPaddle);
+        entityData.set(BoatAccessor.getDATA_ID_BUBBLE_TIME(), bubbleTime);
 
         return ActionResult.OK;
     }

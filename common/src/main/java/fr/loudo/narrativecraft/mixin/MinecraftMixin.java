@@ -29,10 +29,9 @@ import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.Screen;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,8 +49,7 @@ public abstract class MinecraftMixin {
     public abstract boolean isSingleplayer();
 
     @Inject(method = "openChatScreen", at = @At(value = "HEAD"), cancellable = true)
-    private void narrativecraft$openChat(ChatComponent.ChatMethod chatMethod, CallbackInfo ci) {
-        if (chatMethod != ChatComponent.ChatMethod.MESSAGE) return;
+    private void narrativecraft$openChat(String p_91327_, CallbackInfo ci) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (editorMaker == null || editorMaker.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;

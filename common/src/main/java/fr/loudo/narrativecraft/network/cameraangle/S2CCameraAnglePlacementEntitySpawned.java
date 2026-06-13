@@ -30,12 +30,12 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CCameraAnglePlacementEntitySpawned(UUID placementId, int entityId) implements CustomPacketPayload {
 
     public static final Type<S2CCameraAnglePlacementEntitySpawned> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_placement_entity_spawned"));
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_placement_entity_spawned"));
 
     public static final StreamCodec<ByteBuf, S2CCameraAnglePlacementEntitySpawned> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

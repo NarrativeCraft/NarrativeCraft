@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record BiCutscenePlayHeadPacket(int tick) implements CustomPacketPayload {
 
     public static final Type<BiCutscenePlayHeadPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_head_update"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_head_update"));
 
     public static final StreamCodec<ByteBuf, BiCutscenePlayHeadPacket> STREAM_CODEC =
             StreamCodec.composite(ByteBufCodecs.INT, BiCutscenePlayHeadPacket::tick, BiCutscenePlayHeadPacket::new);

@@ -31,7 +31,7 @@ import java.util.function.BiConsumer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -67,9 +67,9 @@ public abstract class SoundEngineMixin implements VolumeAudio {
     }
 
     @Override
-    public void narrativecraft$setVolume(Identifier source, float volume) {
+    public void narrativecraft$setVolume(ResourceLocation source, float volume) {
         for (SoundInstance instance : this.instanceBySource.get(SoundSource.MASTER)) {
-            if (source == null || instance.getIdentifier().equals(source)) {
+            if (source == null || instance.getLocation().equals(source)) {
                 narrativecraft$setVolume(instance, volume);
             }
         }
@@ -80,7 +80,7 @@ public abstract class SoundEngineMixin implements VolumeAudio {
         Otherwise, sounds from sound ink are at max volume and broken
     */
     @Redirect(
-            method = "refreshCategoryVolume",
+            method = "updateCategoryVolume",
             at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"))
     private void narrativecraft$updateCategoryVolume(
             Map<SoundInstance, ChannelAccess.ChannelHandle> instance,

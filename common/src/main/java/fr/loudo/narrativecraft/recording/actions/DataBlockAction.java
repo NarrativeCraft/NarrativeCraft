@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import java.io.IOException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -65,7 +65,7 @@ public abstract class DataBlockAction extends AbstractAction {
         blockPos = reader.readBlockPos();
 
         String blockId = reader.readString();
-        Block block = BuiltInRegistries.BLOCK.getValue(Identifier.parse(blockId));
+        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(blockId));
 
         BlockState state = block.defaultBlockState();
 

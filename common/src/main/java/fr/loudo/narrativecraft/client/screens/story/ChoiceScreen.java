@@ -30,12 +30,11 @@ import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 
@@ -60,7 +59,7 @@ public class ChoiceScreen extends Screen {
 
     @Override
     protected void init() {
-        Identifier soundId = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
+        ResourceLocation soundId = ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(soundId), 1.0f));
 
         buttons.clear();
@@ -141,7 +140,7 @@ public class ChoiceScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         double t = Mth.clamp((currentTick + partialTick) / (float) totalTick, 0.0, 1.0);
         int opacity = (int) Mth.lerp(t, 5.0, 255.0);
 
@@ -154,20 +153,17 @@ public class ChoiceScreen extends Screen {
             }
         }
 
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+        super.render(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.key() == InputConstants.KEY_ESCAPE) return false;
-        return super.keyPressed(event);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_ESCAPE) return false;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    protected void extractBlurredBackground(GuiGraphicsExtractor graphics) {}
-
-    @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {}
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {}
 
     @Override
     public void onClose() {}

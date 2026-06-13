@@ -35,11 +35,11 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 
 public class OnHudRender {
 
-    public static void cutsceneHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public static void cutsceneHudRender(GuiGraphics graphics, DeltaTracker deltaTracker) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
@@ -47,7 +47,7 @@ public class OnHudRender {
         }
     }
 
-    public static void cameraAngleHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public static void cameraAngleHudRender(GuiGraphics graphics, DeltaTracker deltaTracker) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
@@ -59,7 +59,7 @@ public class OnHudRender {
         }
     }
 
-    public static void interactionHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public static void interactionHudRender(GuiGraphics graphics, DeltaTracker deltaTracker) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (editorMaker instanceof ClientInteractionMakerEditorMaker interactionEditor) {
@@ -67,7 +67,7 @@ public class OnHudRender {
         }
     }
 
-    public static void dialogHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public static void dialogHudRender(GuiGraphics graphics, DeltaTracker deltaTracker) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         List<DialogRenderer2D> dialogs = session.getActiveDialog2DRenderers();
         for (DialogRenderer2D dialog : dialogs) {
@@ -75,14 +75,14 @@ public class OnHudRender {
         }
     }
 
-    public static void clientInkActionsHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public static void clientInkActionsHudRender(GuiGraphics graphics, DeltaTracker deltaTracker) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         for (InkAction action : session.getActiveClientInkActions()) {
             action.render(graphics, deltaTracker.getGameTimeDeltaPartialTick(true));
         }
     }
 
-    public static void saveIconHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public static void saveIconHudRender(GuiGraphics graphics, DeltaTracker deltaTracker) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         session.getSaveIconRenderer().render(graphics, deltaTracker);
     }

@@ -27,12 +27,12 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CDialogStop() implements CustomPacketPayload {
 
     public static final Type<S2CDialogStop> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_stop"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_stop"));
 
     public static final StreamCodec<ByteBuf, S2CDialogStop> STREAM_CODEC = StreamCodec.unit(new S2CDialogStop());
 

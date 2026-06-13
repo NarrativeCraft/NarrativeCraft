@@ -27,8 +27,9 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.FadeInkAction;
 import fr.loudo.narrativecraft.utils.FadeState;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.util.ARGB;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
 public class ClientFadeInkAction extends FadeInkAction {
@@ -52,7 +53,7 @@ public class ClientFadeInkAction extends FadeInkAction {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {
+    public void render(GuiGraphics guiGraphics, float partialTick) {
         if (!isRunning) return;
         double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
         int opacity = 255;
@@ -61,7 +62,13 @@ public class ClientFadeInkAction extends FadeInkAction {
         } else if (currentFadeState == FadeState.FADE_OUT) {
             opacity = (int) Mth.lerp(t, 255, 0);
         }
-        guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ARGB.color(opacity, color));
+        Minecraft mc = Minecraft.getInstance();
+        guiGraphics.fill(
+                0,
+                0,
+                mc.getWindow().getGuiScaledWidth(),
+                mc.getWindow().getGuiScaledHeight(),
+                FastColor.ARGB32.color(opacity, color));
     }
 
     @Override

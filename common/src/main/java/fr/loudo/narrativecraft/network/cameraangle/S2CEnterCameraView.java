@@ -29,12 +29,12 @@ import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CEnterCameraView(UUID cameraViewId) implements CustomPacketPayload {
 
     public static final Type<S2CEnterCameraView> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "enter_camera_view"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "enter_camera_view"));
 
     public static final StreamCodec<ByteBuf, S2CEnterCameraView> STREAM_CODEC =
             StreamCodec.composite(UUIDUtil.STREAM_CODEC, S2CEnterCameraView::cameraViewId, S2CEnterCameraView::new);

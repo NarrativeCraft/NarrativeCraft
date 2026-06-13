@@ -30,22 +30,21 @@ import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditor
 import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
-import net.minecraft.client.input.MouseButtonEvent;
 
 public class OnScreenMouseDragEvent {
 
-    public static void onCutsceneTimelineDrag(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
+    public static void onCutsceneTimelineDrag(double mouseX, double mouseY, int button, double dragX, double dragY) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         EditorMaker editorMaker = playerSession.getEditor();
         if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
+            cutsceneEditor.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
+            cameraAngleEditor.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
-            globalDialogEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
+            globalDialogEditor.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
-            characterDialogEditor.mouseDragged(mouseButtonEvent, dragX, dragY);
+            characterDialogEditor.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         }
     }
 }

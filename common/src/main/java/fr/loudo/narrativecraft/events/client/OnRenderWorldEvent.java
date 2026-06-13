@@ -47,6 +47,7 @@ public class OnRenderWorldEvent {
         Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
         modelViewStack.pushMatrix();
         modelViewStack.mul(modelViewMatrix);
+        RenderSystem.applyModelViewMatrix();
 
         CutsceneMakerEditorPathRenderer.render(poseStack, deltaTracker);
         CutsceneMakerEditorCameraRenderer.render(poseStack, deltaTracker);

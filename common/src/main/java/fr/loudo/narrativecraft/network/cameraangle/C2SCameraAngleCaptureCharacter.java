@@ -29,13 +29,13 @@ import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleCaptureCharacter(UUID chapterId, UUID sceneId, UUID cameraAngleId, UUID characterId)
         implements CustomPacketPayload {
 
-    public static final Type<C2SCameraAngleCaptureCharacter> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_capture_character"));
+    public static final Type<C2SCameraAngleCaptureCharacter> TYPE = new Type<>(
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_capture_character"));
 
     public static final StreamCodec<ByteBuf, C2SCameraAngleCaptureCharacter> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

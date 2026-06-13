@@ -27,13 +27,12 @@ import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 public class ChoiceButtonWidget extends AbstractButton {
 
@@ -79,28 +78,28 @@ public class ChoiceButtonWidget extends AbstractButton {
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int left = (int) (getX() + renderOffsetX);
         int top = (int) (getY() + renderOffsetY);
         int right = left + getWidth();
         int bottom = top + getHeight();
 
         if (isHovered && canPress) {
-            int hoverColor = ARGB.color(opacity, BASE_HOVER_COLOR);
+            int hoverColor = FastColor.ARGB32.color(opacity, BASE_HOVER_COLOR);
             graphics.fill(left - 1, top - 1, right + 1, top, hoverColor);
             graphics.fill(left - 1, bottom, right + 1, bottom + 1, hoverColor);
             graphics.fill(left - 1, top, left, bottom, hoverColor);
             graphics.fill(right, top, right + 1, bottom, hoverColor);
         }
 
-        graphics.fill(left, top, right, bottom, ARGB.color(opacity, BASE_BACKGROUND_COLOR));
+        graphics.fill(left, top, right, bottom, FastColor.ARGB32.color(opacity, BASE_BACKGROUND_COLOR));
 
-        dialogData.setTextColor(ARGB.color(opacity, BASE_TEXT_COLOR));
+        dialogData.setTextColor(FastColor.ARGB32.color(opacity, BASE_TEXT_COLOR));
         scrollText.render2D(graphics, left + PADDING_X, top + PADDING_Y, dialogData, partialTick);
     }
 
     @Override
-    public void onPress(InputWithModifiers inputWithModifiers) {
+    public void onPress() {
         if (!canPress) return;
         onPress.accept(index);
     }

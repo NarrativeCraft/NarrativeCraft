@@ -27,14 +27,14 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class S2CClearLoadedSkins implements CustomPacketPayload {
 
     public static final S2CClearLoadedSkins INSTANCE = new S2CClearLoadedSkins();
 
     public static final Type<S2CClearLoadedSkins> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "clear_loaded_skins"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "clear_loaded_skins"));
 
     public static final StreamCodec<ByteBuf, S2CClearLoadedSkins> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 

@@ -44,14 +44,13 @@ import fr.loudo.narrativecraft.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
-import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.phys.AABB;
 
 public class Recording implements IRecording {
@@ -95,7 +94,7 @@ public class Recording implements IRecording {
                 data.addAction(
                         new HorseByteAction(tick, horse.getEntityData().get(AbstractHorseAccessor.getDATA_ID_FLAGS())));
             }
-            if (entity instanceof AbstractBoat boat) {
+            if (entity instanceof Boat boat) {
                 data.addAction(new BoatDataAction(tick, boat));
             }
             if (entity instanceof ServerPlayer player) {
@@ -136,9 +135,9 @@ public class Recording implements IRecording {
         if (data == null) return -1;
 
         if (!data.isTracked()) {
-            TagValueOutput nbt = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, entity.registryAccess());
+            CompoundTag nbt = new CompoundTag();
             entity.saveWithoutId(nbt);
-            data.getRecordingData().setInitialNbt(nbt.buildResult());
+            data.getRecordingData().setInitialNbt(nbt);
             data.getRecordingData().setSpawnTick(data.getFirstSeenTick());
             data.setTracked(true);
         }

@@ -31,13 +31,13 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record BiSyncNarrativeEntryPacket(UUID entryId, NarrativeEntryPayload entry, NarrativeEntryAction action)
         implements CustomPacketPayload {
 
     public static final Type<BiSyncNarrativeEntryPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sync_narrative_entry"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sync_narrative_entry"));
 
     public static final StreamCodec<ByteBuf, BiSyncNarrativeEntryPacket> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

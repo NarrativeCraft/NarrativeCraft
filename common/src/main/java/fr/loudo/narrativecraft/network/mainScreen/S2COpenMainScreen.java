@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2COpenMainScreen(boolean canContinue, boolean finishedStory) implements CustomPacketPayload {
 
     public static final Type<S2COpenMainScreen> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "open_main_screen"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "open_main_screen"));
 
     public static final StreamCodec<ByteBuf, S2COpenMainScreen> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.BOOL,

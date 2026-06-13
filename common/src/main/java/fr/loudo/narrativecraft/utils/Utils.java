@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.utils;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -33,7 +34,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.PlayerModelType;
 
 public class Utils {
 
@@ -58,14 +58,14 @@ public class Utils {
     }
 
     public static CompoundTag nbtFromString(String nbtString) throws CommandSyntaxException {
-        return TagParser.parseCompoundFully(nbtString);
+        return TagParser.parseTag(nbtString);
     }
 
-    public static PlayerModelType parsePlayerModelType(String value) {
+    public static PlayerSkin.Model parsePlayerModelType(String value) {
         try {
-            return PlayerModelType.valueOf(value);
+            return PlayerSkin.Model.valueOf(value);
         } catch (IllegalArgumentException e) {
-            return PlayerModelType.values()[0];
+            return PlayerSkin.Model.values()[0];
         }
     }
 }

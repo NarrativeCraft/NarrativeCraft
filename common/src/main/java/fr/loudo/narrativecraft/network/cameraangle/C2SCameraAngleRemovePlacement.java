@@ -30,7 +30,7 @@ import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleRemovePlacement(UUID chapterId, UUID sceneId, UUID cameraAngleId, UUID placementId)
         implements CustomPacketPayload {
@@ -43,8 +43,8 @@ public record C2SCameraAngleRemovePlacement(UUID chapterId, UUID sceneId, UUID c
                 placementId);
     }
 
-    public static final Type<C2SCameraAngleRemovePlacement> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_remove_placement"));
+    public static final Type<C2SCameraAngleRemovePlacement> TYPE = new Type<>(
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_remove_placement"));
 
     public static final StreamCodec<ByteBuf, C2SCameraAngleRemovePlacement> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

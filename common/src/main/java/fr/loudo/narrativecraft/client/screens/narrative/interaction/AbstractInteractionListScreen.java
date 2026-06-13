@@ -130,7 +130,8 @@ public abstract class AbstractInteractionListScreen<T> extends Screen {
         if (player == null) return;
         minecraft.setScreen(null);
         player.setPos(position.x, position.y, position.z);
-        player.connection.send(new ServerboundMovePlayerPacket.Pos(position, player.onGround(), false));
+        player.connection.send(
+                new ServerboundMovePlayerPacket.Pos(position.x, position.y, position.z, player.onGround()));
     }
 
     private void buildPagination(int totalItems) {

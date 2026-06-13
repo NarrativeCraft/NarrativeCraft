@@ -29,12 +29,12 @@ import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleTeleportToTemplate(UUID refId) implements CustomPacketPayload {
 
-    public static final Type<C2SCameraAngleTeleportToTemplate> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_teleport_to_template"));
+    public static final Type<C2SCameraAngleTeleportToTemplate> TYPE = new Type<>(
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_teleport_to_template"));
 
     public static final StreamCodec<ByteBuf, C2SCameraAngleTeleportToTemplate> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, C2SCameraAngleTeleportToTemplate::refId, C2SCameraAngleTeleportToTemplate::new);

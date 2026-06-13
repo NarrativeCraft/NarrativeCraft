@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
@@ -32,7 +33,7 @@ import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -45,8 +46,9 @@ public class CutsceneMakerEditorCameraRenderer {
         if (editor == null) return;
 
         if (editor.getPlayback().isPlaying() || editor.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;
-        Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
-        VertexConsumer vertexConsumer = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+        Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
+        RenderSystem.lineWidth(4.0f);
+        VertexConsumer vertexConsumer = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
         Matrix4f matrix4f = poseStack.last().pose();
         float tick = editor.getTick();
 
@@ -71,6 +73,6 @@ public class CutsceneMakerEditorCameraRenderer {
                     1.0F);
         }
 
-        mc.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
+        mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
     }
 }

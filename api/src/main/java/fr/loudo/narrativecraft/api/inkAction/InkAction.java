@@ -27,7 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 
 /**
  * Base class for all Ink tag actions.
@@ -63,7 +63,7 @@ public abstract class InkAction {
 
     public void partialTick(float partialTick) {}
 
-    public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {}
+    public void render(GuiGraphics guiGraphics, float partialTick) {}
 
     public void render(PoseStack poseStack, float partialTick) {}
 

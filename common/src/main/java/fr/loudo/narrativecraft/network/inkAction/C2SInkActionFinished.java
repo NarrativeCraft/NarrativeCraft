@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SInkActionFinished(long instanceId) implements CustomPacketPayload {
 
     public static final Type<C2SInkActionFinished> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "ink_action_finished"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "ink_action_finished"));
 
     public static final StreamCodec<ByteBuf, C2SInkActionFinished> STREAM_CODEC =
             ByteBufCodecs.VAR_LONG.map(C2SInkActionFinished::new, C2SInkActionFinished::instanceId);

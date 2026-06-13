@@ -29,12 +29,12 @@ import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SMainScreenCaptureCharacter(UUID characterId) implements CustomPacketPayload {
 
-    public static final Type<C2SMainScreenCaptureCharacter> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_capture_character"));
+    public static final Type<C2SMainScreenCaptureCharacter> TYPE = new Type<>(
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_capture_character"));
 
     public static final StreamCodec<ByteBuf, C2SMainScreenCaptureCharacter> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, C2SMainScreenCaptureCharacter::characterId, C2SMainScreenCaptureCharacter::new);

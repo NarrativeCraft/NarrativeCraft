@@ -36,29 +36,29 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
 
 public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
 
     private final Scene scene;
     private EntityType<?> selectedEntityType;
-    private PlayerModelType selectedModelType;
+    private PlayerSkin.Model selectedModelType;
 
     public NpcEntryEditScreen(Scene scene, Screen lastScreen) {
         super(lastScreen);
         this.scene = scene;
         this.selectedEntityType = EntityType.PLAYER;
-        this.selectedModelType = PlayerModelType.WIDE;
+        this.selectedModelType = PlayerSkin.Model.WIDE;
     }
 
     public NpcEntryEditScreen(Npc entry, Screen lastScreen) {
         super(entry, lastScreen);
         this.scene = entry.getScene();
         this.selectedEntityType = entry.getEntityType();
-        this.selectedModelType = entry.getModelType() != null ? entry.getModelType() : PlayerModelType.WIDE;
+        this.selectedModelType = entry.getModelType() != null ? entry.getModelType() : PlayerSkin.Model.WIDE;
     }
 
     @Override
@@ -98,9 +98,9 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
 
         Button modelTypeButton = Button.builder(
                         Translation.message("screen.character.model_type", selectedModelType.name()), b -> {
-                            selectedModelType = selectedModelType == PlayerModelType.WIDE
-                                    ? PlayerModelType.SLIM
-                                    : PlayerModelType.WIDE;
+                            selectedModelType = selectedModelType == PlayerSkin.Model.WIDE
+                                    ? PlayerSkin.Model.SLIM
+                                    : PlayerSkin.Model.WIDE;
                             b.setMessage(Translation.message("screen.character.model_type", selectedModelType.name()));
                         })
                 .size(GLOBAL_WIDTH, 20)

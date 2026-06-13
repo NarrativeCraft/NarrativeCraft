@@ -32,12 +32,8 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.clock.ServerClockManager;
-import net.minecraft.world.clock.WorldClock;
-import net.minecraft.world.level.dimension.DimensionType;
 
 @InkCommand(
         keyword = "time",
@@ -115,10 +111,10 @@ public class ChangeDayTimeInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        level = playerSession.getPlayer().level();
+        level = (ServerLevel) playerSession.getPlayer().level();
 
         if (action.equals("add")) {
-            changeTime(getDayTime() + fromTick);
+            changeTime(level.getDayTime() + fromTick);
             isRunning = false;
             return InkActionResult.ok();
         }
@@ -132,18 +128,8 @@ public class ChangeDayTimeInkAction extends InkAction {
         return InkActionResult.ok();
     }
 
-    private void changeTime(long tick) {
-        ServerClockManager clockManager = level.getServer().clockManager();
-        DimensionType dimensionType = level.dimensionType();
-        Holder<WorldClock> worldClock = dimensionType.defaultClock().get();
-        clockManager.setTotalTicks(worldClock, tick);
-    }
-
-    private long getDayTime() {
-        ServerClockManager clockManager = level.getServer().clockManager();
-        DimensionType dimensionType = level.dimensionType();
-        Holder<WorldClock> worldClock = dimensionType.defaultClock().get();
-        return clockManager.getTotalTicks(worldClock);
+    private void changeTime(long newTime) {
+        level.setDayTime(newTime);
     }
 
     private static long parseDayTime(String dayTime) {

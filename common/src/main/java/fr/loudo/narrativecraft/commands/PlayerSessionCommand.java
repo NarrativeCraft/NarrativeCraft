@@ -39,13 +39,12 @@ import fr.loudo.narrativecraft.utils.UtilsServer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 
 public class PlayerSessionCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(stack -> stack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(stack -> stack.hasPermission(2))
                 .then(Commands.literal("session")
                         .then(Commands.literal("clear").executes(PlayerSessionCommand::clear))
                         .then(Commands.literal("set")

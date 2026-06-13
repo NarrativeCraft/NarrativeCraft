@@ -30,12 +30,12 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CCharacterSkin(UUID characterId, byte[] skinBytes) implements CustomPacketPayload {
 
     public static final Type<S2CCharacterSkin> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character_skin"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character_skin"));
 
     public static final StreamCodec<ByteBuf, S2CCharacterSkin> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

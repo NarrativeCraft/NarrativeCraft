@@ -31,7 +31,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class C2SCutsceneSave implements CustomPacketPayload {
 
@@ -58,7 +58,7 @@ public class C2SCutsceneSave implements CustomPacketPayload {
     }
 
     public static final Type<C2SCutsceneSave> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_save"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_save"));
 
     public static final StreamCodec<ByteBuf, C2SCutsceneSave> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

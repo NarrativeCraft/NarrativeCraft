@@ -31,7 +31,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class C2SCameraAngleSave implements CustomPacketPayload {
 
@@ -55,7 +55,7 @@ public class C2SCameraAngleSave implements CustomPacketPayload {
     }
 
     public static final Type<C2SCameraAngleSave> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_save"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_save"));
 
     public static final StreamCodec<ByteBuf, C2SCameraAngleSave> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

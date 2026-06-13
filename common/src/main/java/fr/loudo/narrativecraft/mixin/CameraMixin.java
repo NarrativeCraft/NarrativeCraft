@@ -30,20 +30,17 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
@@ -62,24 +59,14 @@ public abstract class CameraMixin {
     @Final
     private Quaternionf rotation;
 
-    @Shadow
-    private @Nullable Entity entity;
-
-    @Shadow
-    protected abstract float calculateFov(float partialTicks);
-
-    @Shadow
-    @Final
-    private Minecraft minecraft;
-
-    @Shadow
-    private float oldFovModifier;
-
-    @Shadow
-    private float fovModifier;
-
-    @Inject(method = "update", at = @At("RETURN"))
-    private void narrativecraft$camera(DeltaTracker deltaTracker, CallbackInfo ci) {
+    @Inject(method = "setup", at = @At("RETURN"))
+    private void narrativecraft$camera(
+            BlockGetter p_90576_,
+            Entity p_90577_,
+            boolean p_90578_,
+            boolean p_90579_,
+            float p_90580_,
+            CallbackInfo ci) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return;
@@ -95,7 +82,9 @@ public abstract class CameraMixin {
             ClientCutsceneMakerEditorMaker editor =
                     ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
             if (editor != null && editor.getPreviewRoll() != 0f) {
-                this.setRotation(minecraft.player.getYRot(), minecraft.player.getXRot());
+                this.setRotation(
+                        Minecraft.getInstance().player.getYRot(),
+                        Minecraft.getInstance().player.getXRot());
                 this.rotation.rotateZ(-(float) Math.toRadians(editor.getPreviewRoll()));
             }
             return;
@@ -117,22 +106,5 @@ public abstract class CameraMixin {
         this.setPosition(position);
         this.setRotation((float) rotation.y, (float) rotation.x);
         this.rotation.rotateZ(-(float) Math.toRadians(rotation.z()));
-    }
-
-    @Inject(method = "calculateFov", at = @At("HEAD"), cancellable = true)
-    private void narrativecraft$modifyFov(float partialTicks, CallbackInfoReturnable<Float> cir) {
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession == null) return;
-        float customFov = -1;
-
-        if (playerSession.getCutsceneDataSession() != null) {
-            customFov = playerSession.getCutsceneDataSession().getFov();
-        }
-        if (playerSession.getCameraView() != null) {
-            customFov = playerSession.getCameraView().getFov();
-        }
-        if (customFov == -1f) return;
-        cir.setReturnValue(customFov * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier));
     }
 }

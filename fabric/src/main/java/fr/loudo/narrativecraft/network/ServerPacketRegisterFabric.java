@@ -50,35 +50,35 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 public class ServerPacketRegisterFabric {
 
     public static void register() {
-        PayloadTypeRegistry.serverboundPlay().register(BiCutsceneEnter.TYPE, BiCutsceneEnter.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneControl.TYPE, C2SCutsceneControl.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SCutsceneSave.TYPE, C2SCutsceneSave.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
-                .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(BiCameraAngleEnter.TYPE, BiCameraAngleEnter.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(BiStopEditorMaker.TYPE, BiStopEditorMaker.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SCameraAngleSave.TYPE, C2SCameraAngleSave.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
+        PayloadTypeRegistry.playC2S().register(BiCutsceneEnter.TYPE, BiCutsceneEnter.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SCutsceneControl.TYPE, C2SCutsceneControl.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SCutsceneSave.TYPE, C2SCutsceneSave.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiCameraAngleEnter.TYPE, BiCameraAngleEnter.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiStopEditorMaker.TYPE, BiStopEditorMaker.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SCameraAngleSave.TYPE, C2SCameraAngleSave.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S()
                 .register(C2SCameraAngleCaptureCharacter.TYPE, C2SCameraAngleCaptureCharacter.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
+        PayloadTypeRegistry.playC2S()
                 .register(C2SCameraAngleRemovePlacement.TYPE, C2SCameraAngleRemovePlacement.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
+        PayloadTypeRegistry.playC2S()
                 .register(C2SCameraAngleTeleportToTemplate.TYPE, C2SCameraAngleTeleportToTemplate.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
+        PayloadTypeRegistry.playC2S()
                 .register(C2SCameraAngleSetEntityPose.TYPE, C2SCameraAngleSetEntityPose.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
+        PayloadTypeRegistry.playC2S()
                 .register(C2SCameraAngleAddTemplateReference.TYPE, C2SCameraAngleAddTemplateReference.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SInteractionSave.TYPE, C2SInteractionSave.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SInkActionFinished.TYPE, C2SInkActionFinished.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SDialogueFinished.TYPE, C2SDialogueFinished.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SChoiceSelected.TYPE, C2SChoiceSelected.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SPlayStitchStory.TYPE, C2SPlayStitchStory.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(BiMainScreenEnter.TYPE, BiMainScreenEnter.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
+        PayloadTypeRegistry.playC2S().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SInteractionSave.TYPE, C2SInteractionSave.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SInkActionFinished.TYPE, C2SInkActionFinished.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SDialogueFinished.TYPE, C2SDialogueFinished.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SChoiceSelected.TYPE, C2SChoiceSelected.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SPlayStitchStory.TYPE, C2SPlayStitchStory.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiMainScreenEnter.TYPE, BiMainScreenEnter.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S()
                 .register(C2SMainScreenCaptureCharacter.TYPE, C2SMainScreenCaptureCharacter.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SMainScreenSave.TYPE, C2SMainScreenSave.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SEnterDialogEditor.TYPE, C2SEnterDialogEditor.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SStopStory.TYPE, C2SStopStory.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SMainScreenSave.TYPE, C2SMainScreenSave.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SEnterDialogEditor.TYPE, C2SEnterDialogEditor.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SStopStory.TYPE, C2SStopStory.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SChangeGamemodePacket.TYPE, C2SChangeGamemodePacket.STREAM_CODEC);
     }
 }

@@ -28,14 +28,11 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 
 public class DialogSetupAdvancedPanel {
 
@@ -146,7 +143,7 @@ public class DialogSetupAdvancedPanel {
                         return;
                     }
                     try {
-                        data.setBackgroundImage(Identifier.parse(text));
+                        data.setBackgroundImage(ResourceLocation.parse(text));
                     } catch (Exception ignored) {
                     }
                 });
@@ -161,11 +158,11 @@ public class DialogSetupAdvancedPanel {
                 return;
             }
             if (DEFAULT_LETTER_SOUND_DISPLAY.equals(text)) {
-                data.setLetterSound(Identifier.parse(DEFAULT_LETTER_SOUND_ID));
+                data.setLetterSound(ResourceLocation.parse(DEFAULT_LETTER_SOUND_ID));
                 return;
             }
             try {
-                data.setLetterSound(Identifier.parse(text));
+                data.setLetterSound(ResourceLocation.parse(text));
             } catch (Exception ignored) {
             }
         });
@@ -190,9 +187,9 @@ public class DialogSetupAdvancedPanel {
             DialogRenderer3D dialog = previewPanel.getCurrentDialog();
             if (dialog == null) return;
             String value = letterSoundBox.getValue();
-            Identifier soundId = DEFAULT_LETTER_SOUND_DISPLAY.equals(value)
-                    ? Identifier.parse(DEFAULT_LETTER_SOUND_ID)
-                    : Identifier.parse(value);
+            ResourceLocation soundId = DEFAULT_LETTER_SOUND_DISPLAY.equals(value)
+                    ? ResourceLocation.parse(DEFAULT_LETTER_SOUND_ID)
+                    : ResourceLocation.parse(value);
             dialog.getScrollText().setSound(soundId);
         }
     }
@@ -206,7 +203,7 @@ public class DialogSetupAdvancedPanel {
         return box;
     }
 
-    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY) {
         if (!visible || data == null) return;
         Minecraft mc = Minecraft.getInstance();
 
@@ -214,7 +211,7 @@ public class DialogSetupAdvancedPanel {
         int panelHeight = computePanelHeight(data);
         int panelBottom = panelTop + panelHeight;
 
-        graphics.fill(PANEL_X, panelTop, PANEL_X + PANEL_WIDTH, panelBottom, ARGB.color(210, 0, 0, 0));
+        graphics.fill(PANEL_X, panelTop, PANEL_X + PANEL_WIDTH, panelBottom, FastColor.ARGB32.color(210, 0, 0, 0));
         graphics.fill(PANEL_X, panelTop, PANEL_X + PANEL_WIDTH, panelTop + 1, 0xFFAAAAAA);
         graphics.fill(PANEL_X, panelBottom - 1, PANEL_X + PANEL_WIDTH, panelBottom, 0xFFAAAAAA);
         graphics.fill(PANEL_X, panelTop, PANEL_X + 1, panelBottom, 0xFFAAAAAA);
@@ -277,10 +274,11 @@ public class DialogSetupAdvancedPanel {
                     mouseX,
                     mouseY);
 
-            graphics.text(mc.font, trans("screen.dialog_editor.advanced.sound_muted"), contentX, y + 3, 0xFFCCCCCC);
+            graphics.drawString(
+                    mc.font, trans("screen.dialog_editor.advanced.sound_muted"), contentX, y + 3, 0xFFCCCCCC);
             soundMutedButton.setX(editBoxX);
             soundMutedButton.setY(y);
-            soundMutedButton.extractRenderState(graphics, mouseX, mouseY, 0);
+            soundMutedButton.render(graphics, mouseX, mouseY, 0);
             y += ROW_HEIGHT + ROW_GAP;
 
             alignmentRowY = y;
@@ -288,16 +286,18 @@ public class DialogSetupAdvancedPanel {
         }
 
         if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
-            graphics.text(mc.font, trans("screen.dialog_editor.advanced.tail_visible"), contentX, y + 3, 0xFFCCCCCC);
+            graphics.drawString(
+                    mc.font, trans("screen.dialog_editor.advanced.tail_visible"), contentX, y + 3, 0xFFCCCCCC);
             tailVisibleButton.setX(editBoxX);
             tailVisibleButton.setY(y);
-            tailVisibleButton.extractRenderState(graphics, mouseX, mouseY, 0);
+            tailVisibleButton.render(graphics, mouseX, mouseY, 0);
             y += ROW_HEIGHT + ROW_GAP;
 
-            graphics.text(mc.font, trans("screen.dialog_editor.advanced.text_shadow"), contentX, y + 3, 0xFFCCCCCC);
+            graphics.drawString(
+                    mc.font, trans("screen.dialog_editor.advanced.text_shadow"), contentX, y + 3, 0xFFCCCCCC);
             textShadowButton.setX(editBoxX);
             textShadowButton.setY(y);
-            textShadowButton.extractRenderState(graphics, mouseX, mouseY, 0);
+            textShadowButton.render(graphics, mouseX, mouseY, 0);
             y += ROW_HEIGHT + ROW_GAP;
         }
 
@@ -327,12 +327,12 @@ public class DialogSetupAdvancedPanel {
         boolean closeHover = isOver(mouseX, mouseY, contentX, y, 90, ROW_HEIGHT);
         graphics.fill(contentX, y, contentX + 90, y + ROW_HEIGHT, closeHover ? 0xFF666666 : 0xFF444444);
         String closeText = trans("screen.dialog_editor.advanced.close");
-        graphics.text(
+        graphics.drawString(
                 mc.font, closeText, contentX + 45 - mc.font.width(closeText) / 2, y + (ROW_HEIGHT - 8) / 2, 0xFFFFFFFF);
     }
 
     private int renderFieldRow(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             Minecraft mc,
             String label,
             int contentX,
@@ -341,17 +341,17 @@ public class DialogSetupAdvancedPanel {
             EditBox box,
             int mouseX,
             int mouseY) {
-        graphics.text(mc.font, label, contentX, y + 3, 0xFFCCCCCC);
+        graphics.drawString(mc.font, label, contentX, y + 3, 0xFFCCCCCC);
         if (box != null) {
             box.setX(editBoxX);
             box.setY(y);
-            box.extractRenderState(graphics, mouseX, mouseY, 0);
+            box.render(graphics, mouseX, mouseY, 0);
         }
         return y + ROW_HEIGHT + ROW_GAP;
     }
 
     private int renderAlignmentRow(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             Minecraft mc,
             int contentX,
             int editBoxX,
@@ -360,7 +360,7 @@ public class DialogSetupAdvancedPanel {
             DialogData data,
             int mouseX,
             int mouseY) {
-        graphics.text(mc.font, trans("screen.dialog_editor.advanced.alignment"), contentX, y + 3, 0xFFCCCCCC);
+        graphics.drawString(mc.font, trans("screen.dialog_editor.advanced.alignment"), contentX, y + 3, 0xFFCCCCCC);
         DialogData.TextAlignment current = data.getTextAlignment();
         DialogData.TextAlignment[] alignments = DialogData.TextAlignment.values();
         int buttonWidth = editBoxWidth / 3 - 1;
@@ -376,7 +376,7 @@ public class DialogSetupAdvancedPanel {
                     y + ROW_HEIGHT,
                     active ? 0xFF4466AA : (hover ? 0xFF555555 : 0xFF333333));
             String letter = alignment.name().substring(0, 1);
-            graphics.text(
+            graphics.drawString(
                     mc.font,
                     letter,
                     btnX + buttonWidth / 2 - mc.font.width(letter) / 2,
@@ -386,11 +386,11 @@ public class DialogSetupAdvancedPanel {
         return y + ROW_HEIGHT + ROW_GAP;
     }
 
-    public boolean mouseClicked(MouseButtonEvent event) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!visible || data == null) return false;
-        int mouseX = (int) event.x();
-        int mouseY = (int) event.y();
-        if (!isOver(mouseX, mouseY, PANEL_X, 5, PANEL_WIDTH, computePanelHeight(data))) return false;
+        int imx = (int) mouseX;
+        int imy = (int) mouseY;
+        if (!isOver(imx, imy, PANEL_X, 5, PANEL_WIDTH, computePanelHeight(data))) return false;
 
         int contentX = PANEL_X + PANEL_PADDING;
         int editBoxX = contentX + LABEL_WIDTH + 2;
@@ -399,20 +399,20 @@ public class DialogSetupAdvancedPanel {
         unfocusAll();
 
         if (fieldSet == DialogFieldSet.ALL) {
-            if (tryFocus(widthBox, mouseX, mouseY, event)) return true;
-            if (tryFocus(paddingXBox, mouseX, mouseY, event)) return true;
-            if (tryFocus(paddingYBox, mouseX, mouseY, event)) return true;
-            if (tryFocus(letterSpacingBox, mouseX, mouseY, event)) return true;
-            if (tryFocus(lineGapBox, mouseX, mouseY, event)) return true;
-            if (tryFocus(skipSecondsBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(widthBox, mouseX, mouseY, button)) return true;
+            if (tryFocus(paddingXBox, mouseX, mouseY, button)) return true;
+            if (tryFocus(paddingYBox, mouseX, mouseY, button)) return true;
+            if (tryFocus(letterSpacingBox, mouseX, mouseY, button)) return true;
+            if (tryFocus(lineGapBox, mouseX, mouseY, button)) return true;
+            if (tryFocus(skipSecondsBox, mouseX, mouseY, button)) return true;
 
-            if (soundMutedButton != null && soundMutedButton.mouseClicked(event, false)) return true;
+            if (soundMutedButton != null && soundMutedButton.mouseClicked(mouseX, mouseY, button)) return true;
             if (alignmentRowY >= 0) {
                 DialogData.TextAlignment[] alignments = DialogData.TextAlignment.values();
                 int buttonWidth = editBoxWidth / 3 - 1;
                 for (int i = 0; i < alignments.length; i++) {
                     int btnX = editBoxX + i * (buttonWidth + 1);
-                    if (isOver(mouseX, mouseY, btnX, alignmentRowY, buttonWidth, ROW_HEIGHT)) {
+                    if (isOver(imx, imy, btnX, alignmentRowY, buttonWidth, ROW_HEIGHT)) {
                         data.setTextAlignment(alignments[i]);
                         return true;
                     }
@@ -421,43 +421,43 @@ public class DialogSetupAdvancedPanel {
         }
 
         if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
-            if (tailVisibleButton != null && tailVisibleButton.mouseClicked(event, false)) return true;
-            if (textShadowButton != null && textShadowButton.mouseClicked(event, false)) return true;
+            if (tailVisibleButton != null && tailVisibleButton.mouseClicked(mouseX, mouseY, button)) return true;
+            if (textShadowButton != null && textShadowButton.mouseClicked(mouseX, mouseY, button)) return true;
         }
 
-        if (tryFocus(backgroundImageBox, mouseX, mouseY, event)) return true;
-        if (tryFocus(letterSoundBox, mouseX, mouseY, event)) return true;
-        if (closeRowY >= 0 && isOver(mouseX, mouseY, contentX, closeRowY, 90, ROW_HEIGHT)) {
+        if (tryFocus(backgroundImageBox, mouseX, mouseY, button)) return true;
+        if (tryFocus(letterSoundBox, mouseX, mouseY, button)) return true;
+        if (closeRowY >= 0 && isOver(imx, imy, contentX, closeRowY, 90, ROW_HEIGHT)) {
             visible = false;
             return true;
         }
         return true;
     }
 
-    public void keyPressed(KeyEvent event) {
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (fieldSet == DialogFieldSet.ALL) {
-            forwardKeyToFocused(widthBox, event);
-            forwardKeyToFocused(paddingXBox, event);
-            forwardKeyToFocused(paddingYBox, event);
-            forwardKeyToFocused(letterSpacingBox, event);
-            forwardKeyToFocused(lineGapBox, event);
-            forwardKeyToFocused(skipSecondsBox, event);
+            forwardKeyToFocused(widthBox, keyCode, scanCode, modifiers);
+            forwardKeyToFocused(paddingXBox, keyCode, scanCode, modifiers);
+            forwardKeyToFocused(paddingYBox, keyCode, scanCode, modifiers);
+            forwardKeyToFocused(letterSpacingBox, keyCode, scanCode, modifiers);
+            forwardKeyToFocused(lineGapBox, keyCode, scanCode, modifiers);
+            forwardKeyToFocused(skipSecondsBox, keyCode, scanCode, modifiers);
         }
-        forwardKeyToFocused(backgroundImageBox, event);
-        forwardKeyToFocused(letterSoundBox, event);
+        forwardKeyToFocused(backgroundImageBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(letterSoundBox, keyCode, scanCode, modifiers);
     }
 
-    public void charTyped(CharacterEvent event) {
+    public void charTyped(char codePoint, int modifiers) {
         if (fieldSet == DialogFieldSet.ALL) {
-            forwardCharToFocused(widthBox, event);
-            forwardCharToFocused(paddingXBox, event);
-            forwardCharToFocused(paddingYBox, event);
-            forwardCharToFocused(letterSpacingBox, event);
-            forwardCharToFocused(lineGapBox, event);
-            forwardCharToFocused(skipSecondsBox, event);
+            forwardCharToFocused(widthBox, codePoint, modifiers);
+            forwardCharToFocused(paddingXBox, codePoint, modifiers);
+            forwardCharToFocused(paddingYBox, codePoint, modifiers);
+            forwardCharToFocused(letterSpacingBox, codePoint, modifiers);
+            forwardCharToFocused(lineGapBox, codePoint, modifiers);
+            forwardCharToFocused(skipSecondsBox, codePoint, modifiers);
         }
-        forwardCharToFocused(backgroundImageBox, event);
-        forwardCharToFocused(letterSoundBox, event);
+        forwardCharToFocused(backgroundImageBox, codePoint, modifiers);
+        forwardCharToFocused(letterSoundBox, codePoint, modifiers);
     }
 
     public boolean isAnyBoxFocused() {
@@ -491,22 +491,22 @@ public class DialogSetupAdvancedPanel {
         if (box != null) box.setFocused(focused);
     }
 
-    private boolean tryFocus(EditBox box, int mouseX, int mouseY, MouseButtonEvent event) {
+    private boolean tryFocus(EditBox box, double mouseX, double mouseY, int button) {
         if (box == null) return false;
-        if (isOver(mouseX, mouseY, box.getX(), box.getY(), box.getWidth(), box.getHeight())) {
+        if (isOver((int) mouseX, (int) mouseY, box.getX(), box.getY(), box.getWidth(), box.getHeight())) {
             box.setFocused(true);
-            box.mouseClicked(event, false);
+            box.mouseClicked(mouseX, mouseY, button);
             return true;
         }
         return false;
     }
 
-    private void forwardKeyToFocused(EditBox box, KeyEvent event) {
-        if (box != null && box.isFocused()) box.keyPressed(event);
+    private void forwardKeyToFocused(EditBox box, int keyCode, int scanCode, int modifiers) {
+        if (box != null && box.isFocused()) box.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    private void forwardCharToFocused(EditBox box, CharacterEvent event) {
-        if (box != null && box.isFocused()) box.charTyped(event);
+    private void forwardCharToFocused(EditBox box, char codePoint, int modifiers) {
+        if (box != null && box.isFocused()) box.charTyped(codePoint, modifiers);
     }
 
     private boolean isFocused(EditBox box) {

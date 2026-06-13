@@ -24,11 +24,11 @@
 package fr.loudo.narrativecraft.utils;
 
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public interface VolumeAudio {
 
     public void narrativecraft$setVolume(SoundInstance soundInstance, float volume);
 
-    public void narrativecraft$setVolume(Identifier source, float volume);
+    public void narrativecraft$setVolume(ResourceLocation source, float volume);
 }

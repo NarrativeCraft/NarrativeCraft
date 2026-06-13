@@ -25,13 +25,10 @@ package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 public abstract class KeyframeMenu<T extends Keyframe> {
 
@@ -39,7 +36,7 @@ public abstract class KeyframeMenu<T extends Keyframe> {
     protected static final int PADDING = 5;
     protected static final int BUTTON_HEIGHT = 14;
     private static final int BUTTON_WIDTH = (WIDTH - PADDING * 3) / 2;
-    private static final int BACKGROUND_COLOR = ARGB.color(180, 0, 0, 0);
+    private static final int BACKGROUND_COLOR = FastColor.ARGB32.color(180, 0, 0, 0);
 
     protected final T keyframe;
     private final Button editButton;
@@ -66,13 +63,13 @@ public abstract class KeyframeMenu<T extends Keyframe> {
     protected abstract int getContentHeight();
 
     protected abstract void renderContent(
-            GuiGraphicsExtractor graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY);
+            GuiGraphics graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY);
 
     protected abstract void applyChanges();
 
     protected abstract void initContent();
 
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker delta, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, DeltaTracker delta, int mouseX, int mouseY) {
         if (!visible) return;
         Minecraft mc = Minecraft.getInstance();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
@@ -87,11 +84,11 @@ public abstract class KeyframeMenu<T extends Keyframe> {
         int btnY = y + PADDING + getContentHeight() + PADDING;
         editButton.setPosition(x + PADDING, btnY);
         deleteButton.setPosition(x + PADDING * 2 + BUTTON_WIDTH, btnY);
-        editButton.extractRenderState(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
-        deleteButton.extractRenderState(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
+        editButton.render(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
+        deleteButton.render(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
     }
 
-    public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (!visible) return false;
         Minecraft mc = Minecraft.getInstance();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
@@ -99,24 +96,30 @@ public abstract class KeyframeMenu<T extends Keyframe> {
         int x = screenWidth - WIDTH - PADDING;
         int y = PADDING;
 
-        if (!isOnMenu(event.x(), event.y(), x, y, totalHeight)) return false;
+        if (!isOnMenu((mouseX), (mouseY), x, y, totalHeight)) return false;
 
-        editButton.mouseClicked(event, isDoubleClick);
-        deleteButton.mouseClicked(event, isDoubleClick);
-        onContentMouseClicked(event, isDoubleClick, x + PADDING, y + PADDING, WIDTH - PADDING * 2);
+        editButton.mouseClicked(mouseX, mouseY, button);
+        deleteButton.mouseClicked(mouseX, mouseY, button);
+        onContentMouseClicked(mouseX, mouseY, button, isDoubleClick, x + PADDING, y + PADDING, WIDTH - PADDING * 2);
         return true;
     }
 
     protected void onContentMouseClicked(
-            MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {}
+            double mouseX,
+            double mouseY,
+            int button,
+            boolean isDoubleClick,
+            int contentX,
+            int contentY,
+            int contentWidth) {}
 
-    public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {}
+    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {}
 
     public void mouseScrolled(double amount) {}
 
-    public void charTyped(CharacterEvent event) {}
+    public void charTyped(char codePoint, int modifiers) {}
 
-    public void keyPressed(KeyEvent event) {}
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {}
 
     private boolean isOnMenu(double mouseX, double mouseY, int x, int y, int totalHeight) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + totalHeight;

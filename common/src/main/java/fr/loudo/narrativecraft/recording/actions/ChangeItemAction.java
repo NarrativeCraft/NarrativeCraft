@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -59,7 +59,6 @@ public class ChangeItemAction extends AbstractAction {
             .put(EquipmentSlot.CHEST, 5)
             .put(EquipmentSlot.HEAD, 6)
             .put(EquipmentSlot.BODY, 7)
-            .put(EquipmentSlot.SADDLE, 8)
             .build();
 
     private final Map<EquipmentSlot, StoredItem> itemsBySlot = new EnumMap<>(EquipmentSlot.class);
@@ -134,7 +133,7 @@ public class ChangeItemAction extends AbstractAction {
                 throw new IOException("Unknown equipment slot id " + i + 1);
             }
 
-            Identifier key = Identifier.parse(reader.readString());
+            ResourceLocation key = ResourceLocation.parse(reader.readString());
 
             int typeId = reader.readInt();
             String data = null;

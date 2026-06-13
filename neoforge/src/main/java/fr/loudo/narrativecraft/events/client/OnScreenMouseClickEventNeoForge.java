@@ -37,10 +37,10 @@ public class OnScreenMouseClickEventNeoForge {
     }
 
     private static void onMouseClick(ScreenEvent.MouseButtonPressed.Pre event) {
-        OnScreenMouseClickEvent.cutsceneHudClick(event.getMouseButtonEvent(), event.isDoubleClick());
+        OnScreenMouseClickEvent.cutsceneHudClick(event.getMouseX(), event.getMouseY(), event.getButton(), false);
     }
 
     private static void onMouseRelease(ScreenEvent.MouseButtonReleased.Post event) {
-        OnScreenMouseClickEvent.cutsceneHudRelease(event.getMouseButtonEvent());
+        OnScreenMouseClickEvent.cutsceneHudRelease(event.getMouseX(), event.getMouseY(), event.getButton());
     }
 }

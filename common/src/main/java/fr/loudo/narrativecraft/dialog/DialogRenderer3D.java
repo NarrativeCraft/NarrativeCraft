@@ -28,10 +28,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.dialog.geometric.DialogTail;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.util.ARGB;
-import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -65,13 +65,13 @@ public class DialogRenderer3D extends DialogRenderer {
 
         float opacity = animator.getOpacity(partialTick);
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        Vec3 camRight = new Vec3(camera.leftVector()).scale(-1);
+        Vec3 camRight = new Vec3(camera.getLeftVector()).scale(-1);
 
         double interpX = Mth.lerp(partialTick, entity.xo, entity.getX());
         double interpY = Mth.lerp(partialTick, entity.yo, entity.getY());
         double interpZ = Mth.lerp(partialTick, entity.zo, entity.getZ());
 
-        Vec3 cameraPos = camera.position();
+        Vec3 cameraPos = camera.getPosition();
         // Animation: dialog slides from entity head (t=0) to its final position (t=1)
         Vec3 entityHeadPos = new Vec3(interpX, interpY + entity.getEyeHeight(), interpZ);
         Vec3 dialogFinalPos = new Vec3(
@@ -128,14 +128,14 @@ public class DialogRenderer3D extends DialogRenderer {
     }
 
     public Vec3 translateToRelative(Vec3 worldPos) {
-        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         return worldPos.subtract(cameraPos);
     }
 
     public Vec3 translateToRelativeApplyOffset(Vec3 worldPos) {
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 relative = translateToRelative(worldPos);
-        Vec3 right = new Vec3(camera.leftVector()).scale(-1);
+        Vec3 right = new Vec3(camera.getLeftVector()).scale(-1);
         return relative.add(right.scale(data.getOffsetX()));
     }
 
@@ -161,34 +161,34 @@ public class DialogRenderer3D extends DialogRenderer {
 
         if (data.getBackgroundImage() != null) {
             int color = applyOpacity(0xFFFFFFFF, opacity);
-            VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textSeeThrough(data.getBackgroundImage()));
-            consumer.addVertex(matrix, 0, 0, 0).setColor(color).setUv(0f, 0f).setLight(LightCoordsUtil.FULL_BRIGHT);
+            VertexConsumer consumer = bufferSource.getBuffer(RenderType.textSeeThrough(data.getBackgroundImage()));
+            consumer.addVertex(matrix, 0, 0, 0).setColor(color).setUv(0f, 0f).setLight(LightTexture.FULL_BRIGHT);
             consumer.addVertex(matrix, 0, totalHeight, 0)
                     .setColor(color)
                     .setUv(0f, 1f)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT);
+                    .setLight(LightTexture.FULL_BRIGHT);
             consumer.addVertex(matrix, totalWidth, totalHeight, 0)
                     .setColor(color)
                     .setUv(1f, 1f)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT);
+                    .setLight(LightTexture.FULL_BRIGHT);
             consumer.addVertex(matrix, totalWidth, 0, 0)
                     .setColor(color)
                     .setUv(1f, 0f)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT);
+                    .setLight(LightTexture.FULL_BRIGHT);
         } else {
             int color = applyOpacity(data.getBackgroundColor(), opacity);
-            VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
+            VertexConsumer consumer = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
             consumer.addVertex(matrix, 0, 0, 0)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setLight(LightTexture.FULL_BRIGHT)
                     .setColor(color);
             consumer.addVertex(matrix, 0, totalHeight, 0)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setLight(LightTexture.FULL_BRIGHT)
                     .setColor(color);
             consumer.addVertex(matrix, totalWidth, totalHeight, 0)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setLight(LightTexture.FULL_BRIGHT)
                     .setColor(color);
             consumer.addVertex(matrix, totalWidth, 0, 0)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setLight(LightTexture.FULL_BRIGHT)
                     .setColor(color);
         }
 
@@ -217,27 +217,24 @@ public class DialogRenderer3D extends DialogRenderer {
         float x = finalX + SKIP_SLIDE_OFFSET * (1f - skipT);
 
         int color = applyOpacity(0xFFFFFFFF, skipT * 0.9f * opacity);
-        VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
+        VertexConsumer consumer = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
         Matrix4f matrix = poseStack.last().pose();
 
-        consumer.addVertex(matrix, x, y, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
+        consumer.addVertex(matrix, x, y, 0).setLight(LightTexture.FULL_BRIGHT).setColor(color);
         consumer.addVertex(matrix, x, y + SKIP_INDICATOR_SIZE, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
+                .setLight(LightTexture.FULL_BRIGHT)
                 .setColor(color);
         consumer.addVertex(matrix, x + SKIP_INDICATOR_SIZE, y + SKIP_INDICATOR_SIZE / 2f, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
+                .setLight(LightTexture.FULL_BRIGHT)
                 .setColor(color);
-        consumer.addVertex(matrix, x, y, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
+        consumer.addVertex(matrix, x, y, 0).setLight(LightTexture.FULL_BRIGHT).setColor(color);
 
         bufferSource.endBatch();
     }
 
     private int applyOpacity(int color, float opacity) {
-        int alpha = (int) (ARGB.alpha(color) * opacity);
-        return ARGB.color(alpha, ARGB.red(color), ARGB.green(color), ARGB.blue(color));
+        int alpha = (int) (FastColor.ARGB32.alpha(color) * opacity);
+        return FastColor.ARGB32.color(
+                alpha, FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color));
     }
 }

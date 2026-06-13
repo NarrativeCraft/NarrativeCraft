@@ -24,8 +24,7 @@
 package fr.loudo.narrativecraft.utils;
 
 import com.mojang.authlib.GameProfile;
-import fr.loudo.narrativecraft.mixin.accessor.AvatarAccessor;
-import io.netty.channel.ChannelFutureListener;
+import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
@@ -41,9 +40,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.stats.Stat;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.level.portal.TeleportTransition;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 // FakePlayer class from Forge
 public class FakePlayer extends ServerPlayer {
@@ -54,23 +51,18 @@ public class FakePlayer extends ServerPlayer {
         super(level.getServer(), level, profile, DEFAULT_CLIENT_INFO);
         this.connection = new FakePlayerNetHandler(level.getServer(), this, profile);
         this.isInvulnerable = isInvulnerable;
-        getEntityData().set(AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
+        getEntityData().set(PlayerAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
 
         this.invulnerableTime = 0;
-    }
-
-    @Override
-    public ServerPlayer teleport(@NotNull TeleportTransition dimensionTransition) {
-        return null;
     }
 
     @Override
     public void awardStat(@NotNull Stat stat, int amount) {}
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
+    public boolean hurt(DamageSource damageSource, float amount) {
         return (damageSource.is(DamageTypeTags.BYPASSES_INVULNERABILITY) || !isInvulnerable)
-                && super.hurtServer(level, damageSource, amount);
+                && super.hurt(damageSource, amount);
     }
 
     private static class FakePlayerNetHandler extends ServerGamePacketListenerImpl {
@@ -167,9 +159,6 @@ public class FakePlayer extends ServerPlayer {
 
         @Override
         public void send(Packet<?> packet) {}
-
-        @Override
-        public void send(Packet<?> packet, @Nullable ChannelFutureListener sendListener) {}
 
         @Override
         public void handleSetCarriedItem(ServerboundSetCarriedItemPacket packet) {}

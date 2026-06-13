@@ -42,13 +42,12 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 
 public class PlaybackCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(stack -> stack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(stack -> stack.hasPermission(2))
                 .then(Commands.literal("playback")
                         .then(Commands.literal("start")
                                 .then(Commands.argument("animation_name", StringArgumentType.string())

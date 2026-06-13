@@ -30,7 +30,7 @@ import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleRemoveTemplateReference(
         UUID chapterId, UUID sceneId, UUID cameraAngleId, UUID templateReferenceId) implements CustomPacketPayload {
@@ -44,7 +44,7 @@ public record C2SCameraAngleRemoveTemplateReference(
     }
 
     public static final Type<C2SCameraAngleRemoveTemplateReference> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_remove_template_reference"));
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_remove_template_reference"));
 
     public static final StreamCodec<ByteBuf, C2SCameraAngleRemoveTemplateReference> STREAM_CODEC =
             StreamCodec.composite(

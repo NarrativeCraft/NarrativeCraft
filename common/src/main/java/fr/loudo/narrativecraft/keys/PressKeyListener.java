@@ -23,18 +23,26 @@
 
 package fr.loudo.narrativecraft.keys;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegistry;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.scene.SceneMenuScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.permissions.Permissions;
+import net.minecraft.client.player.LocalPlayer;
 
 public class PressKeyListener {
 
@@ -42,7 +50,7 @@ public class PressKeyListener {
         if (ModKeys.STORY_MANAGER.consumeClick()) {
             ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
             if (session.isInStory()) return;
-            if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
+            if (!minecraft.player.hasPermissions(2)) return;
             NarrativeEntryListScreen<Chapter> entryListScreen = new NarrativeEntryListScreen<>(
                     Translation.message("chapter"),
                     ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
@@ -77,6 +85,48 @@ public class PressKeyListener {
             if (editor == null) return;
 
             editor.getRollWidget().toggle();
+        }
+
+        ModKeys.handleKeyPress(
+                InputConstants.MOUSE_BUTTON_LEFT,
+                minecraft.mouseHandler.isLeftPressed(),
+                PressKeyListener::handleAdvanceStory,
+                PressKeyListener::handleInteractionPoints);
+
+        ModKeys.handleKeyPress(
+                InputConstants.MOUSE_BUTTON_RIGHT,
+                minecraft.mouseHandler.isRightPressed(),
+                PressKeyListener::handleInteractionPoints);
+    }
+
+    private static void handleAdvanceStory() {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        DialogRenderer dialogRenderer = session.getMainDialog();
+        if (dialogRenderer != null) {
+            if (dialogRenderer.isAnimating()) return;
+            if (!dialogRenderer.isTextFinished()) {
+                dialogRenderer.forceFinishText();
+                return;
+            }
+
+            Services.PACKET.sendToServer(new C2SDialogueFinished());
+        }
+    }
+
+    private static void handleInteractionPoints() {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (!(session.getEditor() instanceof ClientInteractionMakerEditorMaker interactionEditor)) return;
+        if (interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT) return;
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return;
+        for (InteractionPoint point : interactionEditor.getInteraction().getPoints()) {
+            if (point.isOneTimeClick() && session.hasClickedInteractionPoint(point.getId())) continue;
+            if (point.canSee(player) && point.canClick(player)) {
+                if (point.isOneTimeClick()) session.addClickedInteractionPoint(point.getId());
+                Services.PACKET.sendToServer(
+                        new C2SPlayStitchStory(point.getStitchName(), point.getId(), point.isOneTimeClick()));
+                return;
+            }
         }
     }
 }

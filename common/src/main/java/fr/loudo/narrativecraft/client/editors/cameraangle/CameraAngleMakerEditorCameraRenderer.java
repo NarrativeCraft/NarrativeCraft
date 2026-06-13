@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.cameraangle;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
@@ -32,8 +33,9 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -48,8 +50,9 @@ public class CameraAngleMakerEditorCameraRenderer {
         if (cameraAngleEditor.getPreviewCamera() != null) return;
 
         Minecraft minecraft = Minecraft.getInstance();
-        Vec3 cameraPos = minecraft.gameRenderer.getMainCamera().position();
-        VertexConsumer vertexConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+        Vec3 cameraPos = minecraft.gameRenderer.getMainCamera().getPosition();
+        RenderSystem.lineWidth(4.0f);
+        VertexConsumer vertexConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderType.lines());
         Matrix4f matrix = poseStack.last().pose();
 
         CameraView preview = cameraAngleEditor.getPreviewCamera();
@@ -73,7 +76,7 @@ public class CameraAngleMakerEditorCameraRenderer {
                     1.0F);
         }
 
-        minecraft.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
+        minecraft.renderBuffers().bufferSource().endBatch(RenderType.lines());
 
         renderNameTags(poseStack, cameraAngleEditor, cameraPos, minecraft);
     }
@@ -102,7 +105,7 @@ public class CameraAngleMakerEditorCameraRenderer {
                     bufferSource,
                     Font.DisplayMode.SEE_THROUGH,
                     0x40000000,
-                    0xF000F0);
+                    LightTexture.FULL_BRIGHT);
             poseStack.popPose();
         }
 

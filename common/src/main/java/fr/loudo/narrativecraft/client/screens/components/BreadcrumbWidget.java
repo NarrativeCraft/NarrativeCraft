@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.client.screens.components;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
@@ -60,9 +60,9 @@ public class BreadcrumbWidget extends AbstractWidget {
     }
 
     @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         for (int i = 0; i < sections.length; i++) {
-            graphics.text(font, sections[i], getX() + i * INDENT, getY() + i * LINE_HEIGHT, 0xFFFFFFFF);
+            graphics.drawString(font, sections[i], getX() + i * INDENT, getY() + i * LINE_HEIGHT, 0xFFFFFFFF);
         }
     }
 

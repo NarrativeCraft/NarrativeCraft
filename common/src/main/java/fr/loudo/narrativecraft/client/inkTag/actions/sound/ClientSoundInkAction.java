@@ -31,7 +31,7 @@ import fr.loudo.narrativecraft.utils.VolumeAudio;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 
@@ -69,7 +69,7 @@ public class ClientSoundInkAction extends SoundInkAction {
         if (soundAction.equals("play")) {
             ((VolumeAudio) soundManager).narrativecraft$setVolume(soundInstance, currentVolume);
         } else {
-            ((VolumeAudio) soundManager).narrativecraft$setVolume(soundInstance.getIdentifier(), currentVolume);
+            ((VolumeAudio) soundManager).narrativecraft$setVolume(soundInstance.getLocation(), currentVolume);
         }
         if (currentVolume <= 0.0f && soundAction.equals("stop")) {
             soundManager.stop(soundInstance);
@@ -106,8 +106,8 @@ public class ClientSoundInkAction extends SoundInkAction {
                         clientSoundInkAction.stop();
                     } else if (clientSoundInkAction
                                     .soundInstance
-                                    .getIdentifier()
-                                    .compareTo(this.soundInstance.getIdentifier())
+                                    .getLocation()
+                                    .compareTo(this.soundInstance.getLocation())
                             == 0) {
                         this.volume = clientSoundInkAction.currentVolume;
                         clientSoundInkAction.totalTick = 0;
@@ -124,7 +124,7 @@ public class ClientSoundInkAction extends SoundInkAction {
 
     private SoundInkInstance createSoundInstance() {
         return new SoundInkInstance(
-                Identifier.fromNamespaceAndPath(identifier, soundName),
+                ResourceLocation.fromNamespaceAndPath(identifier, soundName),
                 SoundSource.MASTER,
                 volume,
                 pitch,

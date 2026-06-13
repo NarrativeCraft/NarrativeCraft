@@ -30,8 +30,7 @@ import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -68,7 +67,7 @@ public class CutsceneMakerEditorLayerSelector {
         }
     }
 
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         if (!visible) return;
 
         int visibleHeight = Math.min(layerButtons.size() * 20, maxHeight);
@@ -80,7 +79,7 @@ public class CutsceneMakerEditorLayerSelector {
         for (LayerSelectionButton button : layerButtons) {
             button.setPosition(x, currentY);
             currentY += button.getHeight();
-            button.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            button.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
         }
         graphics.disableScissor();
 
@@ -108,7 +107,7 @@ public class CutsceneMakerEditorLayerSelector {
         scrollOffset = (int) Math.clamp(scrollOffset - deltaY * 20, 0, maxScroll);
     }
 
-    public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
+    public void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (!visible) return;
         int visibleHeight = Math.min(layerButtons.size() * 20, maxHeight);
         int[] mousePos = UtilsClient.getScaledMousePos();
@@ -121,9 +120,9 @@ public class CutsceneMakerEditorLayerSelector {
 
         // only called mouseClicked if we clicked the button in the visible menu
         int containerTop = y - visibleHeight;
-        for (LayerSelectionButton button : layerButtons) {
-            if (button.getY() >= containerTop && button.getY() + button.getHeight() <= y) {
-                button.mouseClicked(mouseButtonEvent, isDoubleClick);
+        for (LayerSelectionButton button1 : layerButtons) {
+            if (button1.getY() >= containerTop && button1.getY() + button1.getHeight() <= y) {
+                button1.mouseClicked(mouseX, mouseY, button);
             }
         }
     }

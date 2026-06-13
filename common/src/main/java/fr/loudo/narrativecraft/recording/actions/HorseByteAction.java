@@ -29,8 +29,7 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.mixin.accessor.AbstractHorseAccessor;
 import java.io.IOException;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 
 public class HorseByteAction extends AbstractAction {
 
@@ -73,8 +72,7 @@ public class HorseByteAction extends AbstractAction {
         if (!(context.getEntity() instanceof AbstractHorse horse)) return ActionResult.IGNORED;
 
         horse.getEntityData().set(AbstractHorseAccessor.getDATA_ID_FLAGS(), horseByte);
-        if (horseByte > AbstractHorseAccessor.getFLAG_STANDING()
-                && horse.getItemBySlot(EquipmentSlot.SADDLE).isEmpty()) {
+        if (horseByte > AbstractHorseAccessor.getFLAG_STANDING() && horse.isSaddled()) {
             horse.ejectPassengers();
         }
         return ActionResult.OK;

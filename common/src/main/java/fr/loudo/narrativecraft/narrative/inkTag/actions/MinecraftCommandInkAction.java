@@ -38,7 +38,6 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.PermissionSet;
 
 @InkCommand(
         keyword = "command",
@@ -54,8 +53,7 @@ public class MinecraftCommandInkAction extends InkAction {
         commandValue = cmd.getString("commandValue").replace("\\{", "{").replace("\\}", "}");
 
         MinecraftServer server = NarrativeCraftMod.getInstance().getServer();
-        CommandSourceStack source =
-                new CommandSourceStack(null, null, null, null, PermissionSet.ALL_PERMISSIONS, null, null, server, null);
+        CommandSourceStack source = new CommandSourceStack(null, null, null, null, 4, null, null, server, null);
         ParseResults<CommandSourceStack> parse =
                 server.getCommands().getDispatcher().parse(new StringReader(commandValue), source);
 
@@ -74,8 +72,8 @@ public class MinecraftCommandInkAction extends InkAction {
                 CommandSource.NULL,
                 player.position(),
                 player.getRotationVector(),
-                player.level(),
-                PermissionSet.ALL_PERMISSIONS,
+                player.serverLevel(),
+                4,
                 player.getName().getString(),
                 player.getDisplayName(),
                 player.level().getServer(),

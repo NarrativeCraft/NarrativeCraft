@@ -47,45 +47,40 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 public class ClientPacketRegisterFabric {
 
     public static void register() {
-        PayloadTypeRegistry.clientboundPlay().register(BiCutsceneEnter.TYPE, BiCutsceneEnter.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(BiCameraAngleEnter.TYPE, BiCameraAngleEnter.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(S2CCameraAngleEditorData.TYPE, S2CCameraAngleEditorData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
+        PayloadTypeRegistry.playS2C().register(BiCutsceneEnter.TYPE, BiCutsceneEnter.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(BiCameraAngleEnter.TYPE, BiCameraAngleEnter.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CCameraAngleEditorData.TYPE, S2CCameraAngleEditorData.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C()
                 .register(S2CCameraAngleCharacterCaptured.TYPE, S2CCameraAngleCharacterCaptured.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
+        PayloadTypeRegistry.playS2C()
                 .register(S2CCameraAnglePlacementEntitySpawned.TYPE, S2CCameraAnglePlacementEntitySpawned.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CEnterCameraView.TYPE, S2CEnterCameraView.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(S2CInteractionEditorData.TYPE, S2CInteractionEditorData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CRunInkAction.TYPE, S2CRunInkAction.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CStopAllInkActions.TYPE, S2CStopAllInkActions.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CShowDialogue.TYPE, S2CShowDialogue.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(BiStopEditorMaker.TYPE, BiStopEditorMaker.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CCharacterSkin.TYPE, S2CCharacterSkin.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(S2CCharacterStoryAction.TYPE, S2CCharacterStoryAction.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CClearLoadedSkins.TYPE, S2CClearLoadedSkins.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CRenderSaveIcon.TYPE, S2CRenderSaveIcon.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(BiMainScreenEnter.TYPE, BiMainScreenEnter.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CMainScreenData.TYPE, S2CMainScreenData.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2COpenMainScreen.TYPE, S2COpenMainScreen.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
+        PayloadTypeRegistry.playS2C().register(S2CEnterCameraView.TYPE, S2CEnterCameraView.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CInteractionEditorData.TYPE, S2CInteractionEditorData.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CRunInkAction.TYPE, S2CRunInkAction.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CStopAllInkActions.TYPE, S2CStopAllInkActions.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CShowDialogue.TYPE, S2CShowDialogue.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(BiStopEditorMaker.TYPE, BiStopEditorMaker.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CCharacterSkin.TYPE, S2CCharacterSkin.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CCharacterStoryAction.TYPE, S2CCharacterStoryAction.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CClearLoadedSkins.TYPE, S2CClearLoadedSkins.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CRenderSaveIcon.TYPE, S2CRenderSaveIcon.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(BiMainScreenEnter.TYPE, BiMainScreenEnter.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CMainScreenData.TYPE, S2CMainScreenData.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2COpenMainScreen.TYPE, S2COpenMainScreen.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C()
                 .register(S2CDialogEditorEntitySpawned.TYPE, S2CDialogEditorEntitySpawned.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(S2CNotifyClientPlayStory.TYPE, S2CNotifyClientPlayStory.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CSessionClear.TYPE, S2CSessionClear.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CNotifyClientPlayStory.TYPE, S2CNotifyClientPlayStory.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CSessionClear.TYPE, S2CSessionClear.STREAM_CODEC);
     }
 }

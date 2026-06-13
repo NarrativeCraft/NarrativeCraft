@@ -28,11 +28,8 @@ import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
 import java.util.Locale;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
@@ -63,14 +60,14 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
 
     @Override
     protected void renderContent(
-            GuiGraphicsExtractor graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
-        graphics.text(Minecraft.getInstance().font, "FOV", x, y - 2, 0xFFAAAAAA);
+            GuiGraphics graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
+        graphics.drawString(Minecraft.getInstance().font, "FOV", x, y - 2, 0xFFAAAAAA);
         fieldFov.setPosition(x, y + FIELD_LABEL_HEIGHT);
         fieldFov.setWidth(contentWidth);
-        fieldFov.extractRenderState(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
+        fieldFov.render(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
 
         int easingY = y + FIELD_LABEL_HEIGHT + FIELD_HEIGHT + FIELD_GAP;
-        graphics.text(Minecraft.getInstance().font, "Easing", x, easingY - 2, 0xFFAAAAAA);
+        graphics.drawString(Minecraft.getInstance().font, "Easing", x, easingY - 2, 0xFFAAAAAA);
         easingDropdown.setPosition(x, easingY + FIELD_LABEL_HEIGHT);
         easingDropdown.setWidth(contentWidth);
         easingDropdown.render(graphics, mouseX, mouseY);
@@ -78,18 +75,24 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
 
     @Override
     protected void onContentMouseClicked(
-            MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
-        if (easingDropdown.mouseClicked(event)) {
+            double mouseX,
+            double mouseY,
+            int button,
+            boolean isDoubleClick,
+            int contentX,
+            int contentY,
+            int contentWidth) {
+        if (easingDropdown.mouseClicked(mouseX, mouseY, button)) {
             fieldFov.setFocused(false);
             return;
         }
         easingDropdown.close();
-        boolean hovered = event.x() >= fieldFov.getX()
-                && event.x() < fieldFov.getX() + fieldFov.getWidth()
-                && event.y() >= fieldFov.getY()
-                && event.y() < fieldFov.getY() + fieldFov.getHeight();
+        boolean hovered = (mouseX) >= fieldFov.getX()
+                && (mouseX) < fieldFov.getX() + fieldFov.getWidth()
+                && (mouseY) >= fieldFov.getY()
+                && (mouseY) < fieldFov.getY() + fieldFov.getHeight();
         fieldFov.setFocused(hovered);
-        if (hovered) fieldFov.mouseClicked(event, isDoubleClick);
+        if (hovered) fieldFov.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -98,18 +101,18 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
     }
 
     @Override
-    public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
-        if (fieldFov.isFocused()) fieldFov.mouseDragged(event, dragX, dragY);
+    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (fieldFov.isFocused()) fieldFov.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override
-    public void charTyped(CharacterEvent event) {
-        if (fieldFov.isFocused()) fieldFov.charTyped(event);
+    public void charTyped(char codePoint, int modifiers) {
+        if (fieldFov.isFocused()) fieldFov.charTyped(codePoint, modifiers);
     }
 
     @Override
-    public void keyPressed(KeyEvent event) {
-        if (fieldFov.isFocused()) fieldFov.keyPressed(event);
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (fieldFov.isFocused()) fieldFov.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

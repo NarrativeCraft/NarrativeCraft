@@ -29,12 +29,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CToastMessage(Component title, Component message) implements CustomPacketPayload {
 
     public static final Type<S2CToastMessage> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "toast_message"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "toast_message"));
 
     public static final StreamCodec<ByteBuf, S2CToastMessage> STREAM_CODEC = StreamCodec.composite(
             ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,

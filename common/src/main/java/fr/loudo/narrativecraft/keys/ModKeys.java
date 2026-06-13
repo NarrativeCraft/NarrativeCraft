@@ -26,14 +26,14 @@ package fr.loudo.narrativecraft.keys;
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
 
 public class ModKeys {
 
-    private static final KeyMapping.Category CATEGORY =
-            new KeyMapping.Category(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main"));
+    private static final Map<Integer, Boolean> previousStatesKeyCode = new HashMap<>();
 
     public static final List<KeyMapping> ALL_KEYS = new ArrayList<>();
     public static final KeyMapping STORY_MANAGER =
@@ -48,8 +48,21 @@ public class ModKeys {
             registerKey("narrativecraft.key.dialog_advance", InputConstants.KEY_RETURN);
 
     private static KeyMapping registerKey(String translationKey, int code) {
-        KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);
+        KeyMapping key = new KeyMapping(
+                translationKey, InputConstants.Type.KEYSYM, code, "key.categories." + NarrativeCraftMod.MOD_ID);
         ALL_KEYS.add(key);
         return key;
+    }
+
+    public static void handleKeyPress(int code, boolean isDown, Runnable... actions) {
+        boolean wasDown = previousStatesKeyCode.getOrDefault(code, false);
+
+        if (isDown && !wasDown) {
+            for (Runnable action : actions) {
+                action.run();
+            }
+        }
+
+        previousStatesKeyCode.put(code, isDown);
     }
 }

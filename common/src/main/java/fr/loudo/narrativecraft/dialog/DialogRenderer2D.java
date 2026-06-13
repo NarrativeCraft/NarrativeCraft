@@ -23,11 +23,14 @@
 
 package fr.loudo.narrativecraft.dialog;
 
-import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.util.ARGB;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.FastColor;
+import org.joml.Matrix4f;
 
 public class DialogRenderer2D extends DialogRenderer {
 
@@ -45,7 +48,7 @@ public class DialogRenderer2D extends DialogRenderer {
 
     private static final float BOX_WIDTH = 430f;
     private static final float BOX_HEIGHT = 80f;
-    private static final float SKIP_INDICATOR_SIZE = 6f;
+    private static final float SKIP_INDICATOR_SIZE = 3f;
     private static final float SKIP_SLIDE_OFFSET = -5f;
 
     private final Anchor anchor;
@@ -76,7 +79,7 @@ public class DialogRenderer2D extends DialogRenderer {
         data.setWidth(BOX_WIDTH - 50f);
     }
 
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         if (animator.isStopped()) return;
 
         float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
@@ -101,46 +104,61 @@ public class DialogRenderer2D extends DialogRenderer {
         float centerY = dialogY + totalHeight / 2f;
 
         var pose = graphics.pose();
-        pose.pushMatrix();
-        pose.translate(centerX, centerY);
-        pose.scale(scale, scale);
-        pose.translate(-totalWidth / 2f, -totalHeight / 2f);
+        pose.pushPose();
+        pose.translate(centerX, centerY, 0);
+        pose.scale(scale, scale, 0f);
+        pose.translate(-totalWidth / 2f, -totalHeight / 2f, 0);
 
         renderBackground(graphics, totalWidth, totalHeight, opacity);
         renderText(graphics, totalWidth, partialTick);
         renderSkipIndicator(graphics, totalWidth, totalHeight, opacity, partialTick);
 
-        pose.popMatrix();
+        pose.popPose();
+        graphics.flush();
     }
 
-    private void renderBackground(GuiGraphicsExtractor graphics, float totalWidth, float totalHeight, float opacity) {
+    private void renderBackground(GuiGraphics graphics, float totalWidth, float totalHeight, float opacity) {
         int color = applyOpacity(data.getBackgroundColor(), 1.0F);
         graphics.fill(0, 0, (int) totalWidth, (int) totalHeight, color);
     }
 
-    private void renderText(GuiGraphicsExtractor graphics, float totalWidth, float partialTick) {
+    private void renderText(GuiGraphics graphics, float totalWidth, float partialTick) {
         float textX = (totalWidth - layout.getWidth()) / 2f;
         float textY = (BOX_HEIGHT - layout.getHeight()) / 2f;
         scrollText.render2D(graphics, textX, textY, data, partialTick);
     }
 
     private void renderSkipIndicator(
-            GuiGraphicsExtractor graphics, float totalWidth, float totalHeight, float opacity, float partialTick) {
+            GuiGraphics graphics, float totalWidth, float totalHeight, float opacity, float partialTick) {
         float skipT = getSkipProgress(partialTick);
         if (skipT <= 0f) return;
 
-        float finalX = totalWidth - (4f * data.getScale()) - SKIP_INDICATOR_SIZE;
-        float iy = totalHeight - (4f * data.getScale()) - SKIP_INDICATOR_SIZE;
-        float x = finalX + SKIP_SLIDE_OFFSET * (1f - skipT);
         int color = applyOpacity(0xFFFFFFFF, skipT * 0.9f * opacity);
+        float centerX = totalWidth - (4f * data.getScale()) - SKIP_INDICATOR_SIZE + SKIP_SLIDE_OFFSET * (1f - skipT);
+        float centerY = totalHeight - (4f * data.getScale()) - SKIP_INDICATOR_SIZE;
 
-        float halfWidth = SKIP_INDICATOR_SIZE / 2f;
-        float halfHeight = SKIP_INDICATOR_SIZE / 2f;
-        float cx = x + halfWidth;
-        float cy = iy + halfHeight;
+        var pose = graphics.pose();
+        pose.pushPose();
+        pose.translate(centerX, centerY, 0);
 
-        GuiGraphicsExtractorExtension graphicsExtension = new GuiGraphicsExtractorExtension(graphics);
-        graphicsExtension.skipArrow(cx, cy, halfWidth, halfHeight, color);
+        VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.textBackground());
+        Matrix4f matrix = pose.last().pose();
+        float hw = SKIP_INDICATOR_SIZE;
+        float hh = SKIP_INDICATOR_SIZE;
+        consumer.addVertex(matrix, -hw, -hh, 0.01f)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(color);
+        consumer.addVertex(matrix, -hw, hh, 0.01f)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(color);
+        consumer.addVertex(matrix, hw, 0, 0.01f)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(color);
+        consumer.addVertex(matrix, -hw, -hh, 0.01f)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(color);
+
+        pose.popPose();
     }
 
     private float[] computeAnchorOrigin(int screenWidth, int screenHeight, float totalWidth, float totalHeight) {
@@ -160,7 +178,8 @@ public class DialogRenderer2D extends DialogRenderer {
     }
 
     private int applyOpacity(int color, float opacity) {
-        int alpha = (int) (ARGB.alpha(color) * opacity);
-        return ARGB.color(alpha, ARGB.red(color), ARGB.green(color), ARGB.blue(color));
+        int alpha = (int) (FastColor.ARGB32.alpha(color) * opacity);
+        return FastColor.ARGB32.color(
+                alpha, FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color));
     }
 }

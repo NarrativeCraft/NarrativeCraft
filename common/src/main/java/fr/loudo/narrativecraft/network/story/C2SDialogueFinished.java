@@ -27,12 +27,12 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SDialogueFinished() implements CustomPacketPayload {
 
     public static final Type<C2SDialogueFinished> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialogue_finished"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialogue_finished"));
 
     public static final StreamCodec<ByteBuf, C2SDialogueFinished> STREAM_CODEC =
             StreamCodec.unit(new C2SDialogueFinished());

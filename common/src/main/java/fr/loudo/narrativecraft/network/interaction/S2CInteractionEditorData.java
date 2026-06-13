@@ -30,7 +30,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class S2CInteractionEditorData implements CustomPacketPayload {
 
@@ -43,7 +43,7 @@ public class S2CInteractionEditorData implements CustomPacketPayload {
     }
 
     public static final Type<S2CInteractionEditorData> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "interaction_editor_data"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "interaction_editor_data"));
 
     public static final StreamCodec<ByteBuf, S2CInteractionEditorData> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

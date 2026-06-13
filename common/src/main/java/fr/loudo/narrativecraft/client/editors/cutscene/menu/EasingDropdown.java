@@ -25,8 +25,7 @@ package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
 
 public class EasingDropdown {
 
@@ -58,12 +57,12 @@ public class EasingDropdown {
         return HEADER_HEIGHT + Math.min(values.length - scrollOffset, MAX_VISIBLE) * ITEM_HEIGHT;
     }
 
-    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY) {
         boolean headerHovered = isOverHeader(mouseX, mouseY);
         graphics.fill(x, y, x + width, y + HEADER_HEIGHT, headerHovered ? 0xFF888888 : 0xFF555555);
-        graphics.text(Minecraft.getInstance().font, selected.name(), x + 2, y + 2, 0xFFFFFFFF);
+        graphics.drawString(Minecraft.getInstance().font, selected.name(), x + 2, y + 2, 0xFFFFFFFF);
         String arrow = open ? "-" : "+";
-        graphics.text(
+        graphics.drawString(
                 Minecraft.getInstance().font,
                 arrow,
                 x + width - Minecraft.getInstance().font.width(arrow) - 2,
@@ -84,13 +83,13 @@ public class EasingDropdown {
                     x + width,
                     listY + ITEM_HEIGHT,
                     hovered ? 0xFF888888 : (isSelected ? 0xFF334433 : 0xFF333333));
-            graphics.text(Minecraft.getInstance().font, type.name(), x + 2, listY + 1, 0xFFFFFFFF);
+            graphics.drawString(Minecraft.getInstance().font, type.name(), x + 2, listY + 1, 0xFFFFFFFF);
             listY += ITEM_HEIGHT;
         }
     }
 
-    public boolean mouseClicked(MouseButtonEvent event) {
-        if (isOverHeader(event.x(), event.y())) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (isOverHeader((mouseX), (mouseY))) {
             open = !open;
             return true;
         }
@@ -98,7 +97,7 @@ public class EasingDropdown {
         int listY = y + HEADER_HEIGHT;
         int visible = Math.min(values.length - scrollOffset, MAX_VISIBLE);
         for (int i = 0; i < visible; i++) {
-            if (event.x() >= x && event.x() < x + width && event.y() >= listY && event.y() < listY + ITEM_HEIGHT) {
+            if ((mouseX) >= x && (mouseX) < x + width && (mouseY) >= listY && (mouseY) < listY + ITEM_HEIGHT) {
                 selected = values[i + scrollOffset];
                 open = false;
                 return true;

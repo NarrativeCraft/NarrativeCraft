@@ -26,17 +26,15 @@ package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class Keyframe {
 
-    public static final Identifier KEYFRAME_SPRITE =
-            Identifier.fromNamespaceAndPath(NarrativeCraftAPI.getInstance().getModId(), "keyframe");
-    public static final Identifier KEYFRAME_SELECTED_SPRITE =
-            Identifier.fromNamespaceAndPath(NarrativeCraftAPI.getInstance().getModId(), "keyframe-selected");
+    public static final ResourceLocation KEYFRAME_SPRITE = ResourceLocation.fromNamespaceAndPath(
+            NarrativeCraftAPI.getInstance().getModId(), "keyframe");
+    public static final ResourceLocation KEYFRAME_SELECTED_SPRITE = ResourceLocation.fromNamespaceAndPath(
+            NarrativeCraftAPI.getInstance().getModId(), "keyframe-selected");
     public static final int SIZE = 7;
 
     protected int x;
@@ -50,7 +48,7 @@ public abstract class Keyframe {
         this.tick = tick;
     }
 
-    public void click(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
+    public void click(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         isSelected = true;
     }
 
@@ -66,9 +64,9 @@ public abstract class Keyframe {
                 viewStartTick + visibleTicks);
     }
 
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker delta) {
-        Identifier sprite = isSelected ? KEYFRAME_SELECTED_SPRITE : KEYFRAME_SPRITE;
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, SIZE, SIZE);
+    public void render(GuiGraphics graphics, DeltaTracker delta) {
+        ResourceLocation sprite = isSelected ? KEYFRAME_SELECTED_SPRITE : KEYFRAME_SPRITE;
+        graphics.blitSprite(sprite, x, y, SIZE, SIZE);
     }
 
     public abstract KeyframeMenu<?> createMenu();

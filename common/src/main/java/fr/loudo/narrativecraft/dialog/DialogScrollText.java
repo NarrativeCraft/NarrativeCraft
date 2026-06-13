@@ -26,18 +26,18 @@ package fr.loudo.narrativecraft.dialog;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.dialog.ITextEffect;
-import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
 import fr.loudo.narrativecraft.dialog.effects.WaitTextEffect;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Matrix4f;
 
@@ -53,10 +53,10 @@ public class DialogScrollText {
     private float tickAccumulator = 0f;
     private int waitTicksRemaining = 0;
     private long currentTick = 0;
-    private Identifier sound;
+    private ResourceLocation sound;
     private boolean mutedSound;
 
-    public DialogScrollText(Identifier sound, boolean mutedSound) {
+    public DialogScrollText(ResourceLocation sound, boolean mutedSound) {
         this.sound = sound;
         this.mutedSound = mutedSound;
     }
@@ -231,8 +231,7 @@ public class DialogScrollText {
         return new float[] {maxX, maxY};
     }
 
-    public void render2D(
-            GuiGraphicsExtractor graphics, float originX, float originY, DialogData data, float partialTick) {
+    public void render2D(GuiGraphics graphics, float originX, float originY, DialogData data, float partialTick) {
         Font font = Minecraft.getInstance().font;
         List<float[]> positions = computeLetterPositions(originX, originY, data.getWidth(), font, data);
 
@@ -245,8 +244,18 @@ public class DialogScrollText {
             Vec2 offset = getEffectOffset(entry, i, partialTick);
             int color = applyOpacity(data.getTextColor(), 1f);
 
-            GuiGraphicsExtractorExtension graphicsExtension = new GuiGraphicsExtractorExtension(graphics);
-            graphicsExtension.text(font, entry.letter, pos[0] + offset.x, pos[1] + offset.y, color, false);
+            Matrix4f matrix = graphics.pose().last().pose();
+            font.drawInBatch(
+                    entry.letter,
+                    pos[0] + offset.x,
+                    pos[1] + offset.y,
+                    color,
+                    data.isTextShadow(),
+                    matrix,
+                    graphics.bufferSource(),
+                    Font.DisplayMode.SEE_THROUGH,
+                    0,
+                    LightTexture.FULL_BRIGHT);
         }
     }
 
@@ -347,15 +356,16 @@ public class DialogScrollText {
     }
 
     private int applyOpacity(int color, float opacity) {
-        int alpha = (int) (ARGB.alpha(color) * opacity);
-        return ARGB.color(alpha, ARGB.red(color), ARGB.green(color), ARGB.blue(color));
+        int alpha = (int) (FastColor.ARGB32.alpha(color) * opacity);
+        return FastColor.ARGB32.color(
+                alpha, FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color));
     }
 
     public void setMutedSound(boolean mutedSound) {
         this.mutedSound = mutedSound;
     }
 
-    public void setSound(Identifier sound) {
+    public void setSound(ResourceLocation sound) {
         this.sound = sound;
     }
 

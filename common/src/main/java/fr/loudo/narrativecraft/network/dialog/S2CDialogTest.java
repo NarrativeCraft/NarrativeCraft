@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CDialogTest(String mode, String text, int entityId) implements CustomPacketPayload {
 
     public static final Type<S2CDialogTest> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_test"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_test"));
 
     public static final StreamCodec<ByteBuf, S2CDialogTest> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,

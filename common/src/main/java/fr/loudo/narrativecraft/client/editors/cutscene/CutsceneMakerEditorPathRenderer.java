@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
@@ -32,7 +33,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -48,8 +49,9 @@ public class CutsceneMakerEditorPathRenderer {
         if (editor == null || editor.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;
 
         if (editor.getPlayback().isPlaying()) return;
-        Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
-        VertexConsumer vertexConsumer = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+        Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
+        RenderSystem.lineWidth(1.0f);
+        VertexConsumer vertexConsumer = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
         Matrix4f matrix4f = poseStack.last().pose();
 
         for (CutsceneMakerEditorLayer editorLayer : editor.getEditorLayers()) {
@@ -77,7 +79,7 @@ public class CutsceneMakerEditorPathRenderer {
                     cameraPos);
         }
 
-        mc.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
+        mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
     }
 
     private static void drawSegment(VertexConsumer vc, Matrix4f matrix, Vec3 from, Vec3 to, Vec3 cameraPos) {
@@ -94,13 +96,7 @@ public class CutsceneMakerEditorPathRenderer {
             dy /= len;
             dz /= len;
         }
-        vc.addVertex(matrix, x1, y1, z1)
-                .setColor(1.0F, 1.0F, 0.0F, 1.0F)
-                .setLineWidth(1.0F)
-                .setNormal(dx, dy, dz);
-        vc.addVertex(matrix, x2, y2, z2)
-                .setColor(1.0F, 1.0F, 0.0F, 1.0F)
-                .setLineWidth(.0F)
-                .setNormal(dx, dy, dz);
+        vc.addVertex(matrix, x1, y1, z1).setColor(1.0F, 1.0F, 0.0F, 1.0F).setNormal(dx, dy, dz);
+        vc.addVertex(matrix, x2, y2, z2).setColor(1.0F, 1.0F, 0.0F, 1.0F).setNormal(dx, dy, dz);
     }
 }

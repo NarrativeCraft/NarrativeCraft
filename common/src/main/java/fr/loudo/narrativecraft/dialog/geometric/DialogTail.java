@@ -27,9 +27,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix4f;
 
 public class DialogTail {
@@ -67,7 +67,7 @@ public class DialogTail {
 
         poseStack.pushPose();
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
         Matrix4f matrix = poseStack.last().pose();
 
         float topRight = -width / 2 + offset;
@@ -106,15 +106,13 @@ public class DialogTail {
 
     private void addVertex(Matrix4f matrix, VertexConsumer consumer, float x, float y, float opacity) {
         int base = dialog.getData().getBackgroundColor();
-        int alpha = (int) (net.minecraft.util.ARGB.alpha(base) * opacity);
-        int color = net.minecraft.util.ARGB.color(
+        int alpha = (int) (net.minecraft.util.FastColor.ARGB32.alpha(base) * opacity);
+        int color = net.minecraft.util.FastColor.ARGB32.color(
                 alpha,
-                net.minecraft.util.ARGB.red(base),
-                net.minecraft.util.ARGB.green(base),
-                net.minecraft.util.ARGB.blue(base));
-        consumer.addVertex(matrix, x, y, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
+                net.minecraft.util.FastColor.ARGB32.red(base),
+                net.minecraft.util.FastColor.ARGB32.green(base),
+                net.minecraft.util.FastColor.ARGB32.blue(base));
+        consumer.addVertex(matrix, x, y, 0).setLight(LightTexture.FULL_BRIGHT).setColor(color);
     }
 
     private void drawTailTop(Matrix4f m, VertexConsumer c, float topRight, float topLeft, float op) {

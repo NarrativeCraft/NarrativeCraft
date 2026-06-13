@@ -23,17 +23,18 @@
 
 package fr.loudo.narrativecraft.client.narrative.story;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 public class StorySaveIconRenderer {
 
-    private static final Identifier SAVE_ICON = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "save");
+    private static final ResourceLocation SAVE_ICON =
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "save");
     private static final int ICON_SIZE = 16;
     private static final int MARGIN = 20;
 
@@ -51,7 +52,7 @@ public class StorySaveIconRenderer {
         this.active = true;
     }
 
-    public void render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (!active) return;
 
         elapsedTicks += deltaTracker.getGameTimeDeltaPartialTick(true);
@@ -73,10 +74,11 @@ public class StorySaveIconRenderer {
             alpha = (int) Interpolation.lerp(255.0, 0.0, t);
         }
 
-        int x = guiGraphics.guiWidth() - ICON_SIZE - MARGIN;
-        int y = guiGraphics.guiHeight() - ICON_SIZE - MARGIN;
+        int x = Minecraft.getInstance().getWindow().getGuiScaledWidth() - ICON_SIZE - MARGIN;
+        int y = Minecraft.getInstance().getWindow().getGuiScaledHeight() - ICON_SIZE - MARGIN;
 
-        guiGraphics.blitSprite(
-                RenderPipelines.GUI_TEXTURED, SAVE_ICON, x, y, ICON_SIZE, ICON_SIZE, ARGB.color(alpha, 0xFFFFFF));
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha / 255.0f);
+        guiGraphics.blitSprite(SAVE_ICON, x, y, ICON_SIZE, ICON_SIZE);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }

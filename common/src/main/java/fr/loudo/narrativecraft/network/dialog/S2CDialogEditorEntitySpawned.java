@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CDialogEditorEntitySpawned(int entityId) implements CustomPacketPayload {
 
     public static final Type<S2CDialogEditorEntitySpawned> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_editor_entity_spawned"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialog_editor_entity_spawned"));
 
     public static final StreamCodec<ByteBuf, S2CDialogEditorEntitySpawned> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, S2CDialogEditorEntitySpawned::entityId, S2CDialogEditorEntitySpawned::new);

@@ -28,21 +28,21 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerModelType;
 
 public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
         extends AbstractNarrativeEntryEditScreen<T> {
 
     protected EntityType<?> selectedEntityType;
-    protected PlayerModelType selectedModelType;
+    protected PlayerSkin.Model selectedModelType;
 
     public AbstractCharacterEntryEditScreen(Screen lastScreen) {
         super(lastScreen);
         this.selectedEntityType = EntityType.PLAYER;
-        this.selectedModelType = PlayerModelType.WIDE;
+        this.selectedModelType = PlayerSkin.Model.WIDE;
     }
 
     public AbstractCharacterEntryEditScreen(T entry, Screen lastScreen) {
@@ -65,9 +65,9 @@ public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
 
         Button modelTypeButton = Button.builder(
                         Translation.message("screen.character.model_type", selectedModelType.name()), b -> {
-                            selectedModelType = selectedModelType == PlayerModelType.WIDE
-                                    ? PlayerModelType.SLIM
-                                    : PlayerModelType.WIDE;
+                            selectedModelType = selectedModelType == PlayerSkin.Model.WIDE
+                                    ? PlayerSkin.Model.SLIM
+                                    : PlayerSkin.Model.WIDE;
                             b.setMessage(Translation.message("screen.character.model_type", selectedModelType.name()));
                         })
                 .size(GLOBAL_WIDTH, 20)

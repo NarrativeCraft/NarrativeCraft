@@ -27,12 +27,12 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CStopAllInkActions() implements CustomPacketPayload {
 
     public static final Type<S2CStopAllInkActions> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "stop_all_ink_actions"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "stop_all_ink_actions"));
 
     public static final StreamCodec<ByteBuf, S2CStopAllInkActions> STREAM_CODEC =
             StreamCodec.unit(new S2CStopAllInkActions());

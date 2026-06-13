@@ -35,8 +35,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.util.ARGB;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
 public class ClientTextInkAction extends TextInkAction {
@@ -90,23 +90,25 @@ public class ClientTextInkAction extends TextInkAction {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {
+    public void render(GuiGraphics guiGraphics, float partialTick) {
         if (!isRunning || scrollText == null || dialogData == null) return;
 
         float currentOpacity = computeOpacity(partialTick);
-        int adjustedAlpha = (int) (ARGB.alpha(ARGB.color(255, color)) * currentOpacity);
-        dialogData.setTextColor(ARGB.color(adjustedAlpha, color));
+        int adjustedAlpha = (int) (FastColor.ARGB32.alpha(FastColor.ARGB32.color(255, color)) * currentOpacity);
+        dialogData.setTextColor(FastColor.ARGB32.color(adjustedAlpha, color));
 
         Font font = Minecraft.getInstance().font;
         cachedTextDimensions = scrollText.computeTextDimensions(width, font, dialogData);
 
-        float[] origin = computeOrigin(guiGraphics.guiWidth(), guiGraphics.guiHeight());
+        Minecraft mc = Minecraft.getInstance();
+        float[] origin =
+                computeOrigin(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
 
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(origin[0], origin[1]);
-        guiGraphics.pose().scale(scale, scale);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(origin[0], origin[1], 0);
+        guiGraphics.pose().scale(scale, scale, 1f);
         scrollText.render2D(guiGraphics, 0, 0, dialogData, partialTick);
-        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().popPose();
     }
 
     @Override
@@ -121,7 +123,7 @@ public class ClientTextInkAction extends TextInkAction {
             }
             dialogData = new DialogData();
             dialogData.setWidth(width);
-            dialogData.setTextColor(ARGB.color(255, color));
+            dialogData.setTextColor(FastColor.ARGB32.color(255, color));
             scrollText = new DialogScrollText(dialogData.getLetterSound(), dialogData.isSoundMuted());
             scrollText.setText(text);
             if (noTyping) scrollText.forceFinish();

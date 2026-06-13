@@ -26,9 +26,8 @@ package fr.loudo.narrativecraft.client.editors.cutscene;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public class CutsceneMakerEditorControl {
@@ -78,13 +77,13 @@ public class CutsceneMakerEditorControl {
         Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.PAUSE));
     }
 
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker, int mouseX, int mouseY) {
         button.setPosition(x, y);
-        button.extractRenderState(graphics, mouseX, mouseY, deltaTracker.getGameTimeDeltaTicks());
+        button.render(graphics, mouseX, mouseY, deltaTracker.getGameTimeDeltaTicks());
     }
 
-    public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
-        button.mouseClicked(event, isDoubleClick);
+    public void mouseClicked(double mouseX, double mouseY, int buttonVal, boolean isDoubleClick) {
+        button.mouseClicked(mouseX, mouseY, buttonVal);
     }
 
     public boolean isPlaying() {

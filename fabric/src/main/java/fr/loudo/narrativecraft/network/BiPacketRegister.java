@@ -29,10 +29,10 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 public class BiPacketRegister {
 
     public static void register() {
-        PayloadTypeRegistry.clientboundPlay()
+        PayloadTypeRegistry.playS2C()
                 .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay()
+        PayloadTypeRegistry.playC2S()
                 .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC);
     }
 }

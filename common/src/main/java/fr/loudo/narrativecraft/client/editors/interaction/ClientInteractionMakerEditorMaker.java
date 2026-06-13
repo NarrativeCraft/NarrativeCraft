@@ -40,11 +40,10 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
@@ -143,7 +142,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         return environment;
     }
 
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
@@ -165,10 +164,10 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
             cancelButton.setPosition(startX + (BUTTON_WIDTH + BUTTON_GAP) * 2, bottomY);
             saveButton.setPosition(startX + (BUTTON_WIDTH + BUTTON_GAP) * 3, bottomY);
 
-            place1Button.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
-            place2Button.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
-            cancelButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
-            saveButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
+            place1Button.render(graphics, mousePos[0], mousePos[1], partialTick);
+            place2Button.render(graphics, mousePos[0], mousePos[1], partialTick);
+            cancelButton.render(graphics, mousePos[0], mousePos[1], partialTick);
+            saveButton.render(graphics, mousePos[0], mousePos[1], partialTick);
         } else if (inPointPlacementMode) {
             int totalWidth = BUTTON_WIDTH * 3 + BUTTON_GAP * 2;
             int startX = screenWidth / 2 - totalWidth / 2;
@@ -182,9 +181,9 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
             cancelButton.setPosition(startX + BUTTON_WIDTH + BUTTON_GAP, bottomY);
             saveButton.setPosition(startX + (BUTTON_WIDTH + BUTTON_GAP) * 2, bottomY);
 
-            placeButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
-            cancelButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
-            saveButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
+            placeButton.render(graphics, mousePos[0], mousePos[1], partialTick);
+            cancelButton.render(graphics, mousePos[0], mousePos[1], partialTick);
+            saveButton.render(graphics, mousePos[0], mousePos[1], partialTick);
         } else {
             Button quitButton = buttons.get(0);
             Button saveButton = buttons.get(1);
@@ -200,14 +199,14 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
             zonesButton.setPosition(bottomStartX, bottomY);
             pointsButton.setPosition(bottomStartX + MENU_BUTTON_WIDTH + BUTTON_GAP, bottomY);
 
-            quitButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
-            saveButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
-            zonesButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
-            pointsButton.extractRenderState(graphics, mousePos[0], mousePos[1], partialTick);
+            quitButton.render(graphics, mousePos[0], mousePos[1], partialTick);
+            saveButton.render(graphics, mousePos[0], mousePos[1], partialTick);
+            zonesButton.render(graphics, mousePos[0], mousePos[1], partialTick);
+            pointsButton.render(graphics, mousePos[0], mousePos[1], partialTick);
         }
     }
 
-    public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+    public void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (!clearScreenOpened() || environment != NarrativeEnvironment.DEVELOPMENT) return;
         List<Button> activeButtons;
         if (inCornerPlacementMode) {
@@ -217,8 +216,8 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         } else {
             activeButtons = buttons;
         }
-        for (Button button : activeButtons) {
-            if (button.mouseClicked(event, isDoubleClick)) return;
+        for (Button button1 : activeButtons) {
+            if (button1.mouseClicked(mouseX, mouseY, button)) return;
         }
     }
 

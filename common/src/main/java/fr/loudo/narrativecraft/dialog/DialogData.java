@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.dialog;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class DialogData {
 
@@ -46,10 +46,11 @@ public class DialogData {
 
     private int backgroundColor = 0xCC000000;
     private int textColor = 0xFFFFFFFF;
-    private Identifier backgroundImage = null;
+    private ResourceLocation backgroundImage = null;
 
     private float scrollSpeed = 0;
-    private Identifier letterSound = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
+    private ResourceLocation letterSound =
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
     private boolean soundMuted = false;
 
     private boolean tailVisible = true;
@@ -230,11 +231,11 @@ public class DialogData {
         this.textColor = textColor;
     }
 
-    public Identifier getBackgroundImage() {
+    public ResourceLocation getBackgroundImage() {
         return backgroundImage;
     }
 
-    public void setBackgroundImage(Identifier backgroundImage) {
+    public void setBackgroundImage(ResourceLocation backgroundImage) {
         this.backgroundImage = backgroundImage;
     }
 
@@ -246,11 +247,11 @@ public class DialogData {
         this.scrollSpeed = scrollSpeed;
     }
 
-    public Identifier getLetterSound() {
+    public ResourceLocation getLetterSound() {
         return letterSound;
     }
 
-    public void setLetterSound(Identifier letterSound) {
+    public void setLetterSound(ResourceLocation letterSound) {
         this.letterSound = letterSound;
     }
 

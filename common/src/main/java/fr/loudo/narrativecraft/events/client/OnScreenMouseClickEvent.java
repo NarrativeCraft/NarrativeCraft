@@ -30,37 +30,36 @@ import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditor
 import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.EditorMaker;
-import net.minecraft.client.input.MouseButtonEvent;
 
 public class OnScreenMouseClickEvent {
 
-    public static void cutsceneHudClick(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
+    public static void cutsceneHudClick(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+            cutsceneEditor.mouseClicked(mouseX, mouseY, button, isDoubleClick);
         } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+            cameraAngleEditor.mouseClicked(mouseX, mouseY, button, isDoubleClick);
         } else if (editorMaker instanceof ClientInteractionMakerEditorMaker interactionEditor) {
-            interactionEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+            interactionEditor.mouseClicked(mouseX, mouseY, button, isDoubleClick);
         } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
-            globalDialogEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+            globalDialogEditor.mouseClicked(mouseX, mouseY, button, isDoubleClick);
         } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
-            characterDialogEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+            characterDialogEditor.mouseClicked(mouseX, mouseY, button, isDoubleClick);
         }
     }
 
-    public static void cutsceneHudRelease(MouseButtonEvent mouseButtonEvent) {
+    public static void cutsceneHudRelease(double mouseX, double mouseY, int button) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.mouseReleased(mouseButtonEvent);
+            cutsceneEditor.mouseReleased(mouseX, mouseY, button);
         } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.mouseReleased(mouseButtonEvent);
+            cameraAngleEditor.mouseReleased(mouseX, mouseY, button);
         } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
-            globalDialogEditor.mouseReleased(mouseButtonEvent);
+            globalDialogEditor.mouseReleased(mouseX, mouseY, button);
         } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
-            characterDialogEditor.mouseReleased(mouseButtonEvent);
+            characterDialogEditor.mouseReleased(mouseX, mouseY, button);
         }
     }
 }

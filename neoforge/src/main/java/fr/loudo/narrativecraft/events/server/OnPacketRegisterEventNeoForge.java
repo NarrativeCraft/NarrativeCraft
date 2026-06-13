@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.*;
+import fr.loudo.narrativecraft.network.C2SChangeGamemodePacket;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.*;
 import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
@@ -38,15 +39,12 @@ import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
-import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
-import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
-import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
-import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
-import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
+import fr.loudo.narrativecraft.network.mainScreen.*;
 import fr.loudo.narrativecraft.network.story.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @Mod(NarrativeCraftMod.MOD_ID)
@@ -196,44 +194,50 @@ public class OnPacketRegisterEventNeoForge {
                 C2SEnterDialogEditor.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::enterDialogEditor);
         registrar.playToServer(C2SStopStory.TYPE, C2SStopStory.STREAM_CODEC, ServerPacketHandlerNeoForge::stopStory);
+        registrar.playToServer(
+                C2SChangeGamemodePacket.TYPE,
+                C2SChangeGamemodePacket.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::changeGamemode);
     }
 
     private static void registerBiPackets(PayloadRegistrar registrar) {
         registrar.playBidirectional(
                 BiSyncNarrativeEntryPacket.TYPE,
                 BiSyncNarrativeEntryPacket.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::syncNarrativeEntry,
-                ClientPacketHandlerNeoForge::syncNarrativeEntry);
+                new DirectionalPayloadHandler<>(
+                        ClientPacketHandlerNeoForge::syncNarrativeEntry,
+                        ServerPacketHandlerNeoForge::syncNarrativeEntry));
         registrar.playBidirectional(
                 BiCutscenePlayHeadPacket.TYPE,
                 BiCutscenePlayHeadPacket.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::playHeadUpdate,
-                ClientPacketHandlerNeoForge::updatePlayHeadCutscene);
+                new DirectionalPayloadHandler<>(
+                        ClientPacketHandlerNeoForge::updatePlayHeadCutscene,
+                        ServerPacketHandlerNeoForge::playHeadUpdate));
         registrar.playBidirectional(
                 BiCameraAngleEnter.TYPE,
                 BiCameraAngleEnter.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::cameraAngleEnter,
-                ClientPacketHandlerNeoForge::cameraAngleEnter);
+                new DirectionalPayloadHandler<>(
+                        ClientPacketHandlerNeoForge::cameraAngleEnter, ServerPacketHandlerNeoForge::cameraAngleEnter));
         registrar.playBidirectional(
                 BiCutsceneEnter.TYPE,
                 BiCutsceneEnter.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::cutsceneState,
-                ClientPacketHandlerNeoForge::cutsceneState);
+                new DirectionalPayloadHandler<>(
+                        ClientPacketHandlerNeoForge::cutsceneState, ServerPacketHandlerNeoForge::cutsceneState));
         registrar.playBidirectional(
                 BiMainScreenEnter.TYPE,
                 BiMainScreenEnter.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::enterMainScreen,
-                ClientPacketHandlerNeoForge::enterMainScreen);
+                new DirectionalPayloadHandler<>(
+                        ClientPacketHandlerNeoForge::enterMainScreen, ServerPacketHandlerNeoForge::enterMainScreen));
         registrar.playBidirectional(
                 BiInteractionEnter.TYPE,
                 BiInteractionEnter.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::interactionEnter,
-                ClientPacketHandlerNeoForge::interactionEnter);
+                new DirectionalPayloadHandler<>(
+                        ClientPacketHandlerNeoForge::interactionEnter, ServerPacketHandlerNeoForge::interactionEnter));
         registrar.playBidirectional(
                 BiStopEditorMaker.TYPE,
                 BiStopEditorMaker.STREAM_CODEC,
-                ServerPacketHandlerNeoForge::stopEditorMaker,
-                ClientPacketHandlerNeoForge::stopEditorMaker);
+                new DirectionalPayloadHandler<>(
+                        ClientPacketHandlerNeoForge::stopEditorMaker, ServerPacketHandlerNeoForge::stopEditorMaker));
         registrar.playToServer(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC, ServerPacketHandlerNeoForge::playStory);
     }
 }

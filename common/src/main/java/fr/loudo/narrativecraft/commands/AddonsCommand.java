@@ -39,13 +39,12 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 
 public class AddonsCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(stack -> stack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(stack -> stack.hasPermission(2))
                 .then(Commands.literal("addon")
                         .then(Commands.literal("list").executes(AddonsCommand::listAddons))
                         .then(Commands.literal("info")
@@ -137,6 +136,7 @@ public class AddonsCommand {
                 .append(Component.literal(": "))
                 .append(Component.literal(url).withStyle(style -> style.withColor(ChatFormatting.AQUA)
                         .withUnderlined(true)
-                        .withClickEvent(new ClickEvent.OpenUrl(URI.create(url)))));
+                        .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.OPEN_URL, URI.create(url).toString()))));
     }
 }

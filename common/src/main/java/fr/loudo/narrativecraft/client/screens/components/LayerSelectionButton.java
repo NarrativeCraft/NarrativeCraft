@@ -23,10 +23,10 @@
 
 package fr.loudo.narrativecraft.client.screens.components;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 
 public class LayerSelectionButton extends AbstractButton {
@@ -39,13 +39,13 @@ public class LayerSelectionButton extends AbstractButton {
     }
 
     @Override
-    public void onPress(InputWithModifiers inputWithModifiers) {
+    public void onPress() {
         onPress.onPress(this);
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int i, int i1, float v) {
-        this.extractDefaultLabel(graphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
+    protected void renderWidget(GuiGraphics graphics, int i, int i1, float v) {
+        renderScrollingString(graphics, Minecraft.getInstance().font, 2, 0xFFFFFF);
         if (isHovered) {
             int x = getX(), y = getY(), r = x + getWidth(), b = y + getHeight();
             graphics.fill(x, y, r, y + 1, 0xFFFFFFFF); // top

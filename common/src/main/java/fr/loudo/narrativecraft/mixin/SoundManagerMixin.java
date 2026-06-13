@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.utils.VolumeAudio;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,7 +44,7 @@ public class SoundManagerMixin implements fr.loudo.narrativecraft.utils.VolumeAu
     }
 
     @Override
-    public void narrativecraft$setVolume(Identifier source, float volume) {
+    public void narrativecraft$setVolume(ResourceLocation source, float volume) {
         ((VolumeAudio) this.soundEngine).narrativecraft$setVolume(source, volume);
     }
 }

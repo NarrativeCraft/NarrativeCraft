@@ -38,10 +38,10 @@ public class OnScreenKeyEventNeoForge {
     }
 
     private static void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
-        OnScreenKeyEvent.onKeyPressed(event.getKeyEvent());
+        OnScreenKeyEvent.onKeyPressed(event.getKeyCode(), event.getScanCode(), event.getModifiers());
     }
 
     private static void onCharTyped(ScreenEvent.CharacterTyped.Pre event) {
-        OnScreenKeyEvent.onCharTyped(event.getCharacterEvent());
+        OnScreenKeyEvent.onCharTyped(event.getCodePoint(), event.getModifiers());
     }
 }

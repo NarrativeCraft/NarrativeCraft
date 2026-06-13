@@ -28,7 +28,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CShowDialogue(String speaker, String text, int entityId, String dialogDataJson)
         implements CustomPacketPayload {
@@ -36,7 +36,7 @@ public record S2CShowDialogue(String speaker, String text, int entityId, String 
     public static final int NO_ENTITY = -1;
 
     public static final Type<S2CShowDialogue> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "show_dialogue"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "show_dialogue"));
 
     public static final StreamCodec<ByteBuf, S2CShowDialogue> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,

@@ -75,8 +75,8 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
         nameBox.setValue(savedName);
 
         descriptionText = new StringWidget(Translation.message("description"), this.font);
-        descriptionBox =
-                new MultiLineEditBox.Builder().build(this.font, GLOBAL_WIDTH, 90, Translation.message("description"));
+        descriptionBox = new MultiLineEditBox(
+                this.font, 0, 0, GLOBAL_WIDTH, 90, Component.empty(), Translation.message("description"));
         descriptionBox.setValue(savedDescription);
 
         sendButton = Button.builder(Translation.message("send"), (b) -> {
@@ -144,7 +144,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
     }
 
     protected void sendToastError(Component title, Component message) {
-        minecraft.getToastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
+        minecraft.getToasts().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
     }
 
     protected boolean showDescription() {

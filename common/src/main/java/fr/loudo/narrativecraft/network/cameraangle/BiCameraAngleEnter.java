@@ -32,7 +32,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class BiCameraAngleEnter implements CustomPacketPayload {
 
@@ -56,7 +56,7 @@ public class BiCameraAngleEnter implements CustomPacketPayload {
     }
 
     public static final Type<BiCameraAngleEnter> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_enter"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_enter"));
 
     public static final StreamCodec<ByteBuf, BiCameraAngleEnter> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

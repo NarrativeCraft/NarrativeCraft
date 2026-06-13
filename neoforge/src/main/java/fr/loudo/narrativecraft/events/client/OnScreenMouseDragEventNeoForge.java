@@ -37,6 +37,7 @@ public class OnScreenMouseDragEventNeoForge {
     }
 
     private static void onDragMouse(ScreenEvent.MouseDragged.Post event) {
-        OnScreenMouseDragEvent.onCutsceneTimelineDrag(event.getMouseButtonEvent(), event.getDragX(), event.getDragY());
+        OnScreenMouseDragEvent.onCutsceneTimelineDrag(
+                event.getMouseX(), event.getMouseY(), event.getMouseButton(), event.getDragX(), event.getDragY());
     }
 }

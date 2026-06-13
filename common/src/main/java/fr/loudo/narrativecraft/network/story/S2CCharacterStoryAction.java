@@ -30,7 +30,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CCharacterStoryAction(UUID characterId, Action action) implements CustomPacketPayload {
 
@@ -41,7 +41,7 @@ public record S2CCharacterStoryAction(UUID characterId, Action action) implement
     }
 
     public static final Type<S2CCharacterStoryAction> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character_story_action"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character_story_action"));
 
     public static final StreamCodec<ByteBuf, S2CCharacterStoryAction> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

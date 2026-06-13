@@ -32,7 +32,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class BiCutsceneEnter implements CustomPacketPayload {
 
@@ -56,7 +56,7 @@ public class BiCutsceneEnter implements CustomPacketPayload {
     }
 
     public static final Type<BiCutsceneEnter> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_state"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_state"));
 
     public static final StreamCodec<ByteBuf, BiCutsceneEnter> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

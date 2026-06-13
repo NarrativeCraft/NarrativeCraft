@@ -30,13 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 public class DialogPreviewPanel {
 
@@ -194,7 +191,7 @@ public class DialogPreviewPanel {
         return box;
     }
 
-    public void render(GuiGraphicsExtractor graphics, int screenWidth, int screenHeight, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, int screenWidth, int screenHeight, int mouseX, int mouseY) {
         if (entries.isEmpty()) return;
 
         Minecraft mc = Minecraft.getInstance();
@@ -203,11 +200,12 @@ public class DialogPreviewPanel {
         int contentHeight = computeContentHeight(entries.size());
 
         graphics.fill(panelX - 1, panelY - 1, panelX + PANEL_WIDTH + 1, panelY + contentHeight + 1, 0xFFAAAAAA);
-        graphics.fill(panelX, panelY, panelX + PANEL_WIDTH, panelY + contentHeight, ARGB.color(220, 0, 0, 0));
+        graphics.fill(
+                panelX, panelY, panelX + PANEL_WIDTH, panelY + contentHeight, FastColor.ARGB32.color(220, 0, 0, 0));
 
         int y = panelY + PADDING;
 
-        graphics.text(
+        graphics.drawString(
                 mc.font,
                 Translation.message("screen.dialog_preview.title").getString(),
                 panelX + PADDING,
@@ -224,7 +222,8 @@ public class DialogPreviewPanel {
                             ? 0xFF334455
                             : 0xFF222222);
             graphics.fill(panelX + PADDING, y, panelX + PANEL_WIDTH - PADDING, y + ROW_HEIGHT - 2, rowColor);
-            graphics.text(mc.font, entry.getLabel(), panelX + PADDING + 2, y + 2, selected ? 0xFFFFFFFF : 0xFFAAAAAA);
+            graphics.drawString(
+                    mc.font, entry.getLabel(), panelX + PADDING + 2, y + 2, selected ? 0xFFFFFFFF : 0xFFAAAAAA);
             y += ROW_HEIGHT;
         }
 
@@ -306,41 +305,34 @@ public class DialogPreviewPanel {
             boolean advHover = isOver(mouseX, mouseY, panelX + PADDING, y, advBtnWidth, 10);
             graphics.fill(
                     panelX + PADDING, y, panelX + PADDING + advBtnWidth, y + 10, advHover ? 0xFF555577 : 0xFF333355);
-            graphics.text(mc.font, "...", panelX + PANEL_WIDTH / 2 - mc.font.width("...") / 2, y + 1, 0xFFFFFFFF);
+            graphics.drawString(mc.font, "...", panelX + PANEL_WIDTH / 2 - mc.font.width("...") / 2, y + 1, 0xFFFFFFFF);
         } else {
             advancedButtonY = -1;
         }
     }
 
     private int renderEditBoxRow(
-            GuiGraphicsExtractor graphics,
-            Minecraft mc,
-            String label,
-            int panelX,
-            int y,
-            EditBox box,
-            int mouseX,
-            int mouseY) {
-        graphics.text(mc.font, label, panelX + PADDING, y, 0xFFCCCCCC);
+            GuiGraphics graphics, Minecraft mc, String label, int panelX, int y, EditBox box, int mouseX, int mouseY) {
+        graphics.drawString(mc.font, label, panelX + PADDING, y, 0xFFCCCCCC);
         y += ROW_HEIGHT - 2;
         if (box != null) {
             box.setX(panelX + PADDING);
             box.setY(y);
-            box.extractRenderState(graphics, mouseX, mouseY, 0);
+            box.render(graphics, mouseX, mouseY, 0);
         }
         return y + EDITBOX_HEIGHT + FIELD_GAP;
     }
 
-    public boolean mouseClicked(MouseButtonEvent event) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (entries.isEmpty()) return false;
         Minecraft mc = Minecraft.getInstance();
         int panelX = getPanelX(mc.getWindow().getGuiScaledWidth());
-        int mouseX = (int) event.x();
-        int mouseY = (int) event.y();
+        int imx = (int) mouseX;
+        int imy = (int) mouseY;
 
         int y = 35 + PADDING + ROW_HEIGHT + 2;
         for (int i = 0; i < entries.size(); i++) {
-            if (isOver(mouseX, mouseY, panelX + PADDING, y, PANEL_WIDTH - PADDING * 2, ROW_HEIGHT - 2)) {
+            if (isOver(imx, imy, panelX + PADDING, y, PANEL_WIDTH - PADDING * 2, ROW_HEIGHT - 2)) {
                 if (selectedIndex != i) {
                     selectedIndex = i;
                     rebuildEditBoxes();
@@ -354,18 +346,18 @@ public class DialogPreviewPanel {
 
         unfocusAll();
 
-        if (tryFocusBox(previewTextBox, mouseX, mouseY, event)) return true;
-        if (tryFocusBox(offsetXBox, mouseX, mouseY, event)) return true;
-        if (tryFocusBox(offsetYBox, mouseX, mouseY, event)) return true;
-        if (tryFocusBox(scaleBox, mouseX, mouseY, event)) return true;
-        if (tryFocusBox(backgroundColorBox, mouseX, mouseY, event)) return true;
-        if (tryFocusBox(opacityBox, mouseX, mouseY, event)) return true;
-        if (tryFocusBox(textColorBox, mouseX, mouseY, event)) return true;
+        if (tryFocusBox(previewTextBox, mouseX, mouseY, button)) return true;
+        if (tryFocusBox(offsetXBox, mouseX, mouseY, button)) return true;
+        if (tryFocusBox(offsetYBox, mouseX, mouseY, button)) return true;
+        if (tryFocusBox(scaleBox, mouseX, mouseY, button)) return true;
+        if (tryFocusBox(backgroundColorBox, mouseX, mouseY, button)) return true;
+        if (tryFocusBox(opacityBox, mouseX, mouseY, button)) return true;
+        if (tryFocusBox(textColorBox, mouseX, mouseY, button)) return true;
 
         int advBtnWidth = PANEL_WIDTH - PADDING * 2;
         if (fieldSet != DialogFieldSet.CAMERA_VIEW
                 && advancedButtonY > 0
-                && isOver(mouseX, mouseY, panelX + PADDING, advancedButtonY, advBtnWidth, 10)) {
+                && isOver(imx, imy, panelX + PADDING, advancedButtonY, advBtnWidth, 10)) {
             DialogPreviewEntry entry = getSelectedEntry();
             if (entry != null && onToggleAdvanced != null) {
                 onToggleAdvanced.accept(entry.getData());
@@ -376,11 +368,11 @@ public class DialogPreviewPanel {
         return false;
     }
 
-    private boolean tryFocusBox(EditBox box, int mouseX, int mouseY, MouseButtonEvent event) {
+    private boolean tryFocusBox(EditBox box, double mouseX, double mouseY, int button) {
         if (box == null) return false;
-        if (isOver(mouseX, mouseY, box.getX(), box.getY(), box.getWidth(), box.getHeight())) {
+        if (isOver((int) mouseX, (int) mouseY, box.getX(), box.getY(), box.getWidth(), box.getHeight())) {
             box.setFocused(true);
-            box.mouseClicked(event, false);
+            box.mouseClicked(mouseX, mouseY, button);
             return true;
         }
         return false;
@@ -406,40 +398,40 @@ public class DialogPreviewPanel {
         return false;
     }
 
-    public void keyPressed(KeyEvent event) {
-        forwardKeyToAll(event);
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+        forwardKeyToAll(keyCode, scanCode, modifiers);
     }
 
-    public void charTyped(CharacterEvent event) {
-        forwardCharToAll(event);
+    public void charTyped(char codePoint, int modifiers) {
+        forwardCharToAll(codePoint, modifiers);
     }
 
-    private void forwardKeyToAll(KeyEvent event) {
-        forwardKeyToFocused(previewTextBox, event);
-        forwardKeyToFocused(offsetXBox, event);
-        forwardKeyToFocused(offsetYBox, event);
-        forwardKeyToFocused(scaleBox, event);
-        forwardKeyToFocused(backgroundColorBox, event);
-        forwardKeyToFocused(opacityBox, event);
-        forwardKeyToFocused(textColorBox, event);
+    private void forwardKeyToAll(int keyCode, int scanCode, int modifiers) {
+        forwardKeyToFocused(previewTextBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(offsetXBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(offsetYBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(scaleBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(backgroundColorBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(opacityBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(textColorBox, keyCode, scanCode, modifiers);
     }
 
-    private void forwardKeyToFocused(EditBox box, KeyEvent event) {
-        if (box != null && box.isFocused()) box.keyPressed(event);
+    private void forwardKeyToFocused(EditBox box, int keyCode, int scanCode, int modifiers) {
+        if (box != null && box.isFocused()) box.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    private void forwardCharToAll(CharacterEvent event) {
-        forwardCharToFocused(previewTextBox, event);
-        forwardCharToFocused(offsetXBox, event);
-        forwardCharToFocused(offsetYBox, event);
-        forwardCharToFocused(scaleBox, event);
-        forwardCharToFocused(backgroundColorBox, event);
-        forwardCharToFocused(opacityBox, event);
-        forwardCharToFocused(textColorBox, event);
+    private void forwardCharToAll(char codePoint, int modifiers) {
+        forwardCharToFocused(previewTextBox, codePoint, modifiers);
+        forwardCharToFocused(offsetXBox, codePoint, modifiers);
+        forwardCharToFocused(offsetYBox, codePoint, modifiers);
+        forwardCharToFocused(scaleBox, codePoint, modifiers);
+        forwardCharToFocused(backgroundColorBox, codePoint, modifiers);
+        forwardCharToFocused(opacityBox, codePoint, modifiers);
+        forwardCharToFocused(textColorBox, codePoint, modifiers);
     }
 
-    private void forwardCharToFocused(EditBox box, CharacterEvent event) {
-        if (box != null && box.isFocused()) box.charTyped(event);
+    private void forwardCharToFocused(EditBox box, char codePoint, int modifiers) {
+        if (box != null && box.isFocused()) box.charTyped(codePoint, modifiers);
     }
 
     public boolean isAnyBoxFocused() {

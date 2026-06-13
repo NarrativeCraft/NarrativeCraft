@@ -86,8 +86,7 @@ public class OptionsScreen extends Screen {
 
         addRenderableWidget(Button.builder(
                         Translation.message("screen.main.options.minecraft_options"),
-                        button -> minecraft.setScreen(new net.minecraft.client.gui.screens.options.OptionsScreen(
-                                this, minecraft.options, false)))
+                        button -> minecraft.setScreen(new OptionsScreen(this)))
                 .bounds(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT)
                 .build());
 

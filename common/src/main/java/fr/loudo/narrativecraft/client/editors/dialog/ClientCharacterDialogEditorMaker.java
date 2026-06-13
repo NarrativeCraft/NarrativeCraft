@@ -44,12 +44,9 @@ import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
@@ -158,7 +155,7 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
         }
     }
 
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         if (rendererData != null) {
             rendererData.copyFrom(
                     DialogData.from(NarrativeCraftMod.getInstance().getGlobalDialogData(), working));
@@ -170,8 +167,8 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
         closeButton.setPosition(5, 5);
         saveButton.setPosition(closeButton.getX() + closeButton.getWidth() + 5, 5);
 
-        closeButton.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
-        saveButton.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+        closeButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+        saveButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
 
         previewPanel.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
         if (advancedPanel.isVisible()) {
@@ -179,41 +176,41 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
         }
     }
 
-    public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+    public void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (!clearScreenOpened()) return;
-        if (advancedPanel.isVisible() && advancedPanel.mouseClicked(event)) {
+        if (advancedPanel.isVisible() && advancedPanel.mouseClicked(mouseX, mouseY, button)) {
             previewPanel.unfocusAll();
             return;
         }
-        if (closeButton.mouseClicked(event, isDoubleClick)) return;
-        if (saveButton.mouseClicked(event, isDoubleClick)) return;
-        if (previewPanel.mouseClicked(event)) {
+        if (closeButton.mouseClicked(mouseX, mouseY, button)) return;
+        if (saveButton.mouseClicked(mouseX, mouseY, button)) return;
+        if (previewPanel.mouseClicked(mouseX, mouseY, button)) {
             advancedPanel.unfocusAll();
         }
     }
 
-    public void mouseReleased(MouseButtonEvent event) {
+    public void mouseReleased(double mouseX, double mouseY, int button) {
         if (!clearScreenOpened()) return;
         previewPanel.mouseReleased();
     }
 
-    public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (!clearScreenOpened()) return;
-        previewPanel.mouseDragged(event.y());
+        previewPanel.mouseDragged((mouseY));
     }
 
-    public void keyPressed(KeyEvent event) {
-        previewPanel.keyPressed(event);
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+        previewPanel.keyPressed(keyCode, scanCode, modifiers);
         if (previewPanel.isAnyBoxFocused()) return;
         if (advancedPanel.isVisible()) {
-            advancedPanel.keyPressed(event);
+            advancedPanel.keyPressed(keyCode, scanCode, modifiers);
         }
     }
 
-    public void charTyped(CharacterEvent event) {
-        previewPanel.charTyped(event);
+    public void charTyped(char codePoint, int modifiers) {
+        previewPanel.charTyped(codePoint, modifiers);
         if (advancedPanel.isVisible()) {
-            advancedPanel.charTyped(event);
+            advancedPanel.charTyped(codePoint, modifiers);
         }
     }
 

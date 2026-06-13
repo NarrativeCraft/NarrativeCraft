@@ -30,13 +30,13 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record C2SPlayStitchStory(String stitchName, UUID interactionId, boolean oneTime)
         implements CustomPacketPayload {
 
     public static final Type<C2SPlayStitchStory> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_stitch_story"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_stitch_story"));
 
     public static final StreamCodec<ByteBuf, C2SPlayStitchStory> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,

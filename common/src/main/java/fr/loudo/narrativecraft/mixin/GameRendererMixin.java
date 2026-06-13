@@ -28,26 +28,42 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
+    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
+    private void narrativecraft$getFov(
+            Camera p_109142_, float p_109143_, boolean p_109144_, CallbackInfoReturnable<Double> cir) {
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (playerSession == null) return;
+        float customFov = -1;
+
+        if (playerSession.getCutsceneDataSession() != null) {
+            customFov = playerSession.getCutsceneDataSession().getFov();
+        }
+        if (playerSession.getCameraView() != null) {
+            customFov = playerSession.getCameraView().getFov();
+        }
+        if (customFov == -1f) return;
+
+        cir.setReturnValue((double) customFov);
+    }
+
     @Inject(method = "bobHurt", at = @At("RETURN"))
-    private void narrativecraft$shakeScreenInkAction(
-            CameraRenderState cameraState, PoseStack poseStack, CallbackInfo ci) {
+    private void narrativecraft$shakeScreenInkAction(PoseStack poseStack, float partialTick, CallbackInfo ci) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        DeltaTracker deltaTracker = Minecraft.getInstance().getDeltaTracker();
         for (InkAction action : session.getActiveClientInkActions()) {
             if (!(action instanceof ClientShakeScreenInkAction clientShakeScreenInkAction)) continue;
-            clientShakeScreenInkAction.shakeScreen(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
+            clientShakeScreenInkAction.shakeScreen(poseStack, partialTick);
         }
     }
 }

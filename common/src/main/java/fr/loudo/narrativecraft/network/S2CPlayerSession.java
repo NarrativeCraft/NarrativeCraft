@@ -29,12 +29,12 @@ import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CPlayerSession(UUID chapterId, UUID sceneId) implements CustomPacketPayload {
 
     public static final Type<S2CPlayerSession> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "player_session"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "player_session"));
 
     public static final StreamCodec<ByteBuf, S2CPlayerSession> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,

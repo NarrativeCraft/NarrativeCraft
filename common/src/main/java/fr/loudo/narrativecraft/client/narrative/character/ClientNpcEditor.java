@@ -38,7 +38,7 @@ import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 
 public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, Npc> {
@@ -128,7 +128,7 @@ public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, N
 
     private EntityType<?> resolveEntityType(String entityTypeId) {
         return BuiltInRegistries.ENTITY_TYPE
-                .getOptional(Identifier.parse(entityTypeId))
+                .getOptional(ResourceLocation.parse(entityTypeId))
                 .orElse(EntityType.PLAYER);
     }
 }

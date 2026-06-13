@@ -27,14 +27,14 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class S2CNarrativeDataClear implements CustomPacketPayload {
 
     public static final S2CNarrativeDataClear INSTANCE = new S2CNarrativeDataClear();
 
     public static final Type<S2CNarrativeDataClear> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "clear_narrative_data"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "clear_narrative_data"));
 
     public static final StreamCodec<ByteBuf, S2CNarrativeDataClear> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 

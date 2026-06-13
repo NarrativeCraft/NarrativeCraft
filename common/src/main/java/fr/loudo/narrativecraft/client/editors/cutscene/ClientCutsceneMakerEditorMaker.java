@@ -49,14 +49,12 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 /**
  * The main container of CutsceneEditor but for the client, it handles all the rendering and server communication.
@@ -80,7 +78,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
             ClientNarrativeCraftMod.getInstance().getPlayerSession();
     private final List<Button> buttons = new ArrayList<>();
     private final CutsceneMakerEditorLayerSelector layerSelector =
-            new CutsceneMakerEditorLayerSelector(this, 90, 120, ARGB.color(190, 0, 0, 0));
+            new CutsceneMakerEditorLayerSelector(this, 90, 120, FastColor.ARGB32.color(190, 0, 0, 0));
     private final CutsceneMakerEditorPlayHead playHead = new CutsceneMakerEditorPlayHead(11, 90, 5);
     private final CutsceneMakerEditorControl control;
     private final CutsceneEditorPlayback playback;
@@ -103,6 +101,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     private float scrollbarDragStartMouseX = 0f;
     private float scrollbarDragStartViewTick = 0f;
     private boolean renderingHud = true;
+    private boolean wasPlaying = false;
 
     public ClientCutsceneMakerEditorMaker(Cutscene cutscene, NarrativeEnvironment environment) {
         this.cutscene = cutscene;
@@ -195,11 +194,10 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void tick() {
-        boolean hideGui = Minecraft.getInstance().options.hideGui;
-        if (playback.isPlaying() && !hideGui) {
-            Minecraft.getInstance().options.hideGui = true;
-        } else if (!playback.isPlaying() && hideGui) {
-            Minecraft.getInstance().options.hideGui = false;
+        boolean isPlaying = playback.isPlaying();
+        if (isPlaying != wasPlaying) {
+            Minecraft.getInstance().options.hideGui = isPlaying;
+            wasPlaying = isPlaying;
         }
     }
 
@@ -239,7 +237,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
     }
 
-    private void renderLayers(GuiGraphicsExtractor graphics, DeltaTracker delta, int mouseX, int mouseY) {
+    private void renderLayers(GuiGraphics graphics, DeltaTracker delta, int mouseX, int mouseY) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         int screenHeight = mc.getWindow().getGuiScaledHeight();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
@@ -250,7 +248,8 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         float visibleTicks = getVisibleTicks();
         int viewportHeight = LAYERS_START_Y_OFFSET - RULER_HEIGHT;
 
-        graphics.fill(0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, ARGB.color(0.8f, 0));
+        graphics.fill(
+                0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, FastColor.ARGB32.color((int) (0.8 * 255), 0));
         graphics.fill(LAYER_GAP, layerStartY, LAYER_GAP + 1, screenHeight, 0xFFFFFFFF);
 
         renderRuler(graphics, screenWidth, screenHeight, layerStartY, timelineWidth, visibleTicks);
@@ -260,7 +259,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
             int layerBottom = currentY + LAYER_HEIGHT;
             if (currentY >= layersAreaStartY && currentY < screenHeight) {
                 graphics.fill(0, layerBottom - 1, screenWidth, layerBottom, 0xFFFFFFFF);
-                graphics.text(
+                graphics.drawString(
                         mc.font,
                         editorLayer.getLayer().getType().getName(),
                         CutsceneMakerEditorLayer.NAME_X,
@@ -299,7 +298,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     private void renderRuler(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int screenWidth,
             int screenHeight,
             int rulerY,
@@ -314,7 +313,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         // Global tick / time display in the left panel
         int currentTick = (int) playback.getCurrentTick();
         String tickDisplay = currentTick + " / " + formatTimeTicks(currentTick);
-        graphics.text(mc.font, Component.literal(tickDisplay), 2, rulerY + 1, 0xFFFFFFFF);
+        graphics.drawString(mc.font, Component.literal(tickDisplay), 2, rulerY + 1, 0xFFFFFFFF);
 
         int firstSecond = (int) (viewStartTick / TICKS_PER_SECOND);
         int lastSecond = (int) Math.ceil((viewStartTick + visibleTicks) / TICKS_PER_SECOND);
@@ -336,7 +335,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
             String label = formatTimeTicks(tickAtSecond);
             int labelWidth = mc.font.width(label);
             int labelX = Math.clamp(xi - labelWidth / 2, LAYER_GAP, LAYER_GAP + timelineWidth - labelWidth);
-            graphics.text(mc.font, Component.literal(label), labelX, rulerY + 1, 0xFFFFFFFF);
+            graphics.drawString(mc.font, Component.literal(label), labelX, rulerY + 1, 0xFFFFFFFF);
 
             // 3 small subdivision lines between this second and the next
             for (int sub = 1; sub <= 3; sub++) {
@@ -351,7 +350,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
     }
 
-    private void renderScrollbar(GuiGraphicsExtractor graphics, int screenHeight, int timelineWidth) {
+    private void renderScrollbar(GuiGraphics graphics, int screenHeight, int timelineWidth) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         float visibleTicks = getVisibleTicks();
         if (visibleTicks >= totalTick) return;
@@ -446,7 +445,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         if (!renderingHud) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
 
-        if (Minecraft.getInstance().hasAltDown() && mousePos[1] >= getStartLayerY()) {
+        if (Screen.hasAltDown() && mousePos[1] >= getStartLayerY()) {
             applyZoom(deltaY, mousePos[0]);
             return;
         }
@@ -461,7 +460,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         scrollOffset = (int) Math.clamp(scrollOffset - deltaY * LAYER_HEIGHT, 0, maxScroll);
     }
 
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         playback.tick(deltaTracker);
 
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
@@ -475,7 +474,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         renderLayers(graphics, deltaTracker, mousePos[0], mousePos[1]);
 
         for (Button button : buttons) {
-            button.extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            button.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
         }
         layerSelector.render(graphics, deltaTracker);
 
@@ -501,46 +500,46 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                 mousePos[1]);
     }
 
-    public void charTyped(CharacterEvent event) {
+    public void charTyped(char codePoint, int modifiers) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (openMenu != null && openMenu.isVisible()) {
-            openMenu.charTyped(event);
+            openMenu.charTyped(codePoint, modifiers);
         }
     }
 
-    public void keyPressed(KeyEvent event) {
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         // Shortcuts are handled first; they consume the event if matched
-        if (shortcuts.handleKeyPressed(event)) return;
+        if (shortcuts.handleKeyPressed(keyCode, scanCode, modifiers)) return;
         if (openMenu != null && openMenu.isVisible()) {
-            openMenu.keyPressed(event);
+            openMenu.keyPressed(keyCode, scanCode, modifiers);
         }
     }
 
-    public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
+    public void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
 
-        if (rollWidget.mouseClicked(mouseButtonEvent)) return;
+        if (rollWidget.mouseClicked(mouseX, mouseY, button)) return;
 
-        if (isOverScrollbar(mouseButtonEvent.x(), mouseButtonEvent.y())) {
+        if (isOverScrollbar((mouseX), (mouseY))) {
             scrollbarDragging = true;
-            scrollbarDragStartMouseX = (float) mouseButtonEvent.x();
+            scrollbarDragStartMouseX = (float) (mouseX);
             scrollbarDragStartViewTick = viewStartTick;
             return;
         }
 
         if (openMenu != null && openMenu.isVisible()) {
-            if (openMenu.mouseClicked(mouseButtonEvent, isDoubleClick)) return;
+            if (openMenu.mouseClicked(mouseX, mouseY, button, isDoubleClick)) return;
         }
         boolean onAddLayerButton = addLayerButton.isMouseOver(mousePos[0], mousePos[1]);
-        for (Button button : buttons) {
-            button.mouseClicked(mouseButtonEvent, isDoubleClick);
+        for (Button button1 : buttons) {
+            button1.mouseClicked(mouseX, mouseY, button);
         }
         if (!onAddLayerButton) {
-            layerSelector.mouseClicked(mouseButtonEvent, isDoubleClick);
+            layerSelector.mouseClicked(mouseX, mouseY, button, isDoubleClick);
         }
-        control.mouseClicked(mouseButtonEvent, isDoubleClick);
+        control.mouseClicked(mouseX, mouseY, button, isDoubleClick);
 
         // Check keyframes and layer buttons before the playhead to avoid conflicts
         int layersAreaStartY = getLayersAreaStartY();
@@ -573,7 +572,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                 }
                 Keyframe hovered = editorLayer.getHoveredKeyframe(mousePos[0], mousePos[1]);
                 if (hovered != null) {
-                    handleKeyframeClick(hovered, mouseButtonEvent, isDoubleClick);
+                    handleKeyframeClick(hovered, mouseX, mouseY, button, isDoubleClick);
                     return;
                 }
             }
@@ -589,13 +588,14 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         if (playHead.isHovered()) {
             playHead.setDragging(true);
         } else {
-            playHead.onClick(mouseButtonEvent, LAYER_GAP, getTimelineWidth(), getStartLayerY());
+            playHead.onClick(mouseX, mouseY, button, LAYER_GAP, getTimelineWidth(), getStartLayerY());
             updateTick();
         }
     }
 
-    private void handleKeyframeClick(Keyframe keyframe, MouseButtonEvent event, boolean isDoubleClick) {
-        if (Minecraft.getInstance().hasShiftDown()) {
+    private void handleKeyframeClick(
+            Keyframe keyframe, double mouseX, double mouseY, int button, boolean isDoubleClick) {
+        if (Screen.hasShiftDown()) {
             // Shift+click: toggle this keyframe in/out of the selection
             if (selectedKeyframes.contains(keyframe)) {
                 keyframe.setSelected(false);
@@ -622,14 +622,14 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
 
         // Start drag tracking for all currently selected keyframes
-        draggingStartMouseX = (float) event.x();
+        draggingStartMouseX = (float) (mouseX);
         draggingOriginalTicks = new HashMap<>();
         for (Keyframe selected : selectedKeyframes) {
             draggingOriginalTicks.put(selected, selected.getTick());
         }
     }
 
-    public void mouseReleased(MouseButtonEvent mouseButtonEvent) {
+    public void mouseReleased(double mouseX, double mouseY, int button) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         rollWidget.mouseReleased();
         playHead.setDragging(false);
@@ -640,19 +640,18 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         scrollbarDragging = false;
     }
 
-    public void mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
+    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
-        if (rollWidget.mouseDragged(mouseButtonEvent.y())) return;
+        if (rollWidget.mouseDragged((mouseY))) return;
         if (scrollbarDragging) {
-            float dragDeltaPixels = (float) mouseButtonEvent.x() - scrollbarDragStartMouseX;
+            float dragDeltaPixels = (float) (mouseX) - scrollbarDragStartMouseX;
             float tickDelta = dragDeltaPixels / getTimelineWidth() * totalTick;
             viewStartTick = scrollbarDragStartViewTick + tickDelta;
             clampViewStart();
             return;
         }
         if (draggingOriginalTicks != null && !draggingOriginalTicks.isEmpty()) {
-            float deltaTick =
-                    (float) ((mouseButtonEvent.x() - draggingStartMouseX) / getTimelineWidth() * getVisibleTicks());
+            float deltaTick = (float) (((mouseX) - draggingStartMouseX) / getTimelineWidth() * getVisibleTicks());
             for (Map.Entry<Keyframe, Integer> entry : draggingOriginalTicks.entrySet()) {
                 int newTick = (int) Math.clamp(entry.getValue() + deltaTick, 0, totalTick);
                 entry.getKey().setTick(newTick);
@@ -660,12 +659,12 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
             return;
         }
         if (playHead.isDragging()) {
-            playHead.onMouseDrag(mouseButtonEvent.x(), LAYER_GAP, getTimelineWidth());
+            playHead.onMouseDrag((mouseX), LAYER_GAP, getTimelineWidth());
             updateTick();
             return;
         }
         if (openMenu != null && openMenu.isVisible()) {
-            openMenu.mouseDragged(mouseButtonEvent, dragX, dragY);
+            openMenu.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         }
     }
 

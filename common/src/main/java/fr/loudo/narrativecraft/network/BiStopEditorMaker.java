@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class BiStopEditorMaker implements CustomPacketPayload {
 
@@ -36,7 +36,7 @@ public class BiStopEditorMaker implements CustomPacketPayload {
     private BiStopEditorMaker() {}
 
     public static final Type<BiStopEditorMaker> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "stop_editor_maker"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "stop_editor_maker"));
 
     public static final StreamCodec<ByteBuf, BiStopEditorMaker> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 

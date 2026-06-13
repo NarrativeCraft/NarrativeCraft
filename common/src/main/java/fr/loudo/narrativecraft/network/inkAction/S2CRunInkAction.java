@@ -28,13 +28,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CRunInkAction(long instanceId, String keyword, String parsedArgsJson, boolean blocking)
         implements CustomPacketPayload {
 
     public static final Type<S2CRunInkAction> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "run_ink_action"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "run_ink_action"));
 
     public static final StreamCodec<ByteBuf, S2CRunInkAction> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_LONG,

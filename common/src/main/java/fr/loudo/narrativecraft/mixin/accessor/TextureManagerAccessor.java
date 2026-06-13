@@ -21,11 +21,17 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.gui;
+package fr.loudo.narrativecraft.mixin.accessor;
 
-import net.minecraft.client.gui.navigation.ScreenRectangle;
+import java.util.Map;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.resources.ResourceLocation;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-public interface IGuiGraphicsExtractorExtension {
-
-    ScreenRectangle getPeekScissorStack();
+@Mixin(TextureManager.class)
+public interface TextureManagerAccessor {
+    @Accessor("byPath")
+    Map<ResourceLocation, AbstractTexture> getByPath();
 }

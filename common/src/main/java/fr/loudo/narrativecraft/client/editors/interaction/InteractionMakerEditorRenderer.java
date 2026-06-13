@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.interaction;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -42,10 +43,10 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -53,8 +54,8 @@ import org.joml.Vector3f;
 
 public class InteractionMakerEditorRenderer {
 
-    private static final Identifier POINT_TEXTURE =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/interaction/interaction_point.png");
+    private static final ResourceLocation POINT_TEXTURE = ResourceLocation.fromNamespaceAndPath(
+            NarrativeCraftMod.MOD_ID, "textures/interaction/interaction_point.png");
     private static final float POINT_SPRITE_SCALE = 0.1f;
     private static final float POINT_ANIMATION_SPEED = 6.5f;
     private static final Map<UUID, Float> pointAnimT = new HashMap<>();
@@ -65,12 +66,13 @@ public class InteractionMakerEditorRenderer {
         if (!(editorMaker instanceof ClientInteractionMakerEditorMaker interactionEditor)) return;
 
         Minecraft minecraft = Minecraft.getInstance();
-        Vec3 cameraPosition = minecraft.gameRenderer.getMainCamera().position();
+        Vec3 cameraPosition = minecraft.gameRenderer.getMainCamera().getPosition();
         Interaction interaction = interactionEditor.getInteraction();
         boolean isDev = interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT;
         float deltaSeconds = deltaTracker.getGameTimeDeltaTicks() / 20.0f;
 
-        VertexConsumer lineConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+        RenderSystem.lineWidth(4.0f);
+        VertexConsumer lineConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderType.lines());
         Matrix4f lineMatrix = poseStack.last().pose();
         for (InteractionZone zone : interaction.getZones()) {
             Vec3[] corners = resolveZoneCorners(zone, interactionEditor);
@@ -78,7 +80,7 @@ public class InteractionMakerEditorRenderer {
             drawAABB(
                     lineConsumer, lineMatrix, new AABB(corners[0], corners[1]), cameraPosition, 0.2f, 0.5f, 1.0f, 1.0f);
         }
-        minecraft.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
+        minecraft.renderBuffers().bufferSource().endBatch(RenderType.lines());
 
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
         ClientPlayerSession clientSession =
@@ -169,7 +171,7 @@ public class InteractionMakerEditorRenderer {
             Vec3 worldPosition,
             Minecraft minecraft,
             float scale) {
-        VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.beaconBeam(POINT_TEXTURE, true));
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.beaconBeam(POINT_TEXTURE, true));
         poseStack.pushPose();
         poseStack.translate(
                 worldPosition.x - cameraPosition.x,
@@ -178,7 +180,7 @@ public class InteractionMakerEditorRenderer {
         poseStack.mulPose(minecraft.gameRenderer.getMainCamera().rotation());
         poseStack.scale(scale, scale, 1.0f);
         Matrix4f matrix = poseStack.last().pose();
-        int light = LightCoordsUtil.FULL_BRIGHT;
+        int light = LightTexture.FULL_BRIGHT;
         buffer.addVertex(matrix, -0.5f, 0.5f, 0f)
                 .setColor(1f, 1f, 1f, 1f)
                 .setUv(0f, 0f)
@@ -300,12 +302,10 @@ public class InteractionMakerEditorRenderer {
         }
         vertexConsumer
                 .addVertex(matrix, from.x, from.y, from.z)
-                .setLineWidth(4.0f)
                 .setColor(red, green, blue, alpha)
                 .setNormal(dx, dy, dz);
         vertexConsumer
                 .addVertex(matrix, to.x, to.y, to.z)
-                .setLineWidth(4.0f)
                 .setColor(red, green, blue, alpha)
                 .setNormal(dx, dy, dz);
     }

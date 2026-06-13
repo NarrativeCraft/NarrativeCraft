@@ -73,7 +73,7 @@ public class RideEntityAction extends AbstractAction {
         // Protection to prevent stack overflow if it tries to ride the entity itself
         if (vehicle.getUUID().equals(context.getEntity().getUUID())) return ActionResult.IGNORED;
 
-        context.getEntity().startRiding(vehicle, true, true);
+        context.getEntity().startRiding(vehicle, true);
         return ActionResult.OK;
     }
 }

@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record S2CMainScreenData(String dataJson) implements CustomPacketPayload {
 
     public static final Type<S2CMainScreenData> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_data"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_data"));
 
     public static final StreamCodec<ByteBuf, S2CMainScreenData> STREAM_CODEC =
             StreamCodec.composite(ByteBufCodecs.STRING_UTF8, S2CMainScreenData::dataJson, S2CMainScreenData::new);

@@ -29,11 +29,10 @@ import fr.loudo.narrativecraft.api.events.Event;
 import fr.loudo.narrativecraft.api.events.EventListener;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AddonContext {
 

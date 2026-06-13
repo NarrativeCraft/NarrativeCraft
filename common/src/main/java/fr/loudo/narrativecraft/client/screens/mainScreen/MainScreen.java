@@ -34,14 +34,12 @@ import fr.loudo.narrativecraft.utils.Translation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import org.lwjgl.glfw.GLFW;
@@ -55,11 +53,12 @@ public class MainScreen extends Screen {
     private static final int LOGO_GAP = 20;
     private static final int SECRET_CTRL_PRESSES = 10;
 
-    private static final Identifier LOGO_SPRITE = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "logo");
-    private static final Identifier LOGO_FILE =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/gui/sprites/logo.png");
-    private static final Identifier BACKGROUND_MUSIC =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "music.main_screen");
+    private static final ResourceLocation LOGO_SPRITE =
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "logo");
+    private static final ResourceLocation LOGO_FILE =
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/gui/sprites/logo.png");
+    private static final ResourceLocation BACKGROUND_MUSIC =
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "music.main_screen");
     private static final SimpleSoundInstance MAIN_MUSIC_INSTANCE =
             SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(BACKGROUND_MUSIC), 1);
 
@@ -151,7 +150,7 @@ public class MainScreen extends Screen {
                             .stop();
                     if (!isPause) {
                         close();
-                        minecraft.disconnectFromWorld(Component.empty());
+                        minecraft.disconnect();
                     } else {
                         Services.PACKET.sendToServer(new C2SStopStory(true));
                     }
@@ -175,8 +174,8 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick);
 
         if (!hasLogo) return;
 
@@ -189,13 +188,7 @@ public class MainScreen extends Screen {
         int totalBlockHeight = logoDisplayHeight + LOGO_GAP + totalButtonHeight;
         int blockStartY = (height - totalBlockHeight) / 2;
 
-        graphics.blitSprite(
-                RenderPipelines.GUI_TEXTURED,
-                LOGO_SPRITE,
-                MARGIN_LEFT,
-                blockStartY,
-                logoDisplayWidth,
-                logoDisplayHeight);
+        graphics.blitSprite(LOGO_SPRITE, MARGIN_LEFT, blockStartY, logoDisplayWidth, logoDisplayHeight);
     }
 
     public void close() {
@@ -207,11 +200,8 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    protected void extractBlurredBackground(GuiGraphicsExtractor graphics) {}
-
-    @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        if (isPause) super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        if (isPause) super.renderBackground(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
@@ -220,14 +210,14 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.key() == GLFW.GLFW_KEY_LEFT_CONTROL) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == GLFW.GLFW_KEY_LEFT_CONTROL) {
             ctrlPressCount++;
             if (ctrlPressCount >= SECRET_CTRL_PRESSES && leaveScreenButton != null) {
                 leaveScreenButton.visible = true;
             }
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

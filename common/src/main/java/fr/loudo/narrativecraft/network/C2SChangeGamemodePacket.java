@@ -21,10 +21,28 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.gui;
+package fr.loudo.narrativecraft.network;
 
-public interface IGuiTextRenderStateExtension {
-    void setFloatX(float x);
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.GameType;
 
-    void setFloatY(float y);
+public record C2SChangeGamemodePacket(GameType gameType) implements CustomPacketPayload {
+
+    public static final Type<C2SChangeGamemodePacket> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "c2s_change_gamemode"));
+
+    public static final StreamCodec<ByteBuf, C2SChangeGamemodePacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.idMapper(GameType::byId, GameType::getId),
+            C2SChangeGamemodePacket::gameType,
+            C2SChangeGamemodePacket::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

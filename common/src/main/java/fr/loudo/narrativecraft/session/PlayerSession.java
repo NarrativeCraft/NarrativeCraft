@@ -65,7 +65,7 @@ public class PlayerSession extends AbstractPlayerSession {
     }
 
     public void changeGameMode(GameType gameType) {
-        lastGameType = player.gameMode();
+        lastGameType = player.gameMode.getGameModeForPlayer();
         player.setGameMode(gameType);
     }
 

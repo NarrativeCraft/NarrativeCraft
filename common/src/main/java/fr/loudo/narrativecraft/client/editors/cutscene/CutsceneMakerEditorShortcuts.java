@@ -33,8 +33,7 @@ import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.*;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
 
 public class CutsceneMakerEditorShortcuts {
@@ -58,9 +57,8 @@ public class CutsceneMakerEditorShortcuts {
         this.editor = editor;
     }
 
-    public boolean handleKeyPressed(KeyEvent event) {
-        boolean ctrl = Minecraft.getInstance().hasControlDown();
-        int keyCode = event.key();
+    public boolean handleKeyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean ctrl = Screen.hasControlDown();
 
         if (ctrl && keyCode == GLFW.GLFW_KEY_S) {
             save();

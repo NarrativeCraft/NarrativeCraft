@@ -43,7 +43,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 
 public class StoryCommand {
 
@@ -51,12 +50,10 @@ public class StoryCommand {
         dispatcher.register(Commands.literal("nc")
                 .then(Commands.literal("story")
                         .then(Commands.literal("reload")
-                                .requires(commandSourceStack ->
-                                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                                 .executes(StoryCommand::reload))
                         .then(Commands.literal("play")
-                                .requires(commandSourceStack ->
-                                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayerOrException();
                                     return playFor(ctx, player, null);
@@ -81,8 +78,7 @@ public class StoryCommand {
                                                                     StringArgumentType.getString(ctx, "scene_name"));
                                                         })))))
                         .then(Commands.literal("stop")
-                                .requires(commandSourceStack ->
-                                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayerOrException();
                                     return stopFor(ctx, player);

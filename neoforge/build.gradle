@@ -3,22 +3,6 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-dependencies {
-    jarJar(implementation("com.bladecoder.ink:blade-ink")) {
-        version {
-            prefer "${blade_ink_version}"
-        }
-    }
-    jarJar(implementation("com.bladecoder.ink:blade-ink-compiler")) {
-        version {
-            prefer "${blade_ink_version}"
-        }
-    }
-    implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}"
-    implementation "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}"
-    implementation project(':api')
-}
-
 
 neoForge {
     version = neoforge_version
@@ -49,8 +33,26 @@ neoForge {
     mods {
         "${mod_id}" {
             sourceSet sourceSets.main
+            sourceSet project(':api').sourceSets.main
         }
     }
+}
+
+
+dependencies {
+    jarJar(implementation("com.bladecoder.ink:blade-ink")) {
+        version {
+            prefer "${blade_ink_version}"
+        }
+    }
+    jarJar(implementation("com.bladecoder.ink:blade-ink-compiler")) {
+        version {
+            prefer "${blade_ink_version}"
+        }
+    }
+    additionalRuntimeClasspath "com.bladecoder.ink:blade-ink:${blade_ink_version}"
+    additionalRuntimeClasspath "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}"
+    implementation project(':api')
 }
 
 
@@ -59,5 +61,3 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 jar {
     from project(':api').sourceSets.main.output
 }
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }

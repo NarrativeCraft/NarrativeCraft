@@ -38,13 +38,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.storage.TagValueInput;
 
 public class PlaybackContext implements IPlaybackContext {
 
@@ -106,7 +103,7 @@ public class PlaybackContext implements IPlaybackContext {
             return;
         }
 
-        entity = typeOpt.get().create(level, EntitySpawnReason.MOB_SUMMONED);
+        entity = typeOpt.get().create(level);
         if (entity == null) {
             Utils.sendError(Translation.message("error.playback_entity_null", entityId), playback.getRequester());
             playback.stop();
@@ -115,7 +112,7 @@ public class PlaybackContext implements IPlaybackContext {
 
         CompoundTag nbt = recordingData.getInitialNbt();
         if (nbt != null && !nbt.isEmpty()) {
-            entity.load(TagValueInput.create(ProblemReporter.DISCARDING, entity.registryAccess(), nbt));
+            entity.load(nbt);
             entity.setUUID(UUID.randomUUID());
         }
 
@@ -132,7 +129,7 @@ public class PlaybackContext implements IPlaybackContext {
         }
 
         entity.setInvulnerable(true);
-        entity.entityTags().add(Playback.ENTITY_TAG);
+        entity.getTags().add(Playback.ENTITY_TAG);
     }
 
     private void addEntityToWorld() {

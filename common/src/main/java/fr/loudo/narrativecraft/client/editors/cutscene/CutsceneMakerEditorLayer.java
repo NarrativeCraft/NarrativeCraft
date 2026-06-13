@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 
 public class CutsceneMakerEditorLayer {
 
@@ -45,7 +45,7 @@ public class CutsceneMakerEditorLayer {
     }
 
     public void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             DeltaTracker delta,
             int layerY,
             int layerHeight,
@@ -63,40 +63,39 @@ public class CutsceneMakerEditorLayer {
         renderKeyframes(graphics, delta, layerY, layerHeight, timelineWidth, visibleTicks, viewStartTick);
     }
 
-    private void renderMoveUpButton(GuiGraphicsExtractor graphics, int layerY, int mouseX, int mouseY) {
+    private void renderMoveUpButton(GuiGraphics graphics, int layerY, int mouseX, int mouseY) {
         int btnY = layerY + 1;
         boolean hovered = isMoveUpButtonHovered(mouseX, mouseY, layerY);
         renderButton(graphics, MOVE_BTN_X, btnY, hovered, "⮝");
     }
 
-    private void renderMoveDownButton(GuiGraphicsExtractor graphics, int layerY, int mouseX, int mouseY) {
+    private void renderMoveDownButton(GuiGraphics graphics, int layerY, int mouseX, int mouseY) {
         int btnY = layerY + BTN_SIZE + 1;
         boolean hovered = isMoveDownButtonHovered(mouseX, mouseY, layerY);
         renderButton(graphics, MOVE_BTN_X, btnY, hovered, "⮟");
     }
 
-    private void renderAddButton(GuiGraphicsExtractor graphics, int layerY, int layerHeight, int mouseX, int mouseY) {
+    private void renderAddButton(GuiGraphics graphics, int layerY, int layerHeight, int mouseX, int mouseY) {
         int btnX = getBtnXAdd();
         int btnY = layerY + (layerHeight - BTN_SIZE) / 2;
         boolean hovered = isAddButtonHovered(mouseX, mouseY, layerY, layerHeight);
         renderButton(graphics, btnX, btnY, hovered, "+");
     }
 
-    private void renderRemoveButton(
-            GuiGraphicsExtractor graphics, int layerY, int layerHeight, int mouseX, int mouseY) {
+    private void renderRemoveButton(GuiGraphics graphics, int layerY, int layerHeight, int mouseX, int mouseY) {
         int btnX = getBtnXRemove();
         int btnY = layerY + (layerHeight - BTN_SIZE) / 2;
         boolean hovered = isRemoveButtonHovered(mouseX, mouseY, layerY, layerHeight);
         renderButton(graphics, btnX, btnY, hovered, "×");
     }
 
-    private void renderButton(GuiGraphicsExtractor graphics, int btnX, int btnY, boolean hovered, String text) {
+    private void renderButton(GuiGraphics graphics, int btnX, int btnY, boolean hovered, String text) {
         graphics.fill(btnX, btnY, btnX + BTN_SIZE, btnY + BTN_SIZE, hovered ? 0xFFAAAAAA : 0xFF666666);
-        graphics.text(Minecraft.getInstance().font, text, btnX + 2, btnY + 1, 0xFFFFFFFF);
+        graphics.drawString(Minecraft.getInstance().font, text, btnX + 2, btnY + 1, 0xFFFFFFFF);
     }
 
     private void renderKeyframes(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             DeltaTracker delta,
             int layerY,
             int layerHeight,
