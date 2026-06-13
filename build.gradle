@@ -1,8 +1,9 @@
 plugins {
+	id 'java'
 	// see https://fabricmc.net/develop/ for new versions
-	id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT' apply false
+	id 'fabric-loom' version '1.11-SNAPSHOT' apply false
 	// see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-	id 'net.neoforged.moddev' version '2.0.141' apply false
+	id 'net.neoforged.moddev' version '2.0.112' apply false
 
 	id 'com.diffplug.spotless' version '8.4.0'
 }
