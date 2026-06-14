@@ -23,7 +23,7 @@ NarrativeCraft works thanks to the amazing open source project [Ink](https://www
 
 ## Features
 
-NarrativeCraft is an all-in-one system, meaning that you have almost everything by default. 
+NarrativeCraft is an all-in-one system, meaning that you have everything by default. 
 
 Compatibility with other mods requires installing addons.
 
