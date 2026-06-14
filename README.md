@@ -78,6 +78,8 @@ compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.1+mc{minecraft_versi
 </dependency>
 ```
 
+Current minecraft versions available: `26.1.2` and `1.21.1`
+
 ## Contributing
 
 Thank you for your interest in the project and for helping to make it better, take a look at [CONTRIBUTING.MD](CONTRIBUTING.MD) before making a pull request.
