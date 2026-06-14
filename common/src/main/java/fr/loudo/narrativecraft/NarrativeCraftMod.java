@@ -46,12 +46,11 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandlerManager;
 import fr.loudo.narrativecraft.playback.PlaybackManager;
 import fr.loudo.narrativecraft.recording.actions.ActionRegister;
 import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class NarrativeCraftMod {
     public static final String MOD_ID = "narrativecraft";

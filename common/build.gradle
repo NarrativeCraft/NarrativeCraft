@@ -62,6 +62,7 @@ publishing {
     publications {
         register('mavenJava', MavenPublication) {
             artifactId base.archivesName.get()
+            version "${version}+mc${minecraft_version}"
             from components.java
         }
     }
