@@ -6,108 +6,151 @@ on:
       - 'v*.*.*'
 
 jobs:
-  release:
+  build:
+    name: Build MC ${{ matrix.mc_version }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - branch: 26.1.2
+            mc_version: 26.1.2
+          - branch: 1.21.1
+            mc_version: 1.21.1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+
+      - name: Extract variables
+        run: |
+          echo "MOD_VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+          echo "JAVA_VERSION=$(grep '^java_version=' gradle.properties | cut -d= -f2)" >> $GITHUB_ENV
+
+      - name: Setup Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4.4.4
+
+      - name: Build jars
+        run: ./gradlew :fabric:build :neoforge:build -Pversion=${{ env.MOD_VERSION }}
+
+      - name: Publish API and Common to Maven
+        run: ./gradlew :api:publish :common:publish -Pversion=${{ env.MOD_VERSION }}
+        env:
+          ORG_GRADLE_PROJECT_reposiliteUser: ${{ secrets.REPOSILITE_USER }}
+          ORG_GRADLE_PROJECT_reposilitePassword: ${{ secrets.REPOSILITE_PASSWORD }}
+
+      - name: Upload fabric jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: fabric-${{ matrix.mc_version }}
+          path: fabric/build/libs/narrativecraft-fabric-${{ matrix.mc_version }}-${{ env.MOD_VERSION }}.jar
+
+      - name: Upload neoforge jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: neoforge-${{ matrix.mc_version }}
+          path: neoforge/build/libs/narrativecraft-neoforge-${{ matrix.mc_version }}-${{ env.MOD_VERSION }}.jar
+
+  release:
+    name: GitHub Release & Modrinth
+    runs-on: ubuntu-latest
+    needs: build
     permissions:
       contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Java 25
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 25
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.4.4
 
       - name: Extract variables
-        id: vars
         run: |
           MOD_VERSION="${GITHUB_REF_NAME#v}"
-          MINECRAFT_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
-
           echo "MOD_VERSION=${MOD_VERSION}" >> $GITHUB_ENV
-          echo "MINECRAFT_VERSION=${MINECRAFT_VERSION}" >> $GITHUB_ENV
-
-          # Extract the changelog section for this version from CHANGELOG.md
           CHANGELOG=$(awk "/^## \[${MOD_VERSION}\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
           echo "CHANGELOG<<EOF" >> $GITHUB_ENV
           echo "$CHANGELOG" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Build jars
-        run: ./gradlew :fabric:build :neoforge:build
-
-      - name: Publish API and Common to Maven
-        run: ./gradlew :api:publish :common:publish
-        env:
-          ORG_GRADLE_PROJECT_reposiliteUser: ${{ secrets.REPOSILITE_USER }}
-          ORG_GRADLE_PROJECT_reposilitePassword: ${{ secrets.REPOSILITE_PASSWORD }}
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           body: ${{ env.CHANGELOG }}
-          files: |
-            fabric/build/libs/narrativecraft-fabric-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
-            neoforge/build/libs/narrativecraft-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}.jar
+          files: artifacts/**/*.jar
 
-      - name: Publish Fabric jar to Modrinth
+      - name: Publish to Modrinth
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
-          DATA=$(jq -n \
-            --arg name "NarrativeCraft - Fabric - ${MOD_VERSION} - ${MINECRAFT_VERSION}" \
-            --arg version "${MOD_VERSION}-fabric-${MINECRAFT_VERSION}" \
-            --arg changelog "${CHANGELOG}" \
-            --arg mc_version "${MINECRAFT_VERSION}" \
-            '{
-              name: $name,
-              version_number: $version,
-              changelog: $changelog,
-              dependencies: [{project_id: "P7dR8mSH", dependency_type: "required"}],
-              game_versions: [$mc_version],
-              version_type: "release",
-              environment: "client_and_server",
-              loaders: ["fabric"],
-              featured: true,
-              project_id: "bR35WQGQ",
-              file_parts: ["file"]
-            }')
-          curl -sf -X POST "https://api.modrinth.com/v2/version" \
-            -H "Authorization: ${MODRINTH_TOKEN}" \
-            -F "data=${DATA}" \
-            -F "file=@fabric/build/libs/narrativecraft-fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
+          for MC_VERSION in 26.1.2 1.21.1; do
+            for LOADER in fabric neoforge; do
+              LOADER_DISPLAY="${LOADER^}"
+              JAR="artifacts/${LOADER}-${MC_VERSION}/narrativecraft-${LOADER}-${MC_VERSION}-${MOD_VERSION}.jar"
 
-      - name: Publish NeoForge jar to Modrinth
+              if [ "$LOADER" = "fabric" ]; then
+                DEPS='[{"project_id": "P7dR8mSH", "dependency_type": "required"}]'
+              else
+                DEPS='[]'
+              fi
+
+              DATA=$(jq -n \
+                --arg name "NarrativeCraft - ${LOADER_DISPLAY} - ${MOD_VERSION} - ${MC_VERSION}" \
+                --arg version "${MOD_VERSION}-${LOADER}-${MC_VERSION}" \
+                --arg changelog "${CHANGELOG}" \
+                --arg mc_version "${MC_VERSION}" \
+                --arg loader "${LOADER}" \
+                --argjson deps "${DEPS}" \
+                '{
+                  name: $name,
+                  version_number: $version,
+                  changelog: $changelog,
+                  dependencies: $deps,
+                  game_versions: [$mc_version],
+                  version_type: "release",
+                  environment: "client_and_server",
+                  loaders: [$loader],
+                  featured: true,
+                  project_id: "bR35WQGQ",
+                  file_parts: ["file"]
+                }')
+
+              curl -sf -X POST "https://api.modrinth.com/v2/version" \
+                -H "Authorization: ${MODRINTH_TOKEN}" \
+                -F "data=${DATA}" \
+                -F "file=@${JAR}"
+
+              echo "Published ${LOADER_DISPLAY} ${MC_VERSION} to Modrinth"
+            done
+          done
+
+      - name: Notify Discord
         env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          DATA=$(jq -n \
-            --arg name "NarrativeCraft - NeoForge - ${MOD_VERSION} - ${MINECRAFT_VERSION}" \
-            --arg version "${MOD_VERSION}-neoforge-${MINECRAFT_VERSION}" \
-            --arg changelog "${CHANGELOG}" \
-            --arg mc_version "${MINECRAFT_VERSION}" \
-            '{
-              name: $name,
-              version_number: $version,
-              changelog: $changelog,
-              dependencies: [],
-              game_versions: [$mc_version],
-              version_type: "release",
-              environment: "client_and_server",
-              loaders: ["neoforge"],
-              featured: true,
-              project_id: "bR35WQGQ",
-              file_parts: ["file"]
-            }')
-          curl -sf -X POST "https://api.modrinth.com/v2/version" \
-            -H "Authorization: ${MODRINTH_TOKEN}" \
-            -F "data=${DATA}" \
-            -F "file=@neoforge/build/libs/narrativecraft-neoforge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
+          CHANGELOG_URL="https://github.com/LOUDO/NarrativeCraft/blob/${GITHUB_SHA}/CHANGELOG.md"
+          MESSAGE=$(printf '<@&1515654284430020718>\n# v%s\n## Changelog\n%s\n## Downloads\n### Neoforge\n- 26.1.2 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-26.1.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-1.21.1\n### Fabric\n- 26.1.2 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-26.1.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-1.21.1' \
+            "${MOD_VERSION}" "${CHANGELOG_URL}" "${MOD_VERSION}" "${MOD_VERSION}" "${MOD_VERSION}" "${MOD_VERSION}")
+
+          curl -sf -X POST "${DISCORD_WEBHOOK}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg content "${MESSAGE}" \
+              '{
+                content: $content,
+                allowed_mentions: { roles: ["1515654284430020718"] }
+              }')"
