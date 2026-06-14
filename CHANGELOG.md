@@ -1,14 +1,8 @@
 # Changelog
 
-## [2.0.1]
+## [2.0.2]
 
 ### Features
 
-- Addons managers "/nc addon"
-- Edited way to register new items through registries in API
-- Incompatible addon are disabled if not matching right NarrativeCraft API version 
-
-
-### Fixes
-
-- Fetching "common" package from maven giving error messages (API)
+- Updated NeoForge and Fabric loaders
+- **1.21.1** support
