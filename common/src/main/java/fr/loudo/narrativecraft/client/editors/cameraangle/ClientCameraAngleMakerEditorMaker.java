@@ -91,7 +91,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     private boolean renderingHud = true;
     private boolean editingCameraViewPosition = false;
     private final Map<UUID, Integer> placementEntityIds = new HashMap<>();
-    private final Map<DialogData, DialogRenderer3D> previewDialogRenderers = new HashMap<>();
+    private DialogRenderer3D activeDialogRenderer;
     private final DialogPreviewPanel dialogPreviewPanel =
             new DialogPreviewPanel(this::toggleAdvancedPanel, DEFAULT_DIALOG_TEXT);
     private final DialogSetupAdvancedPanel advancedPanel = new DialogSetupAdvancedPanel(dialogPreviewPanel);
@@ -99,8 +99,10 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     {
         dialogPreviewPanel.setFieldSet(DialogFieldSet.CAMERA_VIEW);
         advancedPanel.setFieldSet(DialogFieldSet.CAMERA_VIEW);
+        dialogPreviewPanel.setOnSelectionChanged(this::onDialogSelectionChanged);
     }
 
+    private final Set<DialogRenderer3D> stoppingRenderers = new HashSet<>();
     private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
     private final List<TemplateReference> templateReferences = new ArrayList<>();
     private final List<CameraView> cameraViews = new ArrayList<>();
@@ -401,6 +403,10 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         previewMode = PreviewMode.DIALOG;
         rollWidget.setVisible(false);
         fovWidget.setVisible(false);
+        for (DialogRenderer3D renderer : new ArrayList<>(stoppingRenderers)) {
+            playerSession.removeDialog3D(renderer);
+        }
+        stoppingRenderers.clear();
         List<DialogPreviewEntry> entries = new ArrayList<>();
         for (CameraViewDialogSetup setup : previewCameraView.getDialogSetups()) {
             Entity entity = getEntityForPlacement(setup.getCharacterPlacementId());
@@ -408,27 +414,44 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             DialogData data = setup.getDialogData();
             DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
             renderer.onStopped(() -> {
-                previewDialogRenderers.remove(data);
+                if (activeDialogRenderer == renderer) activeDialogRenderer = null;
+                stoppingRenderers.remove(renderer);
                 playerSession.removeDialog3D(renderer);
             });
-            String text = setup.getPreviewText().isEmpty() ? DEFAULT_DIALOG_TEXT : setup.getPreviewText();
-            renderer.start(text);
-            previewDialogRenderers.put(data, renderer);
-            playerSession.addDialog3D(renderer);
             String label = resolvePlacementLabel(setup.getCharacterPlacementId());
             DialogPreviewEntry entry = new DialogPreviewEntry(label, data, renderer);
             entry.setPreviewText(setup.getPreviewText());
             entries.add(entry);
         }
         dialogPreviewPanel.setEntries(entries);
+        if (!entries.isEmpty()) {
+            startDialogEntry(entries.get(0));
+        }
+    }
+
+    private void startDialogEntry(DialogPreviewEntry entry) {
+        DialogRenderer3D renderer = entry.getRenderer();
+        String text = entry.getPreviewText().isEmpty() ? DEFAULT_DIALOG_TEXT : entry.getPreviewText();
+        renderer.start(text);
+        activeDialogRenderer = renderer;
+        playerSession.addDialog3D(renderer);
+    }
+
+    private void stopActiveDialogRenderer() {
+        if (activeDialogRenderer == null) return;
+        activeDialogRenderer.stop();
+        stoppingRenderers.add(activeDialogRenderer);
+        activeDialogRenderer = null;
+    }
+
+    private void onDialogSelectionChanged(DialogPreviewEntry newEntry) {
+        stopActiveDialogRenderer();
+        startDialogEntry(newEntry);
     }
 
     public void exitDialogMode() {
         previewMode = PreviewMode.CAMERA;
-        for (DialogRenderer3D renderer : new ArrayList<>(previewDialogRenderers.values())) {
-            renderer.stop();
-        }
-        previewDialogRenderers.clear();
+        stopActiveDialogRenderer();
         if (previewCameraView != null) {
             rollWidget.setVisible(true);
             fovWidget.setVisible(true);
@@ -700,10 +723,6 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     public PreviewMode getPreviewMode() {
         return previewMode;
-    }
-
-    public Map<DialogData, DialogRenderer3D> getPreviewDialogRenderers() {
-        return previewDialogRenderers;
     }
 
     public List<TemplateReference> getTemplateReferences() {

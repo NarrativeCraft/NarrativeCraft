@@ -58,6 +58,7 @@ public class DialogPreviewPanel {
 
     private final Consumer<DialogData> onToggleAdvanced;
     private final String defaultDialogText;
+    private Consumer<DialogPreviewEntry> onSelectionChanged;
 
     private DialogFieldSet fieldSet = DialogFieldSet.ALL;
     private List<DialogPreviewEntry> entries = new ArrayList<>();
@@ -116,6 +117,10 @@ public class DialogPreviewPanel {
         bufferSource.endBatch();
 
         poseStack.popPose();
+    }
+
+    public void setOnSelectionChanged(Consumer<DialogPreviewEntry> onSelectionChanged) {
+        this.onSelectionChanged = onSelectionChanged;
     }
 
     public void setFieldSet(DialogFieldSet fieldSet) {
@@ -442,6 +447,7 @@ public class DialogPreviewPanel {
                 if (selectedIndex != i) {
                     selectedIndex = i;
                     rebuildEditBoxes();
+                    if (onSelectionChanged != null) onSelectionChanged.accept(entries.get(i));
                 }
                 return true;
             }
