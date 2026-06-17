@@ -33,13 +33,12 @@ import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class InteractionMakerEditorMaker implements EditorMaker {
 
@@ -80,7 +79,8 @@ public class InteractionMakerEditorMaker implements EditorMaker {
             boolean wasInside = insideZoneIds.contains(zone.getId());
 
             if (isInside && !wasInside) {
-                if (!(zone.isOneTime() && storyHandler.hasAlreadyInteracted(zone.getId())) && playerSession.isGameplayMode()) {
+                if (!(zone.isOneTime() && storyHandler.hasAlreadyInteracted(zone.getId()))
+                        && playerSession.isGameplayMode()) {
                     storyHandler.playStitch(zone.getStitchName());
                     if (zone.isOneTime()) storyHandler.addInteractionId(zone.getId());
                 }
