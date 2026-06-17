@@ -102,6 +102,7 @@ public class DialogAnimator {
         this.resizeToWidth = toWidth;
         this.resizeToHeight = toHeight;
         resizeProgress = 0f;
+        previousResizeProgress = 0f;
         state = State.RESIZING;
     }
 

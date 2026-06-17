@@ -1,8 +1,7 @@
 # Changelog
 
-## [2.0.2]
+## [2.0.3]
 
-### Features
+### Fixes
 
-- Updated NeoForge and Fabric loaders
-- **1.21.1** support
+- Dialog resizing crackling animation first second
