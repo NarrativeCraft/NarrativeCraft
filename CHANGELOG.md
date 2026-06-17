@@ -10,3 +10,4 @@
 - Dialog resizing crackling animation first second
 - Spamming "dialog mode" in camera view spawning multiple dialogs that does not disappear
 - Minor fixes in sound tag
+- Spamming an interaction point soft locking

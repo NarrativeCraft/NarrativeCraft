@@ -64,15 +64,16 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ServerPacketHandler {
 
@@ -393,7 +394,7 @@ public class ServerPacketHandler {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         if (session == null) return;
         StoryHandler storyHandler = session.getStoryHandler();
-        if (storyHandler != null) {
+        if (storyHandler != null && session.isGameplayMode()) {
             if (packet.oneTime() && storyHandler.hasAlreadyInteracted(packet.interactionId())) return;
             if (packet.oneTime()) storyHandler.addInteractionId(packet.interactionId());
             storyHandler.playStitch(packet.stitchName());
