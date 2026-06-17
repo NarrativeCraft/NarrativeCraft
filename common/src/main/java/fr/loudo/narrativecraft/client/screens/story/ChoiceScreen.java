@@ -179,6 +179,6 @@ public class ChoiceScreen extends Screen {
 
     private void select(int index) {
         Services.PACKET.sendToServer(new C2SChoiceSelected(index));
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
     }
 }

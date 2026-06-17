@@ -86,13 +86,13 @@ public class OptionsScreen extends Screen {
 
         addRenderableWidget(Button.builder(
                         Translation.message("screen.main.options.minecraft_options"),
-                        button -> minecraft.setScreen(new net.minecraft.client.gui.screens.options.OptionsScreen(
+                        button -> minecraft.gui.setScreen(new net.minecraft.client.gui.screens.options.OptionsScreen(
                                 this, minecraft.options, false)))
                 .bounds(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT)
                 .build());
 
         addRenderableWidget(Button.builder(Translation.message("screen.main.options.done"), button -> {
-                    minecraft.setScreen(lastScreen);
+                    minecraft.gui.setScreen(lastScreen);
                     try {
                         NarrativeClientSettings.save();
                     } catch (IOException e) {
@@ -115,6 +115,6 @@ public class OptionsScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

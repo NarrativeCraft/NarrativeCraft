@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -41,43 +42,42 @@ public class CutsceneMakerEditorPathRenderer {
     // Number of ticks between each sampled point along the pathString
     private static final int SAMPLE_STEP = 2;
 
-    public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
+    public static void render(SubmitNodeCollector collector, PoseStack poseStack, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         ClientCutsceneMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
         if (editor == null || editor.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;
 
         if (editor.getPlayback().isPlaying()) return;
-        Vec3 cameraPos = mc.gameRenderer.getMainCamera().position();
-        VertexConsumer vertexConsumer = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
-        Matrix4f matrix4f = poseStack.last().pose();
+        Vec3 cameraPos = mc.gameRenderer.mainCamera().position();
 
-        for (CutsceneMakerEditorLayer editorLayer : editor.getEditorLayers()) {
-            if (!(editorLayer.getLayer() instanceof CameraLayer cameraLayer)) continue;
-            List<CameraKeyframe> keyframes = cameraLayer.getSortedCameraKeyframes();
-            if (keyframes.size() < 2) continue;
+        collector.submitCustomGeometry(poseStack, RenderTypes.lines(), (pose, vertexConsumer) -> {
+            Matrix4f matrix4f = pose.pose();
+            for (CutsceneMakerEditorLayer editorLayer : editor.getEditorLayers()) {
+                if (!(editorLayer.getLayer() instanceof CameraLayer cameraLayer)) continue;
+                List<CameraKeyframe> keyframes = cameraLayer.getSortedCameraKeyframes();
+                if (keyframes.size() < 2) continue;
 
-            int firstTick = keyframes.get(0).getTick();
-            int lastTick = keyframes.get(keyframes.size() - 1).getTick();
+                int firstTick = keyframes.get(0).getTick();
+                int lastTick = keyframes.get(keyframes.size() - 1).getTick();
 
-            Vec3 prev = cameraLayer.getInterpolatedPosition(firstTick).getPosition();
-            int tick = firstTick + SAMPLE_STEP;
-            while (tick < lastTick) {
-                Vec3 curr = cameraLayer.getInterpolatedPosition(tick).getPosition();
-                drawSegment(vertexConsumer, matrix4f, prev, curr, cameraPos);
-                prev = curr;
-                tick += SAMPLE_STEP;
+                Vec3 prev = cameraLayer.getInterpolatedPosition(firstTick).getPosition();
+                int tick = firstTick + SAMPLE_STEP;
+                while (tick < lastTick) {
+                    Vec3 curr = cameraLayer.getInterpolatedPosition(tick).getPosition();
+                    drawSegment(vertexConsumer, matrix4f, prev, curr, cameraPos);
+                    prev = curr;
+                    tick += SAMPLE_STEP;
+                }
+                // Always connect to the exact last keyframe position
+                drawSegment(
+                        vertexConsumer,
+                        matrix4f,
+                        prev,
+                        cameraLayer.getInterpolatedPosition(lastTick).getPosition(),
+                        cameraPos);
             }
-            // Always connect to the exact last keyframe position
-            drawSegment(
-                    vertexConsumer,
-                    matrix4f,
-                    prev,
-                    cameraLayer.getInterpolatedPosition(lastTick).getPosition(),
-                    cameraPos);
-        }
-
-        mc.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
+        });
     }
 
     private static void drawSegment(VertexConsumer vc, Matrix4f matrix, Vec3 from, Vec3 to, Vec3 cameraPos) {

@@ -117,7 +117,7 @@ public class ClientPacketHandler {
     }
 
     public static void clearScreen() {
-        MINECRAFT.setScreen(null);
+        MINECRAFT.gui.setScreen(null);
     }
 
     public static void setSession(S2CPlayerSession packet) {
@@ -373,7 +373,7 @@ public class ClientPacketHandler {
     }
 
     public static void showChoices(S2CShowChoices packet) {
-        MINECRAFT.setScreen(new ChoiceScreen(packet.texts()));
+        MINECRAFT.gui.setScreen(new ChoiceScreen(packet.texts()));
     }
 
     public static void cameraAngleEnter(BiCameraAngleEnter packet) {
@@ -390,7 +390,7 @@ public class ClientPacketHandler {
                 new ClientCameraAngleMakerEditorMaker(cameraAngle, packet.getEnvironment());
         cameraAngleEditor.init();
         session.setEditor(cameraAngleEditor);
-        Minecraft.getInstance().setScreen(null);
+        Minecraft.getInstance().gui.setScreen(null);
     }
 
     public static void stopEditorMaker(BiStopEditorMaker packet) {
@@ -415,7 +415,7 @@ public class ClientPacketHandler {
                 new ClientInteractionMakerEditorMaker(interaction, packet.getEnvironment());
         interactionEditor.init();
         session.setEditor(interactionEditor);
-        Minecraft.getInstance().setScreen(null);
+        Minecraft.getInstance().gui.setScreen(null);
     }
 
     public static void characterSkin(S2CCharacterSkin packet) {
@@ -465,7 +465,7 @@ public class ClientPacketHandler {
     }
 
     public static void openMainScreen(S2COpenMainScreen packet) {
-        Minecraft.getInstance().setScreen(new MainScreen(packet.canContinue(), packet.finishedStory()));
+        Minecraft.getInstance().gui.setScreen(new MainScreen(packet.canContinue(), packet.finishedStory()));
     }
 
     public static void enterMainScreen(BiMainScreenEnter packet) {
@@ -476,7 +476,7 @@ public class ClientPacketHandler {
                 new ClientCameraAngleMakerEditorMaker(mainScreenData, packet.getEnvironment());
         cameraAngleEditor.init();
         session.setEditor(cameraAngleEditor);
-        Minecraft.getInstance().setScreen(null);
+        Minecraft.getInstance().gui.setScreen(null);
     }
 
     public static void notifyClientPlayStory() {

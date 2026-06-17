@@ -42,9 +42,11 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -59,28 +61,33 @@ public class InteractionMakerEditorRenderer {
     private static final float POINT_ANIMATION_SPEED = 6.5f;
     private static final Map<UUID, Float> pointAnimT = new HashMap<>();
 
-    public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
+    public static void render(SubmitNodeCollector collector, PoseStack poseStack, DeltaTracker deltaTracker) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (!(editorMaker instanceof ClientInteractionMakerEditorMaker interactionEditor)) return;
 
         Minecraft minecraft = Minecraft.getInstance();
-        Vec3 cameraPosition = minecraft.gameRenderer.getMainCamera().position();
+        Vec3 cameraPosition = minecraft.gameRenderer.mainCamera().position();
         Interaction interaction = interactionEditor.getInteraction();
         boolean isDev = interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT;
         float deltaSeconds = deltaTracker.getGameTimeDeltaTicks() / 20.0f;
 
-        VertexConsumer lineConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
-        Matrix4f lineMatrix = poseStack.last().pose();
-        for (InteractionZone zone : interaction.getZones()) {
-            Vec3[] corners = resolveZoneCorners(zone, interactionEditor);
-            if (corners == null || !isDev) continue;
-            drawAABB(
-                    lineConsumer, lineMatrix, new AABB(corners[0], corners[1]), cameraPosition, 0.2f, 0.5f, 1.0f, 1.0f);
-        }
-        minecraft.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
+        collector.submitCustomGeometry(poseStack, RenderTypes.lines(), (pose, lineConsumer) -> {
+            for (InteractionZone zone : interaction.getZones()) {
+                Vec3[] corners = resolveZoneCorners(zone, interactionEditor);
+                if (corners == null || !isDev) continue;
+                drawAABB(
+                        lineConsumer,
+                        pose.pose(),
+                        new AABB(corners[0], corners[1]),
+                        cameraPosition,
+                        0.2f,
+                        0.5f,
+                        1.0f,
+                        1.0f);
+            }
+        });
 
-        MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
         ClientPlayerSession clientSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
@@ -105,7 +112,7 @@ public class InteractionMakerEditorRenderer {
                 renderScale = (float) Interpolation.lerp(0, POINT_SPRITE_SCALE, easedT);
             }
             if (renderScale > 0.001f) {
-                drawPointSprite(poseStack, bufferSource, cameraPosition, pointPosition, minecraft, renderScale);
+                drawPointSprite(poseStack, collector, cameraPosition, pointPosition, minecraft, renderScale);
             }
         }
 
@@ -113,8 +120,7 @@ public class InteractionMakerEditorRenderer {
             Vec3[] corners = resolveZoneCorners(zone, interactionEditor);
             if (corners == null || !isDev) continue;
             Vec3 center = corners[0].add(corners[1]).scale(0.5);
-            drawNameTag(
-                    poseStack, bufferSource, cameraPosition, center, 0.3, 0.1f, zone.getName(), 0xFF88CCFF, minecraft);
+            drawNameTag(poseStack, collector, cameraPosition, center, 0.3, 0.1f, zone.getName(), 0xFF88CCFF, minecraft);
         }
 
         if (isDev) {
@@ -123,7 +129,7 @@ public class InteractionMakerEditorRenderer {
                 if (pointPosition == null) continue;
                 drawNameTag(
                         poseStack,
-                        bufferSource,
+                        collector,
                         cameraPosition,
                         pointPosition,
                         0.35,
@@ -133,8 +139,6 @@ public class InteractionMakerEditorRenderer {
                         minecraft);
             }
         }
-
-        bufferSource.endBatch();
     }
 
     private static boolean isPointConditionMet(InteractionPoint point, LocalPlayer player) {
@@ -164,51 +168,51 @@ public class InteractionMakerEditorRenderer {
 
     private static void drawPointSprite(
             PoseStack poseStack,
-            MultiBufferSource bufferSource,
+            SubmitNodeCollector collector,
             Vec3 cameraPosition,
             Vec3 worldPosition,
             Minecraft minecraft,
             float scale) {
-        VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.beaconBeam(POINT_TEXTURE, true));
         poseStack.pushPose();
         poseStack.translate(
                 worldPosition.x - cameraPosition.x,
                 worldPosition.y - cameraPosition.y,
                 worldPosition.z - cameraPosition.z);
-        poseStack.mulPose(minecraft.gameRenderer.getMainCamera().rotation());
+        poseStack.mulPose(minecraft.gameRenderer.mainCamera().rotation());
         poseStack.scale(scale, scale, 1.0f);
-        Matrix4f matrix = poseStack.last().pose();
         int light = LightCoordsUtil.FULL_BRIGHT;
-        buffer.addVertex(matrix, -0.5f, 0.5f, 0f)
-                .setColor(1f, 1f, 1f, 1f)
-                .setUv(0f, 0f)
-                .setUv1(0, 0)
-                .setLight(light)
-                .setNormal(0, 0, 1);
-        buffer.addVertex(matrix, -0.5f, -0.5f, 0f)
-                .setColor(1f, 1f, 1f, 1f)
-                .setUv(0f, 1f)
-                .setUv1(0, 0)
-                .setLight(light)
-                .setNormal(0, 0, 1);
-        buffer.addVertex(matrix, 0.5f, -0.5f, 0f)
-                .setColor(1f, 1f, 1f, 1f)
-                .setUv(1f, 1f)
-                .setUv1(0, 0)
-                .setLight(light)
-                .setNormal(0, 0, 1);
-        buffer.addVertex(matrix, 0.5f, 0.5f, 0f)
-                .setColor(1f, 1f, 1f, 1f)
-                .setUv(1f, 0f)
-                .setUv1(0, 0)
-                .setLight(light)
-                .setNormal(0, 0, 1);
+        collector.submitCustomGeometry(poseStack, RenderTypes.beaconBeam(POINT_TEXTURE, true), (pose, buffer) -> {
+            buffer.addVertex(pose, -0.5f, 0.5f, 0f)
+                    .setColor(1f, 1f, 1f, 1f)
+                    .setUv(0f, 0f)
+                    .setUv1(0, 0)
+                    .setLight(light)
+                    .setNormal(0, 0, 1);
+            buffer.addVertex(pose, -0.5f, -0.5f, 0f)
+                    .setColor(1f, 1f, 1f, 1f)
+                    .setUv(0f, 1f)
+                    .setUv1(0, 0)
+                    .setLight(light)
+                    .setNormal(0, 0, 1);
+            buffer.addVertex(pose, 0.5f, -0.5f, 0f)
+                    .setColor(1f, 1f, 1f, 1f)
+                    .setUv(1f, 1f)
+                    .setUv1(0, 0)
+                    .setLight(light)
+                    .setNormal(0, 0, 1);
+            buffer.addVertex(pose, 0.5f, 0.5f, 0f)
+                    .setColor(1f, 1f, 1f, 1f)
+                    .setUv(1f, 0f)
+                    .setUv1(0, 0)
+                    .setLight(light)
+                    .setNormal(0, 0, 1);
+        });
         poseStack.popPose();
     }
 
     private static void drawNameTag(
             PoseStack poseStack,
-            MultiBufferSource.BufferSource bufferSource,
+            SubmitNodeCollector collector,
             Vec3 cameraPosition,
             Vec3 worldPosition,
             double yOffset,
@@ -221,21 +225,20 @@ public class InteractionMakerEditorRenderer {
                 worldPosition.x - cameraPosition.x,
                 worldPosition.y - cameraPosition.y + yOffset,
                 worldPosition.z - cameraPosition.z);
-        poseStack.mulPose(minecraft.gameRenderer.getMainCamera().rotation());
+        poseStack.mulPose(minecraft.gameRenderer.mainCamera().rotation());
         poseStack.scale(scale, -scale, scale);
-        Matrix4f matrix = poseStack.last().pose();
         Font font = minecraft.font;
-        font.drawInBatch(
-                name,
+        collector.submitText(
+                poseStack,
                 -font.width(name) / 2f,
                 0,
-                color,
+                FormattedCharSequence.forward(name, Style.EMPTY),
                 false,
-                matrix,
-                bufferSource,
                 Font.DisplayMode.SEE_THROUGH,
+                0xF000F0,
+                color,
                 0x40000000,
-                0xF000F0);
+                0);
         poseStack.popPose();
     }
 

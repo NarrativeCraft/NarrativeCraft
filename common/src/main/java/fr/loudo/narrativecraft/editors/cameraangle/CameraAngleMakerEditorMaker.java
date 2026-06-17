@@ -172,7 +172,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         ServerPlayer player = playerSession.getPlayer();
         ServerLevel level = player.level();
         Entity entity;
-        if (characterStory.getEntityType() == EntityType.PLAYER) {
+        if (characterStory.getEntityType() == EntityTypes.PLAYER) {
             entity = new FakePlayer(
                     level,
                     new GameProfile(characterPlacement.getCharacterStory().getId(), characterStory.getName()),
@@ -282,7 +282,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         ServerLevel level = player.level();
         Entity entity;
 
-        if (characterStory.getEntityType() == EntityType.PLAYER) {
+        if (characterStory.getEntityType() == EntityTypes.PLAYER) {
             entity = new FakePlayer(level, new GameProfile(characterStory.getId(), characterStory.getName()), true);
         } else {
             entity = characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);

@@ -63,6 +63,6 @@ public class SelectScenesScreen extends PaginationsItemsScreen<Scene> {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

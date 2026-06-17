@@ -52,7 +52,7 @@ public class SubsceneEntryListScreen extends NarrativeEntryListScreen<Subscene> 
 
     protected Button addAssignButton(int x, int y, Subscene item) {
         Button assignButton = Button.builder(Component.literal("⚙"), b -> {
-                    minecraft.setScreen(new SubsceneAnimationsAssignScreen(item, this));
+                    minecraft.gui.setScreen(new SubsceneAnimationsAssignScreen(item, this));
                 })
                 .bounds(x, y, 20, 20)
                 .build();

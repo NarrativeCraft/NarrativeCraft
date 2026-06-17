@@ -14,9 +14,9 @@
     "ServerPlayerMixinFabric"
   ],
   "client": [
-    "GameRendererMixinFabric",
+    "LevelRendererMixinFabric",
     "GuiGraphicsExtractorMixinFabric",
-    "GuiMixinFabric",
+    "HuiMixinFabric",
     "KeyboardHandlerMixinFabric",
     "MouseHandlerMixinFabric"
   ],

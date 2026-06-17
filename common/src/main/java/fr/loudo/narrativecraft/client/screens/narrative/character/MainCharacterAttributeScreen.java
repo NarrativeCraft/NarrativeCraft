@@ -86,7 +86,7 @@ public class MainCharacterAttributeScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     private Component buildMainCharacterLabel() {

@@ -53,7 +53,7 @@ public class AnimationEntryListScreen extends NarrativeEntryListScreen<Animation
     private Button addLinkButton(int x, int y, Animation item) {
         Button linkButton = Button.builder(
                         Component.literal("⚙"),
-                        b -> minecraft.setScreen(new AnimationCharacterPickerScreen(item, this)))
+                        b -> minecraft.gui.setScreen(new AnimationCharacterPickerScreen(item, this)))
                 .bounds(x, y, 20, 20)
                 .build();
         addRenderableWidget(linkButton);

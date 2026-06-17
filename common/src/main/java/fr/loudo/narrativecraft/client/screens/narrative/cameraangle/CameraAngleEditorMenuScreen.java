@@ -165,7 +165,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
                             Component.literal(template.sourceType() + " " + shortId(template.refId())),
                             () -> {
                                 Services.PACKET.sendToServer(new C2SCameraAngleTeleportToTemplate(template.refId()));
-                                minecraft.setScreen(null);
+                                minecraft.gui.setScreen(null);
                             },
                             () -> {
                                 editor.removeTemplateReference(template);
@@ -230,7 +230,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
     }
 
     private void openModifyScreen(CameraView cameraView) {
-        minecraft.setScreen(new CameraAngleCameraNameScreen(
+        minecraft.gui.setScreen(new CameraAngleCameraNameScreen(
                 Translation.message("screen.camera_angle_editor.camera_name_prompt"),
                 cameraView.getName(),
                 cameraView,
@@ -290,6 +290,6 @@ public class CameraAngleEditorMenuScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

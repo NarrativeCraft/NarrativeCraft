@@ -89,7 +89,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                 ClientNarrativeUIActionRegistry.getInstance().showCreateScreen(entryClass, this, parentEntry);
         if (createScreen != null) {
             Button addButton = Button.builder(Component.literal("+"), (b) -> {
-                        minecraft.setScreen(ClientNarrativeUIActionRegistry.getInstance()
+                        minecraft.gui.setScreen(ClientNarrativeUIActionRegistry.getInstance()
                                 .showCreateScreen(entryClass, this, parentEntry));
                     })
                     .bounds(this.width / 2 + buttonWidth / 2 + 10, 20, 20, 20)
@@ -104,7 +104,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
             this.addRenderableWidget(storiesButton);
         } else {
             Button charactersButton = Button.builder(Component.literal("C"), b -> {
-                        minecraft.setScreen(new CharacterEntryListScreen(
+                        minecraft.gui.setScreen(new CharacterEntryListScreen(
                                 ClientNarrativeCraftMod.getInstance()
                                         .getCharacterManager()
                                         .getList(),
@@ -116,7 +116,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
             this.addRenderableWidget(charactersButton);
         }
         Button settingsButton = Button.builder(Component.literal(CustomFont.SETTINGS), b -> {
-                    minecraft.setScreen(new NarrativeSettingsScreen(this));
+                    minecraft.gui.setScreen(new NarrativeSettingsScreen(this));
                 })
                 .bounds(10, 35, 20, 20)
                 .build();
@@ -126,7 +126,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                     ClientGlobalDialogEditorMaker editor = new ClientGlobalDialogEditorMaker();
                     editor.init();
                     ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(editor);
-                    minecraft.setScreen(new ClearScreen());
+                    minecraft.gui.setScreen(new ClearScreen());
                     Services.PACKET.sendToServer(new C2SEnterDialogEditor("global", ""));
                 })
                 .bounds(10, 60, 20, 20)
@@ -140,7 +140,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
 
     protected Button addEditButton(int x, int y, E item) {
         Button editButton = Button.builder(Component.literal("✎"), b -> {
-                    minecraft.setScreen(
+                    minecraft.gui.setScreen(
                             ClientNarrativeUIActionRegistry.getInstance().showEditScreen(item, this));
                 })
                 .bounds(x, y, 20, 20)
@@ -167,13 +167,13 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                     if (b) {
                         Services.PACKET.sendToServer(BiSyncNarrativeEntryPacket.delete(item.getId(), item.toPayload()));
                     }
-                    minecraft.setScreen(this);
+                    minecraft.gui.setScreen(this);
                 },
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.delete", item.getName()));
 
         Button deleteButton = Button.builder(
-                        Component.literal(CustomFont.CROSS), b -> minecraft.setScreen(confirmScreen))
+                        Component.literal(CustomFont.CROSS), b -> minecraft.gui.setScreen(confirmScreen))
                 .bounds(x, y, 20, 20)
                 .build();
         this.addRenderableWidget(deleteButton);
@@ -189,7 +189,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
     protected void onItemClicked(E item) {
         Screen subScreen = ClientNarrativeUIActionRegistry.getInstance().showListSubScreen(item, this);
         if (subScreen != null) {
-            minecraft.setScreen(subScreen);
+            minecraft.gui.setScreen(subScreen);
         } else {
             ClientNarrativeUIActionRegistry.getInstance().customClickAction(item);
         }

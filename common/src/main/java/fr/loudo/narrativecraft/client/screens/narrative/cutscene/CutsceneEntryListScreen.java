@@ -56,7 +56,7 @@ public class CutsceneEntryListScreen extends NarrativeEntryListScreen<Cutscene> 
                     Screen screen = Minecraft.getInstance().hasShiftDown()
                             ? new CutsceneAnimationsAssignScreen(item, this)
                             : new CutsceneSubscenesAssignScreen(item, this);
-                    minecraft.setScreen(screen);
+                    minecraft.gui.setScreen(screen);
                 })
                 .bounds(x, y, 20, 20)
                 .build();

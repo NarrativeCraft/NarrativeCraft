@@ -31,6 +31,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.PlayerModelType;
 
 public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
@@ -41,7 +42,7 @@ public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
 
     public AbstractCharacterEntryEditScreen(Screen lastScreen) {
         super(lastScreen);
-        this.selectedEntityType = EntityType.PLAYER;
+        this.selectedEntityType = EntityTypes.PLAYER;
         this.selectedModelType = PlayerModelType.WIDE;
     }
 
@@ -57,7 +58,7 @@ public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
                 BuiltInRegistries.ENTITY_TYPE.getKey(selectedEntityType).toString();
         Button entityTypeButton = Button.builder(
                         Component.literal(Translation.message("entity_type").getString() + ": " + entityTypeLabel),
-                        b -> minecraft.setScreen(
+                        b -> minecraft.gui.setScreen(
                                 new EntityTypePickerScreen(this, picked -> selectedEntityType = picked)))
                 .size(GLOBAL_WIDTH, 20)
                 .build();

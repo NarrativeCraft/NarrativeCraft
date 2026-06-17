@@ -107,7 +107,7 @@ public class MainScreen extends Screen {
         if (canContinue || isPause) {
             addRenderableWidget(Button.builder(Translation.message("screen.main.continue"), button -> {
                         if (isPause) {
-                            minecraft.setScreen(null);
+                            minecraft.gui.setScreen(null);
                         } else {
                             close();
                             Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), true));
@@ -131,7 +131,7 @@ public class MainScreen extends Screen {
         if (finishedStory && !isPause) {
             addRenderableWidget(Button.builder(
                             Translation.message("screen.main.select_scene"),
-                            button -> minecraft.setScreen(new SelectChaptersScreen(this)))
+                            button -> minecraft.gui.setScreen(new SelectChaptersScreen(this)))
                     .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                     .build());
             currentY += BUTTON_HEIGHT + BUTTON_GAP;
@@ -139,7 +139,7 @@ public class MainScreen extends Screen {
 
         addRenderableWidget(Button.builder(
                         Translation.message("screen.main.options"),
-                        button -> minecraft.setScreen(new OptionsScreen(this)))
+                        button -> minecraft.gui.setScreen(new OptionsScreen(this)))
                 .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
         currentY += BUTTON_HEIGHT + BUTTON_GAP;
@@ -199,7 +199,7 @@ public class MainScreen extends Screen {
     }
 
     public void close() {
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
         minecraft.getSoundManager().stop(MAIN_MUSIC_INSTANCE);
         ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor().stop();
         ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(null);

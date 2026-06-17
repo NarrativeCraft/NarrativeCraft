@@ -57,7 +57,7 @@ public class ClientCameraAngleNarrativeUIAction implements ClientNarrativeUIActi
         ClientCameraAngleMakerEditorMaker cameraAngleEditor = new ClientCameraAngleMakerEditorMaker(entry);
         cameraAngleEditor.init();
         session.setEditor(cameraAngleEditor);
-        Minecraft.getInstance().setScreen(null);
+        Minecraft.getInstance().gui.setScreen(null);
     }
 
     @Override

@@ -47,7 +47,7 @@ public class SelectChaptersScreen extends PaginationsItemsScreen<Chapter> {
 
     @Override
     protected void onItemClicked(Chapter chapter) {
-        minecraft.setScreen(new SelectScenesScreen(this, (MainScreen) lastScreen, chapter));
+        minecraft.gui.setScreen(new SelectScenesScreen(this, (MainScreen) lastScreen, chapter));
     }
 
     @Override
@@ -57,6 +57,6 @@ public class SelectChaptersScreen extends PaginationsItemsScreen<Chapter> {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

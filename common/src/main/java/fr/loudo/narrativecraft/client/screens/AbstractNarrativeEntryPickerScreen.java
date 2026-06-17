@@ -42,7 +42,7 @@ public abstract class AbstractNarrativeEntryPickerScreen<T> extends PaginationsI
     @Override
     protected void onItemClicked(T item) {
         onPick.accept(item);
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     @Override
@@ -52,6 +52,6 @@ public abstract class AbstractNarrativeEntryPickerScreen<T> extends PaginationsI
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

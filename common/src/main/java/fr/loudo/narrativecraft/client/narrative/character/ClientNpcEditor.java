@@ -40,6 +40,7 @@ import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 
 public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, Npc> {
 
@@ -129,6 +130,6 @@ public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, N
     private EntityType<?> resolveEntityType(String entityTypeId) {
         return BuiltInRegistries.ENTITY_TYPE
                 .getOptional(Identifier.parse(entityTypeId))
-                .orElse(EntityType.PLAYER);
+                .orElse(EntityTypes.PLAYER);
     }
 }

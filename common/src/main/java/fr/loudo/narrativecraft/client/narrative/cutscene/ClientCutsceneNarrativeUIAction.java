@@ -58,7 +58,7 @@ public class ClientCutsceneNarrativeUIAction implements ClientNarrativeUIAction<
                 new ClientCutsceneMakerEditorMaker(entry, NarrativeEnvironment.DEVELOPMENT);
         cutsceneEditor.init();
         session.setEditor(cutsceneEditor);
-        Minecraft.getInstance().setScreen(null);
+        Minecraft.getInstance().gui.setScreen(null);
     }
 
     @Override

@@ -57,7 +57,7 @@ public class ClientInteractionNarrativeUIAction implements ClientNarrativeUIActi
         ClientInteractionMakerEditorMaker interactionEditor = new ClientInteractionMakerEditorMaker(entry);
         interactionEditor.init();
         session.setEditor(interactionEditor);
-        Minecraft.getInstance().setScreen(null);
+        Minecraft.getInstance().gui.setScreen(null);
     }
 
     @Override

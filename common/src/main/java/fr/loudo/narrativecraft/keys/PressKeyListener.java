@@ -53,9 +53,9 @@ public class PressKeyListener {
                         session.getScene(),
                         ClientNarrativeUIActionRegistry.getInstance()
                                 .showListSubScreen(session.getChapter(), entryListScreen));
-                minecraft.setScreen(screen);
+                minecraft.gui.setScreen(screen);
             } else {
-                minecraft.setScreen(entryListScreen);
+                minecraft.gui.setScreen(entryListScreen);
             }
         }
 

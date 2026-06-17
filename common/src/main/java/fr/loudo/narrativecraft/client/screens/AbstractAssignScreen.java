@@ -237,6 +237,6 @@ public abstract class AbstractAssignScreen<T> extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

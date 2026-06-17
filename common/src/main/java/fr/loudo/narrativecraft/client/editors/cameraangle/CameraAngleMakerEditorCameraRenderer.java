@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.client.editors.cameraangle;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.rendering.CameraWireframeRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -32,83 +31,82 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 
 public class CameraAngleMakerEditorCameraRenderer {
 
     private static final float NAME_TAG_SCALE = 0.025f;
 
-    public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
+    public static void render(SubmitNodeCollector collector, PoseStack poseStack, DeltaTracker deltaTracker) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (!(editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor)) return;
 
-        cameraAngleEditor.renderAnchorPoint(poseStack);
+        cameraAngleEditor.renderAnchorPoint(collector, poseStack);
 
         if (cameraAngleEditor.getPreviewCamera() != null) return;
 
         Minecraft minecraft = Minecraft.getInstance();
-        Vec3 cameraPos = minecraft.gameRenderer.getMainCamera().position();
-        VertexConsumer vertexConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
-        Matrix4f matrix = poseStack.last().pose();
+        Vec3 cameraPos = minecraft.gameRenderer.mainCamera().position();
 
         CameraView preview = cameraAngleEditor.getPreviewCamera();
-        for (CameraView cameraView : cameraAngleEditor.getCameraViews()) {
-            boolean isPreview = cameraView == preview;
-            float red = isPreview ? 1.0F : 0.2F;
-            float green = isPreview ? 0.6F : 0.8F;
-            float blue = isPreview ? 0.2F : 1.0F;
-            CameraWireframeRenderer.renderWireframe(
-                    vertexConsumer,
-                    matrix,
-                    cameraView.getPosition(),
-                    cameraView.getRotation(),
-                    cameraPos,
-                    0.6f,
-                    0.4f,
-                    0.5f,
-                    red,
-                    green,
-                    blue,
-                    1.0F);
-        }
+        collector.submitCustomGeometry(poseStack, RenderTypes.lines(), (pose, vertexConsumer) -> {
+            for (CameraView cameraView : cameraAngleEditor.getCameraViews()) {
+                boolean isPreview = cameraView == preview;
+                float red = isPreview ? 1.0F : 0.2F;
+                float green = isPreview ? 0.6F : 0.8F;
+                float blue = isPreview ? 0.2F : 1.0F;
+                CameraWireframeRenderer.renderWireframe(
+                        vertexConsumer,
+                        pose.pose(),
+                        cameraView.getPosition(),
+                        cameraView.getRotation(),
+                        cameraPos,
+                        0.6f,
+                        0.4f,
+                        0.5f,
+                        red,
+                        green,
+                        blue,
+                        1.0F);
+            }
+        });
 
-        minecraft.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
-
-        renderNameTags(poseStack, cameraAngleEditor, cameraPos, minecraft);
+        renderNameTags(collector, poseStack, cameraAngleEditor, cameraPos, minecraft);
     }
 
     private static void renderNameTags(
-            PoseStack poseStack, ClientCameraAngleMakerEditorMaker editor, Vec3 cameraPos, Minecraft minecraft) {
+            SubmitNodeCollector collector,
+            PoseStack poseStack,
+            ClientCameraAngleMakerEditorMaker editor,
+            Vec3 cameraPos,
+            Minecraft minecraft) {
         Font font = minecraft.font;
-        MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
 
         for (CameraView cameraView : editor.getCameraViews()) {
             Vec3 position = cameraView.getPosition();
             poseStack.pushPose();
             poseStack.translate(position.x - cameraPos.x, position.y - cameraPos.y + 0.6, position.z - cameraPos.z);
-            poseStack.mulPose(minecraft.gameRenderer.getMainCamera().rotation());
+            poseStack.mulPose(minecraft.gameRenderer.mainCamera().rotation());
             poseStack.scale(NAME_TAG_SCALE, -NAME_TAG_SCALE, NAME_TAG_SCALE);
-            Matrix4f matrix = poseStack.last().pose();
 
             int width = font.width(cameraView.getName());
-            font.drawInBatch(
-                    cameraView.getName(),
+            collector.submitText(
+                    poseStack,
                     -width / 2f,
                     0,
-                    0xFFFFFFFF,
+                    FormattedCharSequence.forward(cameraView.getName(), Style.EMPTY),
                     false,
-                    matrix,
-                    bufferSource,
                     Font.DisplayMode.SEE_THROUGH,
+                    0xF000F0,
+                    0xFFFFFFFF,
                     0x40000000,
-                    0xF000F0);
+                    0);
             poseStack.popPose();
         }
-
-        bufferSource.endBatch();
     }
 }

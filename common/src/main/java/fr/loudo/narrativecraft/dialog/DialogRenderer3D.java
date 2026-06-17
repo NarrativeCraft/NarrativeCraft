@@ -24,18 +24,17 @@
 package fr.loudo.narrativecraft.dialog;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.client.rendering.Dialog3DRendererHelper;
 import fr.loudo.narrativecraft.dialog.geometric.DialogTail;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 
 public class DialogRenderer3D extends DialogRenderer {
 
@@ -57,14 +56,14 @@ public class DialogRenderer3D extends DialogRenderer {
         super.tick();
     }
 
-    public void render(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float partialTick) {
+    public void render(PoseStack poseStack, SubmitNodeCollector collector, float partialTick) {
         if (animator.isStopped()) return;
 
         float scale = data.getScale() * animator.getScale(partialTick) * 0.025f;
         if (scale <= 0f) return;
 
         float opacity = animator.getOpacity(partialTick);
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
         Vec3 camRight = new Vec3(camera.leftVector()).scale(-1);
 
         double interpX = Mth.lerp(partialTick, entity.xo, entity.getX());
@@ -103,20 +102,19 @@ public class DialogRenderer3D extends DialogRenderer {
         float anchorY = data.getOffsetY() == 0 ? -totalHeight / 2f : (data.getOffsetY() > 0 ? -totalHeight : 0f);
         poseStack.translate(anchorX, anchorY, 0);
 
-        renderBackground(poseStack, bufferSource, totalWidth, totalHeight, opacity);
+        renderBackground(poseStack, collector, totalWidth, totalHeight, opacity);
         if (!isAnimating()) {
-            renderText(poseStack, bufferSource, partialTick);
-            bufferSource.endBatch();
+            renderText(poseStack, collector, partialTick);
         }
 
         if (data.isTailVisible()) {
             poseStack.pushPose();
             poseStack.translate(-anchorX, -anchorY, 0);
-            tail.render(poseStack, bufferSource, opacity);
+            tail.render(poseStack, collector, opacity);
             poseStack.popPose();
         }
 
-        renderSkipIndicator(poseStack, bufferSource, totalWidth, totalHeight, opacity, partialTick);
+        renderSkipIndicator(poseStack, collector, totalWidth, totalHeight, opacity, partialTick);
 
         poseStack.popPose();
     }
@@ -133,12 +131,12 @@ public class DialogRenderer3D extends DialogRenderer {
     }
 
     public Vec3 translateToRelative(Vec3 worldPos) {
-        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.mainCamera().position();
         return worldPos.subtract(cameraPos);
     }
 
     public Vec3 translateToRelativeApplyOffset(Vec3 worldPos) {
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
         Vec3 relative = translateToRelative(worldPos);
         Vec3 right = new Vec3(camera.leftVector()).scale(-1);
         return relative.add(right.scale(data.getOffsetX()));
@@ -157,58 +155,65 @@ public class DialogRenderer3D extends DialogRenderer {
     }
 
     private void renderBackground(
-            PoseStack poseStack,
-            MultiBufferSource.BufferSource bufferSource,
-            float totalWidth,
-            float totalHeight,
-            float opacity) {
-        Matrix4f matrix = poseStack.last().pose();
-
+            PoseStack poseStack, SubmitNodeCollector collector, float totalWidth, float totalHeight, float opacity) {
         if (data.getBackgroundImage() != null) {
             int color = applyOpacity(0xFFFFFFFF, opacity);
-            VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textSeeThrough(data.getBackgroundImage()));
-            consumer.addVertex(matrix, 0, 0, 0).setColor(color).setUv(0f, 0f).setLight(LightCoordsUtil.FULL_BRIGHT);
-            consumer.addVertex(matrix, 0, totalHeight, 0)
-                    .setColor(color)
-                    .setUv(0f, 1f)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT);
-            consumer.addVertex(matrix, totalWidth, totalHeight, 0)
-                    .setColor(color)
-                    .setUv(1f, 1f)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT);
-            consumer.addVertex(matrix, totalWidth, 0, 0)
-                    .setColor(color)
-                    .setUv(1f, 0f)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT);
+            Dialog3DRendererHelper.geometry(
+                    collector,
+                    Dialog3DRendererHelper.LAYER_BACKGROUND,
+                    poseStack,
+                    RenderTypes.textSeeThrough(data.getBackgroundImage()),
+                    (pose, consumer) -> {
+                        consumer.addVertex(pose, 0, 0, 0)
+                                .setColor(color)
+                                .setUv(0f, 0f)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT);
+                        consumer.addVertex(pose, 0, totalHeight, 0)
+                                .setColor(color)
+                                .setUv(0f, 1f)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT);
+                        consumer.addVertex(pose, totalWidth, totalHeight, 0)
+                                .setColor(color)
+                                .setUv(1f, 1f)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT);
+                        consumer.addVertex(pose, totalWidth, 0, 0)
+                                .setColor(color)
+                                .setUv(1f, 0f)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT);
+                    });
         } else {
             int color = applyOpacity(data.getBackgroundColor(), opacity);
-            VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
-            consumer.addVertex(matrix, 0, 0, 0)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT)
-                    .setColor(color);
-            consumer.addVertex(matrix, 0, totalHeight, 0)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT)
-                    .setColor(color);
-            consumer.addVertex(matrix, totalWidth, totalHeight, 0)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT)
-                    .setColor(color);
-            consumer.addVertex(matrix, totalWidth, 0, 0)
-                    .setLight(LightCoordsUtil.FULL_BRIGHT)
-                    .setColor(color);
+            Dialog3DRendererHelper.geometry(
+                    collector,
+                    Dialog3DRendererHelper.LAYER_BACKGROUND,
+                    poseStack,
+                    RenderTypes.textBackgroundSeeThrough(),
+                    (pose, consumer) -> {
+                        consumer.addVertex(pose, 0, 0, 0)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT)
+                                .setColor(color);
+                        consumer.addVertex(pose, 0, totalHeight, 0)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT)
+                                .setColor(color);
+                        consumer.addVertex(pose, totalWidth, totalHeight, 0)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT)
+                                .setColor(color);
+                        consumer.addVertex(pose, totalWidth, 0, 0)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT)
+                                .setColor(color);
+                    });
         }
-
-        bufferSource.endBatch();
     }
 
-    private void renderText(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick) {
+    private void renderText(PoseStack poseStack, SubmitNodeCollector collector, float partialTick) {
         float textX = data.getPaddingX();
         float textY = data.getPaddingY();
-        scrollText.render3D(poseStack, bufferSource, textX, textY, data, partialTick);
+        scrollText.render3D(poseStack, collector, textX, textY, data, partialTick);
     }
 
     private void renderSkipIndicator(
             PoseStack poseStack,
-            MultiBufferSource.BufferSource bufferSource,
+            SubmitNodeCollector collector,
             float totalWidth,
             float totalHeight,
             float opacity,
@@ -221,23 +226,25 @@ public class DialogRenderer3D extends DialogRenderer {
         float x = finalX + SKIP_SLIDE_OFFSET * (1f - skipT);
 
         int color = applyOpacity(0xFFFFFFFF, skipT * 0.9f * opacity);
-        VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
-        Matrix4f matrix = poseStack.last().pose();
-
-        consumer.addVertex(matrix, x, y, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, x, y + SKIP_INDICATOR_SIZE, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, x + SKIP_INDICATOR_SIZE, y + SKIP_INDICATOR_SIZE / 2f, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, x, y, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-
-        bufferSource.endBatch();
+        Dialog3DRendererHelper.geometry(
+                collector,
+                Dialog3DRendererHelper.LAYER_FOREGROUND,
+                poseStack,
+                RenderTypes.textBackgroundSeeThrough(),
+                (pose, consumer) -> {
+                    consumer.addVertex(pose, x, y, 0)
+                            .setLight(LightCoordsUtil.FULL_BRIGHT)
+                            .setColor(color);
+                    consumer.addVertex(pose, x, y + SKIP_INDICATOR_SIZE, 0)
+                            .setLight(LightCoordsUtil.FULL_BRIGHT)
+                            .setColor(color);
+                    consumer.addVertex(pose, x + SKIP_INDICATOR_SIZE, y + SKIP_INDICATOR_SIZE / 2f, 0)
+                            .setLight(LightCoordsUtil.FULL_BRIGHT)
+                            .setColor(color);
+                    consumer.addVertex(pose, x, y, 0)
+                            .setLight(LightCoordsUtil.FULL_BRIGHT)
+                            .setColor(color);
+                });
     }
 
     private int applyOpacity(int color, float opacity) {

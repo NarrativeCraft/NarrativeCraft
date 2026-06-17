@@ -17,6 +17,7 @@
   "client": [
     "CameraMixin",
     "GameRendererMixin",
+    "GuiMixin",
     "GuiTextRenderStateMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",

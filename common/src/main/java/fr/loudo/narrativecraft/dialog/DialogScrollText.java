@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.dialog.ITextEffect;
 import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
+import fr.loudo.narrativecraft.client.rendering.Dialog3DRendererHelper;
 import fr.loudo.narrativecraft.dialog.effects.WaitTextEffect;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -34,12 +35,13 @@ import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.phys.Vec2;
-import org.joml.Matrix4f;
 
 public class DialogScrollText {
 
@@ -252,14 +254,13 @@ public class DialogScrollText {
 
     public void render3D(
             PoseStack poseStack,
-            MultiBufferSource bufferSource,
+            SubmitNodeCollector collector,
             float originX,
             float originY,
             DialogData data,
             float partialTick) {
         Font font = Minecraft.getInstance().font;
         List<float[]> positions = computeLetterPositions(originX, originY, data.getWidth(), font, data);
-        Matrix4f matrix = poseStack.last().pose();
 
         for (int i = 0; i < letters.size(); i++) {
             LetterEntry entry = letters.get(i);
@@ -270,17 +271,19 @@ public class DialogScrollText {
             Vec2 offset = getEffectOffset(entry, i, partialTick);
             int color = applyOpacity(data.getTextColor(), 1f);
 
-            font.drawInBatch(
-                    entry.letter,
+            Dialog3DRendererHelper.text(
+                    collector,
+                    Dialog3DRendererHelper.LAYER_TEXT,
+                    poseStack,
                     pos[0] + offset.x,
                     pos[1] + offset.y,
-                    color,
+                    FormattedCharSequence.forward(entry.letter, Style.EMPTY),
                     data.isTextShadow(),
-                    matrix,
-                    bufferSource,
                     Font.DisplayMode.SEE_THROUGH,
+                    0xF000F0,
+                    color,
                     0,
-                    0xF000F0);
+                    0);
         }
     }
 

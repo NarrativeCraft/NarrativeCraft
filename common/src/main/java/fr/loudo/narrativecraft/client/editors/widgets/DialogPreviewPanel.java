@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.client.editors.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -39,13 +38,12 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 
 public class DialogPreviewPanel {
 
@@ -81,17 +79,15 @@ public class DialogPreviewPanel {
         this.defaultDialogText = defaultDialogText;
     }
 
-    public void renderAnchorPoint(PoseStack poseStack) {
+    public void renderAnchorPoint(SubmitNodeCollector collector, PoseStack poseStack) {
         if (fieldSet != DialogFieldSet.CAMERA_VIEW) return;
         DialogRenderer3D renderer = getCurrentDialog();
         if (renderer == null) return;
 
         Minecraft mc = Minecraft.getInstance();
-        Camera camera = mc.gameRenderer.getMainCamera();
+        Camera camera = mc.gameRenderer.mainCamera();
         Vec3 cameraPos = camera.position();
         Vec3 anchorPos = renderer.getAnchorPosition();
-
-        MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
 
         poseStack.pushPose();
         poseStack.translate(anchorPos.x - cameraPos.x, anchorPos.y - cameraPos.y, anchorPos.z - cameraPos.z);
@@ -100,21 +96,20 @@ public class DialogPreviewPanel {
 
         float halfSize = 0.05f;
         int color = 0xFFFF0000;
-        Matrix4f matrix = poseStack.last().pose();
-        VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
-        consumer.addVertex(matrix, -halfSize, -halfSize, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, -halfSize, halfSize, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, halfSize, halfSize, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, halfSize, -halfSize, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
-        bufferSource.endBatch();
+        collector.submitCustomGeometry(poseStack, RenderTypes.textBackgroundSeeThrough(), (pose, consumer) -> {
+            consumer.addVertex(pose, -halfSize, -halfSize, 0)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setColor(color);
+            consumer.addVertex(pose, -halfSize, halfSize, 0)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setColor(color);
+            consumer.addVertex(pose, halfSize, halfSize, 0)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setColor(color);
+            consumer.addVertex(pose, halfSize, -halfSize, 0)
+                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                    .setColor(color);
+        });
 
         poseStack.popPose();
     }

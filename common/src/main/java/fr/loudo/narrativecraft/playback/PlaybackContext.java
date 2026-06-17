@@ -33,16 +33,15 @@ import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.util.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.storage.TagValueInput;
 
@@ -99,7 +98,7 @@ public class PlaybackContext implements IPlaybackContext {
             return;
         }
 
-        Optional<EntityType<?>> typeOpt = EntityType.byString(entityId);
+        Optional<EntityType<?>> typeOpt = BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.tryParse(entityId));
         if (typeOpt.isEmpty()) {
             Utils.sendError(Translation.message("error.playback_entity_type", entityId), playback.getRequester());
             playback.stop();

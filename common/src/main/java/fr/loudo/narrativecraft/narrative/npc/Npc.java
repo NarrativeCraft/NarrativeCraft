@@ -37,6 +37,7 @@ import java.io.File;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.PlayerModelType;
 
 public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
@@ -44,7 +45,7 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
     private final Scene scene;
     private final CharacterType characterType = CharacterType.NPC;
     private DialogData dialogData = new DialogData();
-    private EntityType<?> entityType = EntityType.PLAYER;
+    private EntityType<?> entityType = EntityTypes.PLAYER;
     private PlayerModelType modelType;
 
     public Npc(UUID id, String name, Scene scene) {

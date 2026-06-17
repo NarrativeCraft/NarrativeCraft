@@ -41,6 +41,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 
 public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPayload, CharacterStory> {
 
@@ -152,6 +153,6 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
     private EntityType<?> resolveEntityType(String entityTypeId) {
         return BuiltInRegistries.ENTITY_TYPE
                 .getOptional(Identifier.parse(entityTypeId))
-                .orElse(EntityType.PLAYER);
+                .orElse(EntityTypes.PLAYER);
     }
 }

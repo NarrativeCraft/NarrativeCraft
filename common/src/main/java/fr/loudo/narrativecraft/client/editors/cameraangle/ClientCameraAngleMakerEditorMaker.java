@@ -48,8 +48,10 @@ import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.*;
+import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -57,7 +59,9 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundChangeGameModePacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
@@ -166,7 +170,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     @Override
     public void stop() {
         exitPreview();
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
     }
 
     public void tick() {
@@ -182,7 +186,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                     (float) previewCameraView.getRotation().y,
                     player.onGround(),
                     false));
-            Minecraft.getInstance().options.hideGui = true;
+            UtilsClient.setHudHidden(true);
         }
         advancedPanel.tick();
     }
@@ -226,12 +230,12 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private void openAddCameraScreen() {
         if (cameraAngle.getScene() != null) {
-            minecraft.setScreen(new CameraAngleCameraNameScreen(
+            minecraft.gui.setScreen(new CameraAngleCameraNameScreen(
                     Translation.message("screen.camera_angle_editor.camera_name_prompt"),
                     "",
                     null,
                     this::createCameraFromPlayer,
-                    minecraft.screen));
+                    minecraft.gui.screen()));
         } else {
             createCameraFromPlayer("main");
         }
@@ -307,23 +311,25 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     private void openCharacterPicker() {
-        minecraft.setScreen(new CameraAngleCharacterPickerScreen(cameraAngle.getScene(), minecraft.screen, pick -> {
-            if (cameraAngle.getScene() != null) {
-                Services.PACKET.sendToServer(new C2SCameraAngleCaptureCharacter(
-                        cameraAngle.getScene().getChapter().getId(),
-                        cameraAngle.getScene().getId(),
-                        cameraAngle.getId(),
-                        pick.characterId()));
-            } else {
-                Services.PACKET.sendToServer(new C2SMainScreenCaptureCharacter(pick.characterId()));
-            }
-        }));
+        minecraft.gui.setScreen(
+                new CameraAngleCharacterPickerScreen(cameraAngle.getScene(), minecraft.gui.screen(), pick -> {
+                    if (cameraAngle.getScene() != null) {
+                        Services.PACKET.sendToServer(new C2SCameraAngleCaptureCharacter(
+                                cameraAngle.getScene().getChapter().getId(),
+                                cameraAngle.getScene().getId(),
+                                cameraAngle.getId(),
+                                pick.characterId()));
+                    } else {
+                        Services.PACKET.sendToServer(new C2SMainScreenCaptureCharacter(pick.characterId()));
+                    }
+                }));
     }
 
     private void openTemplatePicker() {
-        minecraft.setScreen(new CameraAngleTemplatePickerScreen(cameraAngle.getScene(), minecraft.screen, pick -> {
-            addTemplateReference(pick.sourceType(), pick.refId());
-        }));
+        minecraft.gui.setScreen(
+                new CameraAngleTemplatePickerScreen(cameraAngle.getScene(), minecraft.gui.screen(), pick -> {
+                    addTemplateReference(pick.sourceType(), pick.refId());
+                }));
     }
 
     public void addTemplateReference(TemplateSourceType sourceType, UUID refId) {
@@ -333,7 +339,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void openMenu() {
-        minecraft.setScreen(new CameraAngleEditorMenuScreen(this, minecraft.screen));
+        minecraft.gui.setScreen(new CameraAngleEditorMenuScreen(this, minecraft.gui.screen()));
     }
 
     private void openQuitConfirm() {
@@ -348,7 +354,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                 },
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.save"));
-        minecraft.setScreen(confirmScreen);
+        minecraft.gui.setScreen(confirmScreen);
     }
 
     private void save() {
@@ -370,7 +376,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void teleportPlayerToPlacement(Vec3 position) {
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
         LocalPlayer player = minecraft.player;
         if (player == null) return;
         player.setPos(position);
@@ -395,7 +401,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         playerSession.setCameraView(null);
         rollWidget.setVisible(false);
         fovWidget.setVisible(false);
-        Minecraft.getInstance().options.hideGui = false;
+        UtilsClient.setHudHidden(false);
     }
 
     public void enterDialogMode() {
@@ -518,7 +524,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private void editCameraPosition() {
         editingCameraViewPosition = true;
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
     }
 
     private void acceptNewCameraPosition() {
@@ -532,15 +538,19 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private void stopNewCameraPosition() {
         editingCameraViewPosition = false;
-        minecraft.levelRenderer.allChanged();
+        ClientLevel level = minecraft.level;
+        if (level == null) return;
+        Options options = minecraft.options;
+        Camera camera = minecraft.gameRenderer.mainCamera();
+        minecraft.levelRenderer.invalidateCompiledGeometry(level, options, camera, minecraft.getBlockColors());
     }
 
     public CameraView getPreviewCamera() {
         return previewCameraView;
     }
 
-    public void renderAnchorPoint(PoseStack poseStack) {
-        dialogPreviewPanel.renderAnchorPoint(poseStack);
+    public void renderAnchorPoint(SubmitNodeCollector collector, PoseStack poseStack) {
+        dialogPreviewPanel.renderAnchorPoint(collector, poseStack);
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
@@ -659,7 +669,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     private boolean clearScreenOpened() {
-        return minecraft.screen != null && minecraft.screen instanceof ClearScreen;
+        return minecraft.gui.screen() != null && minecraft.gui.screen() instanceof ClearScreen;
     }
 
     public void keyPressed(KeyEvent event) {

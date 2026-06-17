@@ -21,25 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.client;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.events.client.OnHudRender;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.Hud;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnRenderWordEventNeoForge {
+@Mixin(Hud.class)
+public class HuiMixinFabric {
 
-    public OnRenderWordEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(OnRenderWordEventNeoForge::onSubmitCustomGeometry);
-    }
-
-    private static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
-        DeltaTracker deltaTracker = Minecraft.getInstance().getDeltaTracker();
-        OnRenderWorldEvent.renderWorld(event.getSubmitNodeCollector(), event.getPoseStack(), deltaTracker);
+    @Inject(method = "extractRenderState", at = @At("RETURN"))
+    private void narrativecraft$renderHud(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
+        OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
+        OnHudRender.interactionHudRender(graphics, deltaTracker);
+        OnHudRender.dialogHudRender(graphics, deltaTracker);
+        OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
+        OnHudRender.saveIconHudRender(graphics, deltaTracker);
     }
 }

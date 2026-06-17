@@ -25,11 +25,11 @@ package fr.loudo.narrativecraft.dialog.geometric;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.client.rendering.Dialog3DRendererHelper;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.LightCoordsUtil;
-import org.joml.Matrix4f;
 
 public class DialogTail {
 
@@ -56,29 +56,32 @@ public class DialogTail {
         this.offset = offset;
     }
 
-    public void render(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float opacity) {
+    public void render(PoseStack poseStack, SubmitNodeCollector collector, float opacity) {
         TailDirection tailDirection = getTailDirection();
 
         poseStack.pushPose();
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderTypes.textBackgroundSeeThrough());
-        Matrix4f matrix = poseStack.last().pose();
-
         float topRight = -width / 2 + offset;
         float topLeft = width / 2 + offset;
 
-        switch (tailDirection) {
-            case TOP -> drawTailTop(matrix, vertexConsumer, topRight, topLeft, opacity);
-            case BOTTOM -> drawTailBottom(matrix, vertexConsumer, topRight, topLeft, opacity);
-            case RIGHT -> drawTailRight(matrix, vertexConsumer, opacity);
-            case RIGHT_UP_CORNER -> drawTailUpRightCorner(matrix, vertexConsumer, opacity);
-            case RIGHT_DOWN_CORNER -> drawTailDownRightCorner(matrix, vertexConsumer, opacity);
-            case LEFT -> drawTailLeft(matrix, vertexConsumer, opacity);
-            case LEFT_UP_CORNER -> drawTailUpLeftCorner(matrix, vertexConsumer, opacity);
-            case LEFT_DOWN_CORNER -> drawTailDownLeftCorner(matrix, vertexConsumer, opacity);
-        }
+        Dialog3DRendererHelper.geometry(
+                collector,
+                Dialog3DRendererHelper.LAYER_BACKGROUND,
+                poseStack,
+                RenderTypes.textBackgroundSeeThrough(),
+                (pose, vertexConsumer) -> {
+                    switch (tailDirection) {
+                        case TOP -> drawTailTop(pose, vertexConsumer, topRight, topLeft, opacity);
+                        case BOTTOM -> drawTailBottom(pose, vertexConsumer, topRight, topLeft, opacity);
+                        case RIGHT -> drawTailRight(pose, vertexConsumer, opacity);
+                        case RIGHT_UP_CORNER -> drawTailUpRightCorner(pose, vertexConsumer, opacity);
+                        case RIGHT_DOWN_CORNER -> drawTailDownRightCorner(pose, vertexConsumer, opacity);
+                        case LEFT -> drawTailLeft(pose, vertexConsumer, opacity);
+                        case LEFT_UP_CORNER -> drawTailUpLeftCorner(pose, vertexConsumer, opacity);
+                        case LEFT_DOWN_CORNER -> drawTailDownLeftCorner(pose, vertexConsumer, opacity);
+                    }
+                });
 
-        bufferSource.endBatch();
         poseStack.popPose();
     }
 
@@ -98,7 +101,7 @@ public class DialogTail {
         return tailDirection;
     }
 
-    private void addVertex(Matrix4f matrix, VertexConsumer consumer, float x, float y, float opacity) {
+    private void addVertex(PoseStack.Pose matrix, VertexConsumer consumer, float x, float y, float opacity) {
         int base = dialog.getData().getBackgroundColor();
         int alpha = (int) (net.minecraft.util.ARGB.alpha(base) * opacity);
         int color = net.minecraft.util.ARGB.color(
@@ -111,56 +114,56 @@ public class DialogTail {
                 .setColor(color);
     }
 
-    private void drawTailTop(Matrix4f m, VertexConsumer c, float topRight, float topLeft, float op) {
+    private void drawTailTop(PoseStack.Pose m, VertexConsumer c, float topRight, float topLeft, float op) {
         addVertex(m, c, 0, -height, op);
         addVertex(m, c, -topRight, height, op);
         addVertex(m, c, -topLeft, 0, op);
         addVertex(m, c, -topRight, 0, op);
     }
 
-    private void drawTailBottom(Matrix4f m, VertexConsumer c, float topRight, float topLeft, float op) {
+    private void drawTailBottom(PoseStack.Pose m, VertexConsumer c, float topRight, float topLeft, float op) {
         addVertex(m, c, -topRight, 0, op);
         addVertex(m, c, -topLeft, 0, op);
         addVertex(m, c, 0, height, op);
         addVertex(m, c, -topRight, 0, op);
     }
 
-    private void drawTailLeft(Matrix4f m, VertexConsumer c, float op) {
+    private void drawTailLeft(PoseStack.Pose m, VertexConsumer c, float op) {
         addVertex(m, c, -height, 0, op);
         addVertex(m, c, 0, -width / 2, op);
         addVertex(m, c, 0, width / 2, op);
         addVertex(m, c, 0, -width / 2, op);
     }
 
-    private void drawTailRight(Matrix4f m, VertexConsumer c, float op) {
+    private void drawTailRight(PoseStack.Pose m, VertexConsumer c, float op) {
         addVertex(m, c, height, 0, op);
         addVertex(m, c, 0, width / 2, op);
         addVertex(m, c, 0, -width / 2, op);
         addVertex(m, c, 0, width / 2, op);
     }
 
-    private void drawTailUpRightCorner(Matrix4f m, VertexConsumer c, float op) {
+    private void drawTailUpRightCorner(PoseStack.Pose m, VertexConsumer c, float op) {
         addVertex(m, c, 0, 0, op);
         addVertex(m, c, 0, height / 2, op);
         addVertex(m, c, width / 2, -height / 2, op);
         addVertex(m, c, -width / 2, 0, op);
     }
 
-    private void drawTailDownRightCorner(Matrix4f m, VertexConsumer c, float op) {
+    private void drawTailDownRightCorner(PoseStack.Pose m, VertexConsumer c, float op) {
         addVertex(m, c, 0, 0, op);
         addVertex(m, c, -width / 2, 0, op);
         addVertex(m, c, width / 2, height / 2, op);
         addVertex(m, c, 0, -height / 2, op);
     }
 
-    private void drawTailUpLeftCorner(Matrix4f m, VertexConsumer c, float op) {
+    private void drawTailUpLeftCorner(PoseStack.Pose m, VertexConsumer c, float op) {
         addVertex(m, c, 0, 0, op);
         addVertex(m, c, width / 2, 0, op);
         addVertex(m, c, -width / 2, -height / 2, op);
         addVertex(m, c, 0, height / 2, op);
     }
 
-    private void drawTailDownLeftCorner(Matrix4f m, VertexConsumer c, float op) {
+    private void drawTailDownLeftCorner(PoseStack.Pose m, VertexConsumer c, float op) {
         addVertex(m, c, -width / 2, height / 2, op);
         addVertex(m, c, width / 2, 0, op);
         addVertex(m, c, 0, 0, op);

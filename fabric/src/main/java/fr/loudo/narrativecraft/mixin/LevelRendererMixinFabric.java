@@ -21,25 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.client;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.client.DeltaTracker;
+import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.events.client.OnRenderWorldEvent;
 import net.minecraft.client.Minecraft;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class OnRenderWordEventNeoForge {
+@Mixin(LevelRenderer.class)
+public class LevelRendererMixinFabric {
 
-    public OnRenderWordEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(OnRenderWordEventNeoForge::onSubmitCustomGeometry);
-    }
-
-    private static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
-        DeltaTracker deltaTracker = Minecraft.getInstance().getDeltaTracker();
-        OnRenderWorldEvent.renderWorld(event.getSubmitNodeCollector(), event.getPoseStack(), deltaTracker);
+    @Inject(method = "submitFeatures", at = @At("TAIL"))
+    private void narrativecraft$submitWorld(
+            LevelRenderState levelRenderState,
+            SubmitNodeCollector submitNodeCollector,
+            boolean renderOutline,
+            CallbackInfo ci) {
+        OnRenderWorldEvent.renderWorld(
+                submitNodeCollector, new PoseStack(), Minecraft.getInstance().getDeltaTracker());
     }
 }

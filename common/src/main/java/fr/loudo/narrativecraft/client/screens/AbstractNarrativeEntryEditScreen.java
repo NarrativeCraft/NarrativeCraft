@@ -92,7 +92,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
                         Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
                                 entry.getId(), instance.toPayload(), NarrativeEntryAction.EDIT));
                     }
-                    minecraft.setScreen(lastScreen);
+                    minecraft.gui.setScreen(lastScreen);
                 })
                 .size(GLOBAL_WIDTH, 20)
                 .build();
@@ -119,7 +119,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     public Screen getLastScreen() {
@@ -144,7 +144,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
     }
 
     protected void sendToastError(Component title, Component message) {
-        minecraft.getToastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
+        minecraft.gui.toastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
     }
 
     protected boolean showDescription() {

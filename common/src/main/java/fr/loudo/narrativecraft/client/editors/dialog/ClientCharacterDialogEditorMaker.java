@@ -114,7 +114,7 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
             renderer.stop();
             renderer = null;
         }
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
         Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
         playerSession.getCharactersInWorld().remove(character);
     }
@@ -146,7 +146,7 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
                 },
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.save"));
-        minecraft.setScreen(confirmScreen);
+        minecraft.gui.setScreen(confirmScreen);
     }
 
     private void toggleAdvancedPanel(DialogData data) {
@@ -218,6 +218,6 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
     }
 
     private boolean clearScreenOpened() {
-        return minecraft.screen instanceof ClearScreen;
+        return minecraft.gui.screen() instanceof ClearScreen;
     }
 }

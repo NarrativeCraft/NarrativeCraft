@@ -55,8 +55,8 @@ public class NarrativeWorldSettingsScreen extends Screen {
                 NarrativeServerSettings.showMainScreenOnJoin,
                 middleX,
                 currentY);
-        showMainScreenOnJoin.active = minecraft.isSingleplayer();
-        if (!minecraft.isSingleplayer()) {
+        showMainScreenOnJoin.active = minecraft.hasSingleplayerServer();
+        if (!minecraft.hasSingleplayerServer()) {
             showMainScreenOnJoin.setTooltip(
                     Tooltip.create(Translation.message("screen.world_settings.tooltip.main_screen")));
         }
@@ -70,7 +70,7 @@ public class NarrativeWorldSettingsScreen extends Screen {
                         minecraft.player.sendSystemMessage(
                                 Translation.message("error.save_settings").withStyle(ChatFormatting.RED));
                     }
-                    minecraft.setScreen(lastScreen);
+                    minecraft.gui.setScreen(lastScreen);
                 })
                 .bounds(middleX, height - BUTTON_HEIGHT - 10, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
@@ -94,6 +94,6 @@ public class NarrativeWorldSettingsScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

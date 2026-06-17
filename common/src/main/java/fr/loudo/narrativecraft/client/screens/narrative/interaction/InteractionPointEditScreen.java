@@ -213,7 +213,7 @@ public class InteractionPointEditScreen extends Screen {
 
     private void saveAndClose() {
         applyCurrentValues();
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     private void rebuild() {
@@ -224,7 +224,7 @@ public class InteractionPointEditScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     @Override

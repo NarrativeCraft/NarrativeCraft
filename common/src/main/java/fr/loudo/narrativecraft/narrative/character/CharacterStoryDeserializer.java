@@ -36,6 +36,7 @@ import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 
 public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterStory> {
 
@@ -53,7 +54,7 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
         String entityTypeId = jsonObject.get("entityTypeId").getAsString();
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE
                 .getOptional(Identifier.parse(entityTypeId))
-                .orElse(EntityType.PLAYER);
+                .orElse(EntityTypes.PLAYER);
         character.setEntityType(entityType);
     }
 

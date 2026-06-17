@@ -116,19 +116,19 @@ public abstract class AbstractInteractionListScreen<T> extends Screen {
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 b -> {
                     if (b) onConfirmed.run();
-                    minecraft.setScreen(this);
+                    minecraft.gui.setScreen(this);
                     rebuild();
                 },
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.delete", name));
-        minecraft.setScreen(confirmScreen);
+        minecraft.gui.setScreen(confirmScreen);
     }
 
     protected void teleportTo(Vec3 position) {
         if (position == null || position.equals(Vec3.ZERO)) return;
         LocalPlayer player = minecraft.player;
         if (player == null) return;
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
         player.setPos(position.x, position.y, position.z);
         player.connection.send(new ServerboundMovePlayerPacket.Pos(position, player.onGround(), false));
     }
@@ -167,7 +167,7 @@ public abstract class AbstractInteractionListScreen<T> extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     @Override

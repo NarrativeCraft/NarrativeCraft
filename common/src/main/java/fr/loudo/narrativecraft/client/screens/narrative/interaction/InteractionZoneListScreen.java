@@ -59,7 +59,7 @@ public class InteractionZoneListScreen extends AbstractInteractionListScreen<Int
                 y,
                 zone.getName(),
                 () -> teleportTo(zone.center()),
-                () -> minecraft.setScreen(new InteractionZoneEditScreen(editor, zone, this)),
+                () -> minecraft.gui.setScreen(new InteractionZoneEditScreen(editor, zone, this)),
                 () -> confirmDelete(
                         zone.getName(), () -> getItems().removeIf(z -> z.getId().equals(zone.getId()))));
     }

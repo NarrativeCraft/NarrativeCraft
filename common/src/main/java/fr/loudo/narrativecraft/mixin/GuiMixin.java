@@ -23,25 +23,35 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.events.client.OnHudRender;
-import net.minecraft.client.DeltaTracker;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.screens.ClearScreen;
+import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.gui.screens.Screen;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
-public class GuiMixinFabric {
+public abstract class GuiMixin {
 
-    @Inject(method = "extractRenderState", at = @At("RETURN"))
-    private void narrativecraft$renderHud(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
-        OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
-        OnHudRender.interactionHudRender(graphics, deltaTracker);
-        OnHudRender.dialogHudRender(graphics, deltaTracker);
-        OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
-        OnHudRender.saveIconHudRender(graphics, deltaTracker);
+    @Shadow
+    public abstract void setScreen(@Nullable Screen screen);
+
+    @Inject(method = "openChatScreen", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$openChat(ChatComponent.ChatMethod chatMethod, CallbackInfo ci) {
+        if (chatMethod != ChatComponent.ChatMethod.MESSAGE) return;
+        EditorMaker editorMaker =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editorMaker == null || editorMaker.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;
+
+        ClearScreen screen = new ClearScreen();
+        setScreen(screen);
+        ci.cancel();
     }
 }

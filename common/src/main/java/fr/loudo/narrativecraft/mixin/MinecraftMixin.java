@@ -24,15 +24,11 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.screens.ClearScreen;
 import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.editors.EditorMaker;
-import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.gui.screens.Screen;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.client.gui.Gui;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,31 +40,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MinecraftMixin {
 
     @Shadow
-    public abstract void setScreen(@Nullable Screen screen);
+    public abstract boolean hasSingleplayerServer();
 
     @Shadow
-    public abstract boolean isSingleplayer();
-
-    @Inject(method = "openChatScreen", at = @At(value = "HEAD"), cancellable = true)
-    private void narrativecraft$openChat(ChatComponent.ChatMethod chatMethod, CallbackInfo ci) {
-        if (chatMethod != ChatComponent.ChatMethod.MESSAGE) return;
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker == null || editorMaker.getEnvironment() != NarrativeEnvironment.DEVELOPMENT) return;
-
-        ClearScreen screen = new ClearScreen();
-        setScreen(screen);
-        ci.cancel();
-    }
+    @Final
+    public Gui gui;
 
     @Inject(method = "pauseGame", at = @At(value = "HEAD"))
     private void narrativecraft$pauseGame(boolean suppressPauseMenuIfWeReallyArePausing, CallbackInfo ci) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (!playerSession.isInStory()) return;
-        if (!isSingleplayer()) return;
+        if (!hasSingleplayerServer()) return;
 
-        setScreen(new MainScreen(true));
+        gui.setScreen(new MainScreen(true));
     }
 
     @Inject(method = "startAttack", at = @At(value = "HEAD"), cancellable = true)

@@ -49,7 +49,7 @@ public class NarrativeSettingsScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class NarrativeSettingsScreen extends Screen {
                             cameraAngleEditor.init();
                             session.setEditor(cameraAngleEditor);
                             Services.PACKET.sendToServer(new BiMainScreenEnter(NarrativeEnvironment.DEVELOPMENT));
-                            minecraft.setScreen(null);
+                            minecraft.gui.setScreen(null);
                         })
                 .bounds(width / 2 - BUTTON_WIDTH / 2, 10, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
@@ -73,7 +73,7 @@ public class NarrativeSettingsScreen extends Screen {
 
         Button worldSettings = Button.builder(
                         Translation.message("screen.settings.world_settings"),
-                        button -> minecraft.setScreen(new NarrativeWorldSettingsScreen(this)))
+                        button -> minecraft.gui.setScreen(new NarrativeWorldSettingsScreen(this)))
                 .bounds(width / 2 - BUTTON_WIDTH / 2, 10 + BUTTON_HEIGHT + 5, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
         addRenderableWidget(worldSettings);

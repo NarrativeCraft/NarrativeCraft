@@ -101,7 +101,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
             renderer.stop();
             renderer = null;
         }
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
         Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
     }
 
@@ -136,7 +136,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
                 },
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.save"));
-        minecraft.setScreen(confirmScreen);
+        minecraft.gui.setScreen(confirmScreen);
     }
 
     private void toggleAdvancedPanel(DialogData data) {
@@ -204,6 +204,6 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
     }
 
     private boolean clearScreenOpened() {
-        return minecraft.screen instanceof ClearScreen;
+        return minecraft.gui.screen() instanceof ClearScreen;
     }
 }

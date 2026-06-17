@@ -62,7 +62,7 @@ public class InteractionPointListScreen extends AbstractInteractionListScreen<In
                 y,
                 point.getName(),
                 () -> teleportTo(point.getPosition()),
-                () -> minecraft.setScreen(new InteractionPointEditScreen(editor, point, this)),
+                () -> minecraft.gui.setScreen(new InteractionPointEditScreen(editor, point, this)),
                 () -> confirmDelete(point.getName(), () -> getItems()
                         .removeIf(p -> p.getId().equals(point.getId()))));
     }

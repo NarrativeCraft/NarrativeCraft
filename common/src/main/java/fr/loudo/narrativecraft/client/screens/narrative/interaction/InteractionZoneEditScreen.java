@@ -140,7 +140,7 @@ public class InteractionZoneEditScreen extends Screen {
 
     private void saveAndClose() {
         applyNameAndStitch();
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     private static String formatVec(Vec3 vec) {
@@ -150,7 +150,7 @@ public class InteractionZoneEditScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     @Override

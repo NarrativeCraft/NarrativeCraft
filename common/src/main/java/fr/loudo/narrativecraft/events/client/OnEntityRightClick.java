@@ -38,6 +38,6 @@ public class OnEntityRightClick {
         if (editor == null) return;
         CharacterPlacement characterPlacement = editor.getPlacementByEntityId(clickedEntity.getId());
         if (characterPlacement == null) return;
-        Minecraft.getInstance().setScreen(new EntityPosePickerScreen(characterPlacement));
+        Minecraft.getInstance().gui.setScreen(new EntityPosePickerScreen(characterPlacement));
     }
 }

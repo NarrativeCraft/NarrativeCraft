@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.utils;
 import com.mojang.blaze3d.platform.Window;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -38,7 +39,7 @@ public class UtilsClient {
 
     public static void reloadListScreen() {
         // Reload list for player if a new NarrativeEntry element was added
-        if (minecraft.screen instanceof NarrativeEntryListScreen<?> screen) {
+        if (minecraft.gui.screen() instanceof NarrativeEntryListScreen<?> screen) {
             screen.reload();
         }
     }
@@ -51,7 +52,7 @@ public class UtilsClient {
     }
 
     public static void sendToast(Component title, Component message) {
-        minecraft.getToastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
+        minecraft.gui.toastManager().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
     }
 
     public static void teleportPlayerTo(Vec3 position, Vec3 rotation) {
@@ -62,5 +63,12 @@ public class UtilsClient {
         player.setYHeadRot((float) rotation.y);
         player.connection.send(new ServerboundMovePlayerPacket.PosRot(
                 position, (float) rotation.x, (float) rotation.y, player.onGround(), false));
+    }
+
+    public static void setHudHidden(boolean hidden) {
+        Hud hud = Minecraft.getInstance().gui.hud;
+        if (hud.isHidden() != hidden) {
+            hud.toggle();
+        }
     }
 }

@@ -126,11 +126,11 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                                 Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.QUIT));
                                 playerSession.getCutsceneDataSession().reset();
                                 playerSession.setEditor(null);
-                                mc.setScreen(null);
+                                mc.gui.setScreen(null);
                             },
                             Translation.message("screen.confirm.title"),
                             Translation.message("screen.confirm.save"));
-                    mc.setScreen(confirmScreen);
+                    mc.gui.setScreen(confirmScreen);
                 })
                 .bounds(5, 5, 20, 20)
                 .build());
@@ -144,7 +144,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         if (cutscene.getAnimations().isEmpty() && cutscene.getSubscenes().isEmpty()) {
             buttons.add(Button.builder(
                             Component.literal("⏱"),
-                            button -> mc.setScreen(new InputScreen(
+                            button -> mc.gui.setScreen(new InputScreen(
                                     Translation.message("screen.set_max_tick.title"),
                                     raw -> {
                                         try {
@@ -154,7 +154,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                                             playback.setTotalTick(value);
                                             zoomFactor = getMinZoomFactor();
                                             clampViewStart();
-                                            mc.setScreen(null);
+                                            mc.gui.setScreen(null);
                                         } catch (NumberFormatException e) {
                                             UtilsClient.sendToast(
                                                     Translation.message("error"),
@@ -195,11 +195,11 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void tick() {
-        boolean hideGui = Minecraft.getInstance().options.hideGui;
+        boolean hideGui = Minecraft.getInstance().gui.hud.isHidden();
         if (playback.isPlaying() && !hideGui) {
-            Minecraft.getInstance().options.hideGui = true;
+            UtilsClient.setHudHidden(true);
         } else if (!playback.isPlaying() && hideGui) {
-            Minecraft.getInstance().options.hideGui = false;
+            UtilsClient.setHudHidden(false);
         }
     }
 

@@ -77,7 +77,7 @@ public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<C
         super.addCustomFields();
         Button mainCharacterSettingsButton = Button.builder(
                         Translation.message("screen.character.main_character_settings"),
-                        b -> minecraft.setScreen(new MainCharacterAttributeScreen(this, mainCharacterAttribute)))
+                        b -> minecraft.gui.setScreen(new MainCharacterAttributeScreen(this, mainCharacterAttribute)))
                 .size(GLOBAL_WIDTH, 20)
                 .build();
         addElementToWidgetsList(mainCharacterSettingsButton);
@@ -95,7 +95,7 @@ public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<C
                                         target.getId(), target.toPayload(), NarrativeEntryAction.EDIT)));
                         editor.init();
                         ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(editor);
-                        minecraft.setScreen(new ClearScreen());
+                        minecraft.gui.setScreen(new ClearScreen());
                         Services.PACKET.sendToServer(new C2SEnterDialogEditor(
                                 "character", target.getId().toString()));
                     })

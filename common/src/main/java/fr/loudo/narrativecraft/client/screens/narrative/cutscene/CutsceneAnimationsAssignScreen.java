@@ -102,6 +102,6 @@ public class CutsceneAnimationsAssignScreen extends AbstractAssignScreen<Animati
                         animationIds,
                         subsceneIds),
                 NarrativeEntryAction.EDIT));
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

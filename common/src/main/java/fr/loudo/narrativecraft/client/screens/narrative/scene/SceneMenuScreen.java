@@ -59,7 +59,7 @@ public class SceneMenuScreen extends Screen {
         Map<Component, Runnable> labels = new LinkedHashMap<>();
 
         labels.put(Translation.message("screen.scene_menu.animations"), () -> {
-            minecraft.setScreen(new AnimationEntryListScreen(
+            minecraft.gui.setScreen(new AnimationEntryListScreen(
                     Translation.message("animation"),
                     scene.getAnimationManager().getList(),
                     this,
@@ -72,7 +72,7 @@ public class SceneMenuScreen extends Screen {
         });
 
         labels.put(Translation.message("screen.scene_menu.camera_angles"), () -> {
-            minecraft.setScreen(new CameraAngleEntryListScreen(
+            minecraft.gui.setScreen(new CameraAngleEntryListScreen(
                     Translation.message("camera_angle"),
                     scene.getCameraAngleManager().getList(),
                     this,
@@ -84,7 +84,7 @@ public class SceneMenuScreen extends Screen {
                             Translation.message("camera_angle").getString())));
         });
         labels.put(Translation.message("screen.scene_menu.cutscenes"), () -> {
-            minecraft.setScreen(new CutsceneEntryListScreen(
+            minecraft.gui.setScreen(new CutsceneEntryListScreen(
                     Translation.message("cutscene"),
                     scene.getCutsceneManager().getList(),
                     this,
@@ -96,7 +96,7 @@ public class SceneMenuScreen extends Screen {
                             Translation.message("cutscene").getString())));
         });
         labels.put(Translation.message("screen.scene_menu.interactions"), () -> {
-            minecraft.setScreen(new InteractionEntryListScreen(
+            minecraft.gui.setScreen(new InteractionEntryListScreen(
                     Translation.message("interaction"),
                     scene.getInteractionManager().getList(),
                     this,
@@ -108,7 +108,7 @@ public class SceneMenuScreen extends Screen {
                             Translation.message("interaction").getString())));
         });
         labels.put(Translation.message("screen.scene_menu.npc"), () -> {
-            minecraft.setScreen(new NarrativeEntryListScreen<>(
+            minecraft.gui.setScreen(new NarrativeEntryListScreen<>(
                     Translation.message("npc"),
                     scene.getNpcManager().getList(),
                     this,
@@ -121,7 +121,7 @@ public class SceneMenuScreen extends Screen {
                             Translation.message("npc").getString())));
         });
         labels.put(Translation.message("screen.scene_menu.subscenes"), () -> {
-            minecraft.setScreen(new SubsceneEntryListScreen(
+            minecraft.gui.setScreen(new SubsceneEntryListScreen(
                     Translation.message("subscene"),
                     scene.getSubsceneManager().getList(),
                     this,
@@ -157,6 +157,6 @@ public class SceneMenuScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(lastScreen);
+        this.minecraft.gui.setScreen(lastScreen);
     }
 }

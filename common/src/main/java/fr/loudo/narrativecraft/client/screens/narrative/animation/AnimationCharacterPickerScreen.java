@@ -99,7 +99,7 @@ public class AnimationCharacterPickerScreen extends PaginationsItemsScreen<IChar
         animation.setCharacterStory(item);
         Services.PACKET.sendToServer(
                 new BiSyncNarrativeEntryPacket(animation.getId(), animation.toPayload(), NarrativeEntryAction.EDIT));
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 
     @Override
@@ -109,6 +109,6 @@ public class AnimationCharacterPickerScreen extends PaginationsItemsScreen<IChar
 
     @Override
     public void onClose() {
-        minecraft.setScreen(lastScreen);
+        minecraft.gui.setScreen(lastScreen);
     }
 }

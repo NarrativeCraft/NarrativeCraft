@@ -39,6 +39,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.PlayerModelType;
 
 public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
@@ -50,7 +51,7 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
     public NpcEntryEditScreen(Scene scene, Screen lastScreen) {
         super(lastScreen);
         this.scene = scene;
-        this.selectedEntityType = EntityType.PLAYER;
+        this.selectedEntityType = EntityTypes.PLAYER;
         this.selectedModelType = PlayerModelType.WIDE;
     }
 
@@ -90,7 +91,7 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
                 BuiltInRegistries.ENTITY_TYPE.getKey(selectedEntityType).toString();
         Button entityTypeButton = Button.builder(
                         Component.literal(Translation.message("entity_type").getString() + ": " + entityTypeLabel),
-                        b -> minecraft.setScreen(
+                        b -> minecraft.gui.setScreen(
                                 new EntityTypePickerScreen(this, picked -> selectedEntityType = picked)))
                 .size(GLOBAL_WIDTH, 20)
                 .build();
@@ -120,7 +121,7 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
                                         target.getId(), target.toPayload(), NarrativeEntryAction.EDIT)));
                         editor.init();
                         ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(editor);
-                        minecraft.setScreen(new ClearScreen());
+                        minecraft.gui.setScreen(new ClearScreen());
                         Services.PACKET.sendToServer(
                                 new C2SEnterDialogEditor("npc", target.getId().toString()));
                     })

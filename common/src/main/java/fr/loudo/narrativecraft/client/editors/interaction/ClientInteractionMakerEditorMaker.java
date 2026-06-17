@@ -223,7 +223,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     }
 
     private boolean clearScreenOpened() {
-        return minecraft.screen instanceof ClearScreen;
+        return minecraft.gui.screen() instanceof ClearScreen;
     }
 
     private void save() {
@@ -232,11 +232,11 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     }
 
     private void openZones() {
-        minecraft.setScreen(new InteractionZoneListScreen(this, minecraft.screen));
+        minecraft.gui.setScreen(new InteractionZoneListScreen(this, minecraft.gui.screen()));
     }
 
     private void openPoints() {
-        minecraft.setScreen(new InteractionPointListScreen(this, minecraft.screen));
+        minecraft.gui.setScreen(new InteractionPointListScreen(this, minecraft.gui.screen()));
     }
 
     private void openQuitConfirm() {
@@ -247,7 +247,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
                 },
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.save"));
-        minecraft.setScreen(confirmScreen);
+        minecraft.gui.setScreen(confirmScreen);
     }
 
     public void enterCornerPlacementMode(InteractionZone zone, Screen returnScreen) {
@@ -256,7 +256,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         this.tempCorner1 = zone.getCorner1();
         this.tempCorner2 = zone.getCorner2();
         this.inCornerPlacementMode = true;
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
     }
 
     private void placeCorner(int cornerNumber) {
@@ -290,7 +290,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         this.tempCorner1 = null;
         this.tempCorner2 = null;
         if (returnTo != null) {
-            minecraft.setScreen(returnTo);
+            minecraft.gui.setScreen(returnTo);
         }
     }
 
@@ -299,7 +299,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         this.pointPlacementReturnScreen = returnScreen;
         this.tempPointPosition = point.getPosition();
         this.inPointPlacementMode = true;
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
     }
 
     private void placePoint() {
@@ -326,7 +326,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         this.pointPlacementReturnScreen = null;
         this.tempPointPosition = null;
         if (returnTo != null) {
-            minecraft.setScreen(returnTo);
+            minecraft.gui.setScreen(returnTo);
         }
     }
 
@@ -336,7 +336,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
 
     public void quit() {
         playerSession.setEditor(null);
-        minecraft.setScreen(null);
+        minecraft.gui.setScreen(null);
     }
 
     public Interaction getInteraction() {
