@@ -72,7 +72,6 @@ public class DialogRenderer3D extends DialogRenderer {
         double interpZ = Mth.lerp(partialTick, entity.zo, entity.getZ());
 
         Vec3 cameraPos = camera.getPosition();
-        // Animation: dialog slides from entity head (t=0) to its final position (t=1)
         Vec3 entityHeadPos = new Vec3(interpX, interpY + entity.getEyeHeight(), interpZ);
         Vec3 dialogFinalPos = new Vec3(
                 interpX + camRight.x * data.getOffsetX(),
@@ -80,7 +79,6 @@ public class DialogRenderer3D extends DialogRenderer {
                 interpZ + camRight.z * data.getOffsetX());
         Vec3 dialogPos = animator.getPosition(entityHeadPos, dialogFinalPos, partialTick);
 
-        // Recompute layout
         layout.compute(data, scrollText, Minecraft.getInstance().font);
         checkAndApplyPendingResize();
 
@@ -93,13 +91,10 @@ public class DialogRenderer3D extends DialogRenderer {
         // Translate to dialog position (relative to camera), offset already included in dialogFinalPos
         poseStack.translate(dialogPos.x - cameraPos.x, dialogPos.y - cameraPos.y, dialogPos.z - cameraPos.z);
 
-        // Billboard: align to camera plane
         poseStack.mulPose(camera.rotation());
 
-        // Scale from entity head (scale origin = anchor corner of dialog)
         poseStack.scale(scale, -scale, scale);
 
-        // Anchor point: determined by offset direction so the dialog never covers the entity head
         float anchorX = data.getOffsetX() == 0 ? -totalWidth / 2f : (data.getOffsetX() > 0 ? 0f : -totalWidth);
         float anchorY = data.getOffsetY() == 0 ? -totalHeight / 2f : (data.getOffsetY() > 0 ? -totalHeight : 0f);
         poseStack.translate(anchorX, anchorY, 0);
@@ -111,7 +106,6 @@ public class DialogRenderer3D extends DialogRenderer {
         }
 
         if (data.isTailVisible()) {
-            // Translate tail to the anchor corner (the corner closest to the entity head)
             poseStack.pushPose();
             poseStack.translate(-anchorX, -anchorY, 0);
             tail.render(poseStack, partialTick, bufferSource, camera, opacity);
@@ -213,7 +207,6 @@ public class DialogRenderer3D extends DialogRenderer {
 
         float finalX = totalWidth - data.getPaddingX() - SKIP_INDICATOR_SIZE;
         float y = totalHeight - SKIP_INDICATOR_SIZE / 2;
-        // Slide from right (finalX + SLIDE) to finalX as skipT goes 0 → 1
         float x = finalX + SKIP_SLIDE_OFFSET * (1f - skipT);
 
         int color = applyOpacity(0xFFFFFFFF, skipT * 0.9f * opacity);
