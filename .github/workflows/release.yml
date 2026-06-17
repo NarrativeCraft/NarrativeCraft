@@ -15,8 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - branch: 26.1.2
-            mc_version: 26.1.2
+          - branch: 26.2
+            mc_version: 26.2
           - branch: 1.21.1
             mc_version: 1.21.1
 
@@ -97,7 +97,7 @@ jobs:
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
-          for MC_VERSION in 26.1.2 1.21.1; do
+          for MC_VERSION in 26.2 1.21.1; do
             for LOADER in fabric neoforge; do
               LOADER_DISPLAY="${LOADER^}"
               JAR="artifacts/${LOADER}-${MC_VERSION}/narrativecraft-${LOADER}-${MC_VERSION}-${MOD_VERSION}.jar"
@@ -143,7 +143,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           CHANGELOG_URL="https://github.com/NarrativeCraft/NarrativeCraft/blob/${GITHUB_SHA}/CHANGELOG.md"
-          MESSAGE=$(printf '<@&1515653721621794968>\n# v%s\n## Changelog\n%s\n## Downloads\n### Neoforge\n- 26.1.2 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-26.1.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-1.21.1\n### Fabric\n- 26.1.2 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-26.1.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-1.21.1' \
+          MESSAGE=$(printf '<@&1515653721621794968>\n# v%s\n## Changelog\n%s\n## Downloads\n### Neoforge\n- 26.2 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-26.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-1.21.1\n### Fabric\n- 26.2 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-26.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-1.21.1' \
             "${MOD_VERSION}" "${CHANGELOG_URL}" "${MOD_VERSION}" "${MOD_VERSION}" "${MOD_VERSION}" "${MOD_VERSION}")
 
           curl -sf -X POST "${DISCORD_WEBHOOK}" \
