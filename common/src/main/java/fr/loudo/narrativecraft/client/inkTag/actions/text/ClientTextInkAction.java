@@ -31,13 +31,14 @@ import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.TextInkAction;
 import fr.loudo.narrativecraft.utils.FadeState;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ClientTextInkAction extends TextInkAction {
 
@@ -105,7 +106,7 @@ public class ClientTextInkAction extends TextInkAction {
                 computeOrigin(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
 
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(origin[0], origin[1], 0);
+        guiGraphics.pose().translate(origin[0] + space.x, origin[1] + space.y, 0);
         guiGraphics.pose().scale(scale, scale, 1f);
         scrollText.render2D(guiGraphics, 0, 0, dialogData, partialTick);
         guiGraphics.pose().popPose();
@@ -151,6 +152,10 @@ public class ClientTextInkAction extends TextInkAction {
             }
             case "position", "pos" -> {
                 existing.position = position;
+                isRunning = false;
+            }
+            case "space" -> {
+                existing.space = space;
                 isRunning = false;
             }
             case "color" -> {
