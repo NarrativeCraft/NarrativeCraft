@@ -92,12 +92,10 @@ public abstract class DialogRenderer {
     public void tick() {
         animator.tick();
 
-        // Text scrolls only once the appear animation is done
         if (animator.isTextScrollAllowed()) {
             scrollText.tick(data.getScrollSpeed() > 0 ? data.getScrollSpeed() : NarrativeClientSettings.textSpeed);
         }
 
-        // Skip indicator slides in when text is fully shown
         previousSkipProgress = skipProgress;
         if (scrollText.isFinished() && skipProgress < 1f) {
             skipProgress = Math.min(1f, skipProgress + 1f / SKIP_APPEAR_TICKS);

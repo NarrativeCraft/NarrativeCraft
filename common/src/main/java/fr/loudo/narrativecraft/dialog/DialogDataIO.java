@@ -38,6 +38,8 @@ public final class DialogDataIO {
         if (all || fieldSet == DialogFieldSet.CAMERA_VIEW) {
             json.addProperty("offsetX", data.getOffsetX());
             json.addProperty("offsetY", data.getOffsetY());
+            json.addProperty("ancOffsetX", data.getAncOffsetX());
+            json.addProperty("ancOffsetY", data.getAncOffsetY());
             json.addProperty("scale", data.getScale());
         }
         if (all || fieldSet == DialogFieldSet.CHARACTER) {
@@ -74,6 +76,10 @@ public final class DialogDataIO {
         if (all || fieldSet == DialogFieldSet.CAMERA_VIEW) {
             if (json.has("offsetX")) data.setOffsetX(json.get("offsetX").getAsFloat());
             if (json.has("offsetY")) data.setOffsetY(json.get("offsetY").getAsFloat());
+            if (json.has("ancOffsetX"))
+                data.setAncOffsetX(json.get("ancOffsetX").getAsFloat());
+            if (json.has("ancOffsetY"))
+                data.setAncOffsetY(json.get("ancOffsetY").getAsFloat());
             if (json.has("scale")) data.setScale(json.get("scale").getAsFloat());
         }
         if (all || fieldSet == DialogFieldSet.CHARACTER) {

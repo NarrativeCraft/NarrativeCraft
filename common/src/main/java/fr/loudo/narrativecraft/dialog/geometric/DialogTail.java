@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.dialog.geometric;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
-import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.LightCoordsUtil;
@@ -57,12 +56,7 @@ public class DialogTail {
         this.offset = offset;
     }
 
-    public void render(
-            PoseStack poseStack,
-            float partialTick,
-            MultiBufferSource.BufferSource bufferSource,
-            Camera camera,
-            float opacity) {
+    public void render(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float opacity) {
         TailDirection tailDirection = getTailDirection();
 
         poseStack.pushPose();

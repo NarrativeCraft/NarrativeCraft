@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.editors.widgets;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.Locale;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -97,39 +98,38 @@ public class DialogSetupAdvancedPanel {
         if (data == null) return;
         Minecraft mc = Minecraft.getInstance();
 
-        widthBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getWidth()), text -> {
+        widthBox = makeBox(mc, 16, String.format(Locale.ROOT, "%.2f", data.getWidth()), text -> {
             try {
                 data.setWidth(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
-        paddingXBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getPaddingX()), text -> {
+        paddingXBox = makeBox(mc, 16, String.format(Locale.ROOT, "%.2f", data.getPaddingX()), text -> {
             try {
                 data.setPaddingX(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
-        paddingYBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getPaddingY()), text -> {
+        paddingYBox = makeBox(mc, 16, String.format(Locale.ROOT, "%.2f", data.getPaddingY()), text -> {
             try {
                 data.setPaddingY(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
-        letterSpacingBox =
-                makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getLetterSpacing()), text -> {
-                    try {
-                        data.setLetterSpacing(Float.parseFloat(text));
-                    } catch (NumberFormatException ignored) {
-                    }
-                });
-        lineGapBox = makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getLineGap()), text -> {
+        letterSpacingBox = makeBox(mc, 16, String.format(Locale.ROOT, "%.2f", data.getLetterSpacing()), text -> {
+            try {
+                data.setLetterSpacing(Float.parseFloat(text));
+            } catch (NumberFormatException ignored) {
+            }
+        });
+        lineGapBox = makeBox(mc, 16, String.format(Locale.ROOT, "%.2f", data.getLineGap()), text -> {
             try {
                 data.setLineGap(Float.parseFloat(text));
             } catch (NumberFormatException ignored) {
             }
         });
         skipSecondsBox = data.isAutoSkipEnabled()
-                ? makeBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getAutoSkipSeconds()), text -> {
+                ? makeBox(mc, 16, String.format(Locale.ROOT, "%.2f", data.getAutoSkipSeconds()), text -> {
                     try {
                         data.setAutoSkipSeconds(Float.parseFloat(text));
                     } catch (NumberFormatException ignored) {

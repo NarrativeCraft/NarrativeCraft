@@ -193,6 +193,8 @@
   "narrativecraft.screen.dialog_preview.field.text": "Text:",
   "narrativecraft.screen.dialog_preview.field.offset_x": "Offset X:",
   "narrativecraft.screen.dialog_preview.field.offset_y": "Offset Y:",
+  "narrativecraft.screen.dialog_preview.field.anc_offset_x": "Anchor Offset X:",
+  "narrativecraft.screen.dialog_preview.field.anc_offset_y": "Anchor Offset Y:",
   "narrativecraft.screen.dialog_preview.field.scale": "Scale:",
   "narrativecraft.screen.dialog_preview.field.bg_color": "Bg Color:",
   "narrativecraft.screen.dialog_preview.field.opacity": "Opacity:",

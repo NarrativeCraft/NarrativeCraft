@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.cameraangle;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.widgets.*;
 import fr.loudo.narrativecraft.client.screens.ClearScreen;
@@ -513,6 +514,10 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     public CameraView getPreviewCamera() {
         return previewCameraView;
+    }
+
+    public void renderAnchorPoint(PoseStack poseStack) {
+        dialogPreviewPanel.renderAnchorPoint(poseStack);
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
