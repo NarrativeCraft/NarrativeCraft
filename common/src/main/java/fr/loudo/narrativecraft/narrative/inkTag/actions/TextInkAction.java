@@ -31,6 +31,8 @@ import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.utils.FadeState;
+import net.minecraft.world.phys.Vec2;
+
 import javax.annotation.Nullable;
 
 @InkCommand(
@@ -64,6 +66,7 @@ public class TextInkAction extends InkAction {
     protected boolean noTyping = true;
     protected boolean noRemove = false;
     protected float scrollSpeed = 1.5f;
+    protected Vec2 space = new Vec2(0, 0);
 
     @Nullable
     protected FadeState fadeState;
@@ -111,6 +114,19 @@ public class TextInkAction extends InkAction {
                     position = Position.valueOf(value1.toUpperCase());
                 } catch (IllegalArgumentException e) {
                     return InkActionResult.error("Invalid position '" + value1 + "'");
+                }
+            }
+            case "space" -> {
+                if (value1 == null || value1.isEmpty()) {
+                    return InkActionResult.error("'space' requires a 'x' value (value1)");
+                }
+                if (value2 == null || value2.isEmpty()) {
+                    return InkActionResult.error("'space' requires a 'y' value (value2)");
+                }
+                try {
+                    space = new Vec2(Float.parseFloat(value1), Float.parseFloat(value2));
+                } catch (IllegalArgumentException e) {
+                    return InkActionResult.error(String.format("Invalid x or y position x:%s y:%s", value1, value2));
                 }
             }
             case "color" -> {
