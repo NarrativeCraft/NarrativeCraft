@@ -31,9 +31,8 @@ import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.utils.FadeState;
-import net.minecraft.world.phys.Vec2;
-
 import javax.annotation.Nullable;
+import net.minecraft.world.phys.Vec2;
 
 @InkCommand(
         keyword = "text",

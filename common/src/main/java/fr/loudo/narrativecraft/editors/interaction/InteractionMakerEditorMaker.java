@@ -79,7 +79,8 @@ public class InteractionMakerEditorMaker implements EditorMaker {
             boolean wasInside = insideZoneIds.contains(zone.getId());
 
             if (isInside && !wasInside) {
-                if (!(zone.isOneTime() && storyHandler.hasAlreadyInteracted(zone.getId()))) {
+                if (!(zone.isOneTime() && storyHandler.hasAlreadyInteracted(zone.getId()))
+                        && playerSession.isGameplayMode()) {
                     storyHandler.playStitch(zone.getStitchName());
                     if (zone.isOneTime()) storyHandler.addInteractionId(zone.getId());
                 }

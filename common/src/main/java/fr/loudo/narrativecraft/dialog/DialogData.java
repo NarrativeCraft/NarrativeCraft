@@ -37,6 +37,9 @@ public class DialogData {
     private float offsetX = 0f;
     private float offsetY = 0.5f;
 
+    private float ancOffsetX = 0f;
+    private float ancOffsetY = 0f;
+
     private float width = 80f;
     private float paddingX = 4f;
     private float paddingY = 4f;
@@ -65,6 +68,8 @@ public class DialogData {
     public DialogData(DialogData source) {
         this.offsetX = source.offsetX;
         this.offsetY = source.offsetY;
+        this.ancOffsetX = source.ancOffsetX;
+        this.ancOffsetY = source.ancOffsetY;
         this.width = source.width;
         this.paddingX = source.paddingX;
         this.paddingY = source.paddingY;
@@ -87,6 +92,8 @@ public class DialogData {
     public void copyFrom(DialogData source) {
         this.offsetX = source.offsetX;
         this.offsetY = source.offsetY;
+        this.ancOffsetX = source.ancOffsetX;
+        this.ancOffsetY = source.ancOffsetY;
         this.width = source.width;
         this.paddingX = source.paddingX;
         this.paddingY = source.paddingY;
@@ -119,6 +126,8 @@ public class DialogData {
         if (cameraView != null) {
             result.offsetX = cameraView.offsetX;
             result.offsetY = cameraView.offsetY;
+            result.ancOffsetX = cameraView.ancOffsetX;
+            result.ancOffsetY = cameraView.ancOffsetY;
             result.scale = cameraView.scale;
         }
         return result;
@@ -131,6 +140,8 @@ public class DialogData {
         DialogData defaults = new DialogData();
         if (overrides.offsetX != defaults.offsetX) base.offsetX = overrides.offsetX;
         if (overrides.offsetY != defaults.offsetY) base.offsetY = overrides.offsetY;
+        if (overrides.ancOffsetX != defaults.ancOffsetX) base.ancOffsetX = overrides.ancOffsetX;
+        if (overrides.ancOffsetY != defaults.ancOffsetY) base.ancOffsetY = overrides.ancOffsetY;
         if (overrides.width != defaults.width) base.width = overrides.width;
         if (overrides.paddingX != defaults.paddingX) base.paddingX = overrides.paddingX;
         if (overrides.paddingY != defaults.paddingY) base.paddingY = overrides.paddingY;
@@ -165,6 +176,22 @@ public class DialogData {
 
     public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
+    }
+
+    public float getAncOffsetX() {
+        return ancOffsetX;
+    }
+
+    public void setAncOffsetX(float ancOffsetX) {
+        this.ancOffsetX = ancOffsetX;
+    }
+
+    public float getAncOffsetY() {
+        return ancOffsetY;
+    }
+
+    public void setAncOffsetY(float ancOffsetY) {
+        this.ancOffsetY = ancOffsetY;
     }
 
     public float getWidth() {

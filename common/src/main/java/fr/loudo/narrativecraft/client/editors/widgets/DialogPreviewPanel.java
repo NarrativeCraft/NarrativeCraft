@@ -23,17 +23,25 @@
 
 package fr.loudo.narrativecraft.client.editors.widgets;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 
 public class DialogPreviewPanel {
 
@@ -46,6 +54,7 @@ public class DialogPreviewPanel {
 
     private final Consumer<DialogData> onToggleAdvanced;
     private final String defaultDialogText;
+    private Consumer<DialogPreviewEntry> onSelectionChanged;
 
     private DialogFieldSet fieldSet = DialogFieldSet.ALL;
     private List<DialogPreviewEntry> entries = new ArrayList<>();
@@ -54,6 +63,8 @@ public class DialogPreviewPanel {
     private EditBox previewTextBox;
     private EditBox offsetXBox;
     private EditBox offsetYBox;
+    private EditBox ancOffsetXBox;
+    private EditBox ancOffsetYBox;
     private EditBox scaleBox;
     private EditBox backgroundColorBox;
     private EditBox opacityBox;
@@ -64,6 +75,48 @@ public class DialogPreviewPanel {
     public DialogPreviewPanel(Consumer<DialogData> onToggleAdvanced, String defaultDialogText) {
         this.onToggleAdvanced = onToggleAdvanced;
         this.defaultDialogText = defaultDialogText;
+    }
+
+    public void renderAnchorPoint(PoseStack poseStack) {
+        if (fieldSet != DialogFieldSet.CAMERA_VIEW) return;
+        DialogRenderer3D renderer = getCurrentDialog();
+        if (renderer == null) return;
+
+        Minecraft mc = Minecraft.getInstance();
+        Camera camera = mc.gameRenderer.getMainCamera();
+        Vec3 cameraPos = camera.getPosition();
+        Vec3 anchorPos = renderer.getAnchorPosition();
+
+        MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
+
+        poseStack.pushPose();
+        poseStack.translate(anchorPos.x - cameraPos.x, anchorPos.y - cameraPos.y, anchorPos.z - cameraPos.z);
+        poseStack.mulPose(camera.rotation());
+        poseStack.scale(0.5f, -0.5f, 0.5f);
+
+        float halfSize = 0.05f;
+        int color = 0xFFFF0000;
+        Matrix4f matrix = poseStack.last().pose();
+        VertexConsumer consumer = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
+        consumer.addVertex(matrix, -halfSize, -halfSize, 0)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(color);
+        consumer.addVertex(matrix, -halfSize, halfSize, 0)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(color);
+        consumer.addVertex(matrix, halfSize, halfSize, 0)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(color);
+        consumer.addVertex(matrix, halfSize, -halfSize, 0)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(color);
+        bufferSource.endBatch();
+
+        poseStack.popPose();
+    }
+
+    public void setOnSelectionChanged(Consumer<DialogPreviewEntry> onSelectionChanged) {
+        this.onSelectionChanged = onSelectionChanged;
     }
 
     public void setFieldSet(DialogFieldSet fieldSet) {
@@ -131,6 +184,31 @@ public class DialogPreviewPanel {
                 scaleBox = null;
             }
 
+            if (fieldSet == DialogFieldSet.CAMERA_VIEW) {
+                ancOffsetXBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getAncOffsetX()));
+                ancOffsetXBox.setResponder(text -> {
+                    DialogPreviewEntry s = getSelectedEntry();
+                    if (s == null) return;
+                    try {
+                        s.getData().setAncOffsetX(Float.parseFloat(text));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+
+                ancOffsetYBox = makeEditBox(mc, 16, String.format(java.util.Locale.ROOT, "%.2f", data.getAncOffsetY()));
+                ancOffsetYBox.setResponder(text -> {
+                    DialogPreviewEntry s = getSelectedEntry();
+                    if (s == null) return;
+                    try {
+                        s.getData().setAncOffsetY(Float.parseFloat(text));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+            } else {
+                ancOffsetXBox = null;
+                ancOffsetYBox = null;
+            }
+
             if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
                 backgroundColorBox = makeEditBox(mc, 6, String.format("%06X", data.getBackgroundColor() & 0xFFFFFF));
                 backgroundColorBox.setResponder(text -> {
@@ -177,6 +255,8 @@ public class DialogPreviewPanel {
         } else {
             offsetXBox = null;
             offsetYBox = null;
+            ancOffsetXBox = null;
+            ancOffsetYBox = null;
             scaleBox = null;
             backgroundColorBox = null;
             opacityBox = null;
@@ -268,6 +348,28 @@ public class DialogPreviewPanel {
                     mouseX,
                     mouseY);
         }
+        if (fieldSet == DialogFieldSet.CAMERA_VIEW) {
+            y = renderEditBoxRow(
+                    graphics,
+                    mc,
+                    Translation.message("screen.dialog_preview.field.anc_offset_x")
+                            .getString(),
+                    panelX,
+                    y,
+                    ancOffsetXBox,
+                    mouseX,
+                    mouseY);
+            y = renderEditBoxRow(
+                    graphics,
+                    mc,
+                    Translation.message("screen.dialog_preview.field.anc_offset_y")
+                            .getString(),
+                    panelX,
+                    y,
+                    ancOffsetYBox,
+                    mouseX,
+                    mouseY);
+        }
         if (fieldSet == DialogFieldSet.ALL || fieldSet == DialogFieldSet.CHARACTER) {
             y = renderEditBoxRow(
                     graphics,
@@ -336,6 +438,7 @@ public class DialogPreviewPanel {
                 if (selectedIndex != i) {
                     selectedIndex = i;
                     rebuildEditBoxes();
+                    if (onSelectionChanged != null) onSelectionChanged.accept(entries.get(i));
                 }
                 return true;
             }
@@ -349,6 +452,8 @@ public class DialogPreviewPanel {
         if (tryFocusBox(previewTextBox, mouseX, mouseY, button)) return true;
         if (tryFocusBox(offsetXBox, mouseX, mouseY, button)) return true;
         if (tryFocusBox(offsetYBox, mouseX, mouseY, button)) return true;
+        if (tryFocusBox(ancOffsetXBox, mouseX, mouseY, button)) return true;
+        if (tryFocusBox(ancOffsetYBox, mouseX, mouseY, button)) return true;
         if (tryFocusBox(scaleBox, mouseX, mouseY, button)) return true;
         if (tryFocusBox(backgroundColorBox, mouseX, mouseY, button)) return true;
         if (tryFocusBox(opacityBox, mouseX, mouseY, button)) return true;
@@ -382,6 +487,8 @@ public class DialogPreviewPanel {
         setBoxFocus(previewTextBox, false);
         setBoxFocus(offsetXBox, false);
         setBoxFocus(offsetYBox, false);
+        setBoxFocus(ancOffsetXBox, false);
+        setBoxFocus(ancOffsetYBox, false);
         setBoxFocus(scaleBox, false);
         setBoxFocus(backgroundColorBox, false);
         setBoxFocus(opacityBox, false);
@@ -410,6 +517,8 @@ public class DialogPreviewPanel {
         forwardKeyToFocused(previewTextBox, keyCode, scanCode, modifiers);
         forwardKeyToFocused(offsetXBox, keyCode, scanCode, modifiers);
         forwardKeyToFocused(offsetYBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(ancOffsetXBox, keyCode, scanCode, modifiers);
+        forwardKeyToFocused(ancOffsetYBox, keyCode, scanCode, modifiers);
         forwardKeyToFocused(scaleBox, keyCode, scanCode, modifiers);
         forwardKeyToFocused(backgroundColorBox, keyCode, scanCode, modifiers);
         forwardKeyToFocused(opacityBox, keyCode, scanCode, modifiers);
@@ -424,6 +533,8 @@ public class DialogPreviewPanel {
         forwardCharToFocused(previewTextBox, codePoint, modifiers);
         forwardCharToFocused(offsetXBox, codePoint, modifiers);
         forwardCharToFocused(offsetYBox, codePoint, modifiers);
+        forwardCharToFocused(ancOffsetXBox, codePoint, modifiers);
+        forwardCharToFocused(ancOffsetYBox, codePoint, modifiers);
         forwardCharToFocused(scaleBox, codePoint, modifiers);
         forwardCharToFocused(backgroundColorBox, codePoint, modifiers);
         forwardCharToFocused(opacityBox, codePoint, modifiers);
@@ -438,6 +549,8 @@ public class DialogPreviewPanel {
         return isFocused(previewTextBox)
                 || isFocused(offsetXBox)
                 || isFocused(offsetYBox)
+                || isFocused(ancOffsetXBox)
+                || isFocused(ancOffsetYBox)
                 || isFocused(scaleBox)
                 || isFocused(backgroundColorBox)
                 || isFocused(opacityBox)
@@ -463,7 +576,7 @@ public class DialogPreviewPanel {
             fieldCount = 4;
             hasAdvancedButton = true;
         } else if (fieldSet == DialogFieldSet.CAMERA_VIEW) {
-            fieldCount = 4;
+            fieldCount = 6;
             hasAdvancedButton = false;
         } else {
             fieldCount = 7;

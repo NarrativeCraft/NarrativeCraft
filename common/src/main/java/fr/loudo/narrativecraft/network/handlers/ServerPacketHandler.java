@@ -390,7 +390,7 @@ public class ServerPacketHandler {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         if (session == null) return;
         StoryHandler storyHandler = session.getStoryHandler();
-        if (storyHandler != null) {
+        if (storyHandler != null && session.isGameplayMode()) {
             if (packet.oneTime() && storyHandler.hasAlreadyInteracted(packet.interactionId())) return;
             if (packet.oneTime()) storyHandler.addInteractionId(packet.interactionId());
             storyHandler.playStitch(packet.stitchName());
@@ -534,11 +534,12 @@ public class ServerPacketHandler {
         if (playerSession == null) return;
 
         try {
-            StoryHandler storyHandler;
+            StoryHandler storyHandler = null;
             if (packet.fromSave()) {
                 storyHandler =
                         NarrativeCraftMod.getInstance().getSaveFileManager().loadSave(playerSession);
-            } else {
+            }
+            if (storyHandler == null) {
                 storyHandler = new StoryHandler(playerSession);
             }
             playerSession.setStoryHandler(storyHandler);

@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.screens.mainScreen;
 import com.mojang.blaze3d.platform.NativeImage;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
@@ -121,6 +122,19 @@ public class MainScreen extends Screen {
             addRenderableWidget(Button.builder(Translation.message("screen.main.new_game"), button -> {
                         close();
                         Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false));
+                    })
+                    .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build());
+            currentY += BUTTON_HEIGHT + BUTTON_GAP;
+        }
+
+        if (isPause) {
+            addRenderableWidget(Button.builder(Translation.message("screen.main.restart_scene"), button -> {
+                        close();
+                        ClientPlayerSession session =
+                                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+                        Services.PACKET.sendToServer(
+                                new C2SPlayStory(Optional.of(session.getScene().knotName()), true));
                     })
                     .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                     .build());

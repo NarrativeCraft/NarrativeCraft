@@ -72,10 +72,15 @@ public class DialogRenderer3D extends DialogRenderer {
         double interpZ = Mth.lerp(partialTick, entity.zo, entity.getZ());
 
         Vec3 cameraPos = camera.getPosition();
-        Vec3 entityHeadPos = new Vec3(interpX, interpY + entity.getEyeHeight(), interpZ);
+        Vec3 entityHeadPos = new Vec3(
+                interpX + data.getAncOffsetX(), interpY + entity.getEyeHeight() + data.getAncOffsetY(), interpZ);
         Vec3 dialogFinalPos = new Vec3(
-                interpX + camRight.x * data.getOffsetX(),
-                interpY + entity.getEyeHeight() + data.getOffsetY() + camRight.y * data.getOffsetX(),
+                interpX + data.getAncOffsetX() + camRight.x * data.getOffsetX(),
+                interpY
+                        + entity.getEyeHeight()
+                        + data.getAncOffsetY()
+                        + data.getOffsetY()
+                        + camRight.y * data.getOffsetX(),
                 interpZ + camRight.z * data.getOffsetX());
         Vec3 dialogPos = animator.getPosition(entityHeadPos, dialogFinalPos, partialTick);
 
@@ -108,7 +113,7 @@ public class DialogRenderer3D extends DialogRenderer {
         if (data.isTailVisible()) {
             poseStack.pushPose();
             poseStack.translate(-anchorX, -anchorY, 0);
-            tail.render(poseStack, partialTick, bufferSource, camera, opacity);
+            tail.render(poseStack, bufferSource, opacity);
             poseStack.popPose();
         }
 
@@ -119,6 +124,13 @@ public class DialogRenderer3D extends DialogRenderer {
 
     public Vec3 getDialogPosition() {
         return new Vec3(entity.getX(), entity.getY() + entity.getBbHeight() + data.getOffsetY(), entity.getZ());
+    }
+
+    public Vec3 getAnchorPosition() {
+        return new Vec3(
+                entity.getX() + data.getAncOffsetX(),
+                entity.getY() + entity.getEyeHeight() + data.getAncOffsetY(),
+                entity.getZ());
     }
 
     public Vec3 translateToRelative(Vec3 worldPos) {

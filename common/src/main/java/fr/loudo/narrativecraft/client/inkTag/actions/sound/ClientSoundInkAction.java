@@ -109,13 +109,19 @@ public class ClientSoundInkAction extends SoundInkAction {
                                     .getLocation()
                                     .compareTo(this.soundInstance.getLocation())
                             == 0) {
-                        this.volume = clientSoundInkAction.currentVolume;
-                        clientSoundInkAction.totalTick = 0;
+                        if (totalTick == 0) {
+                            clientSoundInkAction.stop();
+                        } else {
+                            this.volume = clientSoundInkAction.currentVolume > 0
+                                    ? clientSoundInkAction.currentVolume
+                                    : clientSoundInkAction.volume;
+                            clientSoundInkAction.totalTick = 0;
+                        }
                     }
                 }
             }
         }
-        if (soundName.equals("all")) {
+        if (soundName.equals("all") || totalTick == 0) {
             isRunning = false;
         }
 
