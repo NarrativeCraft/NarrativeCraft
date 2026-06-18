@@ -66,4 +66,10 @@ public class GameRendererMixin {
             clientShakeScreenInkAction.shakeScreen(poseStack, partialTick);
         }
     }
+
+    @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$cancelBobCamera(PoseStack poseStack, float partialTicks, CallbackInfo ci) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (session.inCamera()) ci.cancel();
+    }
 }
