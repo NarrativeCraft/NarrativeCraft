@@ -32,9 +32,6 @@ import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -44,6 +41,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import org.lwjgl.glfw.GLFW;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 
 public class MainScreen extends Screen {
 
@@ -89,7 +90,7 @@ public class MainScreen extends Screen {
     protected void init() {
         loadLogoInfo();
 
-        int buttonCount = 3 + (canContinue ? 1 : 0) + (finishedStory ? 1 : 0);
+        int buttonCount = 3 + (canContinue ? 1 : 0) + (finishedStory ? 1 : 0) + (isPause ? 1 : 0);
         int totalButtonHeight = buttonCount * BUTTON_HEIGHT + (buttonCount - 1) * BUTTON_GAP;
 
         int logoDisplayWidth = Math.min(width / 3, 500);
