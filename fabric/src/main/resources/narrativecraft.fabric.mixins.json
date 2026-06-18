@@ -17,8 +17,7 @@
     "LevelRendererMixinFabric",
     "GuiGraphicsExtractorMixinFabric",
     "HuiMixinFabric",
-    "KeyboardHandlerMixinFabric",
-    "MouseHandlerMixinFabric"
+    "KeyboardHandlerMixinFabric"
   ],
   "server": [],
   "injectors": {

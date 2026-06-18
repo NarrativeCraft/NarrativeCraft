@@ -153,12 +153,6 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             }
         }
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
-        for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
-            Services.PACKET.sendToPlayer(
-                    playerSession.getPlayer(),
-                    new S2CCharacterStoryAction(
-                            placement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.REMOVE));
-        }
     }
 
     public void spawnEntity(CharacterPlacement characterPlacement) {

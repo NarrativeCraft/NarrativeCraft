@@ -25,12 +25,17 @@ package fr.loudo.narrativecraft.keys;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class ModKeys {
+
+    private static final Map<Integer, Boolean> previousStatesKeyCode = new HashMap<>();
 
     private static final KeyMapping.Category CATEGORY =
             new KeyMapping.Category(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main"));
@@ -51,5 +56,17 @@ public class ModKeys {
         KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);
         ALL_KEYS.add(key);
         return key;
+    }
+
+    public static void handleKeyPress(int code, boolean isDown, Runnable... actions) {
+        boolean wasDown = previousStatesKeyCode.getOrDefault(code, false);
+
+        if (isDown && !wasDown) {
+            for (Runnable action : actions) {
+                action.run();
+            }
+        }
+
+        previousStatesKeyCode.put(code, isDown);
     }
 }
