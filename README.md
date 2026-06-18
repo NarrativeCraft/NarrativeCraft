@@ -23,7 +23,9 @@ NarrativeCraft works thanks to the amazing open source project [Ink](https://www
 
 ## Features
 
-NarrativeCraft is an all-in-one system, meaning that you have everything by default, no addons required.
+NarrativeCraft is an all-in-one system, meaning that you have everything by default. 
+
+Compatibility with other mods requires installing addons.
 
 - Cutscenes
 - Player recording
@@ -60,7 +62,7 @@ maven {
 }
 ```
 ```
-compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.1+mc{minecraft_version}'
+compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.4+mc{minecraft_version}'
 ```
 
 ### Maven
@@ -74,9 +76,11 @@ compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.1+mc{minecraft_versi
 <dependency>
     <groupId>fr.loudo.narrativecraft</groupId>
     <artifactId>narrativecraft-api</artifactId>
-    <version>2.0.1+mc{minecraft_version}</version>
+    <version>2.0.4+mc{minecraft_version}</version>
 </dependency>
 ```
+
+Current minecraft versions available: `26.2` and `1.21.1`
 
 ## Contributing
 

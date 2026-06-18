@@ -60,22 +60,7 @@ public class StoryHandlerSerializer implements JsonSerializer<StoryHandler> {
         json.add("interactionIds", interactionIds);
 
         json.addProperty("lastCharacterSpoke", src.getLastCharacterSpoke());
-
-        StoryHandler.Snapshot snapshot = src.getSnapshot();
-        if (snapshot != null) {
-            JsonObject snapshotJson = new JsonObject();
-            snapshotJson.addProperty("text", snapshot.text());
-            JsonArray snapshotTags = new JsonArray();
-            for (String tag : snapshot.tags()) {
-                snapshotTags.add(tag);
-            }
-            snapshotJson.add("tags", snapshotTags);
-            json.add("snapshot", snapshotJson);
-        }
-
-        if (src.getPendingDialogueText() != null) {
-            json.addProperty("pendingDialogueText", src.getPendingDialogueText());
-        }
+        json.addProperty("dialogVisible", src.isDialogVisible());
 
         json.addProperty("ended", src.isEnded());
         json.addProperty("finishedStory", src.hasFinishedStory());

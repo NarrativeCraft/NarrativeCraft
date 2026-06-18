@@ -1,10 +1,6 @@
 # Changelog
 
-## [2.0.3]
-
-### Features
-- Added 'space' type for text tag
+## [2.0.4]
 
 ### Fixes
-
-- Dialog resizing crackling animation first second
+- Choices workflow that either block the story or advance 2 times the story

@@ -37,10 +37,8 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -79,21 +77,8 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
         String lastCharacterSpoke =
                 obj.has("lastCharacterSpoke") ? obj.get("lastCharacterSpoke").getAsString() : "";
 
-        StoryHandler.Snapshot snapshot = null;
-        if (obj.has("snapshot")) {
-            JsonObject snapshotObj = obj.getAsJsonObject("snapshot");
-            String text = snapshotObj.get("text").getAsString();
-            List<String> tags = new ArrayList<>();
-            if (snapshotObj.has("tags")) {
-                for (JsonElement element : snapshotObj.getAsJsonArray("tags")) {
-                    tags.add(element.getAsString());
-                }
-            }
-            snapshot = new StoryHandler.Snapshot(text, tags);
-        }
-
-        String pendingDialogueText =
-                obj.has("pendingDialogueText") ? obj.get("pendingDialogueText").getAsString() : null;
+        boolean dialogVisible =
+                obj.has("dialogVisible") && obj.get("dialogVisible").getAsBoolean();
 
         boolean ended = obj.has("ended") && obj.get("ended").getAsBoolean();
         boolean finishedStory =
@@ -123,8 +108,7 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
                     characterDialogData,
                     interactionIds,
                     lastCharacterSpoke,
-                    snapshot,
-                    pendingDialogueText,
+                    dialogVisible,
                     ended,
                     finishedStory);
         } catch (Exception e) {
