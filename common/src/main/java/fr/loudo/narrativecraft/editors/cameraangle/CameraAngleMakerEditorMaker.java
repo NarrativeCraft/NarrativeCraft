@@ -52,6 +52,7 @@ import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -150,6 +151,12 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         if (environment == NarrativeEnvironment.DEVELOPMENT || cameraAngle.getScene() == null) {
             for (Entity entity : characterEntities.values()) {
                 entity.remove(Entity.RemovalReason.DISCARDED);
+                if (entity instanceof FakePlayer player) {
+                    playerSession
+                            .getPlayer()
+                            .connection
+                            .send(new ClientboundPlayerInfoRemovePacket(List.of(player.getUUID())));
+                }
             }
         }
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);

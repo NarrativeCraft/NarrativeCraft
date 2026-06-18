@@ -136,16 +136,16 @@ public class Playback implements IPlaybackSession {
         isPlaying = false;
         if (killOnEnd) {
             resetActions();
+            for (ServerPlayer player : requester.level().players()) {
+                Services.PACKET.sendToPlayer(
+                        player,
+                        new S2CCharacterStoryAction(
+                                animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.REMOVE));
+            }
         }
         for (PlaybackContext context : contexts) {
             if (killOnEnd) {
                 context.stop();
-                for (ServerPlayer player : requester.level().players()) {
-                    Services.PACKET.sendToPlayer(
-                            player,
-                            new S2CCharacterStoryAction(
-                                    animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.REMOVE));
-                }
             } else {
                 context.pause();
             }

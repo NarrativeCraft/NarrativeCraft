@@ -36,12 +36,16 @@ import java.util.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.storage.TagValueInput;
 
@@ -166,6 +170,11 @@ public class PlaybackContext implements IPlaybackContext {
     public void stop() {
         if (entity == null) return;
         entity.remove(Entity.RemovalReason.KILLED);
+        if (entity instanceof FakePlayer player) {
+            for (ServerPlayer serverPlayer : playback.getLevel().players()) {
+                serverPlayer.connection.send(new ClientboundPlayerInfoRemovePacket(List.of(player.getUUID())));
+            }
+        }
         entity = null;
         pause();
     }
