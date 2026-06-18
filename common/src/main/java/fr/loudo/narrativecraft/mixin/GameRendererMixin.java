@@ -50,4 +50,10 @@ public class GameRendererMixin {
             clientShakeScreenInkAction.shakeScreen(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
         }
     }
+
+    @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$cancelBobCamera(CameraRenderState cameraState, PoseStack poseStack, CallbackInfo ci) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (session.inCamera()) ci.cancel();
+    }
 }
