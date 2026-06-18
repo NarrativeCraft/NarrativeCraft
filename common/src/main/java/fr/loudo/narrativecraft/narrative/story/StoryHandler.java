@@ -222,11 +222,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         Line line = currentLine;
         step = Step.READY;
         if (!showDialogueOrContinue(line)) {
-            if (dialogVisible) {
-                dialogVisible = false;
-                Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
-                return;
-            }
             advance();
         }
     }
@@ -281,6 +276,12 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 if (line.hasText() || !line.tags().isEmpty()) {
                     if (beginLine(line)) return;
                 }
+            }
+
+            if (dialogVisible) {
+                dialogVisible = false;
+                Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+                return;
             }
 
             List<Choice> choices = story.getCurrentChoices();
@@ -468,10 +469,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     public boolean willTagsBlock(List<String> tags) {
-        for (String tag : tags) {
-            if (tag.contains("--block")) return true;
-        }
-        return false;
+        return inkTagHandler.nextTagsContainsBlocking(tags);
     }
 
     public Map<String, Entity> getCharacterEntities() {

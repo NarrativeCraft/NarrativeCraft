@@ -180,6 +180,26 @@ public final class InkTagHandler {
         lifecycle.onTagsDrained();
     }
 
+    public boolean nextTagsContainsBlocking(List<String> tags) {
+        for (String tag : tags) {
+            DispatchResult dispatchResult;
+            try {
+                dispatchResult = dispatcher.dispatch(tag, playerSession.getScene());
+            } catch (InkTagHandlerException exception) {
+                lifecycle.onError(exception);
+                return false;
+            }
+
+            if (dispatchResult == null) continue; // unknown keyword, already logged
+
+            InkAction action = dispatchResult.action();
+            if (action.isBlocking()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Executes the action on the server (if {@link Side#SERVER}) or sends it to the client
      * (if {@link Side#CLIENT}).
