@@ -31,11 +31,13 @@ import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.utils.Utils;
-import java.lang.reflect.Type;
-import java.util.UUID;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+
+import java.lang.reflect.Type;
+import java.util.UUID;
 
 public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterStory> {
 
@@ -45,19 +47,21 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
                     DialogDataIO.deserialize(jsonObject.getAsJsonObject("dialogData"), DialogFieldSet.CHARACTER));
         }
 
-        String modelTypeName = jsonObject.get("modelType").getAsString();
-        if (!modelTypeName.isEmpty()) {
-            character.setModelType(Utils.parsePlayerModelType(modelTypeName));
+        character.setModelType(PlayerSkin.Model.WIDE);
+        if (jsonObject.has("modelType")) {
+            String modelTypeName = jsonObject.get("modelType").getAsString();
+            if (!modelTypeName.isEmpty()) {
+                character.setModelType(Utils.parsePlayerModelType(modelTypeName));
+            }
         }
 
-        String entityTypeId = "";
+        character.setEntityType(EntityType.PLAYER);
         if (jsonObject.has("entityTypeId")) {
-            entityTypeId = jsonObject.get("entityTypeId").getAsString();
+            String entityTypeId = jsonObject.get("entityTypeId").getAsString();
+            character.setEntityType(BuiltInRegistries.ENTITY_TYPE
+                    .getOptional(ResourceLocation.parse(entityTypeId))
+                    .orElse(EntityType.PLAYER));
         }
-        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE
-                .getOptional(ResourceLocation.parse(entityTypeId))
-                .orElse(EntityType.PLAYER);
-        character.setEntityType(entityType);
     }
 
     @Override
