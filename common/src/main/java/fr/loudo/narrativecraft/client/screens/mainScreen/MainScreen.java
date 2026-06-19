@@ -24,26 +24,33 @@
 package fr.loudo.narrativecraft.client.screens.mainScreen;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.realmsclient.RealmsMainScreen;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.GenericMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import org.lwjgl.glfw.GLFW;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 
 public class MainScreen extends Screen {
 
@@ -130,7 +137,7 @@ public class MainScreen extends Screen {
 
         if (isPause) {
             addRenderableWidget(Button.builder(Translation.message("screen.main.restart_scene"), button -> {
-                        close();
+                        minecraft.setScreen(null);
                         ClientPlayerSession session =
                                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
                         Services.PACKET.sendToServer(
@@ -158,13 +165,9 @@ public class MainScreen extends Screen {
         currentY += BUTTON_HEIGHT + BUTTON_GAP;
 
         addRenderableWidget(Button.builder(Translation.message("screen.main.quit"), button -> {
-                    ClientNarrativeCraftMod.getInstance()
-                            .getPlayerSession()
-                            .getEditor()
-                            .stop();
                     if (!isPause) {
                         close();
-                        minecraft.disconnect();
+                        disconnect();
                     } else {
                         Services.PACKET.sendToServer(new C2SStopStory(true));
                     }
@@ -208,7 +211,11 @@ public class MainScreen extends Screen {
     public void close() {
         minecraft.setScreen(null);
         minecraft.getSoundManager().stop(MAIN_MUSIC_INSTANCE);
-        ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor().stop();
+        EditorMaker editor =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editor != null) {
+            editor.stop();
+        }
         ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(null);
         Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
     }
@@ -253,6 +260,26 @@ public class MainScreen extends Screen {
             hasLogo = true;
         } catch (IOException e) {
             hasLogo = false;
+        }
+    }
+
+    private void disconnect() {
+        boolean flag = this.minecraft.isLocalServer();
+        ServerData serverdata = this.minecraft.getCurrentServer();
+        this.minecraft.level.disconnect();
+        if (flag) {
+            this.minecraft.disconnect(new GenericMessageScreen(Component.translatable("menu.savingLevel")));
+        } else {
+            this.minecraft.disconnect();
+        }
+
+        TitleScreen titlescreen = new TitleScreen();
+        if (flag) {
+            this.minecraft.setScreen(titlescreen);
+        } else if (serverdata != null && serverdata.isRealm()) {
+            this.minecraft.setScreen(new RealmsMainScreen(titlescreen));
+        } else {
+            this.minecraft.setScreen(new JoinMultiplayerScreen(titlescreen));
         }
     }
 }
