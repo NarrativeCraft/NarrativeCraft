@@ -59,6 +59,7 @@ import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
@@ -506,6 +507,20 @@ public class ServerPacketHandler {
                 (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(mainScreenAngle.getId(), placementJson));
 
         editor.spawnEntity(placement);
+    }
+
+    public static void mainScreenRemovePlacement(C2SMainScreenRemovePlacement packet, Player player) {
+        if (!player.hasPermissions(2)) return;
+        CameraAngle mainScreenAngle = NarrativeCraftMod.getInstance().getMainScreenData();
+        if (mainScreenAngle == null) return;
+
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (playerSession == null) return;
+        EditorMaker editorMaker = playerSession.getEditor();
+        if (!(editorMaker instanceof MainScreenMakerEditor editor)) return;
+
+        editor.removePlacement(packet.placementId());
     }
 
     public static void mainScreenSave(C2SMainScreenSave packet, Player player) {

@@ -43,6 +43,7 @@ import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.C2SChangeGamemodePacket;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
@@ -282,7 +283,11 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     public void removeCharacterPlacement(CharacterPlacement placement) {
         characterPlacements.remove(placement);
         removeDialogSetupsForPlacement(placement.getId());
-        Services.PACKET.sendToServer(new C2SCameraAngleRemovePlacement(cameraAngle, placement.getId()));
+        if (cameraAngle.getScene() != null) {
+            Services.PACKET.sendToServer(new C2SCameraAngleRemovePlacement(cameraAngle, placement.getId()));
+        } else {
+            Services.PACKET.sendToServer(new C2SMainScreenRemovePlacement(placement.getId()));
+        }
     }
 
     public void removeTemplateReference(TemplateReference reference) {

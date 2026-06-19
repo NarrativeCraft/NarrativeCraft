@@ -43,6 +43,7 @@ import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
@@ -119,6 +120,9 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SMainScreenSave.TYPE, (packet, context) -> {
             ServerPacketHandler.mainScreenSave(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SMainScreenRemovePlacement.TYPE, (packet, context) -> {
+            ServerPacketHandler.mainScreenRemovePlacement(packet, context.player());
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SPlayStory.TYPE, (packet, context) -> {
             ServerPacketHandler.playStory(packet, context.player());

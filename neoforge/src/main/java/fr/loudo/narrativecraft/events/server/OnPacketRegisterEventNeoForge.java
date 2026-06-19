@@ -190,6 +190,10 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playToServer(
                 C2SMainScreenSave.TYPE, C2SMainScreenSave.STREAM_CODEC, ServerPacketHandlerNeoForge::mainScreenSave);
         registrar.playToServer(
+                C2SMainScreenRemovePlacement.TYPE,
+                C2SMainScreenRemovePlacement.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::mainScreenRemovePlacement);
+        registrar.playToServer(
                 C2SEnterDialogEditor.TYPE,
                 C2SEnterDialogEditor.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::enterDialogEditor);

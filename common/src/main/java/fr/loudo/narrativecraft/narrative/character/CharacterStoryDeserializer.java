@@ -50,7 +50,10 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
             character.setModelType(Utils.parsePlayerModelType(modelTypeName));
         }
 
-        String entityTypeId = jsonObject.get("entityTypeId").getAsString();
+        String entityTypeId = "";
+        if (jsonObject.has("entityTypeId")) {
+            entityTypeId = jsonObject.get("entityTypeId").getAsString();
+        }
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE
                 .getOptional(ResourceLocation.parse(entityTypeId))
                 .orElse(EntityType.PLAYER);
