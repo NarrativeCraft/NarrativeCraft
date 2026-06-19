@@ -34,6 +34,9 @@ import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.GenericMessageScreen;
@@ -47,10 +50,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import org.lwjgl.glfw.GLFW;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
 
 public class MainScreen extends Screen {
 

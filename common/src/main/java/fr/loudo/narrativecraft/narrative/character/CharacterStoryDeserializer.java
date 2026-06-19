@@ -31,13 +31,12 @@ import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.utils.Utils;
+import java.lang.reflect.Type;
+import java.util.UUID;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-
-import java.lang.reflect.Type;
-import java.util.UUID;
 
 public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterStory> {
 
