@@ -43,6 +43,7 @@ import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
@@ -161,6 +162,10 @@ public class ServerPacketHandlerNeoForge {
 
     public static void mainScreenSave(C2SMainScreenSave packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.mainScreenSave(packet, context.player()));
+    }
+
+    public static void mainScreenRemovePlacement(C2SMainScreenRemovePlacement packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.mainScreenRemovePlacement(packet, context.player()));
     }
 
     public static void playStory(C2SPlayStory packet, IPayloadContext context) {

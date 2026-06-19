@@ -14,10 +14,11 @@
     "ServerPlayerMixinFabric"
   ],
   "client": [
-    "LevelRendererMixinFabric",
     "GuiGraphicsExtractorMixinFabric",
     "HuiMixinFabric",
-    "KeyboardHandlerMixinFabric"
+    "KeyboardHandlerMixinFabric",
+    "LevelRendererMixinFabric",
+    "MouseHandlerMixinFabric"
   ],
   "server": [],
   "injectors": {

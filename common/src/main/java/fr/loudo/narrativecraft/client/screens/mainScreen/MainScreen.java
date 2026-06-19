@@ -27,6 +27,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
@@ -131,7 +132,7 @@ public class MainScreen extends Screen {
 
         if (isPause) {
             addRenderableWidget(Button.builder(Translation.message("screen.main.restart_scene"), button -> {
-                        close();
+                        minecraft.gui.setScreen(null);
                         ClientPlayerSession session =
                                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
                         Services.PACKET.sendToServer(
@@ -159,10 +160,6 @@ public class MainScreen extends Screen {
         currentY += BUTTON_HEIGHT + BUTTON_GAP;
 
         addRenderableWidget(Button.builder(Translation.message("screen.main.quit"), button -> {
-                    ClientNarrativeCraftMod.getInstance()
-                            .getPlayerSession()
-                            .getEditor()
-                            .stop();
                     if (!isPause) {
                         close();
                         minecraft.disconnectFromWorld(Component.empty());
@@ -215,7 +212,11 @@ public class MainScreen extends Screen {
     public void close() {
         minecraft.gui.setScreen(null);
         minecraft.getSoundManager().stop(MAIN_MUSIC_INSTANCE);
-        ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor().stop();
+        EditorMaker editor =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
+        if (editor != null) {
+            editor.stop();
+        }
         ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(null);
         Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
     }

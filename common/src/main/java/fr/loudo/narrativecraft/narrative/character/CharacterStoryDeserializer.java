@@ -35,7 +35,6 @@ import java.lang.reflect.Type;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 
 public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterStory> {
@@ -46,16 +45,20 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
                     DialogDataIO.deserialize(jsonObject.getAsJsonObject("dialogData"), DialogFieldSet.CHARACTER));
         }
 
-        String modelTypeName = jsonObject.get("modelType").getAsString();
-        if (!modelTypeName.isEmpty()) {
-            character.setModelType(Utils.parsePlayerModelType(modelTypeName));
+        if (jsonObject.has("modelType")) {
+            String modelTypeName = jsonObject.get("modelType").getAsString();
+            if (!modelTypeName.isEmpty()) {
+                character.setModelType(Utils.parsePlayerModelType(modelTypeName));
+            }
         }
 
-        String entityTypeId = jsonObject.get("entityTypeId").getAsString();
-        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE
-                .getOptional(Identifier.parse(entityTypeId))
-                .orElse(EntityTypes.PLAYER);
-        character.setEntityType(entityType);
+        character.setEntityType(EntityTypes.PLAYER);
+        if (jsonObject.has("entityTypeId")) {
+            String entityTypeId = jsonObject.get("entityTypeId").getAsString();
+            character.setEntityType(BuiltInRegistries.ENTITY_TYPE
+                    .getOptional(Identifier.parse(entityTypeId))
+                    .orElse(EntityTypes.PLAYER));
+        }
     }
 
     @Override

@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
+import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
@@ -191,6 +192,10 @@ public class OnPacketRegisterEventNeoForge {
                 ServerPacketHandlerNeoForge::mainScreenCaptureCharacter);
         registrar.playToServer(
                 C2SMainScreenSave.TYPE, C2SMainScreenSave.STREAM_CODEC, ServerPacketHandlerNeoForge::mainScreenSave);
+        registrar.playToServer(
+                C2SMainScreenRemovePlacement.TYPE,
+                C2SMainScreenRemovePlacement.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::mainScreenRemovePlacement);
         registrar.playToServer(
                 C2SEnterDialogEditor.TYPE,
                 C2SEnterDialogEditor.STREAM_CODEC,
