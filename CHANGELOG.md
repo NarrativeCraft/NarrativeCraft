@@ -1,8 +1,10 @@
 # Changelog
 
-## [2.0.5]
+## [2.0.6]
 
 ### Fixes
-- Crash if removing a character from main screen editor
-- Crash if leaving or restart a scene if you were not in an editor (tries to stop it while it's null)
-- Packet for removing template characters in fabric not properly registered
+- Better retro-compatibility for animations
+- Can't access options screen from main screen in 1.21.1
+
+### Misc
+- Send errors in chat if animations are not properly initialized on cutscene editor
