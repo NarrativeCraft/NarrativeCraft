@@ -550,9 +550,13 @@ public class ServerPacketHandler {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         if (playerSession == null) return;
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler != null) {
+            storyHandler.stop();
+        }
 
         try {
-            StoryHandler storyHandler = null;
+            storyHandler = null;
             if (packet.fromSave()) {
                 storyHandler =
                         NarrativeCraftMod.getInstance().getSaveFileManager().loadSave(playerSession);

@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
+import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CSessionClear;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
@@ -49,6 +50,12 @@ public class PlayerSession extends AbstractPlayerSession {
     public PlayerSession(ServerPlayer player, Chapter chapter, Scene scene) {
         super(chapter, scene);
         this.player = player;
+    }
+
+    @Override
+    public void apply(Chapter chapter, Scene scene) {
+        super.apply(chapter, scene);
+        Services.PACKET.sendToPlayer(player, new S2CPlayerSession(chapter.getId(), scene.getId()));
     }
 
     @Override

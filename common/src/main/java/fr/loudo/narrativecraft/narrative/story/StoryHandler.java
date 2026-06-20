@@ -49,7 +49,6 @@ import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.save.SaveFileManager;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CRenderSaveIcon;
 import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
@@ -133,10 +132,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 throw new Exception("No scene found in the first chapter!");
             }
             Scene firstScene = firstChapter.getSceneManager().get(0);
-            playerSession.setChapter(firstChapter);
-            playerSession.setScene(firstScene);
-            Services.PACKET.sendToPlayer(
-                    playerSession.getPlayer(), new S2CPlayerSession(firstChapter.getId(), firstScene.getId()));
+            playerSession.apply(firstChapter, firstScene);
             NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneStartEvent(playerSession, firstChapter, firstScene));
         }
         advance();
@@ -156,8 +152,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             stop();
             throw new Exception("Scene of the knot does not exists!");
         }
-        playerSession.setChapter(chapter);
-        playerSession.setScene(scene);
+        playerSession.apply(chapter, scene);
         NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneStartEvent(playerSession, chapter, scene));
         advance();
     }

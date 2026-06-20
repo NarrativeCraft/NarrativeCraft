@@ -94,12 +94,11 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
 
         Chapter chapter = chapterManager.getById(chapterId);
         if (chapter == null) chapter = firstChapter;
-        playerSession.setChapter(chapter);
         Scene scene = chapter.getSceneManager().getById(sceneId);
         if (scene == null && !chapter.getSceneManager().getList().isEmpty()) {
             scene = chapter.getSceneManager().get(0);
         }
-        playerSession.setScene(scene);
+        playerSession.apply(chapter, scene);
 
         try {
             return new StoryHandler(
