@@ -40,12 +40,14 @@ import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CutsceneMakerEditorMaker implements EditorMaker {
 
@@ -85,12 +87,18 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     public void init() {
         for (Subscene subscene : cutscene.getSubscenes()) {
             for (Animation animation : subscene.getAnimations()) {
-                animation.initialize();
+                if (!animation.initialize()) {
+                    playerSession.getPlayer().sendSystemMessage(Translation.message("error.animation.initialize", animation.getName()));
+                    continue;
+                }
                 playbacks.add(new Playback(animation, playerSession.getPlayer()));
             }
         }
         for (Animation animation : cutscene.getAnimations()) {
-            animation.initialize();
+            if (!animation.initialize()) {
+                playerSession.getPlayer().sendSystemMessage(Translation.message("error.animation.initialize", animation.getName()));
+                continue;
+            }
             playbacks.add(new Playback(animation, playerSession.getPlayer()));
         }
         playerSession.changeGameMode(GameType.SPECTATOR);
