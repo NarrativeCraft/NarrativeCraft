@@ -40,15 +40,26 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.List;
+
 @InkCommand(
         keyword = "gameplay",
         description = "Enables or disables standard player gameplay controls (movement, inventory, …) during a scene.",
-        syntax = "gameplay",
+        syntax = "gameplay [gamemode:string=adventure]",
         side = Side.SERVER)
 public class GameplayInkAction extends InkAction {
 
+    private GameType gameType = GameType.ADVENTURE;
+
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
+        String gamemode = cmd.getString("gamemode");
+        if (!List.of("adventure", "survival", "creative", "spectator").contains(gamemode)) {
+            return InkActionResult.error(String.format("Gamemode %s is not a valid gamemode. Only adventure, survival, creative and spectator", gamemode));
+        }
+        try {
+            gameType = GameType.byName(gamemode.toLowerCase());
+        } catch (Exception _) { }
         return InkActionResult.ok();
     }
 
@@ -67,7 +78,7 @@ public class GameplayInkAction extends InkAction {
         CharacterStory mainCharacter =
                 NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
 
-        playerSession.getPlayer().setGameMode(GameType.ADVENTURE);
+        playerSession.getPlayer().setGameMode(gameType);
         if (mainCharacterEntity == null) return InkActionResult.ok();
 
         storyHandler.unregisterEntity(mainCharacter);
