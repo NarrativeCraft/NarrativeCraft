@@ -26,14 +26,15 @@ package fr.loudo.narrativecraft.client.screens.mainScreen;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import fr.loudo.narrativecraft.utils.Translation;
-import java.io.IOException;
-import java.util.Locale;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
+import java.io.IOException;
+import java.util.Locale;
 
 public class OptionsScreen extends Screen {
 
@@ -86,7 +87,7 @@ public class OptionsScreen extends Screen {
 
         addRenderableWidget(Button.builder(
                         Translation.message("screen.main.options.minecraft_options"),
-                        button -> minecraft.setScreen(new OptionsScreen(this)))
+                        button -> minecraft.setScreen(new net.minecraft.client.gui.screens.options.OptionsScreen(this, minecraft.options)))
                 .bounds(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT)
                 .build());
 
