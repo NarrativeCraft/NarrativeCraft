@@ -130,9 +130,6 @@ public class ChangeItemAction extends AbstractAction {
 
         for (int i = 0; i < size; i++) {
             EquipmentSlot slot = SLOT_IDS.inverse().get(reader.readInt());
-            if (slot == null) {
-                throw new IOException("Unknown equipment slot id " + i + 1);
-            }
 
             Identifier key = Identifier.parse(reader.readString());
 
@@ -145,7 +142,9 @@ public class ChangeItemAction extends AbstractAction {
             Item item =
                     BuiltInRegistries.ITEM.getOptional(key).orElseThrow(() -> new IOException("Unknown item: " + key));
 
-            itemsBySlot.put(slot, new StoredItem(item, data));
+            if (slot != null) {
+                itemsBySlot.put(slot, new StoredItem(item, data));
+            }
         }
     }
 

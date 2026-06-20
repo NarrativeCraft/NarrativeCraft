@@ -1,8 +1,6 @@
 # Changelog
 
-## [2.0.5]
+## [2.0.6]
 
 ### Fixes
-- Crash if removing a character from main screen editor
-- Crash if leaving or restart a scene if you were not in an editor (tries to stop it while it's null)
-- Packet for removing template characters in fabric not properly registered
+- Better retro-compatibility for animations
