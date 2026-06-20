@@ -134,6 +134,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             Scene firstScene = firstChapter.getSceneManager().get(0);
             playerSession.apply(firstChapter, firstScene);
             NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneStartEvent(playerSession, firstChapter, firstScene));
+        } else {
+            story.resetState();
+            story.choosePathString(playerSession.getScene().knotName());
         }
         advance();
     }
