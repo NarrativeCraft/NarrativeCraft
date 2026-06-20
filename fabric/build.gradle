@@ -12,7 +12,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     include(implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}")
     include(implementation "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}")
-    include(implementation project(':api'))
+    implementation project(':api')
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
@@ -38,4 +38,8 @@ loom {
             runDir('runs/server')
         }
     }
+}
+
+jar {
+    from project(':api').sourceSets.main.output
 }
