@@ -48,6 +48,7 @@ public class OnRenderWorldEvent {
         modelViewStack.pushMatrix();
         modelViewStack.mul(modelViewMatrix);
         RenderSystem.applyModelViewMatrix();
+        RenderSystem.disableDepthTest();
 
         CutsceneMakerEditorPathRenderer.render(poseStack, deltaTracker);
         CutsceneMakerEditorCameraRenderer.render(poseStack, deltaTracker);
@@ -58,6 +59,7 @@ public class OnRenderWorldEvent {
         renderClientInkActions(poseStack, deltaTracker);
         partialTickInkActions(deltaTracker);
 
+        RenderSystem.enableDepthTest();
         modelViewStack.popMatrix();
     }
 

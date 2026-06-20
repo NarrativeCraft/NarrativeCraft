@@ -36,11 +36,10 @@ import fr.loudo.narrativecraft.editors.interaction.InteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import java.util.List;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
 
 @InkCommand(
         keyword = "gameplay",

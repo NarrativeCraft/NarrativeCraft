@@ -34,6 +34,10 @@ import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.utils.Utils;
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
@@ -42,11 +46,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-
-import java.io.IOException;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
 
 public class ChangeItemAction extends AbstractAction {
 
