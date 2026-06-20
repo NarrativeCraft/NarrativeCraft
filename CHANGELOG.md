@@ -11,3 +11,4 @@
 
 ### Misc
 - Send errors in chat if animations are not properly initialized on cutscene editor
+- Improved Dialog 2D animation appear and disappear
