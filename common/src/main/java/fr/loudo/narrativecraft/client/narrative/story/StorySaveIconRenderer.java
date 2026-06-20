@@ -77,8 +77,11 @@ public class StorySaveIconRenderer {
         int x = Minecraft.getInstance().getWindow().getGuiScaledWidth() - ICON_SIZE - MARGIN;
         int y = Minecraft.getInstance().getWindow().getGuiScaledHeight() - ICON_SIZE - MARGIN;
 
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha / 255.0f);
         guiGraphics.blitSprite(SAVE_ICON, x, y, ICON_SIZE, ICON_SIZE);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.disableBlend();
     }
 }

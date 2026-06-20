@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.client.screens.mainScreen;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.realmsclient.RealmsMainScreen;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
@@ -204,7 +205,10 @@ public class MainScreen extends Screen {
         int totalBlockHeight = logoDisplayHeight + LOGO_GAP + totalButtonHeight;
         int blockStartY = (height - totalBlockHeight) / 2;
 
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         graphics.blitSprite(LOGO_SPRITE, MARGIN_LEFT, blockStartY, logoDisplayWidth, logoDisplayHeight);
+        RenderSystem.disableBlend();
     }
 
     public void close() {

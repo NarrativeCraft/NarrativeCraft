@@ -217,9 +217,9 @@ public class ClientTextInkAction extends TextInkAction {
         if (fadeState == null) return opacity;
         double t = Mth.clamp((tick + partialTick) / (float) totalTick, 0.0, 1.0);
         return switch (fadeState) {
-            case FADE_IN -> (float) Interpolation.lerp(0.0, opacity, t);
+            case FADE_IN -> (float) Interpolation.lerp(0.05, opacity, t);
             case STAY -> opacity;
-            case FADE_OUT -> (float) Interpolation.lerp(opacity, 0.0, t);
+            case FADE_OUT -> (float) Interpolation.lerp(opacity, 0.05, t);
         };
     }
 
