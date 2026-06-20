@@ -138,19 +138,19 @@ jobs:
             done
           done
 
-      - name: Notify Discord
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: |
-          CHANGELOG_URL="https://github.com/NarrativeCraft/NarrativeCraft/blob/${GITHUB_SHA}/CHANGELOG.md"
-          MESSAGE=$(printf '<@&1515653721621794968>\n# v%s\n## Changelog\n%s\n## Downloads\n### Neoforge\n- 26.2 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-26.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-1.21.1\n### Fabric\n- 26.2 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-26.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-1.21.1' \
-            "${MOD_VERSION}" "${CHANGELOG_URL}" "${MOD_VERSION}" "${MOD_VERSION}" "${MOD_VERSION}" "${MOD_VERSION}")
-
-          curl -sf -X POST "${DISCORD_WEBHOOK}" \
-            -H "Content-Type: application/json" \
-            -d "$(jq -n \
-              --arg content "${MESSAGE}" \
-              '{
-                content: $content,
-                allowed_mentions: { roles: ["1515653721621794968"] }
-              }')"
+#      - name: Notify Discord
+#        env:
+#          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+#        run: |
+#          CHANGELOG_URL="https://github.com/NarrativeCraft/NarrativeCraft/blob/${GITHUB_SHA}/CHANGELOG.md"
+#          MESSAGE=$(printf '<@&1515653721621794968>\n# v%s\n## Changelog\n%s\n## Downloads\n### Neoforge\n- 26.2 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-26.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-neoforge-1.21.1\n### Fabric\n- 26.2 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-26.2\n- 1.21.1 : https://modrinth.com/mod/narrativecraft/version/%s-fabric-1.21.1' \
+#            "${MOD_VERSION}" "${CHANGELOG_URL}" "${MOD_VERSION}" "${MOD_VERSION}" "${MOD_VERSION}" "${MOD_VERSION}")
+#
+#          curl -sf -X POST "${DISCORD_WEBHOOK}" \
+#            -H "Content-Type: application/json" \
+#            -d "$(jq -n \
+#              --arg content "${MESSAGE}" \
+#              '{
+#                content: $content,
+#                allowed_mentions: { roles: ["1515653721621794968"] }
+#              }')"
