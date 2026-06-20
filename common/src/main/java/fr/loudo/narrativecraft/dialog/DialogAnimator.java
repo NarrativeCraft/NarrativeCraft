@@ -110,29 +110,29 @@ public class DialogAnimator {
         this.onStoppedCallback = callback;
     }
 
-    public float getScale(float partialTick) {
-        return smoothStep(getInterpolatedProgress(partialTick));
+    public float getScale(float partialTick, float min, float max) {
+        return Mth.lerp(smoothStep(getInterpolatedProgress(partialTick)), min, max);
     }
 
-    public float getOpacity(float partialTick) {
-        return getInterpolatedProgress(partialTick);
+    public float getOpacity(float partialTick, float min, float max) {
+        return Mth.lerp(getInterpolatedProgress(partialTick), min, max);
     }
 
-    public Vec3 getPosition(Vec3 fromPos, Vec3 toPos, float partialTick) {
-        float t = smoothStep(getInterpolatedProgress(partialTick));
+    public Vec3 getPosition(Vec3 fromPos, Vec3 toPos, float partialTick, float min, float max) {
+        float t = Mth.lerp(smoothStep(getInterpolatedProgress(partialTick)), min, max);
         return new Vec3(
                 Mth.lerp(t, fromPos.x, toPos.x), Mth.lerp(t, fromPos.y, toPos.y), Mth.lerp(t, fromPos.z, toPos.z));
     }
 
-    public float getResizeWidth(float partialTick) {
+    public float getResizeWidth(float partialTick, float min, float max) {
         if (state != State.RESIZING) return resizeToWidth;
-        float t = smoothStep(getInterpolatedResize(partialTick));
+        float t = Mth.lerp(smoothStep(getInterpolatedResize(partialTick)), min, max);
         return resizeFromWidth + (resizeToWidth - resizeFromWidth) * t;
     }
 
-    public float getResizeHeight(float partialTick) {
+    public float getResizeHeight(float partialTick, float min, float max) {
         if (state != State.RESIZING) return resizeToHeight;
-        float t = smoothStep(getInterpolatedResize(partialTick));
+        float t = Mth.lerp(smoothStep(getInterpolatedResize(partialTick)), min, max);
         return resizeFromHeight + (resizeToHeight - resizeFromHeight) * t;
     }
 

@@ -36,11 +36,10 @@ import fr.loudo.narrativecraft.editors.interaction.InteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import java.util.List;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
 
 @InkCommand(
         keyword = "gameplay",
@@ -55,11 +54,13 @@ public class GameplayInkAction extends InkAction {
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
         String gamemode = cmd.getString("gamemode");
         if (!List.of("adventure", "survival", "creative", "spectator").contains(gamemode)) {
-            return InkActionResult.error(String.format("Gamemode %s is not a valid gamemode. Only adventure, survival, creative and spectator", gamemode));
+            return InkActionResult.error(String.format(
+                    "Gamemode %s is not a valid gamemode. Only adventure, survival, creative and spectator", gamemode));
         }
         try {
             gameType = GameType.byName(gamemode.toLowerCase());
-        } catch (Exception _) { }
+        } catch (Exception _) {
+        }
         return InkActionResult.ok();
     }
 

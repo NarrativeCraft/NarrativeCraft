@@ -83,10 +83,10 @@ public class DialogRenderer2D extends DialogRenderer {
         if (animator.isStopped()) return;
 
         float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
-        float scale = animator.getScale(partialTick);
+        float scale = animator.getScale(partialTick, 0.8f, 1f);
         if (scale <= 0f) return;
 
-        float opacity = animator.getOpacity(partialTick);
+        float opacity = animator.getOpacity(partialTick, 0f, 1f);
         Minecraft mc = Minecraft.getInstance();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
@@ -118,7 +118,7 @@ public class DialogRenderer2D extends DialogRenderer {
     }
 
     private void renderBackground(GuiGraphics graphics, float totalWidth, float totalHeight, float opacity) {
-        int color = applyOpacity(data.getBackgroundColor(), 1.0F);
+        int color = applyOpacity(data.getBackgroundColor(), opacity);
         graphics.fill(0, 0, (int) totalWidth, (int) totalHeight, color);
     }
 

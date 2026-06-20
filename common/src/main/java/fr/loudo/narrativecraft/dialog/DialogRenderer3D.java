@@ -60,10 +60,10 @@ public class DialogRenderer3D extends DialogRenderer {
     public void render(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float partialTick) {
         if (animator.isStopped()) return;
 
-        float scale = data.getScale() * animator.getScale(partialTick) * 0.025f;
+        float scale = data.getScale() * animator.getScale(partialTick, 0f, 1f) * 0.025f;
         if (scale <= 0f) return;
 
-        float opacity = animator.getOpacity(partialTick);
+        float opacity = animator.getOpacity(partialTick, 0f, 1f);
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 camRight = new Vec3(camera.getLeftVector()).scale(-1);
 
@@ -82,14 +82,14 @@ public class DialogRenderer3D extends DialogRenderer {
                         + data.getOffsetY()
                         + camRight.y * data.getOffsetX(),
                 interpZ + camRight.z * data.getOffsetX());
-        Vec3 dialogPos = animator.getPosition(entityHeadPos, dialogFinalPos, partialTick);
+        Vec3 dialogPos = animator.getPosition(entityHeadPos, dialogFinalPos, partialTick, 0f, 1f);
 
         layout.compute(data, scrollText, Minecraft.getInstance().font);
         checkAndApplyPendingResize();
 
         boolean resizing = animator.getState() == DialogAnimator.State.RESIZING;
-        float totalWidth = resizing ? animator.getResizeWidth(partialTick) : layout.getTotalWidth();
-        float totalHeight = resizing ? animator.getResizeHeight(partialTick) : layout.getTotalHeight();
+        float totalWidth = resizing ? animator.getResizeWidth(partialTick, 0f, 1f) : layout.getTotalWidth();
+        float totalHeight = resizing ? animator.getResizeHeight(partialTick, 0f, 1f) : layout.getTotalHeight();
 
         poseStack.pushPose();
 

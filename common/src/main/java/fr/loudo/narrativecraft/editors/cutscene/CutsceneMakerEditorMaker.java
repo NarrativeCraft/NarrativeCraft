@@ -41,13 +41,12 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.phys.Vec3;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
 
 public class CutsceneMakerEditorMaker implements EditorMaker {
 
@@ -88,7 +87,9 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         for (Subscene subscene : cutscene.getSubscenes()) {
             for (Animation animation : subscene.getAnimations()) {
                 if (!animation.initialize()) {
-                    playerSession.getPlayer().sendSystemMessage(Translation.message("error.animation.initialize", animation.getName()));
+                    playerSession
+                            .getPlayer()
+                            .sendSystemMessage(Translation.message("error.animation.initialize", animation.getName()));
                     continue;
                 }
                 playbacks.add(new Playback(animation, playerSession.getPlayer()));
@@ -96,7 +97,9 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         }
         for (Animation animation : cutscene.getAnimations()) {
             if (!animation.initialize()) {
-                playerSession.getPlayer().sendSystemMessage(Translation.message("error.animation.initialize", animation.getName()));
+                playerSession
+                        .getPlayer()
+                        .sendSystemMessage(Translation.message("error.animation.initialize", animation.getName()));
                 continue;
             }
             playbacks.add(new Playback(animation, playerSession.getPlayer()));
