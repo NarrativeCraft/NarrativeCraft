@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.dialog;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.geometric.DialogTail;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -183,7 +184,7 @@ public class DialogRenderer3D extends DialogRenderer {
                     .setLight(LightTexture.FULL_BRIGHT);
         } else {
             int color = applyOpacity(data.getBackgroundColor(), opacity);
-            VertexConsumer consumer = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
+            VertexConsumer consumer = bufferSource.getBuffer(NarrativeCraftMod.dialogRenderType);
             consumer.addVertex(matrix, 0, 0, 0)
                     .setLight(LightTexture.FULL_BRIGHT)
                     .setColor(color);
@@ -222,7 +223,7 @@ public class DialogRenderer3D extends DialogRenderer {
         float x = finalX + SKIP_SLIDE_OFFSET * (1f - skipT);
 
         int color = applyOpacity(0xFFFFFFFF, skipT * 0.9f * opacity);
-        VertexConsumer consumer = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
+        VertexConsumer consumer = bufferSource.getBuffer(NarrativeCraftMod.dialogRenderType);
         Matrix4f matrix = poseStack.last().pose();
 
         consumer.addVertex(matrix, x, y, 0).setLight(LightTexture.FULL_BRIGHT).setColor(color);

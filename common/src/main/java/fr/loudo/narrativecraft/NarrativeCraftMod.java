@@ -48,6 +48,7 @@ import fr.loudo.narrativecraft.recording.actions.ActionRegister;
 import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ public class NarrativeCraftMod {
     public static final EventBus EVENT_BUS = new EventBus();
     private static final NarrativeCraftMod instance = new NarrativeCraftMod();
 
+    public static RenderType dialogRenderType;
     private final ChapterManager chapterManager = new ChapterManager();
     private final CharacterManager characterManager = new CharacterManager();
     private final RecordingManager recordingManager = new RecordingManager();

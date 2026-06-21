@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.editors.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -37,7 +38,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec3;
@@ -97,7 +97,7 @@ public class DialogPreviewPanel {
         float halfSize = 0.05f;
         int color = 0xFFFF0000;
         Matrix4f matrix = poseStack.last().pose();
-        VertexConsumer consumer = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
+        VertexConsumer consumer = bufferSource.getBuffer(NarrativeCraftMod.dialogRenderType);
         consumer.addVertex(matrix, -halfSize, -halfSize, 0)
                 .setLight(LightTexture.FULL_BRIGHT)
                 .setColor(color);
