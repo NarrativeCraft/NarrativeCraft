@@ -135,8 +135,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             playerSession.apply(firstChapter, firstScene);
             NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneStartEvent(playerSession, firstChapter, firstScene));
         } else {
-            story.resetState();
-            story.choosePathString(playerSession.getScene().knotName());
+            story.choosePathString(playerSession.getScene().knotName(), true);
         }
         advance();
     }
@@ -310,12 +309,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     private Line readNextLine() throws Exception {
         String raw;
         List<String> tags;
-        if (loadedFromSave) {
-            loadedFromSave = false;
-            raw = story.getCurrentText().stripTrailing();
-        } else {
-            raw = story.Continue().stripTrailing();
-        }
+        loadedFromSave = false;
+        raw = story.Continue().stripTrailing();
         tags = story.getCurrentTags();
         String[] parts = parseSpeaker(raw);
         String speaker = parts[0].isEmpty() ? TAG_2D : parts[0];
