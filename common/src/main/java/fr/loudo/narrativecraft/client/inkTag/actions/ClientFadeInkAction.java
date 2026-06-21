@@ -23,8 +23,10 @@
 
 package fr.loudo.narrativecraft.client.inkTag.actions;
 
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.FadeInkAction;
 import fr.loudo.narrativecraft.utils.FadeState;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -66,6 +68,16 @@ public class ClientFadeInkAction extends FadeInkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
+        if (clear) {
+            ClientPlayerSession session = (ClientPlayerSession) playerSession;
+            for (InkAction active : session.getActiveClientInkActions()) {
+                if (active instanceof ClientFadeInkAction) {
+                    active.stop();
+                }
+            }
+            isRunning = false;
+            return InkActionResult.ok();
+        }
         if (fadeInSeconds == 0 && staySeconds == 0 && fadeOutSeconds == 0) {
             isRunning = false;
             return InkActionResult.ok();

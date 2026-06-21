@@ -2,6 +2,9 @@
 
 ## [2.0.10]
 
+### Features
+- Clear current fade with "--clear" flag in fade tag
+
 ### Fixes
 
 - Unexpected behavior at renaming a scene
