@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class InkFileGenerator {
 
@@ -54,6 +55,34 @@ public class InkFileGenerator {
             Files.writeString(inkFile.toPath(), content);
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to write scene ink file for {}", scene.getName(), e);
+        }
+    }
+
+    public static void renameSceneInkFile(Scene oldScene, Scene newScene) {
+        File sceneDir = NarrativeCraftFileUtil.getSceneFolder(newScene);
+        File oldInkFile = new File(sceneDir, sceneInkFileName(oldScene));
+        File newInkFile = new File(sceneDir, sceneInkFileName(newScene));
+
+        // No previous ink file to preserve: just generate a fresh one
+        if (!oldInkFile.exists()) {
+            generateSceneInkFile(newScene);
+            return;
+        }
+
+        try {
+            String content = Files.readString(oldInkFile.toPath());
+            String oldKnot = sceneKnotName(oldScene);
+            String newKnot = sceneKnotName(newScene);
+
+            // Update the knot name (header and any self-divert) while keeping the user's content
+            content = content.replaceAll("\\b" + Pattern.quote(oldKnot) + "\\b", newKnot);
+
+            Files.writeString(newInkFile.toPath(), content);
+            if (!oldInkFile.equals(newInkFile)) {
+                oldInkFile.delete();
+            }
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Failed to rename scene ink file for {}", newScene.getName(), e);
         }
     }
 

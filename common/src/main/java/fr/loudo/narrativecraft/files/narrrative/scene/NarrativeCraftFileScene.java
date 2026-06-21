@@ -164,14 +164,7 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implement
                 if (!oldScene.getName()
                         .toLowerCase(Locale.ROOT)
                         .equals(entry.getName().toLowerCase(Locale.ROOT))) {
-                    // After the directory move, the old ink file is inside the new scene directory
-                    File sceneDir = NarrativeCraftFileUtil.getSceneFolder(entry);
-                    File oldInkFile = new File(
-                            sceneDir,
-                            oldScene.getName().toLowerCase(Locale.ROOT)
-                                    + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE);
-                    if (oldInkFile.exists()) oldInkFile.delete();
-                    InkFileGenerator.generateSceneInkFile(entry);
+                    InkFileGenerator.renameSceneInkFile(oldScene, entry);
                 }
                 InkFileGenerator.regenerateMainInk();
             }
