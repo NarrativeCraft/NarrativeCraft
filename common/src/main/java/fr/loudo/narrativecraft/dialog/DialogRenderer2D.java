@@ -24,11 +24,11 @@
 package fr.loudo.narrativecraft.dialog;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.FastColor;
 import org.joml.Matrix4f;
 
@@ -141,7 +141,7 @@ public class DialogRenderer2D extends DialogRenderer {
         pose.pushPose();
         pose.translate(centerX, centerY, 0);
 
-        VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.textBackground());
+        VertexConsumer consumer = graphics.bufferSource().getBuffer(NarrativeCraftMod.dialogRenderType);
         Matrix4f matrix = pose.last().pose();
         float hw = SKIP_INDICATOR_SIZE;
         float hh = SKIP_INDICATOR_SIZE;
