@@ -1,7 +1,7 @@
 # Changelog
 
-## [2.0.9]
+## [2.0.10]
 
 ### Fixes
 
-- Dialog background (3D world) not rendered if a shader is on in 1.21.1
+- Unexpected behavior at renaming a scene
