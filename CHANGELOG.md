@@ -5,3 +5,5 @@
 ### Fixes
 
 - Unexpected behavior at renaming a scene
+- 2D Dialog not rendered above ink actions
+- Skip indicator 2D not shown if a shader is on in 1.21.1

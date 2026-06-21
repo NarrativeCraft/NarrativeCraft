@@ -40,8 +40,8 @@ public class HuiMixinFabric {
         OnHudRender.cutsceneHudRender(graphics, deltaTracker);
         OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
         OnHudRender.interactionHudRender(graphics, deltaTracker);
-        OnHudRender.dialogHudRender(graphics, deltaTracker);
         OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
         OnHudRender.saveIconHudRender(graphics, deltaTracker);
+        OnHudRender.dialogHudRender(graphics, deltaTracker);
     }
 }
