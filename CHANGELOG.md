@@ -1,10 +1,7 @@
 # Changelog
 
-## [2.0.7]
+## [2.0.9]
 
 ### Fixes
 
-- Continue from save ends the story instantly if it's the last scene
-- Music or sfx from sound tag not paused if we pause the game
-- Editor not stopped if switching scene
-- Choice screen not re-opened if we pause the game then resume (happens if we unfocus the game)
+- Dialog background (3D world) not rendered if a shader is on in 1.21.1
