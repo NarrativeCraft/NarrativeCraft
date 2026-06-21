@@ -35,7 +35,7 @@ import fr.loudo.narrativecraft.utils.FadeState;
 @InkCommand(
         keyword = "fade",
         description = "Fades the screen to a solid color, holds for a duration, then fades back out.",
-        syntax = "fade <fadeIn:float> <stay:float> <fadeOut:float> [color:string=000000]",
+        syntax = "fade (fadeIn:float) (stay:float) (fadeOut:float) [color:string=000000] [--clear]",
         side = Side.CLIENT)
 public class FadeInkAction extends InkAction {
 
@@ -43,10 +43,16 @@ public class FadeInkAction extends InkAction {
     protected double staySeconds;
     protected double fadeOutSeconds;
     protected int color;
+    protected boolean clear;
     protected FadeState currentFadeState;
 
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
+        clear = cmd.flag("clear");
+        if (clear) {
+            return InkActionResult.ok();
+        }
+
         fadeInSeconds = cmd.getFloat("fadeIn");
         staySeconds = cmd.getFloat("stay");
         fadeOutSeconds = cmd.getFloat("fadeOut");
