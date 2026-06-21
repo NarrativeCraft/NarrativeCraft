@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.mixin;
 
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.audio.Channel;
 import fr.loudo.narrativecraft.client.inkTag.actions.sound.SoundInkInstance;
 import fr.loudo.narrativecraft.utils.VolumeAudio;
 import java.util.Map;
@@ -36,8 +37,11 @@ import net.minecraft.sounds.SoundSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SoundEngine.class)
 public abstract class SoundEngineMixin implements VolumeAudio {
@@ -55,6 +59,20 @@ public abstract class SoundEngineMixin implements VolumeAudio {
     @Shadow
     @Final
     private Multimap<SoundSource, SoundInstance> instanceBySource;
+
+    @Unique
+    private boolean narrativecraft$paused;
+
+    @Inject(method = "tick(Z)V", at = @At("HEAD"))
+    private void narrativecraft$pauseSoundInkInstances(boolean paused, CallbackInfo callbackInfo) {
+        if (!this.loaded || paused == this.narrativecraft$paused) return;
+        this.narrativecraft$paused = paused;
+        for (Map.Entry<SoundInstance, ChannelAccess.ChannelHandle> entry : this.instanceToChannel.entrySet()) {
+            if (entry.getKey() instanceof SoundInkInstance) {
+                entry.getValue().execute(paused ? Channel::pause : Channel::unpause);
+            }
+        }
+    }
 
     @Override
     public void narrativecraft$setVolume(SoundInstance soundInstance, float volume) {
