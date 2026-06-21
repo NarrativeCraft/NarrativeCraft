@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.session;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
 import fr.loudo.narrativecraft.client.narrative.story.StorySaveIconRenderer;
+import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
@@ -46,6 +47,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
     private final List<InkAction> activeClientInkActions = new ArrayList<>();
     private final Set<UUID> clickedInteractionPointIds = new HashSet<>();
+    private ChoiceScreen choiceScreen;
     private boolean inStory;
     private CameraView cameraView;
     private DialogRenderer mainDialog;
@@ -93,6 +95,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
         cameraView = null;
         stopNextDialog = false;
         inStory = false;
+        choiceScreen = null;
     }
 
     public boolean hasClickedInteractionPoint(UUID pointId) {
@@ -174,5 +177,13 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public boolean inCamera() {
         return cameraView != null || cutsceneDataSession.getKeyframePosition() != null;
+    }
+
+    public ChoiceScreen getChoiceScreen() {
+        return choiceScreen;
+    }
+
+    public void setChoiceScreen(ChoiceScreen choiceScreen) {
+        this.choiceScreen = choiceScreen;
     }
 }

@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.screens.story;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.screens.components.ChoiceButtonWidget;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.platform.Services;
@@ -179,6 +180,7 @@ public class ChoiceScreen extends Screen {
 
     private void select(int index) {
         Services.PACKET.sendToServer(new C2SChoiceSelected(index));
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().setChoiceScreen(null);
         minecraft.gui.setScreen(null);
     }
 }
