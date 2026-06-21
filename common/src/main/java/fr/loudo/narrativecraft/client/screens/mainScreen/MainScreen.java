@@ -96,17 +96,7 @@ public class MainScreen extends Screen {
     protected void init() {
         loadLogoInfo();
 
-        int buttonCount = 3 + (canContinue ? 1 : 0) + (finishedStory ? 1 : 0) + (isPause ? 1 : 0);
-        int totalButtonHeight = buttonCount * BUTTON_HEIGHT + (buttonCount - 1) * BUTTON_GAP;
-
-        int logoDisplayWidth = Math.min(width / 3, 500);
-        int logoDisplayHeight =
-                (hasLogo && logoNativeWidth > 0) ? (logoDisplayWidth * logoNativeHeight / logoNativeWidth) : 0;
-
-        int totalBlockHeight = (hasLogo ? logoDisplayHeight + LOGO_GAP : 0) + totalButtonHeight;
-        int blockStartY = (height - totalBlockHeight) / 2;
-
-        int buttonStartY = blockStartY + (hasLogo ? logoDisplayHeight + LOGO_GAP : 0);
+        int buttonStartY = getButtonStartY();
         int buttonX = MARGIN_LEFT;
 
         int currentY = buttonStartY;
@@ -114,7 +104,7 @@ public class MainScreen extends Screen {
         if (canContinue || isPause) {
             addRenderableWidget(Button.builder(Translation.message("screen.main.continue"), button -> {
                         if (isPause) {
-                            minecraft.setScreen(null);
+                            onClose();
                         } else {
                             close();
                             Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), true));
@@ -190,6 +180,21 @@ public class MainScreen extends Screen {
         }
     }
 
+    private int getButtonStartY() {
+        int buttonCount = 3 + (canContinue ? 1 : 0) + (finishedStory ? 1 : 0) + (isPause ? 1 : 0);
+        int totalButtonHeight = buttonCount * BUTTON_HEIGHT + (buttonCount - 1) * BUTTON_GAP;
+
+        int logoDisplayWidth = Math.min(width / 3, 500);
+        int logoDisplayHeight =
+                (hasLogo && logoNativeWidth > 0) ? (logoDisplayWidth * logoNativeHeight / logoNativeWidth) : 0;
+
+        int totalBlockHeight = (hasLogo ? logoDisplayHeight + LOGO_GAP : 0) + totalButtonHeight;
+        int blockStartY = (height - totalBlockHeight) / 2;
+
+        int buttonStartY = blockStartY + (hasLogo ? logoDisplayHeight + LOGO_GAP : 0);
+        return buttonStartY;
+    }
+
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
@@ -246,7 +251,14 @@ public class MainScreen extends Screen {
 
     @Override
     public void onClose() {
-        if (isPause) super.onClose();
+        if (isPause) {
+            ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+            if (session.getChoiceScreen() != null) {
+                minecraft.setScreen(session.getChoiceScreen());
+                return;
+            }
+            super.onClose();
+        }
     }
 
     private void loadLogoInfo() {

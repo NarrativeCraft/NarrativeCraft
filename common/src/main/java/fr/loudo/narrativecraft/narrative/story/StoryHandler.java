@@ -143,7 +143,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     public void start(String knotPath) throws Exception {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CNotifyClientPlayStory());
         NarrativeCraftMod.EVENT_BUS.post(new StoryStartEvent(playerSession));
-        story.choosePathString(knotPath);
+        story.choosePathString(knotPath, true);
         Chapter chapter = getChapterFromKnotName(knotPath);
         if (chapter == null) {
             stop();

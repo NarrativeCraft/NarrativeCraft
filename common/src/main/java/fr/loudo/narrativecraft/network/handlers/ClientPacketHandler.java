@@ -373,7 +373,9 @@ public class ClientPacketHandler {
     }
 
     public static void showChoices(S2CShowChoices packet) {
-        MINECRAFT.setScreen(new ChoiceScreen(packet.texts()));
+        ChoiceScreen choiceScreen = new ChoiceScreen(packet.texts());
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().setChoiceScreen(choiceScreen);
+        MINECRAFT.setScreen(choiceScreen);
     }
 
     public static void cameraAngleEnter(BiCameraAngleEnter packet) {
