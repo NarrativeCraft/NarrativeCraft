@@ -11,3 +11,7 @@
 - 2D Dialog not rendered above ink actions
 - Skip indicator 2D not shown if a shader is on in 1.21.1
 - Cyrillic characters not allowed in narrative names (chapters, scene, characters...)
+
+### Misc
+
+- Errors from story are shown in chat (and more precised in logs)

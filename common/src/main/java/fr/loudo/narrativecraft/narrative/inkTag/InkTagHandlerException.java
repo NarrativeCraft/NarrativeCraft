@@ -28,4 +28,12 @@ public class InkTagHandlerException extends Exception {
     public InkTagHandlerException(String message) {
         super(message);
     }
+
+    public InkTagHandlerException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public InkTagHandlerException(Throwable cause) {
+        super(cause);
+    }
 }
