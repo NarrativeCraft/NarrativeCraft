@@ -59,6 +59,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.world.entity.Entity;
 
@@ -86,12 +87,18 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         this.playerSession = playerSession;
         this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
         this.inkTagHandler = new InkTagHandler(playerSession, this, story);
+        story.onError = (message, type) -> {
+            onError(new InkTagHandlerException(type.name() + ": " + message));
+        };
     }
 
     public StoryHandler(PlayerSession playerSession, String saveJson) throws Exception {
         this.playerSession = playerSession;
         this.story = new Story(saveJson);
         this.inkTagHandler = new InkTagHandler(playerSession, this, story);
+        story.onError = (message, type) -> {
+            onError(new InkTagHandlerException(type.name() + ": " + message));
+        };
     }
 
     StoryHandler(
@@ -115,6 +122,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         this.ended = ended;
         this.finishedStory = finishedStory;
         this.loadedFromSave = true;
+        story.onError = (message, type) -> {
+            onError(new InkTagHandlerException(type.name() + ": " + message));
+        };
     }
 
     public void start() throws Exception {
@@ -198,7 +208,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             story.chooseChoiceIndex(index);
             advance();
         } catch (Exception exception) {
-            onError(new InkTagHandlerException(exception.getMessage()));
+            onError(new InkTagHandlerException(exception.getMessage(), exception));
         }
     }
 
@@ -237,10 +247,14 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         NarrativeCraftMod.LOGGER.error(
                 "Story error for player {}: {}",
                 playerSession.getPlayer().getName().getString(),
+                exception.getMessage(),
                 exception);
         playerSession
                 .getPlayer()
                 .sendSystemMessage(Translation.message("error.story").withStyle(ChatFormatting.RED));
+        playerSession
+                .getPlayer()
+                .sendSystemMessage(Component.literal(exception.getMessage()).withStyle(ChatFormatting.RED));
         stop();
     }
 
@@ -302,7 +316,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
             finish();
         } catch (Exception exception) {
-            onError(new InkTagHandlerException(exception.getMessage()));
+            onError(new InkTagHandlerException(exception.getMessage(), exception));
         }
     }
 

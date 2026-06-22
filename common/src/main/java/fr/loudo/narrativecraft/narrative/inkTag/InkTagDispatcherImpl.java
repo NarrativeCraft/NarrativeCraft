@@ -110,7 +110,7 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
         try {
             cmd = entry.spec().parse(tokens.subList(1, tokens.size()));
         } catch (IllegalArgumentException e) {
-            throw new InkTagHandlerException("Tag '" + keyword + "': " + e.getMessage());
+            throw new InkTagHandlerException("Tag '" + keyword + "': " + e.getMessage(), e);
         }
 
         InkAction action = entry.factory().get();
