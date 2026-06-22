@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.screens.mainScreen;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.screens.PaginationsItemsScreen;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.screens.Screen;
@@ -36,7 +37,8 @@ public class SelectChaptersScreen extends PaginationsItemsScreen<Chapter> {
     public SelectChaptersScreen(Screen lastScreen) {
         super(
                 Translation.message("screen.main.select_chapter.title"),
-                ClientNarrativeCraftMod.getInstance().getChapterManager().getList());
+                ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
+                NarrativeCraftFileUtil.getChaptersFolder());
         this.lastScreen = lastScreen;
     }
 

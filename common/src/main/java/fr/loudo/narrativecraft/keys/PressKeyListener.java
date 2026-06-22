@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
@@ -57,6 +58,7 @@ public class PressKeyListener {
                     Translation.message("chapter"),
                     ClientNarrativeCraftMod.getInstance().getChapterManager().getList(),
                     Chapter.class,
+                    NarrativeCraftFileUtil.getChaptersFolder(),
                     "");
             if (session.sessionSet()) {
                 SceneMenuScreen screen = new SceneMenuScreen(

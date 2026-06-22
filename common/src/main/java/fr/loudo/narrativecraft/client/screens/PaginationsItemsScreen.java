@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.minecraft.client.gui.components.Button;
@@ -35,6 +36,7 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Util;
 
 public abstract class PaginationsItemsScreen<T> extends Screen {
 
@@ -46,14 +48,20 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
     protected int gap = 10;
     protected int buttonWidth = 170;
     protected int buttonHeight = 20;
+    protected File folder;
 
     protected PaginationsItemsScreen(Component title) {
         super(title);
     }
 
     public PaginationsItemsScreen(Component title, List<T> list) {
+        this(title, list, (File) null);
+    }
+
+    public PaginationsItemsScreen(Component title, List<T> list, File folder) {
         super(title);
         this.list = list;
+        this.folder = folder;
     }
 
     public PaginationsItemsScreen(Component title, List<T> list, int page) {
@@ -94,6 +102,14 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
         StringWidget title = new StringWidget(this.title, this.font);
         title.setPosition(this.width / 2 - title.getWidth() / 2, 20 + this.font.lineHeight / 2 + 2);
         this.addRenderableWidget(title);
+
+        if (folder != null && this.minecraft != null && this.minecraft.hasSingleplayerServer()) {
+            Button folderButton = Button.builder(Component.literal(CustomFont.FOLDER), b -> Util.getPlatform()
+                            .openFile(folder))
+                    .bounds(title.getX() + title.getWidth() + 5, title.getY() + this.font.lineHeight / 2 - 10, 20, 20)
+                    .build();
+            this.addRenderableWidget(folderButton);
+        }
 
         // Search bar
         int searchY = 30 + this.font.lineHeight + 12;

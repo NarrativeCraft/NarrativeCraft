@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.CameraAngleE
 import fr.loudo.narrativecraft.client.screens.narrative.cutscene.CutsceneEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.interaction.InteractionEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.subscene.SubsceneEntryListScreen;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -64,6 +65,7 @@ public class SceneMenuScreen extends Screen {
                     scene.getAnimationManager().getList(),
                     this,
                     scene,
+                    NarrativeCraftFileUtil.getAnimationsFolder(scene),
                     String.format(
                             "%s;%s;%s",
                             scene.getChapter().getName(),
@@ -77,6 +79,7 @@ public class SceneMenuScreen extends Screen {
                     scene.getCameraAngleManager().getList(),
                     this,
                     scene,
+                    NarrativeCraftFileUtil.getCameraAnglesFolder(scene),
                     String.format(
                             "%s;%s;%s",
                             scene.getChapter().getName(),
@@ -89,6 +92,7 @@ public class SceneMenuScreen extends Screen {
                     scene.getCutsceneManager().getList(),
                     this,
                     scene,
+                    NarrativeCraftFileUtil.getCutscenesFolder(scene),
                     String.format(
                             "%s;%s;%s",
                             scene.getChapter().getName(),
@@ -101,6 +105,7 @@ public class SceneMenuScreen extends Screen {
                     scene.getInteractionManager().getList(),
                     this,
                     scene,
+                    NarrativeCraftFileUtil.getInteractionsFolder(scene),
                     String.format(
                             "%s;%s;%s",
                             scene.getChapter().getName(),
@@ -114,6 +119,7 @@ public class SceneMenuScreen extends Screen {
                     this,
                     Npc.class,
                     scene,
+                    NarrativeCraftFileUtil.getNpcFolder(scene),
                     String.format(
                             "%s;%s;%s",
                             scene.getChapter().getName(),
@@ -126,6 +132,7 @@ public class SceneMenuScreen extends Screen {
                     scene.getSubsceneManager().getList(),
                     this,
                     scene,
+                    NarrativeCraftFileUtil.getSubscenesFolder(scene),
                     String.format(
                             "%s;%s;%s",
                             scene.getChapter().getName(),

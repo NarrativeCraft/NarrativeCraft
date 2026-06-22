@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.screens.narrative.character;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -37,7 +38,13 @@ public class CharacterEntryListScreen extends NarrativeEntryListScreen<Character
             ClientNarrativeCraftMod.getInstance().getCharacterManager();
 
     public CharacterEntryListScreen(List<CharacterStory> entries, Screen lastScreen, String breadCrumb) {
-        super(Translation.message("character"), entries, lastScreen, CharacterStory.class, breadCrumb);
+        super(
+                Translation.message("character"),
+                entries,
+                lastScreen,
+                CharacterStory.class,
+                NarrativeCraftFileUtil.getCharactersFolder(),
+                breadCrumb);
     }
 
     @Override

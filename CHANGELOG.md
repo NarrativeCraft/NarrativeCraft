@@ -4,6 +4,7 @@
 
 ### Features
 - Clear current fade with "--clear" flag in fade tag
+- Folder button on narrative list to access data more easily (singleplayer only)
 
 ### Fixes
 
