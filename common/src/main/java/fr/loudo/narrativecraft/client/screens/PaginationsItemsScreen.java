@@ -1,5 +1,5 @@
 /*
- * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
  * Copyright (c) 2025 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,12 +30,12 @@ import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
+import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 
 public abstract class PaginationsItemsScreen<T> extends Screen {
