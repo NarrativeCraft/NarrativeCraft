@@ -35,4 +35,5 @@ public class CustomFont {
     public static final String BURGER_MENU = "\uE206";
     public static final String SETTINGS = "⚙";
     public static final String SEARCH = "\uE207";
+    public static final String FOLDER = "\uE208";
 }

@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIAction;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.client.screens.narrative.chapter.ChapterEntryEditScreen;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -42,6 +43,7 @@ public class ClientChapterNarrativeUIAction implements ClientNarrativeUIAction<C
                 parent,
                 Scene.class,
                 entry,
+                NarrativeCraftFileUtil.getScenesFolder(entry),
                 entry.getName());
     }
 

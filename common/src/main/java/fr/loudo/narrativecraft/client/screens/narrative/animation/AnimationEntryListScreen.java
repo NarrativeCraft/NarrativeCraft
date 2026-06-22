@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.screens.narrative.animation;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
+import java.io.File;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -38,8 +39,9 @@ public class AnimationEntryListScreen extends NarrativeEntryListScreen<Animation
             List<Animation> entries,
             Screen lastScreen,
             NarrativeEntry<?> parentEntry,
+            File folder,
             String breadCrumb) {
-        super(title, entries, lastScreen, Animation.class, parentEntry, breadCrumb);
+        super(title, entries, lastScreen, Animation.class, parentEntry, folder, breadCrumb);
     }
 
     @Override

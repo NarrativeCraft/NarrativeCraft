@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.screens.narrative.cameraangle;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import java.io.File;
 import java.util.List;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -37,7 +38,8 @@ public class CameraAngleEntryListScreen extends NarrativeEntryListScreen<CameraA
             List<CameraAngle> entries,
             Screen lastScreen,
             NarrativeEntry<?> parentEntry,
+            File folder,
             String breadCrumb) {
-        super(title, entries, lastScreen, CameraAngle.class, parentEntry, breadCrumb);
+        super(title, entries, lastScreen, CameraAngle.class, parentEntry, folder, breadCrumb);
     }
 }

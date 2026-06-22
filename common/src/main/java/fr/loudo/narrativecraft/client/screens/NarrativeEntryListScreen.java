@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.io.File;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -48,15 +49,16 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
     private Class<? extends NarrativeEntry<?>> entryClass;
     private NarrativeEntry<?> parentEntry;
 
-    public NarrativeEntryListScreen(Component title, List<E> entries, Class<E> entryClass, String breadCrumb) {
-        super(title, entries);
+    public NarrativeEntryListScreen(
+            Component title, List<E> entries, Class<E> entryClass, File folder, String breadCrumb) {
+        super(title, entries, folder);
         this.entryClass = entryClass;
         this.breadCrumb = breadCrumb;
     }
 
     public NarrativeEntryListScreen(
-            Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, String breadCrumb) {
-        this(title, entries, lastScreen, entryClass, null, breadCrumb);
+            Component title, List<E> entries, Screen lastScreen, Class<E> entryClass, File folder, String breadCrumb) {
+        this(title, entries, lastScreen, entryClass, null, folder, breadCrumb);
     }
 
     public NarrativeEntryListScreen(
@@ -65,8 +67,9 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
             Screen lastScreen,
             Class<E> entryClass,
             NarrativeEntry<?> parentEntry,
+            File folder,
             String breadCrumb) {
-        this(title, entries, entryClass, breadCrumb);
+        this(title, entries, entryClass, folder, breadCrumb);
         this.lastScreen = lastScreen;
         this.entryClass = entryClass;
         this.parentEntry = parentEntry;
