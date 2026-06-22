@@ -38,7 +38,7 @@ import net.minecraft.world.entity.player.PlayerModelType;
 public class Utils {
 
     public static final String ONLY_NUMBERS = "^[0-9]*$";
-    public static final String NO_SPECIAL_CHARACTERS = "^[a-zA-Z0-9_ ]*$";
+    public static final String NO_SPECIAL_CHARACTERS = "^[\\p{L}\\p{N}_ ]*$";
 
     public static void sendError(Component message, Player player) {
         if (player == null) return;
