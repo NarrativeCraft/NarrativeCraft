@@ -8,6 +8,7 @@
 - 2D Dialog not rendered above ink actions
 - Skip indicator 2D not shown if a shader is on
 - Npc skin cannot be applied
+- Not teleported to first camera in cutscene editor if no animations
 
 ### Misc
 

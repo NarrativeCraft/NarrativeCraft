@@ -52,7 +52,6 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
 
     private final Cutscene cutscene;
     private final List<Playback> playbacks = new ArrayList<>();
-    private final List<ICutsceneLayer> layersAdded = new ArrayList<>();
     private final PlayerSession playerSession;
     private int totalTick;
     private int currentTick;
@@ -125,7 +124,8 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
             Playback playback = playbacks.get(0);
             position = playback.getFirstPosition();
         } else {
-            for (ICutsceneLayer layer : layersAdded) {
+            for (CutsceneMakerEditorLayer editorLayer : cutscene.getEditorLayers()) {
+                ICutsceneLayer layer = editorLayer.getLayer();
                 if (layer instanceof CameraLayer cameraLayer) {
                     List<CameraKeyframe> cameraKeyframes = cameraLayer.getSortedCameraKeyframes();
                     if (cameraKeyframes.isEmpty()) continue;
@@ -176,14 +176,6 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         currentTick = tick;
     }
 
-    public void addLayer(ICutsceneLayer layer) {
-        layersAdded.add(layer);
-    }
-
-    public void removeLayer(ICutsceneLayer layer) {
-        layersAdded.remove(layer);
-    }
-
     public void play() {
         if (currentTick >= totalTick) {
             Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(totalTick));
@@ -212,10 +204,6 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
 
     public List<Playback> getPlaybacks() {
         return playbacks;
-    }
-
-    public List<ICutsceneLayer> getLayersAdded() {
-        return layersAdded;
     }
 
     public PlayerSession getPlayerSession() {
