@@ -62,6 +62,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
 
     @Override
     public void init() {
+        playerSession.apply(interaction.getScene().getChapter(), interaction.getScene());
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiInteractionEnter(interaction, environment));
         if (environment == NarrativeEnvironment.DEVELOPMENT) teleportToEditorOrigin();
     }

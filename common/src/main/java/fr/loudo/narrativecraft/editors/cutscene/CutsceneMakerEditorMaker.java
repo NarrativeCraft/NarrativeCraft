@@ -83,6 +83,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void init() {
+        playerSession.apply(cutscene.getScene().getChapter(), cutscene.getScene());
         for (Subscene subscene : cutscene.getSubscenes()) {
             for (Animation animation : subscene.getAnimations()) {
                 if (!animation.initialize()) {

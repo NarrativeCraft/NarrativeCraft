@@ -89,6 +89,9 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void init() {
+        if (cameraAngle.getScene() != null) {
+            playerSession.apply(cameraAngle.getScene().getChapter(), cameraAngle.getScene());
+        }
         playerSession.changeGameMode(GameType.SPECTATOR);
         for (CharacterPlacement characterPlacement : cameraAngle.getCharacterPlacements()) {
             Services.PACKET.sendToPlayer(
