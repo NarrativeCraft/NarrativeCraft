@@ -87,6 +87,9 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
     }
 
     public PlayerSkin.Model getModelType() {
+        if (modelType == null) {
+            return PlayerSkin.Model.WIDE;
+        }
         return modelType;
     }
 
@@ -121,6 +124,6 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
 
     @Override
     public String toFileName() {
-        return name.toLowerCase().replace(" ", "_") + NarrativeCraftFileDefault.EXTENSION_DATA_FILE;
+        return name.toLowerCase().replace(" ", "_");
     }
 }
