@@ -49,6 +49,7 @@ import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
@@ -63,8 +64,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.*;
 
 public class CameraAngleMakerEditorMaker implements EditorMaker {
 
