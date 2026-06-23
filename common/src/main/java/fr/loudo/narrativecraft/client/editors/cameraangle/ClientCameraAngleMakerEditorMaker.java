@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.client.editors.cameraangle;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.widgets.*;
 import fr.loudo.narrativecraft.client.screens.ClearScreen;
@@ -411,11 +412,14 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             playerSession.removeDialog3D(renderer);
         }
         stoppingRenderers.clear();
+        DialogData global = NarrativeCraftMod.getInstance().getGlobalDialogData();
         List<DialogPreviewEntry> entries = new ArrayList<>();
         for (CameraViewDialogSetup setup : previewCameraView.getDialogSetups()) {
             Entity entity = getEntityForPlacement(setup.getCharacterPlacementId());
             if (entity == null) continue;
-            DialogData data = setup.getDialogData();
+            DialogData characterData = resolveCharacterDialogData(setup.getCharacterPlacementId());
+            DialogData data = DialogData.resolve(global, characterData, setup.getDialogData());
+            setup.setDialogData(data);
             DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
             renderer.onStopped(() -> {
                 if (activeDialogRenderer == renderer) activeDialogRenderer = null;
@@ -509,6 +513,15 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     public void closeAdvancedPanel() {
         advancedPanel.setVisible(false);
+    }
+
+    private DialogData resolveCharacterDialogData(UUID placementId) {
+        for (CharacterPlacement placement : characterPlacements) {
+            if (placement.getId().equals(placementId) && placement.getCharacterStory() != null) {
+                return placement.getCharacterStory().getDialogData();
+            }
+        }
+        return null;
     }
 
     private String resolvePlacementLabel(UUID placementId) {
