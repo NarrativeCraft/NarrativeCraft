@@ -45,6 +45,11 @@ public class NarrativeCraftFileNpc extends AbstractNarrativeCraftFileSceneJsonEn
     }
 
     @Override
+    protected boolean entryHasOwnFolder() {
+        return true;
+    }
+
+    @Override
     protected Scene getScene(Npc entry) {
         return entry.getScene();
     }

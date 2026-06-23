@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends NarrativeEntry<?>>
         extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<T> {
@@ -53,6 +54,10 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
 
     protected abstract int writeJson(T entry, File file);
 
+    protected boolean entryHasOwnFolder() {
+        return false;
+    }
+
     private File getEntryFolder(T entry) {
         Scene scene = getScene(entry);
         return createDirectory(NarrativeCraftFileUtil.getSceneFolder(scene), getSubFolderName());
@@ -61,7 +66,17 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
     @Override
     public int create(T entry) {
         File folder = getEntryFolder(entry);
-        File file = createFile(folder, entry.toFileName());
+        File file;
+        if (entryHasOwnFolder()) {
+            File entryDirectory = createDirectory(folder, entry.toFileName());
+            if (entryDirectory == null) {
+                NarrativeCraftMod.LOGGER.error("Failed to create directory {}", entry.getName());
+                return OPERATION_FAILED;
+            }
+            file = createFile(entryDirectory, DATA_FILE_NAME);
+        } else {
+            file = createFile(folder, entry.toFileName());
+        }
         if (file == null) {
             NarrativeCraftMod.LOGGER.error("Failed to create file {}", entry.getName());
             return OPERATION_FAILED;
@@ -75,9 +90,12 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
         T oldEntry = getOldEntry(entry);
         try {
             if (oldEntry != null && !oldEntry.toFileName().equals(entry.toFileName())) {
-                File oldFile = new File(folder, oldEntry.toFileName());
-                File newFile = new File(folder, entry.toFileName());
-                Files.move(oldFile.toPath(), newFile.toPath());
+                File oldTarget = new File(folder, oldEntry.toFileName());
+                File newTarget = new File(folder, entry.toFileName());
+                Files.move(oldTarget.toPath(), newTarget.toPath());
+            }
+            if (entryHasOwnFolder()) {
+                return writeJson(entry, new File(new File(folder, entry.toFileName()), DATA_FILE_NAME));
             }
             return writeJson(entry, new File(folder, entry.toFileName()));
         } catch (IOException e) {
@@ -88,12 +106,13 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
 
     @Override
     public int delete(T entry) {
-        File file = new File(getEntryFolder(entry), entry.toFileName());
-        if (!file.exists()) {
+        File target = new File(getEntryFolder(entry), entry.toFileName());
+        if (!target.exists()) {
             NarrativeCraftMod.LOGGER.error("Failed to delete {} because file doesn't exist", entry.getName());
             return OPERATION_FAILED;
         }
-        if (!file.delete()) {
+        boolean deleted = entryHasOwnFolder() ? deleteDirectory(target) : target.delete();
+        if (!deleted) {
             NarrativeCraftMod.LOGGER.error("Failed to delete {}", entry.getName());
             return OPERATION_FAILED;
         }
@@ -104,12 +123,84 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
     public List<DeserializationResult<T>> deserialize() {
         List<DeserializationResult<T>> results = new ArrayList<>();
 
+        migrateLooseEntries();
+
         registerDeserializer(gsonBuilder);
         Gson gson = gsonBuilder.create();
 
+        forEachEntryFolder(entryFolder -> {
+            File[] entryFiles = entryFolder.listFiles();
+            if (entryFiles == null) return;
+
+            for (File entryFile : entryFiles) {
+                File dataFile;
+                if (entryHasOwnFolder()) {
+                    if (!entryFile.isDirectory()) continue;
+                    dataFile = new File(entryFile, DATA_FILE_NAME);
+                } else {
+                    dataFile = entryFile;
+                }
+                try {
+                    String content = Files.readString(dataFile.toPath());
+                    T entry = deserializeEntry(gson, content);
+                    if (entry == null) {
+                        throw new Exception(String.format("Deserialization of %s returned null", entryFile.getName()));
+                    }
+                    results.add(new DeserializationResult<>(entry, false, entryFile.getName()));
+                } catch (Exception e) {
+                    NarrativeCraftMod.LOGGER.error("Failed to init {}", entryFile.getName(), e);
+                    results.add(new DeserializationResult<>(null, true, entryFile.getName()));
+                }
+            }
+        });
+
+        return results;
+    }
+
+    private void migrateLooseEntries() {
+        if (!entryHasOwnFolder()) return;
+
+        forEachEntryFolder(entryFolder -> {
+            File[] children = entryFolder.listFiles();
+            if (children == null) return;
+
+            for (File child : children) {
+                if (!child.isFile() || !child.getName().endsWith(EXTENSION_DATA_FILE)) continue;
+
+                String folderName =
+                        child.getName().substring(0, child.getName().length() - EXTENSION_DATA_FILE.length());
+                File entryDirectory = new File(entryFolder, folderName);
+                if (entryDirectory.exists() && !entryDirectory.isDirectory()) {
+                    NarrativeCraftMod.LOGGER.warn(
+                            "Skipping migration of {} because {} exists and is not a directory",
+                            child.getName(),
+                            entryDirectory.getName());
+                    continue;
+                }
+                File dataFile = new File(entryDirectory, DATA_FILE_NAME);
+                if (dataFile.exists()) {
+                    NarrativeCraftMod.LOGGER.warn(
+                            "Skipping migration of {} because {} already exists", child.getName(), dataFile.getPath());
+                    continue;
+                }
+                if (!entryDirectory.exists() && !entryDirectory.mkdir()) {
+                    NarrativeCraftMod.LOGGER.error("Failed to create migration directory {}", entryDirectory.getPath());
+                    continue;
+                }
+                try {
+                    Files.move(child.toPath(), dataFile.toPath());
+                    NarrativeCraftMod.LOGGER.info("Migrated {} to {}", child.getName(), dataFile.getPath());
+                } catch (IOException e) {
+                    NarrativeCraftMod.LOGGER.error("Failed to migrate {}", child.getName(), e);
+                }
+            }
+        });
+    }
+
+    private void forEachEntryFolder(Consumer<File> consumer) {
         File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
         File[] chapterDirs = chaptersFolder.listFiles();
-        if (chapterDirs == null) return results;
+        if (chapterDirs == null) return;
 
         for (File chapterDir : chapterDirs) {
             File scenesFolder = new File(chapterDir, SCENES_FOLDER_NAME);
@@ -118,26 +209,9 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
 
             for (File sceneDir : sceneDirs) {
                 File entryFolder = new File(sceneDir, getSubFolderName());
-                File[] entryFiles = entryFolder.listFiles();
-                if (entryFiles == null) continue;
-
-                for (File entryFile : entryFiles) {
-                    try {
-                        String content = Files.readString(entryFile.toPath());
-                        T entry = deserializeEntry(gson, content);
-                        if (entry == null) {
-                            throw new Exception(
-                                    String.format("Deserialization of %s returned null", entryFile.getName()));
-                        }
-                        results.add(new DeserializationResult<>(entry, false, entryFile.getName()));
-                    } catch (Exception e) {
-                        NarrativeCraftMod.LOGGER.error("Failed to init {}", entryFile.getName(), e);
-                        results.add(new DeserializationResult<>(null, true, entryFile.getName()));
-                    }
-                }
+                if (!entryFolder.exists()) continue;
+                consumer.accept(entryFolder);
             }
         }
-
-        return results;
     }
 }

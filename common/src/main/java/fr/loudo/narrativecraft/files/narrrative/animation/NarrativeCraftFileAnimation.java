@@ -202,6 +202,14 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
                         ICharacterStory characterStory = NarrativeCraftMod.getInstance()
                                 .getCharacterManager()
                                 .resolveCharacter(header.characterId(), scene);
+                        if (characterStory == null) {
+                            characterStory = NarrativeCraftMod.getInstance()
+                                    .getCharacterManager()
+                                    .get(0);
+                        }
+                        if (characterStory == null) {
+                            continue;
+                        }
                         Animation animation = new Animation(
                                 header.recordingId(), header.name(), scene, header.totalTick(), characterStory);
 
