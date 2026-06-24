@@ -94,7 +94,9 @@ public class SubsceneInkAction extends InkAction {
                 Vec3 firstPosition = playback.getFirstPosition();
 
                 if (oldMasterEntity.position().distanceTo(firstPosition) <= 5.0) {
-                    playback.moveTo(0);
+                    playback.rewindTo(0);
+                    playback.play();
+                    NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
                     continue;
                 }
 
@@ -164,7 +166,9 @@ public class SubsceneInkAction extends InkAction {
         if (blocking) {
             return InkActionResult.block();
         }
-        isRunning = false;
+        if (!loop) {
+            isRunning = false;
+        }
         return InkActionResult.ok();
     }
 

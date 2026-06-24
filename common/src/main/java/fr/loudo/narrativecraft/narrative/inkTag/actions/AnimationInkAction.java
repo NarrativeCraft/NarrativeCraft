@@ -90,9 +90,11 @@ public class AnimationInkAction extends InkAction {
             Entity oldMasterEntity = playback.getMasterEntity();
             Vec3 firstPosition = playback.getFirstPosition();
 
-            // If entity is close to spawn point, just move it
+            // If entity is close to spawn point, just rewind it in place
             if (oldMasterEntity.position().distanceTo(firstPosition) <= 5.0) {
-                playback.moveTo(0);
+                playback.rewindTo(0);
+                playback.play();
+                NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
                 return;
             }
 
@@ -159,7 +161,9 @@ public class AnimationInkAction extends InkAction {
         if (blocking) {
             return InkActionResult.block();
         }
-        isRunning = false;
+        if (!loop) {
+            isRunning = false;
+        }
         return InkActionResult.ok();
     }
 
