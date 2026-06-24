@@ -10,3 +10,4 @@
 - Camera angle not taking custom global dialog data
 - Can't stop sound from ink tag if it started without fade
 - Animation and subscene tag loop not working
+- Shake tag `0 0 0` not clearing active shakes

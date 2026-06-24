@@ -24,8 +24,10 @@
 package fr.loudo.narrativecraft.client.inkTag.actions;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.ShakeScreenInkAction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -89,6 +91,12 @@ public class ClientShakeScreenInkAction extends ShakeScreenInkAction {
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
         if (noiseShakeStrength == 0 && shakeDecayRate == 0 && noiseShakeSpeed == 0) {
+            ClientPlayerSession session = (ClientPlayerSession) playerSession;
+            for (InkAction active : session.getActiveClientInkActions()) {
+                if (active instanceof ClientShakeScreenInkAction) {
+                    active.stop();
+                }
+            }
             isRunning = false;
             return InkActionResult.ok();
         }
