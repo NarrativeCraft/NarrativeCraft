@@ -214,9 +214,14 @@ public final class InkTagHandler {
 
         if (action.getSide() == Side.SERVER) {
             InkActionResult result = action.execute(playerSession);
-            if (!result.isError() && result.isBlock()) {
+            if (result.isError()) {
+                return result;
+            }
+            if (result.isBlock()) {
                 runningServerActions.add(action);
                 blockingAction = action;
+            } else if (action.isRunning()) {
+                runningServerActions.add(action);
             } else {
                 action.setRunning(false);
             }
