@@ -121,7 +121,7 @@ public class ClientSoundInkAction extends SoundInkAction {
                 }
             }
         }
-        if (soundName.equals("all") || totalTick == 0) {
+        if (soundAction.equals("stop") && (soundName.equals("all") || totalTick == 0)) {
             isRunning = false;
         }
 
