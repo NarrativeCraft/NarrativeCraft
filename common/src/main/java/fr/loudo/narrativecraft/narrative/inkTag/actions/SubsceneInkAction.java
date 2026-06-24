@@ -181,11 +181,7 @@ public class SubsceneInkAction extends InkAction {
             }
         }
         for (Playback playback : toRemove) {
-            if (unique) {
-                playback.stopAndKill();
-            } else {
-                playback.stop();
-            }
+            playback.stopAndKill();
             NarrativeCraftMod.getInstance().getPlaybackManager().remove(playback);
         }
     }

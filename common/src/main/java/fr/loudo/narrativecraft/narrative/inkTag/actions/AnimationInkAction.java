@@ -171,11 +171,7 @@ public class AnimationInkAction extends InkAction {
         for (Playback running :
                 NarrativeCraftMod.getInstance().getPlaybackManager().getList()) {
             if (running.getAnimation().equals(animation)) {
-                if (unique) {
-                    running.stopAndKill();
-                } else {
-                    running.stop();
-                }
+                running.stopAndKill();
                 NarrativeCraftMod.getInstance().getPlaybackManager().remove(running);
                 return;
             }

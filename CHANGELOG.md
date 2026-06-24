@@ -11,3 +11,4 @@
 - Can't stop sound from ink tag if it started without fade
 - Animation and subscene tag loop not working
 - Shake tag `0 0 0` not clearing active shakes
+- Animation and subscene stop not killing entities
