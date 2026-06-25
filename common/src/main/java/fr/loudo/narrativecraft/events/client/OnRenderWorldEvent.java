@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.events.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
@@ -34,9 +35,24 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import org.joml.Matrix4fStack;
+import org.joml.Matrix4fc;
 
 public class OnRenderWorldEvent {
+
+    public static void renderWorldImmediate(PoseStack poseStack, Matrix4fc modelViewMatrix, DeltaTracker deltaTracker) {
+        SubmitNodeStorage storage = new SubmitNodeStorage();
+        renderWorld(storage, poseStack, deltaTracker);
+
+        Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
+        modelViewStack.pushMatrix();
+        modelViewStack.mul(modelViewMatrix);
+        Minecraft.getInstance().gameRenderer.featureRenderDispatcher().renderAllFeatures(storage);
+        modelViewStack.popMatrix();
+    }
 
     public static void renderWorld(SubmitNodeCollector collector, PoseStack poseStack, DeltaTracker deltaTracker) {
         CutsceneMakerEditorPathRenderer.render(collector, poseStack, deltaTracker);

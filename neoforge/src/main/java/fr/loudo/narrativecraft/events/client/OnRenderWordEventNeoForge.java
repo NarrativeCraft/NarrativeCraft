@@ -23,23 +23,25 @@
 
 package fr.loudo.narrativecraft.events.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(NarrativeCraftMod.MOD_ID)
 public class OnRenderWordEventNeoForge {
 
     public OnRenderWordEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(OnRenderWordEventNeoForge::onSubmitCustomGeometry);
+        NeoForge.EVENT_BUS.addListener(OnRenderWordEventNeoForge::onRenderWorld);
     }
 
-    private static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
-        DeltaTracker deltaTracker = Minecraft.getInstance().getDeltaTracker();
-        OnRenderWorldEvent.renderWorld(event.getSubmitNodeCollector(), event.getPoseStack(), deltaTracker);
+    private static void onRenderWorld(RenderLevelStageEvent.AfterLevel event) {
+        OnRenderWorldEvent.renderWorldImmediate(
+                new PoseStack(),
+                event.getModelViewMatrix(),
+                Minecraft.getInstance().getDeltaTracker());
     }
 }
