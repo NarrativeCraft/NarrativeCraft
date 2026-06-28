@@ -15,3 +15,4 @@
 
 ### Misc
 - NPC name tag are now not rendered
+- Skip indicator on dialogs is hidden when we go to the next dialog

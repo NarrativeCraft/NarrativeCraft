@@ -216,7 +216,7 @@ public class DialogRenderer3D extends DialogRenderer {
             float opacity,
             float partialTick) {
         float skipT = getSkipProgress(partialTick);
-        if (skipT <= 0f) return;
+        if (skipT <= 0f || animator.isStopping()) return;
 
         float finalX = totalWidth - data.getPaddingX() - SKIP_INDICATOR_SIZE;
         float y = totalHeight - SKIP_INDICATOR_SIZE / 2;

@@ -131,7 +131,7 @@ public class DialogRenderer2D extends DialogRenderer {
     private void renderSkipIndicator(
             GuiGraphics graphics, float totalWidth, float totalHeight, float opacity, float partialTick) {
         float skipT = getSkipProgress(partialTick);
-        if (skipT <= 0f) return;
+        if (skipT <= 0f || animator.isStopping()) return;
 
         int color = applyOpacity(0xFFFFFFFF, skipT * 0.9f * opacity);
         float centerX = totalWidth - (4f * data.getScale()) - SKIP_INDICATOR_SIZE + SKIP_SLIDE_OFFSET * (1f - skipT);
