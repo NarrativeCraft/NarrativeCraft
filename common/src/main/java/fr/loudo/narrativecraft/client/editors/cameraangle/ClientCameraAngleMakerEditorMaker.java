@@ -179,8 +179,8 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                     previewCameraView.getPosition().x,
                     previewCameraView.getPosition().y,
                     previewCameraView.getPosition().z,
-                    (float) previewCameraView.getRotation().x,
                     (float) previewCameraView.getRotation().y,
+                    (float) previewCameraView.getRotation().x,
                     player.onGround()));
             Minecraft.getInstance().options.hideGui = true;
         }

@@ -65,6 +65,6 @@ public class UtilsClient {
         player.setYRot((float) rotation.y);
         player.setYHeadRot((float) rotation.y);
         player.connection.send(new ServerboundMovePlayerPacket.PosRot(
-                position.x, position.y, position.z, (float) rotation.x, (float) rotation.y, player.onGround()));
+                position.x, position.y, position.z, (float) rotation.y, (float) rotation.x, player.onGround()));
     }
 }

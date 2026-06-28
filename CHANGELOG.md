@@ -24,6 +24,7 @@
 - Music from main menu not looping
 - Skin of npc not sent if changing dialog data if no session set
 - Editing a text in text tag making scroll text sound
+- Rotation sent for teleporting pitch and yaw inverted
 
 ### Misc
 - NPC name tag are now not rendered
