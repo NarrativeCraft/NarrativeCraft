@@ -15,6 +15,7 @@
   ],
   "client": [
     "ContainerEventHandlerMixinFabric",
+    "EntityRendererMixinFabric",
     "GameRendererMixinFabric",
     "GuiMixinFabric",
     "KeyboardHandlerMixinFabric",

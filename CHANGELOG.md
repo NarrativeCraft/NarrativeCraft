@@ -12,3 +12,6 @@
 - Animation and subscene tag loop not working
 - Shake tag `0 0 0` not clearing active shakes
 - Animation and subscene stop not killing entities
+
+### Misc
+- NPC name tag are now not rendered
