@@ -167,6 +167,7 @@ public class MainScreen extends Screen {
 
         if (!isPause) {
             leaveScreenButton = Button.builder(Translation.message("screen.main.leave_screen"), button -> {
+                        minecraft.getSoundManager().stop(MAIN_MUSIC_INSTANCE);
                         Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
                     })
                     .bounds(width - BUTTON_WIDTH - 10, 10, BUTTON_WIDTH, BUTTON_HEIGHT)
