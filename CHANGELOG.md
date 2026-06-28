@@ -18,7 +18,7 @@
 - Bandwidth optimization for sending skins
 - Camera rotation rotating only one side in cutscene if rotation applied
 - Template characters saved in memory even without saving in camera angle editor
-
+- Camera angle not renaming correctly
 
 ### Misc
 - NPC name tag are now not rendered

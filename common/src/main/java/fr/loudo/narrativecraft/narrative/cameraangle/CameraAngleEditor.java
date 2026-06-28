@@ -77,21 +77,22 @@ public class CameraAngleEditor implements NarrativeEntryEditor<CameraAnglePayloa
         CameraAngle cameraAngle = resolve(entryId, payload);
         if (cameraAngle == null) return;
 
-        String oldName = cameraAngle.getName();
-        String oldDescription = cameraAngle.getDescription();
+        CameraAngle updatedCameraAngle =
+                new CameraAngle(entryId, payload.getName(), payload.getDescription(), cameraAngle.getScene());
+        updatedCameraAngle.getCameras().addAll(cameraAngle.getCameras());
+        updatedCameraAngle.getCharacterPlacements().addAll(cameraAngle.getCharacterPlacements());
+        updatedCameraAngle.getTemplateReferences().addAll(cameraAngle.getTemplateReferences());
 
-        cameraAngle.setName(payload.getName());
-        cameraAngle.setDescription(payload.getDescription());
-
-        int result = NarrativeCraftFileRegistry.getInstance().edit(cameraAngle);
+        int result = NarrativeCraftFileRegistry.getInstance().edit(updatedCameraAngle);
 
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            cameraAngle.setName(oldName);
-            cameraAngle.setDescription(oldDescription);
             ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
             UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
             return;
         }
+
+        cameraAngle.setName(payload.getName());
+        cameraAngle.setDescription(payload.getDescription());
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }
