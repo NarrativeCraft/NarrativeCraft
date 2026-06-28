@@ -552,6 +552,10 @@ public class ServerPacketHandler {
             storyHandler.stop();
         }
 
+        if (packet.newGame()) {
+            NarrativeCraftMod.getInstance().getSaveFileManager().removeSaveFile((ServerPlayer) player);
+        }
+
         try {
             storyHandler = null;
             if (packet.fromSave()) {

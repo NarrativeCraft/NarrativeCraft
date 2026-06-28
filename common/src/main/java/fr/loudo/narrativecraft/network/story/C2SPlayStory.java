@@ -31,7 +31,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SPlayStory(Optional<String> stitchName, boolean fromSave) implements CustomPacketPayload {
+public record C2SPlayStory(Optional<String> stitchName, boolean fromSave, boolean newGame)
+        implements CustomPacketPayload {
 
     public static final Type<C2SPlayStory> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_story"));
@@ -41,6 +42,8 @@ public record C2SPlayStory(Optional<String> stitchName, boolean fromSave) implem
             C2SPlayStory::stitchName,
             ByteBufCodecs.BOOL,
             C2SPlayStory::fromSave,
+            ByteBufCodecs.BOOL,
+            C2SPlayStory::newGame,
             C2SPlayStory::new);
 
     @Override

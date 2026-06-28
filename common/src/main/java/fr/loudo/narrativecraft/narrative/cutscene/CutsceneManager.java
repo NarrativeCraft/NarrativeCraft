@@ -43,5 +43,4 @@ public class CutsceneManager extends NarrativeManager<Cutscene> implements ICuts
             cutscene.getSubscenes().removeIf(subscene -> subscene.getId().equals(toRemove.getId()));
         }
     }
-
 }
