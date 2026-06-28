@@ -116,7 +116,7 @@ public abstract class CameraMixin {
     private void narrativecraft$overrideCamera(Vec3 position, Vec3 rotation) {
         this.setPosition(position);
         this.setRotation((float) rotation.y, (float) rotation.x);
-        this.rotation.rotateZ(-(float) Math.toRadians(rotation.z()));
+        this.rotation.rotateZ((float) Math.toRadians(rotation.z()));
     }
 
     @Inject(method = "calculateFov", at = @At("HEAD"), cancellable = true)

@@ -50,7 +50,7 @@ public class CameraWireframeRenderer {
         Matrix4f rotationMatrix = new Matrix4f()
                 .rotateY((float) Math.toRadians(-rotation.y + 180))
                 .rotateX((float) Math.toRadians(-rotation.x))
-                .rotateZ((float) Math.toRadians(rotation.z));
+                .rotateZ((float) Math.toRadians(-rotation.z));
 
         float ox = (float) (worldPos.x - cameraPos.x);
         float oy = (float) (worldPos.y - cameraPos.y);

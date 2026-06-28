@@ -16,6 +16,7 @@
 - Can open character position screen camera angle in production mode (and sometimes may cause a crash)
 - Playing one story to one player in multiplayer had characters disappearing
 - Bandwidth optimization for sending skins
+- Camera rotation rotating only one side in cutscene if rotation applied
 
 ### Misc
 - NPC name tag are now not rendered
