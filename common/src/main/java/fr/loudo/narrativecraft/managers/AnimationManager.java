@@ -27,4 +27,11 @@ import fr.loudo.narrativecraft.api.managers.IAnimationManager;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 
-public class AnimationManager extends NarrativeManager<Animation> implements IAnimationManager {}
+public class AnimationManager extends NarrativeManager<Animation> implements IAnimationManager {
+    @Override
+    public void remove(Animation item) {
+        super.remove(item);
+        item.getScene().getSubsceneManager().removeAnimation(item);
+        item.getScene().getCutsceneManager().removeAnimation(item);
+    }
+}
