@@ -208,7 +208,6 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         for (Animation animation : resolveAnimations(reference)) {
             CharacterPlacement placement = createPlacementFromAnimation(animation, reference.id());
             if (placement == null) continue;
-            cameraAngle.getCharacterPlacements().add(placement);
             spawnTemplateEntity(placement, animation);
             createdIds.add(placement.getId());
             String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
