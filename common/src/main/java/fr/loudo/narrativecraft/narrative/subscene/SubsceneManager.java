@@ -25,5 +25,19 @@ package fr.loudo.narrativecraft.narrative.subscene;
 
 import fr.loudo.narrativecraft.api.managers.ISubsceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
 
-public class SubsceneManager extends NarrativeManager<Subscene> implements ISubsceneManager {}
+public class SubsceneManager extends NarrativeManager<Subscene> implements ISubsceneManager {
+
+    @Override
+    public void remove(Subscene item) {
+        super.remove(item);
+        item.getScene().getCutsceneManager().removeSubscene(item);
+    }
+
+    public void removeAnimation(Animation toRemove) {
+        for (Subscene subscene : list) {
+            subscene.getAnimations().removeIf(animation -> animation.getId().equals(toRemove.getId()));
+        }
+    }
+}

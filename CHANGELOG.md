@@ -19,6 +19,7 @@
 - Camera rotation rotating only one side in cutscene if rotation applied
 - Template characters saved in memory even without saving in camera angle editor
 - Camera angle not renaming correctly
+- Deleting an animation or subscene automatically remove them for subscene or cutscene linked to
 
 ### Misc
 - NPC name tag are now not rendered
