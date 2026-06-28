@@ -23,9 +23,14 @@
 
 package fr.loudo.narrativecraft.utils;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import fr.loudo.narrativecraft.mixin.accessor.AvatarAccessor;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import io.netty.channel.ChannelFutureListener;
+import java.util.UUID;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
@@ -47,8 +52,16 @@ import org.jetbrains.annotations.Nullable;
 
 // FakePlayer class from Forge
 public class FakePlayer extends ServerPlayer {
+    public static final String CHARACTER_ID_PROPERTY = "nc_character_id";
     private static final ClientInformation DEFAULT_CLIENT_INFO = ClientInformation.createDefault();
     private final boolean isInvulnerable;
+
+    public static GameProfile createCharacterProfile(ICharacterStory characterStory, String name) {
+        PropertyMap properties = new PropertyMap(ImmutableMultimap.of(
+                CHARACTER_ID_PROPERTY,
+                new Property(CHARACTER_ID_PROPERTY, characterStory.getId().toString())));
+        return new GameProfile(UUID.randomUUID(), name, properties);
+    }
 
     public FakePlayer(ServerLevel level, GameProfile profile, boolean isInvulnerable) {
         super(level.getServer(), level, profile, DEFAULT_CLIENT_INFO);

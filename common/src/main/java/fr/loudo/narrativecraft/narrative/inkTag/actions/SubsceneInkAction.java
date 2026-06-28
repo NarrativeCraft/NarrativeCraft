@@ -141,15 +141,6 @@ public class SubsceneInkAction extends InkAction {
             if (unique && !loop) {
                 playback.setKillOnEnd(true);
             }
-            if (storyHandler != null && animation.getCharacterStory() != null) {
-                Entity existingEntity = storyHandler
-                        .getCharacterEntities()
-                        .get(animation.getCharacterStory().getName().toLowerCase());
-                if (existingEntity != null) {
-                    storyHandler.unregisterEntity(animation.getCharacterStory(), existingEntity);
-                    existingEntity.remove(Entity.RemovalReason.KILLED);
-                }
-            }
             playback.start(Collections.singleton(playerSession.getPlayer()));
             NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
 

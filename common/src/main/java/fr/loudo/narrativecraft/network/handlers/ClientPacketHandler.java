@@ -361,6 +361,7 @@ public class ClientPacketHandler {
         ICharacterStory characterStory = characterManager.resolveCharacter(packet.characterId(), session.getScene());
         List<ICharacterStory> charactersInWorld = session.getCharactersInWorld();
         if (packet.action() == S2CCharacterStoryAction.Action.ADD) {
+            if (characterStory == null) return;
             for (ICharacterStory characterStory1 : charactersInWorld) {
                 if (characterStory1.getId().equals(packet.characterId())) return;
             }

@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.playback;
 
-import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
@@ -97,7 +96,7 @@ public class PlaybackContext implements IPlaybackContext {
             String name = hasCharacter ? characterStory.getName() : "Somebody";
             entity = new FakePlayer(
                     level,
-                    new GameProfile(playback.getAnimation().getCharacterStory().getId(), name),
+                    FakePlayer.createCharacterProfile(playback.getAnimation().getCharacterStory(), name),
                     true);
             return;
         }

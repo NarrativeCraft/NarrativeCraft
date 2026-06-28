@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.editors.cameraangle;
 
-import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -100,8 +99,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                     playerSession.getPlayer(),
                     new S2CCharacterStoryAction(
                             characterPlacement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
-            UtilsServer.broadcastCharacterSkin(
-                    playerSession.getPlayer().level().players(), characterPlacement.getCharacterStory());
+            UtilsServer.sendCharacterSkin(playerSession.getPlayer(), characterPlacement.getCharacterStory());
             spawnEntity(characterPlacement);
             if (characterPlacement.isTemplate() && characterPlacement.getTemplateReferenceId() != null) {
                 placementsByTemplateReference
@@ -178,9 +176,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         Entity entity;
         if (characterStory.getEntityType() == EntityTypes.PLAYER) {
             entity = new FakePlayer(
-                    level,
-                    new GameProfile(characterPlacement.getCharacterStory().getId(), characterStory.getName()),
-                    true);
+                    level, FakePlayer.createCharacterProfile(characterStory, characterStory.getName()), true);
         } else {
             entity = characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
         }
@@ -287,7 +283,8 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         Entity entity;
 
         if (characterStory.getEntityType() == EntityTypes.PLAYER) {
-            entity = new FakePlayer(level, new GameProfile(characterStory.getId(), characterStory.getName()), true);
+            entity = new FakePlayer(
+                    level, FakePlayer.createCharacterProfile(characterStory, characterStory.getName()), true);
         } else {
             entity = characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
             if (entity == null) return;

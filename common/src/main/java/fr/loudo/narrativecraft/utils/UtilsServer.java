@@ -37,7 +37,7 @@ import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -81,7 +81,7 @@ public class UtilsServer {
         return playerSession;
     }
 
-    public static void broadcastCharacterSkin(List<ServerPlayer> players, ICharacterStory characterStory) {
+    public static void broadcastCharacterSkin(Collection<ServerPlayer> players, ICharacterStory characterStory) {
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         try {
             File skinFile = characterStory.getSkinFile();

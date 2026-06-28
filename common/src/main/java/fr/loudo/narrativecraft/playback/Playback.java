@@ -84,13 +84,14 @@ public class Playback implements IPlaybackSession {
         if (forSpecificPlayers()) {
             hideEntitiesToOtherPlayers();
         }
-        for (ServerPlayer player : requester.level().players()) {
+        Collection<ServerPlayer> recipients = packetRecipients();
+        for (ServerPlayer player : recipients) {
             Services.PACKET.sendToPlayer(
                     player,
                     new S2CCharacterStoryAction(
                             animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
         }
-        UtilsServer.broadcastCharacterSkin(requester.level().players(), animation.getCharacterStory());
+        UtilsServer.broadcastCharacterSkin(recipients, animation.getCharacterStory());
         NarrativeCraftMod.EVENT_BUS.post(new PlaybackStartEvent(this));
     }
 
@@ -106,12 +107,6 @@ public class Playback implements IPlaybackSession {
 
     public void start(Collection<ServerPlayer> targetedPlayers) {
         this.targetedPlayers.addAll(targetedPlayers);
-        for (ServerPlayer player : targetedPlayers) {
-            Services.PACKET.sendToPlayer(
-                    player,
-                    new S2CCharacterStoryAction(
-                            animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
-        }
         start();
     }
 
@@ -136,7 +131,7 @@ public class Playback implements IPlaybackSession {
         isPlaying = false;
         if (killOnEnd) {
             resetActions();
-            for (ServerPlayer player : requester.level().players()) {
+            for (ServerPlayer player : packetRecipients()) {
                 Services.PACKET.sendToPlayer(
                         player,
                         new S2CCharacterStoryAction(
@@ -172,6 +167,10 @@ public class Playback implements IPlaybackSession {
         }
 
         tick++;
+    }
+
+    private Collection<ServerPlayer> packetRecipients() {
+        return forSpecificPlayers() ? targetedPlayers : requester.level().players();
     }
 
     public void hideEntitiesToOtherPlayers() {

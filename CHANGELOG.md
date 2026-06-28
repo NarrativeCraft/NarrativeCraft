@@ -14,6 +14,8 @@
 - Animation and subscene stop not killing entities
 - 3D Dialog glitched rendering if a shader is on using iris in 26.2
 - Can open character position screen camera angle in production mode (and sometimes may cause a crash)
+- Playing one story to one player in multiplayer had characters disappearing
+- Bandwidth optimization for sending skins
 
 ### Misc
 - NPC name tag are now not rendered
