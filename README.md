@@ -1,4 +1,4 @@
-# NarrativeCraft
+ # NarrativeCraft
 <div align="center">
     Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
 </div>
@@ -51,7 +51,7 @@ If you want to start learning **NarrativeCraft**, take a look at the [documentat
 
 An API is available for use if you want to create comptability for other mod or if you want to take your story a step further.
 
-There's an [documentation](https://narrativecraft.loudo.dev/api/getting-started) for the API.
+There's a [documentation](https://narrativecraft.loudo.dev/api/getting-started) for the API.
 
 
 ### Gradle
@@ -62,7 +62,7 @@ maven {
 }
 ```
 ```
-compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.4+mc{minecraft_version}'
+compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.11+mc{minecraft_version}'
 ```
 
 ### Maven
@@ -76,7 +76,7 @@ compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.0.4+mc{minecraft_versi
 <dependency>
     <groupId>fr.loudo.narrativecraft</groupId>
     <artifactId>narrativecraft-api</artifactId>
-    <version>2.0.4+mc{minecraft_version}</version>
+    <version>2.0.11+mc{minecraft_version}</version>
 </dependency>
 ```
 

@@ -208,7 +208,6 @@ public class ServerPacketHandler {
                 character = findNpcById(targetId);
             }
         }
-        if (character == null) return;
 
         DialogEditorMaker editor = new DialogEditorMaker(session, character);
         session.setEditor(editor);
