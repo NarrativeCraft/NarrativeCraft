@@ -147,6 +147,7 @@ public class ClientTextInkAction extends TextInkAction {
             case "edit" -> {
                 existing.text = text;
                 existing.scrollText.setText(text);
+                existing.scrollText.forceFinish();
                 isRunning = false;
             }
             case "position", "pos" -> {
