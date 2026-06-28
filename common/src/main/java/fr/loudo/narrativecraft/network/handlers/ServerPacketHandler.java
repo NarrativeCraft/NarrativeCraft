@@ -209,14 +209,17 @@ public class ServerPacketHandler {
             } else if ("npc".equals(packet.editorType())) {
                 character = findNpcById(targetId);
             }
-            UtilsServer.sendCharacterSkin((ServerPlayer) player, character);
-            Services.PACKET.sendToPlayer(
-                    (ServerPlayer) player, new S2CCharacterStoryAction(targetId, S2CCharacterStoryAction.Action.ADD));
         }
+        if (character == null) return;
 
         DialogEditorMaker editor = new DialogEditorMaker(session, character);
         session.setEditor(editor);
         editor.init();
+
+        UtilsServer.sendCharacterSkin((ServerPlayer) player, character);
+        Services.PACKET.sendToPlayer(
+                (ServerPlayer) player,
+                new S2CCharacterStoryAction(character.getId(), S2CCharacterStoryAction.Action.ADD));
     }
 
     private static Npc findNpcById(UUID id) {

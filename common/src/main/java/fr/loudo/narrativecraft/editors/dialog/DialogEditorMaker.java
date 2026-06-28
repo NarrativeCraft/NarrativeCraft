@@ -56,6 +56,9 @@ public class DialogEditorMaker implements EditorMaker {
 
     @Override
     public void init() {
+        if (character.getScene() != null) {
+            playerSession.apply(character.getScene().getChapter(), character.getScene());
+        }
         ServerPlayer player = playerSession.getPlayer();
         ServerLevel level = player.level();
 
