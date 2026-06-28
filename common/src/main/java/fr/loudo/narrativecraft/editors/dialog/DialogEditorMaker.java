@@ -60,7 +60,7 @@ public class DialogEditorMaker implements EditorMaker {
         ServerLevel level = player.serverLevel();
 
         GameProfile profile = character != null
-                ? new GameProfile(character.getId(), character.getName())
+                ? FakePlayer.createCharacterProfile(character, character.getName())
                 : new GameProfile(UUID.randomUUID(), player.getGameProfile().getName());
 
         FakePlayer entity = new FakePlayer(level, profile, true);

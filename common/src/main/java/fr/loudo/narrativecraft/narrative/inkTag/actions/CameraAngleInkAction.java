@@ -39,7 +39,6 @@ import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraViewDialogSetup;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
@@ -109,10 +108,10 @@ public class CameraAngleInkAction extends InkAction {
             editor.init();
             if (storyHandler != null) {
                 for (CharacterPlacement characterPlacement : editor.getCharacterPlacements()) {
+                    if (characterPlacement.isTemplate()) continue;
                     Entity entity = editor.getEntityForPlacement(characterPlacement.getId());
                     if (entity == null) continue;
-                    if (!(characterPlacement.getCharacterStory() instanceof CharacterStory character)) continue;
-                    storyHandler.registerEntity(character, entity);
+                    storyHandler.registerEntity(characterPlacement.getCharacterStory(), entity);
                 }
             }
         }

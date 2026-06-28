@@ -24,7 +24,10 @@
 package fr.loudo.narrativecraft.utils;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import java.util.UUID;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
@@ -44,8 +47,16 @@ import org.jetbrains.annotations.NotNull;
 
 // FakePlayer class from Forge
 public class FakePlayer extends ServerPlayer {
+    public static final String CHARACTER_ID_PROPERTY = "nc_character_id";
     private static final ClientInformation DEFAULT_CLIENT_INFO = ClientInformation.createDefault();
     private final boolean isInvulnerable;
+
+    public static GameProfile createCharacterProfile(ICharacterStory characterStory, String name) {
+        GameProfile profile = new GameProfile(UUID.randomUUID(), name);
+        profile.getProperties()
+                .put(CHARACTER_ID_PROPERTY, new Property(CHARACTER_ID_PROPERTY, characterStory.getId().toString()));
+        return profile;
+    }
 
     public FakePlayer(ServerLevel level, GameProfile profile, boolean isInvulnerable) {
         super(level.getServer(), level, profile, DEFAULT_CLIENT_INFO);

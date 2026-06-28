@@ -138,15 +138,6 @@ public class AnimationInkAction extends InkAction {
         if (unique && !loop) {
             playback.setKillOnEnd(true);
         }
-        if (storyHandler != null) {
-            Entity entity = storyHandler
-                    .getCharacterEntities()
-                    .get(animation.getCharacterStory().getName().toLowerCase());
-            if (entity != null) {
-                storyHandler.unregisterEntity(animation.getCharacterStory(), entity);
-                entity.remove(Entity.RemovalReason.KILLED);
-            }
-        }
         playback.start(Collections.singleton(playerSession.getPlayer()));
         NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
 

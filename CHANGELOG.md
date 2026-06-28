@@ -13,6 +13,8 @@
 - Shake tag `0 0 0` not clearing active shakes
 - Animation and subscene stop not killing entities
 - Can open character position screen camera angle in production mode (and sometimes may cause a crash)
+- Playing one story to one player in multiplayer had characters disappearing
+- Bandwidth optimization for sending skins
 
 ### Misc
 - NPC name tag are now not rendered

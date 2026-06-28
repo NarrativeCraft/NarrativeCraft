@@ -24,12 +24,14 @@
 package fr.loudo.narrativecraft.mixin;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.mixin.accessor.TextureManagerAccessor;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
+import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,10 +58,11 @@ public abstract class PlayerInfoMixin {
     private void narrativecraft$getCharacterSkin(CallbackInfoReturnable<PlayerSkin> cir) {
         GameProfile profile = getProfile();
 
+        UUID characterId = narrativecraft$resolveCharacterId(profile);
         List<ICharacterStory> charactersInWorld =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
         for (ICharacterStory characterStory : charactersInWorld) {
-            if (!profile.getId().equals(characterStory.getId())) continue;
+            if (!characterId.equals(characterStory.getId())) continue;
 
             if (narrativecraft$isMainCharacterWithPlayerSkin(characterStory)) {
                 cir.setReturnValue(Minecraft.getInstance().player.getSkin());
@@ -81,16 +84,18 @@ public abstract class PlayerInfoMixin {
         if (mainCharacter == null) return;
 
         GameProfile gameProfile = cir.getReturnValue();
+        UUID characterId = narrativecraft$resolveCharacterId(gameProfile);
 
         List<ICharacterStory> charactersInWorld =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
         for (ICharacterStory characterStory : charactersInWorld) {
-            if (!gameProfile.getId().equals(mainCharacter.getId())) continue;
+            if (!characterId.equals(mainCharacter.getId())) continue;
             if (!gameProfile.getName().equalsIgnoreCase(CharacterStory.USERNAME_VARIABLE)) continue;
 
-            cir.setReturnValue(new GameProfile(
-                    gameProfile.getId(),
-                    Minecraft.getInstance().player.getName().getString()));
+            GameProfile replaced = new GameProfile(
+                    gameProfile.getId(), Minecraft.getInstance().player.getName().getString());
+            replaced.getProperties().putAll(gameProfile.getProperties());
+            cir.setReturnValue(replaced);
             return;
         }
     }
@@ -121,6 +126,16 @@ public abstract class PlayerInfoMixin {
         if (attr.getSkin() != MainCharacterAttribute.SkinMode.CLIENT_HAS_CHARACTER_SKIN) return Optional.empty();
 
         return narrativecraft$buildCharacterSkin(mainCharacter);
+    }
+
+    private UUID narrativecraft$resolveCharacterId(GameProfile profile) {
+        for (Property property : profile.getProperties().get(FakePlayer.CHARACTER_ID_PROPERTY)) {
+            try {
+                return UUID.fromString(property.value());
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return profile.getId();
     }
 
     private ResourceLocation narrativecraft$getSkinIdentifier(UUID characterId) {
