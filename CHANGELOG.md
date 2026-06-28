@@ -21,7 +21,7 @@
 - Deleting an animation or subscene automatically remove them for subscene or cutscene linked to
 - Load player save if choosing a scene from the main menu
 - Music from main menu not stopped if leaving the screen with the hidden "Leave screen" button
-
+- Music from main menu not looping
 
 ### Misc
 - NPC name tag are now not rendered

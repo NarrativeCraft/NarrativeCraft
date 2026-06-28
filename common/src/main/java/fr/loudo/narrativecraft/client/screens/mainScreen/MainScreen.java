@@ -46,10 +46,12 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import org.lwjgl.glfw.GLFW;
 
 public class MainScreen extends Screen {
@@ -67,8 +69,19 @@ public class MainScreen extends Screen {
             ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/gui/sprites/logo.png");
     private static final ResourceLocation BACKGROUND_MUSIC =
             ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "music.main_screen");
-    private static final SimpleSoundInstance MAIN_MUSIC_INSTANCE =
-            SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(BACKGROUND_MUSIC), 1);
+    private static final SimpleSoundInstance MAIN_MUSIC_INSTANCE = new SimpleSoundInstance(
+            SoundEvent.createVariableRangeEvent(BACKGROUND_MUSIC).getLocation(),
+            SoundSource.MASTER,
+            1.0F,
+            1.0F,
+            SoundInstance.createUnseededRandom(),
+            true,
+            0,
+            SoundInstance.Attenuation.NONE,
+            0.0F,
+            0.0F,
+            0.0F,
+            true);
 
     private boolean canContinue;
     private boolean finishedStory;
