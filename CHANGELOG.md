@@ -2,6 +2,9 @@
 
 ## [2.0.11]
 
+### Feature
+- Added `current` argument in `session` command to know your current session `/nc session current`.
+
 ### Fixes
 
 - Npc skin cannot be applied
