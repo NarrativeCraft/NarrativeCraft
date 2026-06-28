@@ -17,6 +17,8 @@
 - Playing one story to one player in multiplayer had characters disappearing
 - Bandwidth optimization for sending skins
 - Camera rotation rotating only one side in cutscene if rotation applied
+- Template characters saved in memory even without saving in camera angle editor
+
 
 ### Misc
 - NPC name tag are now not rendered
