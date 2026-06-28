@@ -22,6 +22,7 @@
 - Load player save if choosing a scene from the main menu
 - Music from main menu not stopped if leaving the screen with the hidden "Leave screen" button
 - Music from main menu not looping
+- Skin of npc not sent if changing dialog data if no session set
 
 ### Misc
 - NPC name tag are now not rendered
