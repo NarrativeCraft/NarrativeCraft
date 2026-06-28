@@ -57,10 +57,13 @@ public final class InkActionUtil {
      * I went 3 times here!
      * }</pre>
      *
+     * @deprecated Ink already has an internal variable parser. Instead of using {@code %}, it uses
+     *             {@code {}}. For example, {@code %place_time_value%} becomes {@code {place_time_value}}.
      * @param story the main story instance
      * @param text  the text to parse
      * @return the text with the variable parsed if found
      */
+    @Deprecated(since = "1", forRemoval = true)
     public static String parseVariables(Story story, String text) {
         if (story == null) return text;
         Matcher matcher = VARIABLE_NAME.matcher(text);

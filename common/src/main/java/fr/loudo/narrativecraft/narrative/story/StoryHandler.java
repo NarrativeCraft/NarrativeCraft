@@ -35,7 +35,6 @@ import fr.loudo.narrativecraft.api.events.story.ChapterSceneStartEvent;
 import fr.loudo.narrativecraft.api.events.story.SceneEndEvent;
 import fr.loudo.narrativecraft.api.events.story.StoryEndEvent;
 import fr.loudo.narrativecraft.api.events.story.StoryStartEvent;
-import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
 import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
@@ -381,7 +380,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     private void sendDialogue(Line line) {
         String speaker = line.speaker();
-        String dialogueText = InkActionUtil.parseVariables(story, line.dialogueText());
+        String dialogueText = line.dialogueText();
 
         NarrativeCraftMod.EVENT_BUS.post(new DialogStartEvent(playerSession, speaker, dialogueText));
         int entityId = S2CShowDialogue.NO_ENTITY;

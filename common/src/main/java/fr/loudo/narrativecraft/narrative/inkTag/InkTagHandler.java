@@ -29,7 +29,6 @@ import fr.loudo.narrativecraft.api.events.inkAction.InkActionStopEvent;
 import fr.loudo.narrativecraft.api.events.inkAction.InkTagProcessedEvent;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
-import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl.DispatchResult;
@@ -149,7 +148,6 @@ public final class InkTagHandler {
 
         while (!pendingTags.isEmpty()) {
             String rawTag = pendingTags.poll();
-            rawTag = InkActionUtil.parseVariables(story, rawTag);
 
             DispatchResult dispatchResult;
             try {
