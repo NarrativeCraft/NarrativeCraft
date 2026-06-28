@@ -24,6 +24,7 @@
 - Music from main menu not stopped if leaving the screen with the hidden "Leave screen" button
 - Music from main menu not looping
 - Skin of npc not sent if changing dialog data if no session set
+- Editing a text in text tag making scroll text sound
 
 ### Misc
 - NPC name tag are now not rendered
