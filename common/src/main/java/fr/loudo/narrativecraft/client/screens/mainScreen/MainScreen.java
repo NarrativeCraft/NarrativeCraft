@@ -102,7 +102,7 @@ public class MainScreen extends Screen {
                             onClose();
                         } else {
                             close();
-                            Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), true));
+                            Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), true, false));
                         }
                     })
                     .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -113,7 +113,7 @@ public class MainScreen extends Screen {
         if (!isPause) {
             addRenderableWidget(Button.builder(Translation.message("screen.main.new_game"), button -> {
                         close();
-                        Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false));
+                        Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false, true));
                     })
                     .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                     .build());
@@ -126,7 +126,7 @@ public class MainScreen extends Screen {
                         ClientPlayerSession session =
                                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
                         Services.PACKET.sendToServer(
-                                new C2SPlayStory(Optional.of(session.getScene().knotName()), true));
+                                new C2SPlayStory(Optional.of(session.getScene().knotName()), true, false));
                     })
                     .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                     .build());

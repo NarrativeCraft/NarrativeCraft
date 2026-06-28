@@ -20,6 +20,8 @@
 - Template characters saved in memory even without saving in camera angle editor
 - Camera angle not renaming correctly
 - Deleting an animation or subscene automatically remove them for subscene or cutscene linked to
+- Load player save if choosing a scene from the main menu
+
 
 ### Misc
 - NPC name tag are now not rendered

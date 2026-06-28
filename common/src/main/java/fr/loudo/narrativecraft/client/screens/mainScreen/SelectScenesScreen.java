@@ -55,7 +55,7 @@ public class SelectScenesScreen extends PaginationsItemsScreen<Scene> {
     @Override
     protected void onItemClicked(Scene scene) {
         mainScreen.close();
-        Services.PACKET.sendToServer(new C2SPlayStory(Optional.of(scene.knotName()), false));
+        Services.PACKET.sendToServer(new C2SPlayStory(Optional.of(scene.knotName()), true, false));
     }
 
     @Override

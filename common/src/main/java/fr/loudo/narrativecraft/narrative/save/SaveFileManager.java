@@ -83,6 +83,13 @@ public class SaveFileManager {
         return new File(savesDirectory(), name + NarrativeCraftFileDefault.EXTENSION_DATA_FILE);
     }
 
+    public void removeSaveFile(ServerPlayer player) {
+        File saveFile = getSaveFile(player);
+        if (!saveFile.exists()) return;
+
+        saveFile.delete();
+    }
+
     public File getSaveFile(PlayerSession session) {
         return getSaveFile(session.getPlayer());
     }
