@@ -12,6 +12,7 @@
 - Animation and subscene tag loop not working
 - Shake tag `0 0 0` not clearing active shakes
 - Animation and subscene stop not killing entities
+- Can open character position screen camera angle in production mode (and sometimes may cause a crash)
 
 ### Misc
 - NPC name tag are now not rendered
