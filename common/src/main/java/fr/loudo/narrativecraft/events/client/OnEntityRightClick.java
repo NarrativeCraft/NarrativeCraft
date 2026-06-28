@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.events.client;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.screens.narrative.cameraangle.EntityPosePickerScreen;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
@@ -36,6 +37,8 @@ public class OnEntityRightClick {
         ClientCameraAngleMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor == null) return;
+        if (ClientNarrativeCraftMod.getInstance().getPlayerSession().isInStory()) return;
+        if (editor.getEnvironment() == NarrativeEnvironment.PRODUCTION) return;
         CharacterPlacement characterPlacement = editor.getPlacementByEntityId(clickedEntity.getId());
         if (characterPlacement == null) return;
         Minecraft.getInstance().gui.setScreen(new EntityPosePickerScreen(characterPlacement));

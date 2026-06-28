@@ -13,7 +13,7 @@
 - Shake tag `0 0 0` not clearing active shakes
 - Animation and subscene stop not killing entities
 - 3D Dialog glitched rendering if a shader is on using iris in 26.2
-
+- Can open character position screen camera angle in production mode (and sometimes may cause a crash)
 
 ### Misc
 - NPC name tag are now not rendered
