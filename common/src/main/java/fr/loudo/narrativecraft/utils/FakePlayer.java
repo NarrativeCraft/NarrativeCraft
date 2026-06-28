@@ -54,7 +54,10 @@ public class FakePlayer extends ServerPlayer {
     public static GameProfile createCharacterProfile(ICharacterStory characterStory, String name) {
         GameProfile profile = new GameProfile(UUID.randomUUID(), name);
         profile.getProperties()
-                .put(CHARACTER_ID_PROPERTY, new Property(CHARACTER_ID_PROPERTY, characterStory.getId().toString()));
+                .put(
+                        CHARACTER_ID_PROPERTY,
+                        new Property(
+                                CHARACTER_ID_PROPERTY, characterStory.getId().toString()));
         return profile;
     }
 

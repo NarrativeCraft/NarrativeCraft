@@ -93,7 +93,8 @@ public abstract class PlayerInfoMixin {
             if (!gameProfile.getName().equalsIgnoreCase(CharacterStory.USERNAME_VARIABLE)) continue;
 
             GameProfile replaced = new GameProfile(
-                    gameProfile.getId(), Minecraft.getInstance().player.getName().getString());
+                    gameProfile.getId(),
+                    Minecraft.getInstance().player.getName().getString());
             replaced.getProperties().putAll(gameProfile.getProperties());
             cir.setReturnValue(replaced);
             return;

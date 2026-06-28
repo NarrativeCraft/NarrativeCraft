@@ -47,6 +47,7 @@ public class PlayerSessionCommand {
                 .requires(stack -> stack.hasPermission(2))
                 .then(Commands.literal("session")
                         .then(Commands.literal("clear").executes(PlayerSessionCommand::clear))
+                        .then(Commands.literal("current").executes(PlayerSessionCommand::current))
                         .then(Commands.literal("set")
                                 .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
                                         .suggests(CommandSuggestions::suggestChapters)
@@ -65,6 +66,26 @@ public class PlayerSessionCommand {
         playerSession.clear();
 
         context.getSource().sendSuccess(() -> Translation.message("session.clear"), false);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int current(CommandContext<CommandSourceStack> context) {
+
+        PlayerSession playerSession =
+                UtilsServer.getPlayerSessionByPlayer(context.getSource().getPlayer());
+
+        if (playerSession.sessionSet()) {
+            context.getSource()
+                    .sendSuccess(
+                            () -> Translation.message(
+                                    "session.current",
+                                    playerSession.getChapter().getName(),
+                                    playerSession.getScene().getName()),
+                            false);
+        } else {
+            context.getSource().sendSuccess(() -> Translation.message("session.no_current_session"), false);
+        }
 
         return Command.SINGLE_SUCCESS;
     }

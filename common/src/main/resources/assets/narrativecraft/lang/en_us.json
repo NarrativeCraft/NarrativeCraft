@@ -132,6 +132,8 @@
   "narrativecraft.playback.start_for_players": "Animation %s playing back to targeted players...",
 
   "narrativecraft.session.set": "Your session is now set to §lchapter§r %s and §lscene§r %s.",
+  "narrativecraft.session.current": "Your current session is : §lchapter§r %s and §lscene§r %s.",
+  "narrativecraft.session.no_current_session": "You have no session set.",
   "narrativecraft.session.clear": "Session cleared.",
   "narrativecraft.session.no_session": "You need to set you a session.",
 
