@@ -138,57 +138,57 @@ jobs:
             done
           done
 
-      - name: Notify Discord
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-        run: |
-          ICON_URL="https://raw.githubusercontent.com/NarrativeCraft/NarrativeCraft/refs/heads/${DEFAULT_BRANCH}/common/src/main/resources/narrativecraft.png"
-          TIMESTAMP=$(date +%s)
-          ROLE_ID="1515653721621794968"
-
-          PAYLOAD=$(jq -n \
-            --arg version "${MOD_VERSION}" \
-            --arg icon "${ICON_URL}" \
-            --arg changelog "${CHANGELOG}" \
-            --arg ts "${TIMESTAMP}" \
-            --arg role "${ROLE_ID}" \
-            '{
-              flags: 32768,
-              allowed_mentions: { roles: [$role] },
-              components: [
-                {
-                  type: 17,
-                  accent_color: 11479789,
-                  components: [
-                    {
-                      type: 9,
-                      components: [
-                        { type: 10, content: ("# NarrativeCraft\n## Release v" + $version) }
-                      ],
-                      accessory: { type: 11, media: { url: $icon } }
-                    },
-                    { type: 14, spacing: 2, divider: true },
-                    { type: 10, content: ("**Whats new**\n" + $changelog) },
-                    { type: 14, spacing: 2, divider: true },
-                    { type: 10, content: "**Downloads**" },
-                    { type: 10, content: "> NeoForge" },
-                    { type: 1, components: [
-                      { type: 2, style: 5, label: "26.2", emoji: { id: "1136404935374798878", name: "modrinth" }, url: ("https://modrinth.com/mod/narrativecraft/version/" + $version + "-neoforge-26.2") },
-                      { type: 2, style: 5, label: "1.21.1", emoji: { id: "1136404935374798878", name: "modrinth" }, url: ("https://modrinth.com/mod/narrativecraft/version/" + $version + "-neoforge-1.21.1") }
-                    ] },
-                    { type: 10, content: "> Fabric" },
-                    { type: 1, components: [
-                      { type: 2, style: 5, label: "26.2", emoji: { id: "1136404935374798878", name: "modrinth" }, url: ("https://modrinth.com/mod/narrativecraft/version/" + $version + "-fabric-26.2") },
-                      { type: 2, style: 5, label: "1.21.1", emoji: { id: "1136404935374798878", name: "modrinth" }, url: ("https://modrinth.com/mod/narrativecraft/version/" + $version + "-fabric-1.21.1") }
-                    ] },
-                    { type: 14, spacing: 1, divider: true },
-                    { type: 10, content: ("-# ||<@&" + $role + ">|| — released <t:" + $ts + ":R>") }
-                  ]
-                }
-              ]
-            }')
-
-          curl -sf -X POST "${DISCORD_WEBHOOK}?with_components=true" \
-            -H "Content-Type: application/json" \
-            -d "${PAYLOAD}"
+#      - name: Notify Discord
+#        env:
+#          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+#          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+#        run: |
+#          ICON_URL="https://raw.githubusercontent.com/NarrativeCraft/NarrativeCraft/refs/heads/${DEFAULT_BRANCH}/common/src/main/resources/narrativecraft.png"
+#          TIMESTAMP=$(date +%s)
+#          ROLE_ID="1515653721621794968"
+#
+#          PAYLOAD=$(jq -n \
+#            --arg version "${MOD_VERSION}" \
+#            --arg icon "${ICON_URL}" \
+#            --arg changelog "${CHANGELOG}" \
+#            --arg ts "${TIMESTAMP}" \
+#            --arg role "${ROLE_ID}" \
+#            '{
+#              flags: 32768,
+#              allowed_mentions: { roles: [$role] },
+#              components: [
+#                {
+#                  type: 17,
+#                  accent_color: 11479789,
+#                  components: [
+#                    {
+#                      type: 9,
+#                      components: [
+#                        { type: 10, content: ("# NarrativeCraft\n## Release v" + $version) }
+#                      ],
+#                      accessory: { type: 11, media: { url: $icon } }
+#                    },
+#                    { type: 14, spacing: 2, divider: true },
+#                    { type: 10, content: ("**Whats new**\n" + $changelog) },
+#                    { type: 14, spacing: 2, divider: true },
+#                    { type: 10, content: "**Downloads**" },
+#                    { type: 10, content: "> NeoForge" },
+#                    { type: 1, components: [
+#                      { type: 2, style: 5, label: "26.2", emoji: { id: "1136404935374798878", name: "modrinth" }, url: ("https://modrinth.com/mod/narrativecraft/version/" + $version + "-neoforge-26.2") },
+#                      { type: 2, style: 5, label: "1.21.1", emoji: { id: "1136404935374798878", name: "modrinth" }, url: ("https://modrinth.com/mod/narrativecraft/version/" + $version + "-neoforge-1.21.1") }
+#                    ] },
+#                    { type: 10, content: "> Fabric" },
+#                    { type: 1, components: [
+#                      { type: 2, style: 5, label: "26.2", emoji: { id: "1136404935374798878", name: "modrinth" }, url: ("https://modrinth.com/mod/narrativecraft/version/" + $version + "-fabric-26.2") },
+#                      { type: 2, style: 5, label: "1.21.1", emoji: { id: "1136404935374798878", name: "modrinth" }, url: ("https://modrinth.com/mod/narrativecraft/version/" + $version + "-fabric-1.21.1") }
+#                    ] },
+#                    { type: 14, spacing: 1, divider: true },
+#                    { type: 10, content: ("-# ||<@&" + $role + ">|| — released <t:" + $ts + ":R>") }
+#                  ]
+#                }
+#              ]
+#            }')
+#
+#          curl -sf -X POST "${DISCORD_WEBHOOK}?with_components=true" \
+#            -H "Content-Type: application/json" \
+#            -d "${PAYLOAD}"
