@@ -82,7 +82,6 @@ public class GameplayInkAction extends InkAction {
         playerSession.getPlayer().setGameMode(gameType);
         if (mainCharacterEntity == null) return InkActionResult.ok();
 
-        storyHandler.unregisterEntity(mainCharacter);
         Vec3 entityPosition = mainCharacterEntity.position();
         playerSession
                 .getPlayer()
@@ -93,6 +92,7 @@ public class GameplayInkAction extends InkAction {
                         entityPosition.z,
                         mainCharacterEntity.getYRot(),
                         mainCharacterEntity.getXRot());
+        storyHandler.unregisterEntity(mainCharacter);
         mainCharacterEntity.remove(Entity.RemovalReason.KILLED);
 
         isRunning = false;

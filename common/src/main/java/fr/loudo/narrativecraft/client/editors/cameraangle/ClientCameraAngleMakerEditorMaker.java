@@ -184,8 +184,8 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             player.setYHeadRot((float) previewCameraView.getRotation().y);
             player.connection.send(new ServerboundMovePlayerPacket.PosRot(
                     previewCameraView.getPosition(),
-                    (float) previewCameraView.getRotation().x,
                     (float) previewCameraView.getRotation().y,
+                    (float) previewCameraView.getRotation().x,
                     player.onGround(),
                     false));
             UtilsClient.setHudHidden(true);

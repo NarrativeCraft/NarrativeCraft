@@ -87,7 +87,7 @@ public class CameraLayer extends CutsceneLayer {
         int chunkZ = (int) position.z >> 4;
         if (chunkX != lastSentChunkX || chunkZ != lastSentChunkZ) {
             localPlayer.connection.send(new ServerboundMovePlayerPacket.PosRot(
-                    position, (float) rot.x, (float) rot.y, localPlayer.onGround(), false));
+                    position, (float) rot.y, (float) rot.x, localPlayer.onGround(), false));
             lastSentChunkX = chunkX;
             lastSentChunkZ = chunkZ;
         }

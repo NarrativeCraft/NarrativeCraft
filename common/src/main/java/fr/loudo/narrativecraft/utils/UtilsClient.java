@@ -62,7 +62,7 @@ public class UtilsClient {
         player.setYRot((float) rotation.y);
         player.setYHeadRot((float) rotation.y);
         player.connection.send(new ServerboundMovePlayerPacket.PosRot(
-                position, (float) rotation.x, (float) rotation.y, player.onGround(), false));
+                position, (float) rotation.y, (float) rotation.x, player.onGround(), false));
     }
 
     public static void setHudHidden(boolean hidden) {
