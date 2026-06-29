@@ -132,6 +132,8 @@
   "narrativecraft.playback.start_for_players": "Воспроизведение анимации «%s» для выбранных игроков...",
 
   "narrativecraft.session.set": "Сессия: §lглава§r %s, §lсцена§r %s.",
+  "narrativecraft.session.current": "Текущая сессия: §lглава§r %s и §lсцена§r %s.",
+  "narrativecraft.session.no_current_session": "У вас нет установленной сессии.",
   "narrativecraft.session.clear": "Сессия сброшена.",
   "narrativecraft.session.no_session": "Сначала установите сессию.",
 
