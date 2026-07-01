@@ -26,17 +26,14 @@ package fr.loudo.narrativecraft.network.cameraangle;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.TemplateReference;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleAddTemplateReference(
         UUID chapterId, UUID sceneId, UUID cameraAngleId, String sourceType, UUID refId, UUID templateReferenceId)
-        implements CustomPacketPayload {
+        implements NarrativePacket {
 
     public C2SCameraAngleAddTemplateReference(CameraAngle cameraAngle, TemplateReference reference) {
         this(
@@ -48,26 +45,26 @@ public record C2SCameraAngleAddTemplateReference(
                 reference.id());
     }
 
-    public static final Type<C2SCameraAngleAddTemplateReference> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_add_template_reference"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "camera_angle_add_template_reference");
 
-    public static final StreamCodec<ByteBuf, C2SCameraAngleAddTemplateReference> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleAddTemplateReference::chapterId,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleAddTemplateReference::sceneId,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleAddTemplateReference::cameraAngleId,
-            ByteBufCodecs.STRING_UTF8,
-            C2SCameraAngleAddTemplateReference::sourceType,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleAddTemplateReference::refId,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleAddTemplateReference::templateReferenceId,
-            C2SCameraAngleAddTemplateReference::new);
+    public static C2SCameraAngleAddTemplateReference read(FriendlyByteBuf buf) {
+        return new C2SCameraAngleAddTemplateReference(
+                buf.readUUID(), buf.readUUID(), buf.readUUID(), buf.readUtf(), buf.readUUID(), buf.readUUID());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(chapterId);
+        buf.writeUUID(sceneId);
+        buf.writeUUID(cameraAngleId);
+        buf.writeUtf(sourceType);
+        buf.writeUUID(refId);
+        buf.writeUUID(templateReferenceId);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

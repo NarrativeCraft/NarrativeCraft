@@ -53,7 +53,7 @@ public class SceneEntryEditScreen extends AbstractNarrativeEntryEditScreen<Scene
     protected void addCustomFields() {
         if (entry == null) return; // If we're creating a new scene, don't show the rank field
 
-        sceneRankField = new EditBox(this.font, 20, 20, Translation.message("scene_rank"));
+        sceneRankField = new EditBox(this.font, 0, 0, 20, 20, Translation.message("scene_rank"));
         sceneRankField.setValue(String.valueOf(entry.getRank()));
         widgets.add(sceneRankField);
 

@@ -24,26 +24,26 @@
 package fr.loudo.narrativecraft.network.dialog;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SEnterDialogEditor(String editorType, String targetId) implements CustomPacketPayload {
+public record C2SEnterDialogEditor(String editorType, String targetId) implements NarrativePacket {
 
-    public static final Type<C2SEnterDialogEditor> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "enter_dialog_editor"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "enter_dialog_editor");
 
-    public static final StreamCodec<ByteBuf, C2SEnterDialogEditor> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            C2SEnterDialogEditor::editorType,
-            ByteBufCodecs.STRING_UTF8,
-            C2SEnterDialogEditor::targetId,
-            C2SEnterDialogEditor::new);
+    public static C2SEnterDialogEditor read(FriendlyByteBuf buf) {
+        return new C2SEnterDialogEditor(buf.readUtf(), buf.readUtf());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUtf(editorType);
+        buf.writeUtf(targetId);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

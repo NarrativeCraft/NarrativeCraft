@@ -48,104 +48,216 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 public class ClientPacketHandlerFabric {
 
     public static void handle() {
-        ClientPlayNetworking.registerGlobalReceiver(BiSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
-            ClientPacketHandler.narrativeEntry(packet);
+        ClientPlayNetworking.registerGlobalReceiver(
+                BiSyncNarrativeEntryPacket.TYPE, (client, handler, buf, responseSender) -> {
+                    BiSyncNarrativeEntryPacket packet = BiSyncNarrativeEntryPacket.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.narrativeEntry(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(BiCutsceneEnter.TYPE, (client, handler, buf, responseSender) -> {
+            BiCutsceneEnter packet = BiCutsceneEnter.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.cutsceneState(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(BiCutsceneEnter.TYPE, (packet, context) -> {
-            ClientPacketHandler.cutsceneState(packet);
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CNarrativeDataClear.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CNarrativeDataClear packet = S2CNarrativeDataClear.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.clearNarrativeData();
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(S2CScreenClear.TYPE, (client, handler, buf, responseSender) -> {
+            S2CScreenClear packet = S2CScreenClear.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.clearScreen();
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CNarrativeDataClear.TYPE, (packet, context) -> {
-            ClientPacketHandler.clearNarrativeData();
+        ClientPlayNetworking.registerGlobalReceiver(S2CPlayerSession.TYPE, (client, handler, buf, responseSender) -> {
+            S2CPlayerSession packet = S2CPlayerSession.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.setSession(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CScreenClear.TYPE, (packet, context) -> {
-            ClientPacketHandler.clearScreen();
+        ClientPlayNetworking.registerGlobalReceiver(S2CToastMessage.TYPE, (client, handler, buf, responseSender) -> {
+            S2CToastMessage packet = S2CToastMessage.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.showToast(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CPlayerSession.TYPE, (packet, context) -> {
-            ClientPacketHandler.setSession(packet);
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CCutsceneEditorData.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CCutsceneEditorData packet = S2CCutsceneEditorData.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.loadCutsceneEditorData(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(
+                BiCutscenePlayHeadPacket.TYPE, (client, handler, buf, responseSender) -> {
+                    BiCutscenePlayHeadPacket packet = BiCutscenePlayHeadPacket.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.updatePlayHeadCutscene(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(S2CDialogTest.TYPE, (client, handler, buf, responseSender) -> {
+            S2CDialogTest packet = S2CDialogTest.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.handleDialogTest(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CToastMessage.TYPE, (packet, context) -> {
-            ClientPacketHandler.showToast(packet);
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CCameraAngleEditorData.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CCameraAngleEditorData packet = S2CCameraAngleEditorData.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.loadCameraAngleEditorData(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CCameraAngleCharacterCaptured.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CCameraAngleCharacterCaptured packet = S2CCameraAngleCharacterCaptured.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.addCameraAngleCharacter(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CCameraAnglePlacementEntitySpawned.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CCameraAnglePlacementEntitySpawned packet = S2CCameraAnglePlacementEntitySpawned.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.onPlacementEntitySpawned(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CDialogEditorEntitySpawned.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CDialogEditorEntitySpawned packet = S2CDialogEditorEntitySpawned.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.onDialogEditorEntitySpawned(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(S2CEnterCameraView.TYPE, (client, handler, buf, responseSender) -> {
+            S2CEnterCameraView packet = S2CEnterCameraView.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.enterCameraView(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CCutsceneEditorData.TYPE, (packet, context) -> {
-            ClientPacketHandler.loadCutsceneEditorData(packet);
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CInteractionEditorData.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CInteractionEditorData packet = S2CInteractionEditorData.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.loadInteractionEditorData(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(S2CRunInkAction.TYPE, (client, handler, buf, responseSender) -> {
+            S2CRunInkAction packet = S2CRunInkAction.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.runInkAction(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(BiCutscenePlayHeadPacket.TYPE, (packet, context) -> {
-            ClientPacketHandler.updatePlayHeadCutscene(packet);
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CStopAllInkActions.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CStopAllInkActions packet = S2CStopAllInkActions.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.stopAllInkActions();
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(S2CShowDialogue.TYPE, (client, handler, buf, responseSender) -> {
+            S2CShowDialogue packet = S2CShowDialogue.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.showDialogue(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CDialogTest.TYPE, (packet, context) -> {
-            ClientPacketHandler.handleDialogTest(packet);
+        ClientPlayNetworking.registerGlobalReceiver(S2CShowChoices.TYPE, (client, handler, buf, responseSender) -> {
+            S2CShowChoices packet = S2CShowChoices.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.showChoices(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CCameraAngleEditorData.TYPE, (packet, context) -> {
-            ClientPacketHandler.loadCameraAngleEditorData(packet);
+        ClientPlayNetworking.registerGlobalReceiver(S2CStopStory.TYPE, (client, handler, buf, responseSender) -> {
+            S2CStopStory packet = S2CStopStory.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.stopStory();
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CCameraAngleCharacterCaptured.TYPE, (packet, context) -> {
-            ClientPacketHandler.addCameraAngleCharacter(packet);
+        ClientPlayNetworking.registerGlobalReceiver(S2CDialogStop.TYPE, (client, handler, buf, responseSender) -> {
+            S2CDialogStop packet = S2CDialogStop.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.dialogStop();
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CCameraAnglePlacementEntitySpawned.TYPE, (packet, context) -> {
-            ClientPacketHandler.onPlacementEntitySpawned(packet);
+        ClientPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (client, handler, buf, responseSender) -> {
+            BiCameraAngleEnter packet = BiCameraAngleEnter.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.cameraAngleEnter(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CDialogEditorEntitySpawned.TYPE, (packet, context) -> {
-            ClientPacketHandler.onDialogEditorEntitySpawned(packet);
+        ClientPlayNetworking.registerGlobalReceiver(BiStopEditorMaker.TYPE, (client, handler, buf, responseSender) -> {
+            BiStopEditorMaker packet = BiStopEditorMaker.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.stopEditorMaker(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CEnterCameraView.TYPE, (packet, context) -> {
-            ClientPacketHandler.enterCameraView(packet);
+        ClientPlayNetworking.registerGlobalReceiver(BiInteractionEnter.TYPE, (client, handler, buf, responseSender) -> {
+            BiInteractionEnter packet = BiInteractionEnter.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.interactionEnter(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CInteractionEditorData.TYPE, (packet, context) -> {
-            ClientPacketHandler.loadInteractionEditorData(packet);
+        ClientPlayNetworking.registerGlobalReceiver(S2CCharacterSkin.TYPE, (client, handler, buf, responseSender) -> {
+            S2CCharacterSkin packet = S2CCharacterSkin.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.characterSkin(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CRunInkAction.TYPE, (packet, context) -> {
-            ClientPacketHandler.runInkAction(packet);
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CCharacterStoryAction.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CCharacterStoryAction packet = S2CCharacterStoryAction.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.characterStoryAction(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CClearLoadedSkins.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CClearLoadedSkins packet = S2CClearLoadedSkins.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.clearLoadedSkins(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(S2CRenderSaveIcon.TYPE, (client, handler, buf, responseSender) -> {
+            S2CRenderSaveIcon packet = S2CRenderSaveIcon.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.renderSaveIcon(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CStopAllInkActions.TYPE, (packet, context) -> {
-            ClientPacketHandler.stopAllInkActions();
+        ClientPlayNetworking.registerGlobalReceiver(BiMainScreenEnter.TYPE, (client, handler, buf, responseSender) -> {
+            BiMainScreenEnter packet = BiMainScreenEnter.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.enterMainScreen(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CShowDialogue.TYPE, (packet, context) -> {
-            ClientPacketHandler.showDialogue(packet);
+        ClientPlayNetworking.registerGlobalReceiver(S2CMainScreenData.TYPE, (client, handler, buf, responseSender) -> {
+            S2CMainScreenData packet = S2CMainScreenData.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.receiveMainScreenData(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CShowChoices.TYPE, (packet, context) -> {
-            ClientPacketHandler.showChoices(packet);
+        ClientPlayNetworking.registerGlobalReceiver(S2COpenMainScreen.TYPE, (client, handler, buf, responseSender) -> {
+            S2COpenMainScreen packet = S2COpenMainScreen.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.openMainScreen(packet);
+            });
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CStopStory.TYPE, (packet, context) -> {
-            ClientPacketHandler.stopStory();
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CDialogStop.TYPE, (packet, context) -> {
-            ClientPacketHandler.dialogStop();
-        });
-        ClientPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (packet, context) -> {
-            ClientPacketHandler.cameraAngleEnter(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(BiStopEditorMaker.TYPE, (packet, context) -> {
-            ClientPacketHandler.stopEditorMaker(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(BiInteractionEnter.TYPE, (packet, context) -> {
-            ClientPacketHandler.interactionEnter(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CCharacterSkin.TYPE, (packet, context) -> {
-            ClientPacketHandler.characterSkin(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CCharacterStoryAction.TYPE, (packet, context) -> {
-            ClientPacketHandler.characterStoryAction(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CClearLoadedSkins.TYPE, (packet, context) -> {
-            ClientPacketHandler.clearLoadedSkins(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CRenderSaveIcon.TYPE, (packet, context) -> {
-            ClientPacketHandler.renderSaveIcon(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(BiMainScreenEnter.TYPE, (packet, context) -> {
-            ClientPacketHandler.enterMainScreen(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CMainScreenData.TYPE, (packet, context) -> {
-            ClientPacketHandler.receiveMainScreenData(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2COpenMainScreen.TYPE, (packet, context) -> {
-            ClientPacketHandler.openMainScreen(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CNotifyClientPlayStory.TYPE, (packet, context) -> {
-            ClientPacketHandler.notifyClientPlayStory();
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CSessionClear.TYPE, (packet, context) -> {
-            ClientPacketHandler.sessionClear();
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CNotifyClientPlayStory.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CNotifyClientPlayStory packet = S2CNotifyClientPlayStory.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.notifyClientPlayStory();
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(S2CSessionClear.TYPE, (client, handler, buf, responseSender) -> {
+            S2CSessionClear packet = S2CSessionClear.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.sessionClear();
+            });
         });
     }
 }

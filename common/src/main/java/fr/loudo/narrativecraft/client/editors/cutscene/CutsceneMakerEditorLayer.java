@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.client.editors.cutscene;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -46,7 +45,7 @@ public class CutsceneMakerEditorLayer {
 
     public void render(
             GuiGraphics graphics,
-            DeltaTracker delta,
+            float delta,
             int layerY,
             int layerHeight,
             int timelineWidth,
@@ -96,7 +95,7 @@ public class CutsceneMakerEditorLayer {
 
     private void renderKeyframes(
             GuiGraphics graphics,
-            DeltaTracker delta,
+            float delta,
             int layerY,
             int layerHeight,
             int timelineWidth,

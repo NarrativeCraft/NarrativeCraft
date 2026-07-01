@@ -27,7 +27,6 @@ import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.io.File;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.entity.EntityType;
 
 public interface ICharacterStory extends ICharacter {
@@ -44,7 +43,7 @@ public interface ICharacterStory extends ICharacter {
 
     EntityType<?> getEntityType();
 
-    PlayerSkin.Model getModelType();
+    SkinModel getModelType();
 
     CharacterType getCharacterType();
 }

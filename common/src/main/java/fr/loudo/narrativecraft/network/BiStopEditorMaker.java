@@ -24,24 +24,26 @@
 package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public class BiStopEditorMaker implements CustomPacketPayload {
+public class BiStopEditorMaker implements NarrativePacket {
 
     public static final BiStopEditorMaker INSTANCE = new BiStopEditorMaker();
 
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "stop_editor_maker");
+
     private BiStopEditorMaker() {}
 
-    public static final Type<BiStopEditorMaker> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "stop_editor_maker"));
-
-    public static final StreamCodec<ByteBuf, BiStopEditorMaker> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static BiStopEditorMaker read(FriendlyByteBuf buf) {
+        return INSTANCE;
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {}
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

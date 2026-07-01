@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -77,6 +78,8 @@ public class DialogEditorMaker implements EditorMaker {
         player.connection.send(
                 new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entity));
         level.addNewPlayer(entity);
+
+        player.connection.send(new ClientboundRotateHeadPacket(entity, (byte) ((player.getYRot() + 180f) * 256 / 360)));
 
         if (character != null) {
             UtilsServer.broadcastCharacterSkin(List.of(player), character);

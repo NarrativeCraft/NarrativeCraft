@@ -24,26 +24,26 @@
 package fr.loudo.narrativecraft.network.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2COpenMainScreen(boolean canContinue, boolean finishedStory) implements CustomPacketPayload {
+public record S2COpenMainScreen(boolean canContinue, boolean finishedStory) implements NarrativePacket {
 
-    public static final Type<S2COpenMainScreen> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "open_main_screen"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "open_main_screen");
 
-    public static final StreamCodec<ByteBuf, S2COpenMainScreen> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.BOOL,
-            S2COpenMainScreen::canContinue,
-            ByteBufCodecs.BOOL,
-            S2COpenMainScreen::finishedStory,
-            S2COpenMainScreen::new);
+    public static S2COpenMainScreen read(FriendlyByteBuf buf) {
+        return new S2COpenMainScreen(buf.readBoolean(), buf.readBoolean());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeBoolean(canContinue);
+        buf.writeBoolean(finishedStory);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

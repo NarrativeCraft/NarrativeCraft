@@ -24,23 +24,27 @@
 package fr.loudo.narrativecraft.network.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SMainScreenRemovePlacement(UUID placementId) implements CustomPacketPayload {
+public record C2SMainScreenRemovePlacement(UUID placementId) implements NarrativePacket {
 
-    public static final Type<C2SMainScreenRemovePlacement> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_remove_placement"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "main_screen_remove_placement");
 
-    public static final StreamCodec<ByteBuf, C2SMainScreenRemovePlacement> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC, C2SMainScreenRemovePlacement::placementId, C2SMainScreenRemovePlacement::new);
+    public static C2SMainScreenRemovePlacement read(FriendlyByteBuf buf) {
+        return new C2SMainScreenRemovePlacement(buf.readUUID());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(placementId);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

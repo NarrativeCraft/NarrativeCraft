@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.screens.narrative.cameraangle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.function.Consumer;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -61,6 +62,12 @@ public class CameraAngleCameraNameScreen extends Screen {
     }
 
     @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
     protected void init() {
         int centerX = this.width / 2;
         int centerY = this.height / 2;
@@ -69,7 +76,7 @@ public class CameraAngleCameraNameScreen extends Screen {
         promptWidget.setPosition(centerX - promptWidget.getWidth() / 2, centerY - FIELD_HEIGHT - GAP - 20);
         addRenderableWidget(promptWidget);
 
-        nameBox = new EditBox(this.font, FIELD_WIDTH, FIELD_HEIGHT, Translation.message("name"));
+        nameBox = new EditBox(this.font, 0, 0, FIELD_WIDTH, FIELD_HEIGHT, Translation.message("name"));
         nameBox.setValue(initialName);
         nameBox.setPosition(centerX - FIELD_WIDTH / 2, centerY - FIELD_HEIGHT / 2);
         addRenderableWidget(nameBox);

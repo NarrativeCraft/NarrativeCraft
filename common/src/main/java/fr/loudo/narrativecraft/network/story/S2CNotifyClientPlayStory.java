@@ -24,21 +24,24 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CNotifyClientPlayStory() implements CustomPacketPayload {
+public record S2CNotifyClientPlayStory() implements NarrativePacket {
 
-    public static final Type<S2CNotifyClientPlayStory> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "notify_client_play_story"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "notify_client_play_story");
 
-    public static final StreamCodec<ByteBuf, S2CNotifyClientPlayStory> STREAM_CODEC =
-            StreamCodec.unit(new S2CNotifyClientPlayStory());
+    public static S2CNotifyClientPlayStory read(FriendlyByteBuf buf) {
+        return new S2CNotifyClientPlayStory();
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {}
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

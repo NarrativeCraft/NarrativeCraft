@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.screens.narrative.interaction;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
 import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -54,6 +55,12 @@ public class InteractionZoneEditScreen extends Screen {
         this.zone = zone;
         this.lastScreen = lastScreen;
         this.oneTime = zone.isOneTime();
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override

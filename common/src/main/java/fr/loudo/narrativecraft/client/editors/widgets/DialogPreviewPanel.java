@@ -92,24 +92,28 @@ public class DialogPreviewPanel {
         poseStack.pushPose();
         poseStack.translate(anchorPos.x - cameraPos.x, anchorPos.y - cameraPos.y, anchorPos.z - cameraPos.z);
         poseStack.mulPose(camera.rotation());
-        poseStack.scale(0.5f, -0.5f, 0.5f);
+        poseStack.scale(-0.5f, -0.5f, 0.5f);
 
         float halfSize = 0.05f;
         int color = 0xFFFF0000;
         Matrix4f matrix = poseStack.last().pose();
         VertexConsumer consumer = bufferSource.getBuffer(NarrativeCraftMod.dialogRenderType);
-        consumer.addVertex(matrix, -halfSize, -halfSize, 0)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, -halfSize, halfSize, 0)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, halfSize, halfSize, 0)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, halfSize, -halfSize, 0)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
+        consumer.vertex(matrix, -halfSize, -halfSize, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, -halfSize, halfSize, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, halfSize, halfSize, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, halfSize, -halfSize, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
         bufferSource.endBatch();
 
         poseStack.popPose();

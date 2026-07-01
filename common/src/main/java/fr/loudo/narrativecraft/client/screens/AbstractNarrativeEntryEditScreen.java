@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.Screen;
@@ -63,6 +64,12 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
     }
 
     @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
     protected void init() {
         String savedName = nameBox != null ? nameBox.getValue() : (entry != null ? entry.getName() : "");
         String savedDescription =
@@ -71,7 +78,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
         widgets.clear();
 
         nameText = new StringWidget(Translation.message("name"), this.font);
-        nameBox = new EditBox(this.font, GLOBAL_WIDTH, 20, Translation.message("name"));
+        nameBox = new EditBox(this.font, 0, 0, GLOBAL_WIDTH, 20, Translation.message("name"));
         nameBox.setValue(savedName);
 
         descriptionText = new StringWidget(Translation.message("description"), this.font);
@@ -144,7 +151,7 @@ public abstract class AbstractNarrativeEntryEditScreen<T extends NarrativeEntry<
     }
 
     protected void sendToastError(Component title, Component message) {
-        minecraft.getToasts().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
+        minecraft.getToasts().addToast(new SystemToast(SystemToast.SystemToastIds.NARRATOR_TOGGLE, title, message));
     }
 
     protected boolean showDescription() {

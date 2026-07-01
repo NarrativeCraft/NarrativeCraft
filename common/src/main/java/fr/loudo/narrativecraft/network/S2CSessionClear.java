@@ -24,22 +24,24 @@
 package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public class S2CSessionClear implements CustomPacketPayload {
+public class S2CSessionClear implements NarrativePacket {
 
     public static final S2CSessionClear INSTANCE = new S2CSessionClear();
 
-    public static final Type<S2CSessionClear> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "session_clear"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "session_clear");
 
-    public static final StreamCodec<ByteBuf, S2CSessionClear> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static S2CSessionClear read(FriendlyByteBuf buf) {
+        return INSTANCE;
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {}
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

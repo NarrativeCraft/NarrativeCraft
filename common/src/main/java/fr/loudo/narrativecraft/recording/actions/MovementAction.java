@@ -28,6 +28,8 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
@@ -57,6 +59,9 @@ public class MovementAction extends AbstractAction {
         entity.setXRot(pitch);
         entity.setYRot(yaw);
         entity.setYHeadRot(headYaw);
+        for (ServerPlayer player : session.getTargetedPlayers()) {
+            player.connection.send(new ClientboundRotateHeadPacket(entity, (byte) (headYaw * 256 / 360)));
+        }
 
         return ActionResult.OK;
     }

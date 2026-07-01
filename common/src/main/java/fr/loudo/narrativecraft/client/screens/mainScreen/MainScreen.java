@@ -25,11 +25,11 @@ package fr.loudo.narrativecraft.client.screens.mainScreen;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.realmsclient.RealmsMainScreen;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.mixin.invoker.PauseScreenInvoker;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
@@ -40,11 +40,8 @@ import java.io.InputStream;
 import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.GenericMessageScreen;
+import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
-import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
@@ -63,12 +60,11 @@ public class MainScreen extends Screen {
     private static final int LOGO_GAP = 20;
     private static final int SECRET_CTRL_PRESSES = 10;
 
-    private static final ResourceLocation LOGO_SPRITE =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "logo");
+    private static final ResourceLocation LOGO_SPRITE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "logo");
     private static final ResourceLocation LOGO_FILE =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/gui/sprites/logo.png");
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "textures/gui/sprites/logo.png");
     private static final ResourceLocation BACKGROUND_MUSIC =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "music.main_screen");
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "music.main_screen");
     private static final SimpleSoundInstance MAIN_MUSIC_INSTANCE = new SimpleSoundInstance(
             SoundEvent.createVariableRangeEvent(BACKGROUND_MUSIC).getLocation(),
             SoundSource.MASTER,
@@ -211,6 +207,7 @@ public class MainScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, partialTick);
 
         if (!hasLogo) return;
@@ -226,7 +223,18 @@ public class MainScreen extends Screen {
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        graphics.blitSprite(LOGO_SPRITE, MARGIN_LEFT, blockStartY, logoDisplayWidth, logoDisplayHeight);
+        graphics.blit(
+                LOGO_FILE,
+                MARGIN_LEFT,
+                blockStartY,
+                logoDisplayWidth,
+                logoDisplayHeight,
+                0f,
+                0f,
+                logoNativeWidth,
+                logoNativeHeight,
+                logoNativeWidth,
+                logoNativeHeight);
         RenderSystem.disableBlend();
     }
 
@@ -243,8 +251,8 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        if (isPause) super.renderBackground(graphics, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics guiGraphics) {
+        if (isPause) super.renderBackground(guiGraphics);
     }
 
     @Override
@@ -293,22 +301,8 @@ public class MainScreen extends Screen {
     }
 
     private void disconnect() {
-        boolean flag = this.minecraft.isLocalServer();
-        ServerData serverdata = this.minecraft.getCurrentServer();
-        this.minecraft.level.disconnect();
-        if (flag) {
-            this.minecraft.disconnect(new GenericMessageScreen(Component.translatable("menu.savingLevel")));
-        } else {
-            this.minecraft.disconnect();
-        }
-
-        TitleScreen titlescreen = new TitleScreen();
-        if (flag) {
-            this.minecraft.setScreen(titlescreen);
-        } else if (serverdata != null && serverdata.isRealm()) {
-            this.minecraft.setScreen(new RealmsMainScreen(titlescreen));
-        } else {
-            this.minecraft.setScreen(new JoinMultiplayerScreen(titlescreen));
-        }
+        PauseScreen pauseScreen = new PauseScreen(false);
+        minecraft.setScreen(pauseScreen);
+        ((PauseScreenInvoker) pauseScreen).callOnDisconnect();
     }
 }

@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import fr.loudo.narrativecraft.network.S2CCharacterSkin;
 import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
@@ -41,8 +42,11 @@ import java.util.Collection;
 import java.util.UUID;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 public class UtilsServer {
 
@@ -50,7 +54,7 @@ public class UtilsServer {
         return NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayer(playerId);
     }
 
-    public static void broadcastPacket(CustomPacketPayload packet) {
+    public static void broadcastPacket(NarrativePacket packet) {
         for (ServerPlayer player :
                 NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayers()) {
             Services.PACKET.sendToPlayer(player, packet);
@@ -142,5 +146,25 @@ public class UtilsServer {
         boolean finishedStory = storyHandler != null && storyHandler.hasFinishedStory();
 
         openMainScreenToPlayer(player, canContinue, finishedStory);
+    }
+
+    public void updateEntityRotation(Entity entity, ServerPlayer target, float yaw, float pitch) {
+        entity.setXRot(pitch);
+        entity.setYHeadRot(yaw);
+
+        if (entity instanceof LivingEntity livingEntity) {
+            livingEntity.setYBodyRot(yaw);
+        }
+
+        entity.yRotO = yaw;
+        entity.xRotO = pitch;
+
+        byte yawByte = (byte) (yaw * 256.0f / 360.0f);
+        byte pitchByte = (byte) (pitch * 256.0f / 360.0f);
+
+        target.connection.send(
+                new ClientboundMoveEntityPacket.Rot(entity.getId(), yawByte, pitchByte, entity.onGround()));
+
+        target.connection.send(new ClientboundRotateHeadPacket(entity, yawByte));
     }
 }

@@ -24,28 +24,26 @@
 package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CRenderSaveIcon(double in, double stay, double out) implements CustomPacketPayload {
+public record S2CRenderSaveIcon(double in, double stay, double out) implements NarrativePacket {
 
-    public static final Type<S2CRenderSaveIcon> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "save_icon"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "save_icon");
 
-    public static final StreamCodec<ByteBuf, S2CRenderSaveIcon> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.DOUBLE,
-            S2CRenderSaveIcon::in,
-            ByteBufCodecs.DOUBLE,
-            S2CRenderSaveIcon::stay,
-            ByteBufCodecs.DOUBLE,
-            S2CRenderSaveIcon::out,
-            S2CRenderSaveIcon::new);
+    public static S2CRenderSaveIcon read(FriendlyByteBuf buf) {
+        return new S2CRenderSaveIcon(buf.readDouble(), buf.readDouble(), buf.readDouble());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeDouble(in);
+        buf.writeDouble(stay);
+        buf.writeDouble(out);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.client.screens.narrative.character;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -44,6 +45,12 @@ public class MainCharacterAttributeScreen extends Screen {
         super(Component.empty());
         this.lastScreen = lastScreen;
         this.attribute = attribute;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     private Button skinModeButton;

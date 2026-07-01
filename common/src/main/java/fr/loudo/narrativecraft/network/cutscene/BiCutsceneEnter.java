@@ -26,15 +26,12 @@ package fr.loudo.narrativecraft.network.cutscene;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public class BiCutsceneEnter implements CustomPacketPayload {
+public class BiCutsceneEnter implements NarrativePacket {
 
     private final UUID chapterId;
     private final UUID sceneId;
@@ -55,19 +52,20 @@ public class BiCutsceneEnter implements CustomPacketPayload {
         this.environment = environment;
     }
 
-    public static final Type<BiCutsceneEnter> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_state"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "cutscene_state");
 
-    public static final StreamCodec<ByteBuf, BiCutsceneEnter> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            BiCutsceneEnter::getChapterId,
-            UUIDUtil.STREAM_CODEC,
-            BiCutsceneEnter::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            BiCutsceneEnter::getCutsceneId,
-            ByteBufCodecs.idMapper(i -> NarrativeEnvironment.values()[i], NarrativeEnvironment::ordinal),
-            BiCutsceneEnter::getEnvironment,
-            BiCutsceneEnter::new);
+    public static BiCutsceneEnter read(FriendlyByteBuf buf) {
+        return new BiCutsceneEnter(
+                buf.readUUID(), buf.readUUID(), buf.readUUID(), buf.readEnum(NarrativeEnvironment.class));
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(chapterId);
+        buf.writeUUID(sceneId);
+        buf.writeUUID(cutsceneId);
+        buf.writeEnum(environment);
+    }
 
     public UUID getChapterId() {
         return chapterId;
@@ -86,7 +84,7 @@ public class BiCutsceneEnter implements CustomPacketPayload {
     }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public ResourceLocation type() {
         return TYPE;
     }
 }

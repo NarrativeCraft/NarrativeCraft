@@ -56,89 +56,201 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 public class ServerPacketHandlerFabric {
 
     public static void handle() {
-        ServerPlayNetworking.registerGlobalReceiver(BiSyncNarrativeEntryPacket.TYPE, (packet, context) -> {
-            ServerPacketHandler.narrativeEntry(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(BiCutsceneEnter.TYPE, (packet, context) -> {
-            ServerPacketHandler.cutsceneState(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCutsceneControl.TYPE, (packet, context) -> {
-            ServerPacketHandler.cutsceneControl(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCutsceneSave.TYPE, (packet, context) -> {
-            ServerPacketHandler.cutsceneSave(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(BiCutscenePlayHeadPacket.TYPE, (packet, context) -> {
-            ServerPacketHandler.playHeadUpdate(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleEnter(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(BiStopEditorMaker.TYPE, (packet, context) -> {
-            ServerPacketHandler.stopEditorMaker(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleSave.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleSave(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleCaptureCharacter.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleCaptureCharacter(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleRemovePlacement.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleRemovePlacement(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleTeleportToTemplate.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleTeleportToTemplate(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleSetEntityPose.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleSetEntityPose(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleAddTemplateReference.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleAddTemplateReference(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleRemoveTemplateReference.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleRemoveTemplateReference(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(BiInteractionEnter.TYPE, (packet, context) -> {
-            ServerPacketHandler.interactionEnter(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SInteractionSave.TYPE, (packet, context) -> {
-            ServerPacketHandler.interactionSave(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SInkActionFinished.TYPE, (packet, context) -> {
-            ServerPacketHandler.inkActionFinished(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SDialogueFinished.TYPE, (packet, context) -> {
-            ServerPacketHandler.dialogueFinished(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SChoiceSelected.TYPE, (packet, context) -> {
-            ServerPacketHandler.choiceSelected(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SPlayStitchStory.TYPE, (packet, context) -> {
-            ServerPacketHandler.playStitch(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(BiMainScreenEnter.TYPE, (packet, context) -> {
-            ServerPacketHandler.enterMainScreen(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SMainScreenCaptureCharacter.TYPE, (packet, context) -> {
-            ServerPacketHandler.mainScreenCaptureCharacter(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SMainScreenSave.TYPE, (packet, context) -> {
-            ServerPacketHandler.mainScreenSave(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SMainScreenRemovePlacement.TYPE, (packet, context) -> {
-            ServerPacketHandler.mainScreenRemovePlacement(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SPlayStory.TYPE, (packet, context) -> {
-            ServerPacketHandler.playStory(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SEnterDialogEditor.TYPE, (packet, context) -> {
-            ServerPacketHandler.enterDialogEditor(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SStopStory.TYPE, (packet, context) -> {
-            ServerPacketHandler.stopStory(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SChangeGamemodePacket.TYPE, (packet, context) -> {
-            ServerPacketHandler.changeGamemode(packet, context.player());
-        });
+        ServerPlayNetworking.registerGlobalReceiver(
+                BiSyncNarrativeEntryPacket.TYPE, (server, player, handler, buf, responseSender) -> {
+                    BiSyncNarrativeEntryPacket packet = BiSyncNarrativeEntryPacket.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.narrativeEntry(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                BiCutsceneEnter.TYPE, (server, player, handler, buf, responseSender) -> {
+                    BiCutsceneEnter packet = BiCutsceneEnter.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cutsceneState(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCutsceneControl.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCutsceneControl packet = C2SCutsceneControl.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cutsceneControl(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCutsceneSave.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCutsceneSave packet = C2SCutsceneSave.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cutsceneSave(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                BiCutscenePlayHeadPacket.TYPE, (server, player, handler, buf, responseSender) -> {
+                    BiCutscenePlayHeadPacket packet = BiCutscenePlayHeadPacket.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.playHeadUpdate(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                BiCameraAngleEnter.TYPE, (server, player, handler, buf, responseSender) -> {
+                    BiCameraAngleEnter packet = BiCameraAngleEnter.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cameraAngleEnter(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                BiStopEditorMaker.TYPE, (server, player, handler, buf, responseSender) -> {
+                    BiStopEditorMaker packet = BiStopEditorMaker.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.stopEditorMaker(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCameraAngleSave.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCameraAngleSave packet = C2SCameraAngleSave.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cameraAngleSave(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCameraAngleCaptureCharacter.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCameraAngleCaptureCharacter packet = C2SCameraAngleCaptureCharacter.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cameraAngleCaptureCharacter(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCameraAngleRemovePlacement.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCameraAngleRemovePlacement packet = C2SCameraAngleRemovePlacement.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cameraAngleRemovePlacement(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCameraAngleTeleportToTemplate.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCameraAngleTeleportToTemplate packet = C2SCameraAngleTeleportToTemplate.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cameraAngleTeleportToTemplate(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCameraAngleSetEntityPose.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCameraAngleSetEntityPose packet = C2SCameraAngleSetEntityPose.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cameraAngleSetEntityPose(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCameraAngleAddTemplateReference.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCameraAngleAddTemplateReference packet = C2SCameraAngleAddTemplateReference.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cameraAngleAddTemplateReference(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SCameraAngleRemoveTemplateReference.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SCameraAngleRemoveTemplateReference packet = C2SCameraAngleRemoveTemplateReference.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.cameraAngleRemoveTemplateReference(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                BiInteractionEnter.TYPE, (server, player, handler, buf, responseSender) -> {
+                    BiInteractionEnter packet = BiInteractionEnter.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.interactionEnter(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SInteractionSave.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SInteractionSave packet = C2SInteractionSave.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.interactionSave(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SInkActionFinished.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SInkActionFinished packet = C2SInkActionFinished.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.inkActionFinished(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SDialogueFinished.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SDialogueFinished packet = C2SDialogueFinished.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.dialogueFinished(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SChoiceSelected.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SChoiceSelected packet = C2SChoiceSelected.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.choiceSelected(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SPlayStitchStory.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SPlayStitchStory packet = C2SPlayStitchStory.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.playStitch(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                BiMainScreenEnter.TYPE, (server, player, handler, buf, responseSender) -> {
+                    BiMainScreenEnter packet = BiMainScreenEnter.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.enterMainScreen(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SMainScreenCaptureCharacter.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SMainScreenCaptureCharacter packet = C2SMainScreenCaptureCharacter.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.mainScreenCaptureCharacter(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SMainScreenSave.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SMainScreenSave packet = C2SMainScreenSave.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.mainScreenSave(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SMainScreenRemovePlacement.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SMainScreenRemovePlacement packet = C2SMainScreenRemovePlacement.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.mainScreenRemovePlacement(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SPlayStory.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SPlayStory packet = C2SPlayStory.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.playStory(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SEnterDialogEditor.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SEnterDialogEditor packet = C2SEnterDialogEditor.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.enterDialogEditor(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SStopStory.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SStopStory packet = C2SStopStory.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.stopStory(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SChangeGamemodePacket.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SChangeGamemodePacket packet = C2SChangeGamemodePacket.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.changeGamemode(packet, player);
+                    });
+                });
     }
 }

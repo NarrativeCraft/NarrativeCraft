@@ -97,12 +97,12 @@ public class Playback implements IPlaybackSession {
 
     public Entity getMasterEntity() {
         if (contexts.isEmpty()) return null;
-        return contexts.getFirst().getEntity();
+        return contexts.get(0).getEntity();
     }
 
     public void setMasterEntity(Entity entity) {
         if (contexts.isEmpty()) return;
-        contexts.getFirst().setEntity(entity);
+        contexts.get(0).setEntity(entity);
     }
 
     public void start(Collection<ServerPlayer> targetedPlayers) {

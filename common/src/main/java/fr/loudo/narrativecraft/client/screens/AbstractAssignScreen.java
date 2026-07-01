@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.client.screens;
 
 import fr.loudo.narrativecraft.client.screens.components.BreadcrumbWidget;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,12 @@ public abstract class AbstractAssignScreen<T> extends Screen {
     protected AbstractAssignScreen(Component title, Screen lastScreen) {
         super(title);
         this.lastScreen = lastScreen;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     protected abstract List<T> buildAvailableList();
@@ -119,7 +126,8 @@ public abstract class AbstractAssignScreen<T> extends Screen {
                         assigned.add(selectedLeft);
                         available.remove(selectedLeft);
                         selectedLeft = null;
-                        leftPage = Math.clamp((int) Math.ceil((double) available.size() / MAX_PER_PAGE), 1, leftPage);
+                        leftPage =
+                                MathUtils.clamp((int) Math.ceil((double) available.size() / MAX_PER_PAGE), 1, leftPage);
                         rebuildWidgets();
                     }
                 })
@@ -133,7 +141,8 @@ public abstract class AbstractAssignScreen<T> extends Screen {
                         available.add(selectedRight);
                         assigned.remove(selectedRight);
                         selectedRight = null;
-                        rightPage = Math.clamp((int) Math.ceil((double) assigned.size() / MAX_PER_PAGE), 1, rightPage);
+                        rightPage =
+                                MathUtils.clamp((int) Math.ceil((double) assigned.size() / MAX_PER_PAGE), 1, rightPage);
                         rebuildWidgets();
                     }
                 })
@@ -214,7 +223,7 @@ public abstract class AbstractAssignScreen<T> extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+    public void renderBackground(GuiGraphics graphics) {
         int leftListX = this.width / 4 - LIST_WIDTH / 2;
         int rightListX = 3 * this.width / 4 - LIST_WIDTH / 2;
         int totalListHeight = MAX_PER_PAGE * (ITEM_HEIGHT + ITEM_GAP);
@@ -232,7 +241,7 @@ public abstract class AbstractAssignScreen<T> extends Screen {
                 LIST_START_Y + totalListHeight + 2,
                 FastColor.ARGB32.color(70, 31, 30, 30));
 
-        super.renderBackground(graphics, mouseX, mouseY, a);
+        super.renderBackground(graphics);
     }
 
     @Override

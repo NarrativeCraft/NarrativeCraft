@@ -140,7 +140,7 @@ public class RecordingReader implements Action.Reader {
     }
 
     public CompoundTag readCompoundTag() throws IOException {
-        return NbtIo.read(input, NbtAccounter.unlimitedHeap());
+        return NbtIo.read(input, NbtAccounter.UNLIMITED);
     }
 
     public List<AbstractAction> readAllActions(int count) throws IOException {

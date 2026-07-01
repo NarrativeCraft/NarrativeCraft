@@ -25,10 +25,12 @@ package fr.loudo.narrativecraft.client.screens.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.io.IOException;
 import java.util.Locale;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
@@ -46,6 +48,12 @@ public class OptionsScreen extends Screen {
     public OptionsScreen(Screen lastScreen) {
         super(Translation.message("screen.main.options.title"));
         this.lastScreen = lastScreen;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
@@ -75,11 +83,13 @@ public class OptionsScreen extends Screen {
 
         currentY += ELEMENT_HEIGHT + ELEMENT_GAP;
 
-        Checkbox autoSkip = Checkbox.builder(Translation.message("screen.main.options.auto_skip"), font)
-                .pos(middleX, currentY)
-                .selected(NarrativeClientSettings.autoSkip)
-                .onValueChange((checkbox, value) -> NarrativeClientSettings.autoSkip = value)
-                .build();
+        Checkbox autoSkip = new Checkbox(
+                middleX,
+                currentY,
+                20,
+                20,
+                Translation.message("screen.main.options.auto_skip"),
+                NarrativeClientSettings.autoSkip);
         addRenderableWidget(autoSkip);
 
         currentY += autoSkip.getHeight() + ELEMENT_GAP;
@@ -87,7 +97,7 @@ public class OptionsScreen extends Screen {
         addRenderableWidget(Button.builder(
                         Translation.message("screen.main.options.minecraft_options"),
                         button -> minecraft.setScreen(
-                                new net.minecraft.client.gui.screens.options.OptionsScreen(this, minecraft.options)))
+                                new net.minecraft.client.gui.screens.OptionsScreen(this, minecraft.options)))
                 .bounds(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT)
                 .build());
 
@@ -106,7 +116,7 @@ public class OptionsScreen extends Screen {
     }
 
     private static float sliderValueToSpeed(double sliderValue) {
-        return (float) Math.clamp(sliderValue * 4.0 + 1.0, 1.0, 5.0);
+        return (float) MathUtils.clamp(sliderValue * 4.0 + 1.0, 1.0, 5.0);
     }
 
     private static Component buildTextSpeedLabel(double speed) {

@@ -32,8 +32,8 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -81,11 +81,11 @@ public class RightClickBlockAction extends DataBlockHitAction {
         BlockPos blockPos = hitResult.getBlockPos();
         BlockState blockState = session.getLevel().getBlockState(blockPos);
 
-        ItemInteractionResult result = blockState.useItemOn(itemStack, session.getLevel(), player, hand, hitResult);
+        itemStack.useOn(new UseOnContext(player, hand, hitResult));
 
         // TODO: make this action also client-side for session.forSpecificPlayers(). seems to be a bit tricky,
         // unfortunately for now it can be only played server-side.
-        blockState.useWithoutItem(session.getLevel(), player, hitResult);
+        blockState.use(session.getLevel(), player, hand, hitResult);
 
         return ActionResult.OK;
     }

@@ -31,7 +31,6 @@ import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import java.util.List;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
@@ -42,7 +41,7 @@ public class CutsceneMakerEditorPathRenderer {
     // Number of ticks between each sampled point along the pathString
     private static final int SAMPLE_STEP = 2;
 
-    public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
+    public static void render(PoseStack poseStack, float deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         ClientCutsceneMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
@@ -96,7 +95,13 @@ public class CutsceneMakerEditorPathRenderer {
             dy /= len;
             dz /= len;
         }
-        vc.addVertex(matrix, x1, y1, z1).setColor(1.0F, 1.0F, 0.0F, 1.0F).setNormal(dx, dy, dz);
-        vc.addVertex(matrix, x2, y2, z2).setColor(1.0F, 1.0F, 0.0F, 1.0F).setNormal(dx, dy, dz);
+        vc.vertex(matrix, x1, y1, z1)
+                .color(1.0F, 1.0F, 0.0F, 1.0F)
+                .normal(dx, dy, dz)
+                .endVertex();
+        vc.vertex(matrix, x2, y2, z2)
+                .color(1.0F, 1.0F, 0.0F, 1.0F)
+                .normal(dx, dy, dz)
+                .endVertex();
     }
 }

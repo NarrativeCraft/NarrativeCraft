@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.dialog;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
@@ -165,11 +166,12 @@ public class DialogAnimator {
     }
 
     private float getInterpolatedProgress(float partialTick) {
-        return Math.clamp(previousProgress + (animationProgress - previousProgress) * partialTick, 0f, 1f);
+        return MathUtils.clamp(previousProgress + (animationProgress - previousProgress) * partialTick, 0f, 1f);
     }
 
     private float getInterpolatedResize(float partialTick) {
-        return Math.clamp(previousResizeProgress + (resizeProgress - previousResizeProgress) * partialTick, 0f, 1f);
+        return MathUtils.clamp(
+                previousResizeProgress + (resizeProgress - previousResizeProgress) * partialTick, 0f, 1f);
     }
 
     private float smoothStep(float t) {

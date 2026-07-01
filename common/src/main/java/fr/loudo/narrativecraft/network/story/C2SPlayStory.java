@@ -24,30 +24,28 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.Optional;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SPlayStory(Optional<String> stitchName, boolean fromSave, boolean newGame)
-        implements CustomPacketPayload {
+public record C2SPlayStory(Optional<String> stitchName, boolean fromSave, boolean newGame) implements NarrativePacket {
 
-    public static final Type<C2SPlayStory> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_story"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "play_story");
 
-    public static final StreamCodec<ByteBuf, C2SPlayStory> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
-            C2SPlayStory::stitchName,
-            ByteBufCodecs.BOOL,
-            C2SPlayStory::fromSave,
-            ByteBufCodecs.BOOL,
-            C2SPlayStory::newGame,
-            C2SPlayStory::new);
+    public static C2SPlayStory read(FriendlyByteBuf buf) {
+        return new C2SPlayStory(buf.readOptional(FriendlyByteBuf::readUtf), buf.readBoolean(), buf.readBoolean());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeOptional(stitchName, FriendlyByteBuf::writeUtf);
+        buf.writeBoolean(fromSave);
+        buf.writeBoolean(newGame);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

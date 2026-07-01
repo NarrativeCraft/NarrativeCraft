@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMaker
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.Locale;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -60,6 +61,12 @@ public class InteractionPointEditScreen extends Screen {
         this.useAimRadius = point.isUseAimRadius();
         this.neverShow = point.isNeverShow();
         this.oneTimeClick = point.isOneTimeClick();
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override

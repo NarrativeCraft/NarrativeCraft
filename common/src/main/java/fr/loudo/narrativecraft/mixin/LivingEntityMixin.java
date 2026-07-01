@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.SleepAction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,7 +49,7 @@ public class LivingEntityMixin {
     }
 
     @Inject(method = "dropAllDeathLoot", at = @At("HEAD"), cancellable = true)
-    private void narrativecraft$shouldDropLoot(ServerLevel level, DamageSource source, CallbackInfo ci) {
+    private void narrativecraft$shouldDropLoot(DamageSource damageSource, CallbackInfo ci) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         if (livingEntity.getTags().contains(Playback.ENTITY_TAG)) {
             ci.cancel();

@@ -3,27 +3,29 @@
   "minVersion": "0.8",
   "package": "fr.loudo.narrativecraft.mixin",
   "refmap": "${mod_id}.refmap.json",
-  "compatibilityLevel": "JAVA_18",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "EntityMixin",
     "LivingEntityMixin",
     "ServerLevelMixin",
-    "accessor.BoatAccessor",
     "accessor.AbstractHorseAccessor",
-    "accessor.PlayerAccessor",
+    "accessor.BoatAccessor",
     "accessor.EntityAccessor",
     "accessor.LivingEntityAccessor",
+    "accessor.PlayerAccessor",
     "accessor.TextureManagerAccessor"
   ],
   "client": [
     "CameraMixin",
     "GameRendererMixin",
+    "LevelRendererMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",
     "MouseHandlerMixin",
     "PlayerInfoMixin",
     "SoundEngineMixin",
-    "SoundManagerMixin"
+    "SoundManagerMixin",
+    "invoker.PauseScreenInvoker"
   ],
   "server": [],
   "injectors": {

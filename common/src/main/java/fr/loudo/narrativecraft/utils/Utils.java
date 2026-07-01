@@ -25,8 +25,8 @@ package fr.loudo.narrativecraft.utils;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.character.SkinModel;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -61,11 +61,15 @@ public class Utils {
         return TagParser.parseTag(nbtString);
     }
 
-    public static PlayerSkin.Model parsePlayerModelType(String value) {
+    public static int argb(int alpha, int rgb) {
+        return (alpha << 24) | (rgb & 0x00FFFFFF);
+    }
+
+    public static SkinModel parsePlayerModelType(String value) {
         try {
-            return PlayerSkin.Model.valueOf(value);
+            return SkinModel.valueOf(value);
         } catch (IllegalArgumentException e) {
-            return PlayerSkin.Model.values()[0];
+            return SkinModel.values()[0];
         }
     }
 }

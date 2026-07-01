@@ -24,29 +24,29 @@
 package fr.loudo.narrativecraft.network.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Pose;
 
-public record C2SCameraAngleSetEntityPose(UUID placementId, Pose pose) implements CustomPacketPayload {
+public record C2SCameraAngleSetEntityPose(UUID placementId, Pose pose) implements NarrativePacket {
 
-    public static final Type<C2SCameraAngleSetEntityPose> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_set_entity_pose"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "camera_angle_set_entity_pose");
 
-    public static final StreamCodec<ByteBuf, C2SCameraAngleSetEntityPose> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleSetEntityPose::placementId,
-            ByteBufCodecs.idMapper(i -> Pose.values()[i], Pose::ordinal),
-            C2SCameraAngleSetEntityPose::pose,
-            C2SCameraAngleSetEntityPose::new);
+    public static C2SCameraAngleSetEntityPose read(FriendlyByteBuf buf) {
+        return new C2SCameraAngleSetEntityPose(buf.readUUID(), buf.readEnum(Pose.class));
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(placementId);
+        buf.writeEnum(pose);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

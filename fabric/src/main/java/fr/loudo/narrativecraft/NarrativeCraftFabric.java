@@ -25,9 +25,6 @@ package fr.loudo.narrativecraft;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import fr.loudo.narrativecraft.network.BiPacketRegister;
-import fr.loudo.narrativecraft.network.ClientPacketRegisterFabric;
-import fr.loudo.narrativecraft.network.ServerPacketRegisterFabric;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerFabric;
 import fr.loudo.narrativecraft.register.FabricEventList;
 import net.fabricmc.api.ModInitializer;
@@ -41,9 +38,6 @@ public class NarrativeCraftFabric implements ModInitializer {
     @Override
     public void onInitialize() {
 
-        BiPacketRegister.register();
-        ServerPacketRegisterFabric.register();
-        ClientPacketRegisterFabric.register();
         ServerPacketHandlerFabric.handle();
 
         NarrativeCraftMod.commonInit();

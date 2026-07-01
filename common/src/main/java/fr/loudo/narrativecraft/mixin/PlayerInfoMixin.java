@@ -36,11 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -54,8 +54,12 @@ public abstract class PlayerInfoMixin {
     @Shadow
     public abstract GameProfile getProfile();
 
-    @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
-    private void narrativecraft$getCharacterSkin(CallbackInfoReturnable<PlayerSkin> cir) {
+    @Shadow
+    @Nullable
+    private String skinModel;
+
+    @Inject(method = "getSkinLocation", at = @At("RETURN"), cancellable = true)
+    private void narrativecraft$getCharacterSkin(CallbackInfoReturnable<ResourceLocation> cir) {
         GameProfile profile = getProfile();
 
         UUID characterId = narrativecraft$resolveCharacterId(profile);
@@ -65,7 +69,7 @@ public abstract class PlayerInfoMixin {
             if (!characterId.equals(characterStory.getId())) continue;
 
             if (narrativecraft$isMainCharacterWithPlayerSkin(characterStory)) {
-                cir.setReturnValue(Minecraft.getInstance().player.getSkin());
+                cir.setReturnValue(Minecraft.getInstance().player.getSkinTextureLocation());
                 continue;
             }
 
@@ -108,15 +112,17 @@ public abstract class PlayerInfoMixin {
         return attr.isMainCharacter() && attr.getSkin() == MainCharacterAttribute.SkinMode.SKIN_OF_PLAYER;
     }
 
-    private Optional<PlayerSkin> narrativecraft$buildCharacterSkin(ICharacterStory characterStory) {
+    private Optional<ResourceLocation> narrativecraft$buildCharacterSkin(ICharacterStory characterStory) {
         ResourceLocation skinPath = narrativecraft$getSkinIdentifier(characterStory.getId());
 
         if (!narrativecraft$isDynamicTextureLoaded(skinPath)) return Optional.empty();
 
-        return Optional.of(new PlayerSkin(skinPath, null, null, null, characterStory.getModelType(), false));
+        this.skinModel = characterStory.getModelType().name();
+
+        return Optional.of(skinPath);
     }
 
-    private Optional<PlayerSkin> narrativecraft$resolveLocalPlayerSkin() {
+    private Optional<ResourceLocation> narrativecraft$resolveLocalPlayerSkin() {
         CharacterStory mainCharacter =
                 ClientNarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
 
@@ -132,7 +138,7 @@ public abstract class PlayerInfoMixin {
     private UUID narrativecraft$resolveCharacterId(GameProfile profile) {
         for (Property property : profile.getProperties().get(FakePlayer.CHARACTER_ID_PROPERTY)) {
             try {
-                return UUID.fromString(property.value());
+                return UUID.fromString(property.getValue());
             } catch (IllegalArgumentException ignored) {
             }
         }
@@ -140,7 +146,7 @@ public abstract class PlayerInfoMixin {
     }
 
     private ResourceLocation narrativecraft$getSkinIdentifier(UUID characterId) {
-        return ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character/" + characterId);
+        return new ResourceLocation(NarrativeCraftMod.MOD_ID, "character/" + characterId);
     }
 
     private boolean narrativecraft$isDynamicTextureLoaded(ResourceLocation skinPath) {

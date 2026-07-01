@@ -1,0 +1,77 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev.legacyforge'
+}
+
+mixin {
+    add(sourceSets.main, "${mod_id}.refmap.json")
+
+    config("${mod_id}.mixins.json")
+    config("${mod_id}.forge.mixins.json")
+}
+
+def generatedResources = file('src/generated/resources')
+def commonMainResources = project(':common').file('src/main/resources')
+
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
+
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        validateAccessTransformers = true
+        accessTransformers = [at.absolutePath]
+    }
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
+    runs {
+        configureEach {
+            ideName = "Forge ${it.name.capitalize()} (${project.path})"
+        }
+        client {
+            client()
+        }
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', generatedResources.absolutePath, '--existing', commonMainResources.absolutePath
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+            sourceSet project(':api').sourceSets.main
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+dependencies {
+    jarJar(implementation("com.bladecoder.ink:blade-ink")) {
+        version {
+            prefer "${blade_ink_version}"
+        }
+    }
+    jarJar(implementation("com.bladecoder.ink:blade-ink-compiler")) {
+        version {
+            prefer "${blade_ink_version}"
+        }
+    }
+    additionalRuntimeClasspath "com.bladecoder.ink:blade-ink:${blade_ink_version}"
+    additionalRuntimeClasspath "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}"
+    implementation project(':api')
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+}
+
+jar {
+    from project(':api').sourceSets.main.output
+    finalizedBy('reobfJar')
+    manifest.attributes([
+            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+    ])
+}

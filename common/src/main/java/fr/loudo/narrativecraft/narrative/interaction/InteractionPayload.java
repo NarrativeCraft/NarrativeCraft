@@ -24,32 +24,30 @@
 package fr.loudo.narrativecraft.narrative.interaction;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class InteractionPayload extends NarrativeEntryPayload {
 
     private final UUID chapterId;
     private final UUID sceneId;
 
-    public static final StreamCodec<ByteBuf, InteractionPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            InteractionPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            InteractionPayload::getDescription,
-            UUIDUtil.STREAM_CODEC,
-            InteractionPayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            InteractionPayload::getChapterId,
-            InteractionPayload::new);
-
     public InteractionPayload(String name, String description, UUID sceneId, UUID chapterId) {
         super(name, description);
         this.sceneId = sceneId;
         this.chapterId = chapterId;
+    }
+
+    public static InteractionPayload read(FriendlyByteBuf buf) {
+        return new InteractionPayload(buf.readUtf(), buf.readUtf(), buf.readUUID(), buf.readUUID());
+    }
+
+    @Override
+    protected void writeData(FriendlyByteBuf buf) {
+        buf.writeUtf(getName());
+        buf.writeUtf(getDescription());
+        buf.writeUUID(sceneId);
+        buf.writeUUID(chapterId);
     }
 
     public UUID getChapterId() {

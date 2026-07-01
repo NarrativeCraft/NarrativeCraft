@@ -24,22 +24,25 @@
 package fr.loudo.narrativecraft.network.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SMainScreenSave(String dataJson) implements CustomPacketPayload {
+public record C2SMainScreenSave(String dataJson) implements NarrativePacket {
 
-    public static final Type<C2SMainScreenSave> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_save"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "main_screen_save");
 
-    public static final StreamCodec<ByteBuf, C2SMainScreenSave> STREAM_CODEC =
-            StreamCodec.composite(ByteBufCodecs.STRING_UTF8, C2SMainScreenSave::dataJson, C2SMainScreenSave::new);
+    public static C2SMainScreenSave read(FriendlyByteBuf buf) {
+        return new C2SMainScreenSave(buf.readUtf());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUtf(dataJson);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

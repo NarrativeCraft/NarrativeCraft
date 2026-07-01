@@ -24,31 +24,29 @@
 package fr.loudo.narrativecraft.network.inkAction;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public record S2CRunInkAction(long instanceId, String keyword, String parsedArgsJson, boolean blocking)
-        implements CustomPacketPayload {
+        implements NarrativePacket {
 
-    public static final Type<S2CRunInkAction> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "run_ink_action"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "run_ink_action");
 
-    public static final StreamCodec<ByteBuf, S2CRunInkAction> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_LONG,
-            S2CRunInkAction::instanceId,
-            ByteBufCodecs.STRING_UTF8,
-            S2CRunInkAction::keyword,
-            ByteBufCodecs.STRING_UTF8,
-            S2CRunInkAction::parsedArgsJson,
-            ByteBufCodecs.BOOL,
-            S2CRunInkAction::blocking,
-            S2CRunInkAction::new);
+    public static S2CRunInkAction read(FriendlyByteBuf buf) {
+        return new S2CRunInkAction(buf.readVarLong(), buf.readUtf(), buf.readUtf(), buf.readBoolean());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeVarLong(instanceId);
+        buf.writeUtf(keyword);
+        buf.writeUtf(parsedArgsJson);
+        buf.writeBoolean(blocking);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.widgets;
 
+import fr.loudo.narrativecraft.utils.MathUtils;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -63,7 +64,7 @@ public class FovSliderWidget {
     }
 
     public void setValue(float value) {
-        this.value = (float) Math.clamp(value, MIN, MAX);
+        this.value = (float) MathUtils.clamp(value, MIN, MAX);
     }
 
     public void render(GuiGraphics graphics, int screenWidth, int screenHeight, int mouseX, int mouseY) {
@@ -148,7 +149,7 @@ public class FovSliderWidget {
 
     private void updateValue(int mouseY, int trackY) {
         float ratio = (float) (mouseY - trackY) / TRACK_HEIGHT;
-        value = Math.clamp(MIN + ratio * (MAX - MIN), MIN, MAX);
+        value = MathUtils.clamp(MIN + ratio * (MAX - MIN), MIN, MAX);
     }
 
     private int getThumbY(int trackY) {

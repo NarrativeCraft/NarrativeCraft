@@ -59,7 +59,7 @@ public class InputScreen extends Screen {
         promptWidget.setPosition(centerX - promptWidget.getWidth() / 2, centerY - FIELD_HEIGHT - GAP - 20);
         addRenderableWidget(promptWidget);
 
-        inputBox = new EditBox(font, FIELD_WIDTH, FIELD_HEIGHT, Component.empty());
+        inputBox = new EditBox(font, 0, 0, FIELD_WIDTH, FIELD_HEIGHT, Component.empty());
         inputBox.setPosition(centerX - FIELD_WIDTH / 2, centerY - FIELD_HEIGHT / 2);
         addRenderableWidget(inputBox);
 

@@ -23,12 +23,12 @@
 
 package fr.loudo.narrativecraft.platform.services;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import net.minecraft.server.level.ServerPlayer;
 
 public interface IPacketSender {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+    void sendToPlayer(ServerPlayer player, NarrativePacket payload);
 
-    void sendToServer(CustomPacketPayload packet);
+    void sendToServer(NarrativePacket packet);
 }

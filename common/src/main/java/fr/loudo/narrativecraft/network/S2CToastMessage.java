@@ -24,27 +24,26 @@
 package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CToastMessage(Component title, Component message) implements CustomPacketPayload {
+public record S2CToastMessage(Component title, Component message) implements NarrativePacket {
 
-    public static final Type<S2CToastMessage> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "toast_message"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "toast_message");
 
-    public static final StreamCodec<ByteBuf, S2CToastMessage> STREAM_CODEC = StreamCodec.composite(
-            ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,
-            S2CToastMessage::title,
-            ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,
-            S2CToastMessage::message,
-            S2CToastMessage::new);
+    public static S2CToastMessage read(FriendlyByteBuf buf) {
+        return new S2CToastMessage(buf.readComponent(), buf.readComponent());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeComponent(title);
+        buf.writeComponent(message);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

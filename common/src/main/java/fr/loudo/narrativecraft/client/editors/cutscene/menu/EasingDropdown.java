@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -110,7 +111,7 @@ public class EasingDropdown {
     public void mouseScrolled(double amount) {
         if (!open) return;
         int maxScroll = Math.max(0, values.length - MAX_VISIBLE);
-        scrollOffset = (int) Math.clamp(scrollOffset - amount, 0, maxScroll);
+        scrollOffset = (int) MathUtils.clamp(scrollOffset - amount, 0, maxScroll);
     }
 
     public void close() {

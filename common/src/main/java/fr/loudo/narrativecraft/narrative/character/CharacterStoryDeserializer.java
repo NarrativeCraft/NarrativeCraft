@@ -33,7 +33,6 @@ import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.lang.reflect.Type;
 import java.util.UUID;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -46,7 +45,7 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
                     DialogDataIO.deserialize(jsonObject.getAsJsonObject("dialogData"), DialogFieldSet.CHARACTER));
         }
 
-        character.setModelType(PlayerSkin.Model.WIDE);
+        character.setModelType(SkinModel.WIDE);
         if (jsonObject.has("modelType")) {
             String modelTypeName = jsonObject.get("modelType").getAsString();
             if (!modelTypeName.isEmpty()) {
@@ -58,7 +57,7 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
         if (jsonObject.has("entityTypeId")) {
             String entityTypeId = jsonObject.get("entityTypeId").getAsString();
             character.setEntityType(BuiltInRegistries.ENTITY_TYPE
-                    .getOptional(ResourceLocation.parse(entityTypeId))
+                    .getOptional(ResourceLocation.of(entityTypeId, ':'))
                     .orElse(EntityType.PLAYER));
         }
     }

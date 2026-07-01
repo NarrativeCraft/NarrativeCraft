@@ -24,28 +24,28 @@
 package fr.loudo.narrativecraft.network.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CCameraAngleCharacterCaptured(UUID cameraAngleId, String placementJson) implements CustomPacketPayload {
+public record S2CCameraAngleCharacterCaptured(UUID cameraAngleId, String placementJson) implements NarrativePacket {
 
-    public static final Type<S2CCameraAngleCharacterCaptured> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_character_captured"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "camera_angle_character_captured");
 
-    public static final StreamCodec<ByteBuf, S2CCameraAngleCharacterCaptured> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            S2CCameraAngleCharacterCaptured::cameraAngleId,
-            ByteBufCodecs.STRING_UTF8,
-            S2CCameraAngleCharacterCaptured::placementJson,
-            S2CCameraAngleCharacterCaptured::new);
+    public static S2CCameraAngleCharacterCaptured read(FriendlyByteBuf buf) {
+        return new S2CCameraAngleCharacterCaptured(buf.readUUID(), buf.readUtf());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(cameraAngleId);
+        buf.writeUtf(placementJson);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

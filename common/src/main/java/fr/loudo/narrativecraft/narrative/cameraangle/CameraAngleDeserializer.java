@@ -199,7 +199,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
     private static ItemStack deserializeItemStack(String nbtString) {
         try {
             CompoundTag tag = Utils.nbtFromString(nbtString);
-            return ItemStack.CODEC.parse(NbtOps.INSTANCE, tag).getOrThrow();
+            return ItemStack.CODEC.parse(NbtOps.INSTANCE, tag).getOrThrow(false, s -> {});
         } catch (Exception e) {
             return null;
         }

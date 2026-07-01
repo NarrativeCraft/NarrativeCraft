@@ -28,16 +28,32 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.events.client.OnHudRender;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderBuffers;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
+
+    @Shadow
+    @Final
+    private Minecraft minecraft;
+
+    @Shadow
+    @Final
+    private RenderBuffers renderBuffers;
 
     @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
     private void narrativecraft$getFov(
@@ -71,5 +87,24 @@ public class GameRendererMixin {
     private void narrativecraft$cancelBobCamera(PoseStack poseStack, float partialTicks, CallbackInfo ci) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (session.inCamera()) ci.cancel();
+    }
+
+    @Redirect(
+            method = "render",
+            at =
+                    @At(
+                            value = "NEW",
+                            target =
+                                    "(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Lnet/minecraft/client/gui/GuiGraphics;"))
+    private GuiGraphics narrativecraft$hudRender(Minecraft minecraft, MultiBufferSource.BufferSource bufferSource) {
+        float partialTick = minecraft.getFrameTime();
+        GuiGraphics graphics = new GuiGraphics(minecraft, bufferSource);
+        OnHudRender.cutsceneHudRender(graphics, partialTick);
+        OnHudRender.cameraAngleHudRender(graphics, partialTick);
+        OnHudRender.interactionHudRender(graphics, partialTick);
+        OnHudRender.clientInkActionsHudRender(graphics, partialTick);
+        OnHudRender.saveIconHudRender(graphics, partialTick);
+        OnHudRender.dialogHudRender(graphics, partialTick);
+        return graphics;
     }
 }

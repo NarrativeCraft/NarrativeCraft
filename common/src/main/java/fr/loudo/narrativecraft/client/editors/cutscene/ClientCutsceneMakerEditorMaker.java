@@ -41,13 +41,14 @@ import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -237,7 +238,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
     }
 
-    private void renderLayers(GuiGraphics graphics, DeltaTracker delta, int mouseX, int mouseY) {
+    private void renderLayers(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         int screenHeight = mc.getWindow().getGuiScaledHeight();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
@@ -248,8 +249,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         float visibleTicks = getVisibleTicks();
         int viewportHeight = LAYERS_START_Y_OFFSET - RULER_HEIGHT;
 
-        graphics.fill(
-                0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, FastColor.ARGB32.color((int) (0.8 * 255), 0));
+        graphics.fill(0, layerStartY, screenWidth, screenHeight + LAYER_HEIGHT, Utils.argb((int) (0.8 * 255), 0));
         graphics.fill(LAYER_GAP, layerStartY, LAYER_GAP + 1, screenHeight, 0xFFFFFFFF);
 
         renderRuler(graphics, screenWidth, screenHeight, layerStartY, timelineWidth, visibleTicks);
@@ -334,7 +334,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
             // mm:ss label
             String label = formatTimeTicks(tickAtSecond);
             int labelWidth = mc.font.width(label);
-            int labelX = Math.clamp(xi - labelWidth / 2, LAYER_GAP, LAYER_GAP + timelineWidth - labelWidth);
+            int labelX = MathUtils.clamp(xi - labelWidth / 2, LAYER_GAP, LAYER_GAP + timelineWidth - labelWidth);
             graphics.drawString(mc.font, Component.literal(label), labelX, rulerY + 1, 0xFFFFFFFF);
 
             // 3 small subdivision lines between this second and the next
@@ -398,17 +398,17 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
     private void clampViewStart() {
         float maxStart = totalTick - getVisibleTicks();
-        viewStartTick = (float) Math.clamp(viewStartTick, 0f, Math.max(0f, maxStart));
+        viewStartTick = (float) MathUtils.clamp(viewStartTick, 0f, Math.max(0f, maxStart));
     }
 
     private void applyZoom(double scrollDelta, int mouseX) {
         float minZoom = getMinZoomFactor();
         float maxZoom = getMaxZoomFactor();
-        float newZoom = (float) Math.clamp(zoomFactor * Math.pow(1.25, scrollDelta), minZoom, maxZoom);
+        float newZoom = (float) MathUtils.clamp(zoomFactor * Math.pow(1.25, scrollDelta), minZoom, maxZoom);
         if (newZoom == zoomFactor) return;
 
         float timelineWidth = getTimelineWidth();
-        float mouseRatio = (float) Math.clamp((mouseX - LAYER_GAP) / timelineWidth, 0.0, 1.0);
+        float mouseRatio = (float) MathUtils.clamp((mouseX - LAYER_GAP) / timelineWidth, 0.0, 1.0);
         float tickAtMouse = viewStartTick + mouseRatio * getVisibleTicks();
 
         zoomFactor = newZoom;
@@ -417,7 +417,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public int getPlayHeadTick() {
-        return (int) Math.clamp(viewStartTick + playHead.getRatio() * getVisibleTicks(), 0, totalTick);
+        return (int) MathUtils.clamp(viewStartTick + playHead.getRatio() * getVisibleTicks(), 0, totalTick);
     }
 
     private boolean isOverScrollbar(double mouseX, double mouseY) {
@@ -457,10 +457,10 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         layerSelector.mouseScrolled(deltaY);
         if (mousePos[1] < getLayersAreaStartY()) return;
         int maxScroll = Math.max(0, editorLayers.size() * LAYER_HEIGHT - (LAYERS_START_Y_OFFSET - RULER_HEIGHT));
-        scrollOffset = (int) Math.clamp(scrollOffset - deltaY * LAYER_HEIGHT, 0, maxScroll);
+        scrollOffset = (int) MathUtils.clamp(scrollOffset - deltaY * LAYER_HEIGHT, 0, maxScroll);
     }
 
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, float deltaTracker) {
         playback.tick(deltaTracker);
 
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
@@ -474,7 +474,8 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         renderLayers(graphics, deltaTracker, mousePos[0], mousePos[1]);
 
         for (Button button : buttons) {
-            button.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            button.render(
+                    graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
         }
         layerSelector.render(graphics, deltaTracker);
 
@@ -653,7 +654,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         if (draggingOriginalTicks != null && !draggingOriginalTicks.isEmpty()) {
             float deltaTick = (float) (((mouseX) - draggingStartMouseX) / getTimelineWidth() * getVisibleTicks());
             for (Map.Entry<Keyframe, Integer> entry : draggingOriginalTicks.entrySet()) {
-                int newTick = (int) Math.clamp(entry.getValue() + deltaTick, 0, totalTick);
+                int newTick = (int) MathUtils.clamp(entry.getValue() + deltaTick, 0, totalTick);
                 entry.getKey().setTick(newTick);
             }
             return;

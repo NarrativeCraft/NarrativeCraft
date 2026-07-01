@@ -55,7 +55,7 @@ public class UtilsClient {
     }
 
     public static void sendToast(Component title, Component message) {
-        minecraft.getToasts().addToast(new SystemToast(new SystemToast.SystemToastId(), title, message));
+        minecraft.getToasts().addToast(new SystemToast(SystemToast.SystemToastIds.NARRATOR_TOGGLE, title, message));
     }
 
     public static void teleportPlayerTo(Vec3 position, Vec3 rotation) {

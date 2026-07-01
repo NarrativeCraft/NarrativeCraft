@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -115,7 +116,7 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
         int searchY = 30 + this.font.lineHeight + 12;
         int searchInputWidth = buttonWidth - 25;
 
-        EditBox searchBox = new EditBox(this.font, searchInputWidth, 20, Component.empty());
+        EditBox searchBox = new EditBox(this.font, 0, 0, searchInputWidth, 20, Component.empty());
         searchBox.setValue(searchQuery);
         searchBox.setPosition(middleX, searchY);
         this.addRenderableWidget(searchBox);
@@ -189,7 +190,7 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
                 this.width / 2 - pageIndicator.getWidth() / 2, navigationPageY + pageIndicator.getHeight() / 2 + 2);
         this.addRenderableWidget(pageIndicator);
 
-        EditBox skipToPageBox = new EditBox(this.font, 20, 20, Component.empty());
+        EditBox skipToPageBox = new EditBox(this.font, 0, 0, 20, 20, Component.empty());
         skipToPageBox.setTooltip(Tooltip.create(Translation.message("screen.pagination.skip_to_page_tootip")));
         skipToPageBox.setPosition(this.width / 2 - 25, navigationPageY + 25);
         this.addRenderableWidget(skipToPageBox);
@@ -239,6 +240,12 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
         this.page = Math.max(1, Math.min(page, maxPage));
         this.clearWidgets();
         this.init();
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     public int getPage() {

@@ -32,26 +32,26 @@ import fr.loudo.narrativecraft.narrative.interaction.InteractionPayload;
 import fr.loudo.narrativecraft.narrative.npc.NpcPayload;
 import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import java.util.function.Function;
+import net.minecraft.network.FriendlyByteBuf;
 
 public enum NarrativeEntryType {
-    CHAPTER(ChapterPayload.class, ChapterPayload.STREAM_CODEC),
-    SCENE(ScenePayload.class, ScenePayload.STREAM_CODEC),
-    ANIMATION(AnimationPayload.class, AnimationPayload.STREAM_CODEC),
-    SUBSCENE(SubscenePayload.class, SubscenePayload.STREAM_CODEC),
-    CUTSCENE(CutscenePayload.class, CutscenePayload.STREAM_CODEC),
-    CAMERA_ANGLE(CameraAnglePayload.class, CameraAnglePayload.STREAM_CODEC),
-    INTERACTION(InteractionPayload.class, InteractionPayload.STREAM_CODEC),
-    CHARACTER(CharacterStoryPayload.class, CharacterStoryPayload.STREAM_CODEC),
-    NPC(NpcPayload.class, NpcPayload.STREAM_CODEC);
+    CHAPTER(ChapterPayload.class, ChapterPayload::read),
+    SCENE(ScenePayload.class, ScenePayload::read),
+    ANIMATION(AnimationPayload.class, AnimationPayload::read),
+    SUBSCENE(SubscenePayload.class, SubscenePayload::read),
+    CUTSCENE(CutscenePayload.class, CutscenePayload::read),
+    CAMERA_ANGLE(CameraAnglePayload.class, CameraAnglePayload::read),
+    INTERACTION(InteractionPayload.class, InteractionPayload::read),
+    CHARACTER(CharacterStoryPayload.class, CharacterStoryPayload::read),
+    NPC(NpcPayload.class, NpcPayload::read);
 
     private final Class<? extends NarrativeEntryPayload> clazz;
-    private final StreamCodec<? super ByteBuf, ? extends NarrativeEntryPayload> codec;
+    private final Function<FriendlyByteBuf, ? extends NarrativeEntryPayload> reader;
 
-    <T extends NarrativeEntryPayload> NarrativeEntryType(Class<T> clazz, StreamCodec<? super ByteBuf, T> codec) {
+    <T extends NarrativeEntryPayload> NarrativeEntryType(Class<T> clazz, Function<FriendlyByteBuf, T> reader) {
         this.clazz = clazz;
-        this.codec = codec;
+        this.reader = reader;
     }
 
     public static NarrativeEntryType fromClass(Class<? extends NarrativeEntryPayload> clazz) {
@@ -63,8 +63,7 @@ public enum NarrativeEntryType {
         throw new IllegalArgumentException("Unknown NarrativeEntry type: " + clazz.getName());
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntryPayload> StreamCodec<? super ByteBuf, T> getCodec() {
-        return (StreamCodec<? super ByteBuf, T>) codec;
+    public NarrativeEntryPayload read(FriendlyByteBuf buf) {
+        return reader.apply(buf);
     }
 }

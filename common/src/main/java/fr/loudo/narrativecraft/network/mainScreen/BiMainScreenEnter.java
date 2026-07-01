@@ -25,28 +25,29 @@ package fr.loudo.narrativecraft.network.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record BiMainScreenEnter(NarrativeEnvironment environment) implements CustomPacketPayload {
+public record BiMainScreenEnter(NarrativeEnvironment environment) implements NarrativePacket {
 
-    public static final Type<BiMainScreenEnter> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_enter"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "main_screen_enter");
 
-    public static final StreamCodec<ByteBuf, BiMainScreenEnter> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.idMapper(i -> NarrativeEnvironment.values()[i], NarrativeEnvironment::ordinal),
-            BiMainScreenEnter::environment,
-            BiMainScreenEnter::new);
+    public static BiMainScreenEnter read(FriendlyByteBuf buf) {
+        return new BiMainScreenEnter(buf.readEnum(NarrativeEnvironment.class));
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        buf.writeEnum(environment);
+    }
 
     public NarrativeEnvironment getEnvironment() {
         return environment;
     }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public ResourceLocation type() {
         return TYPE;
     }
 }

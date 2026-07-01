@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.client.editors.cutscene;
 
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.platform.Services;
-import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
@@ -77,9 +77,9 @@ public class CutsceneMakerEditorControl {
         Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.PAUSE));
     }
 
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, float deltaTracker, int mouseX, int mouseY) {
         button.setPosition(x, y);
-        button.render(graphics, mouseX, mouseY, deltaTracker.getGameTimeDeltaTicks());
+        button.render(graphics, mouseX, mouseY, Minecraft.getInstance().getDeltaFrameTime());
     }
 
     public void mouseClicked(double mouseX, double mouseY, int buttonVal, boolean isDoubleClick) {

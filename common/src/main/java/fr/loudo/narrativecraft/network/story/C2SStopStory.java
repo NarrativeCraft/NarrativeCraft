@@ -24,22 +24,25 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SStopStory(boolean showMainScreen) implements CustomPacketPayload {
+public record C2SStopStory(boolean showMainScreen) implements NarrativePacket {
 
-    public static final Type<C2SStopStory> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "c2s_stop_story"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "c2s_stop_story");
 
-    public static final StreamCodec<ByteBuf, C2SStopStory> STREAM_CODEC =
-            StreamCodec.composite(ByteBufCodecs.BOOL, C2SStopStory::showMainScreen, C2SStopStory::new);
+    public static C2SStopStory read(FriendlyByteBuf buf) {
+        return new C2SStopStory(buf.readBoolean());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeBoolean(showMainScreen);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

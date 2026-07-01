@@ -124,7 +124,8 @@ public class CameraAngleInkAction extends InkAction {
     private void registerDialogData(StoryHandler storyHandler) {
         DialogData global = NarrativeCraftMod.getInstance().getGlobalDialogData();
         for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
-            if (!(placement.getCharacterStory() instanceof ICharacterStory character)) continue;
+            ICharacterStory character = placement.getCharacterStory();
+            if (character == null) continue;
             CameraViewDialogSetup setup = findSetupForPlacement(placement.getId());
             DialogData cameraData = setup != null ? setup.getDialogData() : null;
             DialogData resolved = DialogData.resolve(global, character.getDialogData(), cameraData);

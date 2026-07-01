@@ -139,9 +139,9 @@ public class ClientPacketHandler {
     public static void loadCutsceneEditorData(S2CCutsceneEditorData packet) {
         ClientCutsceneMakerEditorMaker cutsceneMakerEditor =
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
-        if (!(cutsceneMakerEditor instanceof ClientCutsceneMakerEditorMaker editor)) return;
-        editor.loadLayers(packet.layersJson());
-        editor.applyManualMaxTick(packet.manualMaxTick());
+        if (cutsceneMakerEditor == null) return;
+        cutsceneMakerEditor.loadLayers(packet.layersJson());
+        cutsceneMakerEditor.applyManualMaxTick(packet.manualMaxTick());
     }
 
     public static void loadCameraAngleEditorData(S2CCameraAngleEditorData packet) {
@@ -431,9 +431,7 @@ public class ClientPacketHandler {
             DynamicTexture texture = new DynamicTexture(image);
             minecraft
                     .getTextureManager()
-                    .register(
-                            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character/" + characterId),
-                            texture);
+                    .register(new ResourceLocation(NarrativeCraftMod.MOD_ID, "character/" + characterId), texture);
             session.getLoadedCharactersSkin().add(characterId);
         } catch (Exception e) {
             minecraft.player.sendSystemMessage(
@@ -449,8 +447,7 @@ public class ClientPacketHandler {
         Minecraft minecraft = Minecraft.getInstance();
         TextureManager textureManager = minecraft.getTextureManager();
         for (UUID characterId : session.getLoadedCharactersSkin()) {
-            textureManager.release(
-                    ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character" + characterId));
+            textureManager.release(new ResourceLocation(NarrativeCraftMod.MOD_ID, "character" + characterId));
         }
     }
 

@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.TextInkAction;
 import fr.loudo.narrativecraft.utils.FadeState;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
@@ -94,8 +95,8 @@ public class ClientTextInkAction extends TextInkAction {
         if (!isRunning || scrollText == null || dialogData == null) return;
 
         float currentOpacity = computeOpacity(partialTick);
-        int adjustedAlpha = (int) (FastColor.ARGB32.alpha(FastColor.ARGB32.color(255, color)) * currentOpacity);
-        dialogData.setTextColor(FastColor.ARGB32.color(adjustedAlpha, color));
+        int adjustedAlpha = (int) (FastColor.ARGB32.alpha(Utils.argb(255, color)) * currentOpacity);
+        dialogData.setTextColor(Utils.argb(adjustedAlpha, color));
 
         Font font = Minecraft.getInstance().font;
         cachedTextDimensions = scrollText.computeTextDimensions(width, font, dialogData);
@@ -123,7 +124,7 @@ public class ClientTextInkAction extends TextInkAction {
             }
             dialogData = new DialogData();
             dialogData.setWidth(width);
-            dialogData.setTextColor(FastColor.ARGB32.color(255, color));
+            dialogData.setTextColor(Utils.argb(255, color));
             scrollText = new DialogScrollText(dialogData.getLetterSound(), dialogData.isSoundMuted());
             scrollText.setText(text);
             if (noTyping) scrollText.forceFinish();

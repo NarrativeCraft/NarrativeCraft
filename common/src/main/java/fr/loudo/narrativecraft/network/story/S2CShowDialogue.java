@@ -24,33 +24,31 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public record S2CShowDialogue(String speaker, String text, int entityId, String dialogDataJson)
-        implements CustomPacketPayload {
+        implements NarrativePacket {
 
     public static final int NO_ENTITY = -1;
 
-    public static final Type<S2CShowDialogue> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "show_dialogue"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "show_dialogue");
 
-    public static final StreamCodec<ByteBuf, S2CShowDialogue> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            S2CShowDialogue::speaker,
-            ByteBufCodecs.STRING_UTF8,
-            S2CShowDialogue::text,
-            ByteBufCodecs.INT,
-            S2CShowDialogue::entityId,
-            ByteBufCodecs.STRING_UTF8,
-            S2CShowDialogue::dialogDataJson,
-            S2CShowDialogue::new);
+    public static S2CShowDialogue read(FriendlyByteBuf buf) {
+        return new S2CShowDialogue(buf.readUtf(), buf.readUtf(), buf.readInt(), buf.readUtf());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUtf(speaker);
+        buf.writeUtf(text);
+        buf.writeInt(entityId);
+        buf.writeUtf(dialogDataJson);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

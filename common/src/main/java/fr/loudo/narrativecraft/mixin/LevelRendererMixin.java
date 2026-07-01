@@ -23,37 +23,37 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.events.client.OnHudRender;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.events.client.OnRenderWorldEvent;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Gui.class)
-public class GuiMixinFabric {
+@Mixin(LevelRenderer.class)
+public class LevelRendererMixin {
 
-    @Inject(
-            method = "render",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target =
-                                    "Lnet/minecraft/client/gui/LayeredDraw;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V",
-                            shift = At.Shift.AFTER))
-    private void narrativecraft$renderHud(GuiGraphics graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        graphics.pose().pushPose();
-        graphics.pose().translate(0, 0, 5000f);
-
-        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
-        OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
-        OnHudRender.interactionHudRender(graphics, deltaTracker);
-        OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
-        OnHudRender.saveIconHudRender(graphics, deltaTracker);
-        OnHudRender.dialogHudRender(graphics, deltaTracker);
-
-        graphics.pose().popPose();
+    @Inject(method = "renderLevel", at = @At("RETURN"))
+    private void narrativecraft$renderer(
+            PoseStack poseStack,
+            float partialTick,
+            long finishNanoTime,
+            boolean renderBlockOutline,
+            Camera camera,
+            GameRenderer gameRenderer,
+            LightTexture lightTexture,
+            Matrix4f projectionMatrix,
+            CallbackInfo ci) {
+        RenderSystem.depthMask(false);
+        RenderSystem.disableDepthTest();
+        OnRenderWorldEvent.renderWorld(poseStack, partialTick);
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
     }
 }

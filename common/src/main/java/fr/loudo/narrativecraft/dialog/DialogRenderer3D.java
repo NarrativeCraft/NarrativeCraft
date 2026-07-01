@@ -99,7 +99,7 @@ public class DialogRenderer3D extends DialogRenderer {
 
         poseStack.mulPose(camera.rotation());
 
-        poseStack.scale(scale, -scale, scale);
+        poseStack.scale(-scale, -scale, scale);
 
         float anchorX = data.getOffsetX() == 0 ? -totalWidth / 2f : (data.getOffsetX() > 0 ? 0f : -totalWidth);
         float anchorY = data.getOffsetY() == 0 ? -totalHeight / 2f : (data.getOffsetY() > 0 ? -totalHeight : 0f);
@@ -169,34 +169,41 @@ public class DialogRenderer3D extends DialogRenderer {
         if (data.getBackgroundImage() != null) {
             int color = applyOpacity(0xFFFFFFFF, opacity);
             VertexConsumer consumer = bufferSource.getBuffer(RenderType.textSeeThrough(data.getBackgroundImage()));
-            consumer.addVertex(matrix, 0, 0, 0).setColor(color).setUv(0f, 0f).setLight(LightTexture.FULL_BRIGHT);
-            consumer.addVertex(matrix, 0, totalHeight, 0)
-                    .setColor(color)
-                    .setUv(0f, 1f)
-                    .setLight(LightTexture.FULL_BRIGHT);
-            consumer.addVertex(matrix, totalWidth, totalHeight, 0)
-                    .setColor(color)
-                    .setUv(1f, 1f)
-                    .setLight(LightTexture.FULL_BRIGHT);
-            consumer.addVertex(matrix, totalWidth, 0, 0)
-                    .setColor(color)
-                    .setUv(1f, 0f)
-                    .setLight(LightTexture.FULL_BRIGHT);
+            consumer.vertex(matrix, 0, 0, 0)
+                    .color(color)
+                    .uv2(LightTexture.FULL_BRIGHT)
+                    .endVertex();
+            consumer.vertex(matrix, 0, totalHeight, 0)
+                    .color(color)
+                    .uv2(LightTexture.FULL_BRIGHT)
+                    .endVertex();
+            consumer.vertex(matrix, totalWidth, totalHeight, 0)
+                    .color(color)
+                    .uv2(LightTexture.FULL_BRIGHT)
+                    .endVertex();
+            consumer.vertex(matrix, totalWidth, 0, 0)
+                    .color(color)
+                    .uv2(LightTexture.FULL_BRIGHT)
+                    .endVertex();
         } else {
             int color = applyOpacity(data.getBackgroundColor(), opacity);
             VertexConsumer consumer = bufferSource.getBuffer(NarrativeCraftMod.dialogRenderType);
-            consumer.addVertex(matrix, 0, 0, 0)
-                    .setLight(LightTexture.FULL_BRIGHT)
-                    .setColor(color);
-            consumer.addVertex(matrix, 0, totalHeight, 0)
-                    .setLight(LightTexture.FULL_BRIGHT)
-                    .setColor(color);
-            consumer.addVertex(matrix, totalWidth, totalHeight, 0)
-                    .setLight(LightTexture.FULL_BRIGHT)
-                    .setColor(color);
-            consumer.addVertex(matrix, totalWidth, 0, 0)
-                    .setLight(LightTexture.FULL_BRIGHT)
-                    .setColor(color);
+            consumer.vertex(matrix, 0, 0, 0)
+                    .uv2(LightTexture.FULL_BRIGHT)
+                    .color(color)
+                    .endVertex();
+            consumer.vertex(matrix, 0, totalHeight, 0)
+                    .uv2(LightTexture.FULL_BRIGHT)
+                    .color(color)
+                    .endVertex();
+            consumer.vertex(matrix, totalWidth, totalHeight, 0)
+                    .uv2(LightTexture.FULL_BRIGHT)
+                    .color(color)
+                    .endVertex();
+            consumer.vertex(matrix, totalWidth, 0, 0)
+                    .uv2(LightTexture.FULL_BRIGHT)
+                    .color(color)
+                    .endVertex();
         }
 
         bufferSource.endBatch();
@@ -226,14 +233,22 @@ public class DialogRenderer3D extends DialogRenderer {
         VertexConsumer consumer = bufferSource.getBuffer(NarrativeCraftMod.dialogRenderType);
         Matrix4f matrix = poseStack.last().pose();
 
-        consumer.addVertex(matrix, x, y, 0).setLight(LightTexture.FULL_BRIGHT).setColor(color);
-        consumer.addVertex(matrix, x, y + SKIP_INDICATOR_SIZE, 0)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, x + SKIP_INDICATOR_SIZE, y + SKIP_INDICATOR_SIZE / 2f, 0)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, x, y, 0).setLight(LightTexture.FULL_BRIGHT).setColor(color);
+        consumer.vertex(matrix, x, y, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, x, y + SKIP_INDICATOR_SIZE, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, x + SKIP_INDICATOR_SIZE, y + SKIP_INDICATOR_SIZE / 2f, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, x, y, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
 
         bufferSource.endBatch();
     }

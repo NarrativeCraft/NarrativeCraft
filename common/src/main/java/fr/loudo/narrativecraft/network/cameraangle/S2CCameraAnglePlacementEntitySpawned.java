@@ -24,28 +24,28 @@
 package fr.loudo.narrativecraft.network.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CCameraAnglePlacementEntitySpawned(UUID placementId, int entityId) implements CustomPacketPayload {
+public record S2CCameraAnglePlacementEntitySpawned(UUID placementId, int entityId) implements NarrativePacket {
 
-    public static final Type<S2CCameraAnglePlacementEntitySpawned> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_placement_entity_spawned"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "camera_angle_placement_entity_spawned");
 
-    public static final StreamCodec<ByteBuf, S2CCameraAnglePlacementEntitySpawned> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            S2CCameraAnglePlacementEntitySpawned::placementId,
-            ByteBufCodecs.VAR_INT,
-            S2CCameraAnglePlacementEntitySpawned::entityId,
-            S2CCameraAnglePlacementEntitySpawned::new);
+    public static S2CCameraAnglePlacementEntitySpawned read(FriendlyByteBuf buf) {
+        return new S2CCameraAnglePlacementEntitySpawned(buf.readUUID(), buf.readVarInt());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(placementId);
+        buf.writeVarInt(entityId);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

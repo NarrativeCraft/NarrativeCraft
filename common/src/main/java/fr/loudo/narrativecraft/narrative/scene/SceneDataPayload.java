@@ -24,9 +24,13 @@
 package fr.loudo.narrativecraft.narrative.scene;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class SceneDataPayload extends NarrativeEntryPayload {
     public SceneDataPayload(String name, String description) {
         super(name, description);
     }
+
+    @Override
+    protected void writeData(FriendlyByteBuf buf) {}
 }

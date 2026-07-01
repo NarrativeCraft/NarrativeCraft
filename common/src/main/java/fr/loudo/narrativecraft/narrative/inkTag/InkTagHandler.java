@@ -99,9 +99,7 @@ public final class InkTagHandler {
 
     public void tick() {
         if (blockingAction != null && !blockingAction.isRunning()) {
-            if (blockingAction instanceof InkAction finished) {
-                NarrativeCraftMod.EVENT_BUS.post(new InkActionStopEvent(playerSession, finished.getKeyword()));
-            }
+            NarrativeCraftMod.EVENT_BUS.post(new InkActionStopEvent(playerSession, blockingAction.getKeyword()));
             blockingAction = null;
             drain();
         }

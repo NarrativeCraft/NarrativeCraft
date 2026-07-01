@@ -36,7 +36,7 @@ public class ClearScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {}
 
     @Override
-    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {}
+    public void renderBackground(GuiGraphics graphics) {}
 
     @Override
     public boolean isPauseScreen() {

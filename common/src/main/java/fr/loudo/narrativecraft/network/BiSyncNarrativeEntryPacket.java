@@ -25,31 +25,29 @@ package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public record BiSyncNarrativeEntryPacket(UUID entryId, NarrativeEntryPayload entry, NarrativeEntryAction action)
-        implements CustomPacketPayload {
+        implements NarrativePacket {
 
-    public static final Type<BiSyncNarrativeEntryPacket> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sync_narrative_entry"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "sync_narrative_entry");
 
-    public static final StreamCodec<ByteBuf, BiSyncNarrativeEntryPacket> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            BiSyncNarrativeEntryPacket::entryId,
-            NarrativeEntryPayload.STREAM_CODEC,
-            BiSyncNarrativeEntryPacket::entry,
-            ByteBufCodecs.idMapper(i -> NarrativeEntryAction.values()[i], NarrativeEntryAction::ordinal),
-            BiSyncNarrativeEntryPacket::action,
-            BiSyncNarrativeEntryPacket::new);
+    public static BiSyncNarrativeEntryPacket read(FriendlyByteBuf buf) {
+        return new BiSyncNarrativeEntryPacket(
+                buf.readUUID(), NarrativeEntryPayload.read(buf), buf.readEnum(NarrativeEntryAction.class));
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(entryId);
+        entry.write(buf);
+        buf.writeEnum(action);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 

@@ -24,23 +24,26 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.List;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CShowChoices(List<String> texts) implements CustomPacketPayload {
+public record S2CShowChoices(List<String> texts) implements NarrativePacket {
 
-    public static final Type<S2CShowChoices> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "show_choices"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "show_choices");
 
-    public static final StreamCodec<ByteBuf, S2CShowChoices> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()), S2CShowChoices::texts, S2CShowChoices::new);
+    public static S2CShowChoices read(FriendlyByteBuf buf) {
+        return new S2CShowChoices(buf.readList(FriendlyByteBuf::readUtf));
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeCollection(texts, FriendlyByteBuf::writeUtf);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

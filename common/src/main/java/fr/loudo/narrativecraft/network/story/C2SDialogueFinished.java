@@ -24,21 +24,23 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SDialogueFinished() implements CustomPacketPayload {
+public record C2SDialogueFinished() implements NarrativePacket {
 
-    public static final Type<C2SDialogueFinished> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "dialogue_finished"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "dialogue_finished");
 
-    public static final StreamCodec<ByteBuf, C2SDialogueFinished> STREAM_CODEC =
-            StreamCodec.unit(new C2SDialogueFinished());
+    public static C2SDialogueFinished read(FriendlyByteBuf buf) {
+        return new C2SDialogueFinished();
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {}
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

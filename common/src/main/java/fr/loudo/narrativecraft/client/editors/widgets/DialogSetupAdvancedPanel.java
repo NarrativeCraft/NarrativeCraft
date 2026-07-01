@@ -143,7 +143,7 @@ public class DialogSetupAdvancedPanel {
                         return;
                     }
                     try {
-                        data.setBackgroundImage(ResourceLocation.parse(text));
+                        data.setBackgroundImage(ResourceLocation.of(text, ':'));
                     } catch (Exception ignored) {
                     }
                 });
@@ -158,11 +158,11 @@ public class DialogSetupAdvancedPanel {
                 return;
             }
             if (DEFAULT_LETTER_SOUND_DISPLAY.equals(text)) {
-                data.setLetterSound(ResourceLocation.parse(DEFAULT_LETTER_SOUND_ID));
+                data.setLetterSound(ResourceLocation.of(DEFAULT_LETTER_SOUND_ID, ':'));
                 return;
             }
             try {
-                data.setLetterSound(ResourceLocation.parse(text));
+                data.setLetterSound(ResourceLocation.of(text, ':'));
             } catch (Exception ignored) {
             }
         });
@@ -188,8 +188,8 @@ public class DialogSetupAdvancedPanel {
             if (dialog == null) return;
             String value = letterSoundBox.getValue();
             ResourceLocation soundId = DEFAULT_LETTER_SOUND_DISPLAY.equals(value)
-                    ? ResourceLocation.parse(DEFAULT_LETTER_SOUND_ID)
-                    : ResourceLocation.parse(value);
+                    ? ResourceLocation.of(DEFAULT_LETTER_SOUND_ID, ':')
+                    : ResourceLocation.of(value, ':');
             dialog.getScrollText().setSound(soundId);
         }
     }

@@ -29,9 +29,9 @@ import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.FadeInkAction;
 import fr.loudo.narrativecraft.utils.FadeState;
+import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
 public class ClientFadeInkAction extends FadeInkAction {
@@ -70,7 +70,7 @@ public class ClientFadeInkAction extends FadeInkAction {
                 0,
                 mc.getWindow().getGuiScaledWidth(),
                 mc.getWindow().getGuiScaledHeight(),
-                FastColor.ARGB32.color(opacity, color));
+                Utils.argb(opacity, color));
     }
 
     @Override

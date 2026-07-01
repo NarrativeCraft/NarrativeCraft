@@ -25,16 +25,16 @@ package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
 import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
-import net.minecraft.client.DeltaTracker;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class Keyframe {
 
-    public static final ResourceLocation KEYFRAME_SPRITE = ResourceLocation.fromNamespaceAndPath(
-            NarrativeCraftAPI.getInstance().getModId(), "keyframe");
-    public static final ResourceLocation KEYFRAME_SELECTED_SPRITE = ResourceLocation.fromNamespaceAndPath(
-            NarrativeCraftAPI.getInstance().getModId(), "keyframe-selected");
+    public static final ResourceLocation KEYFRAME_SPRITE =
+            new ResourceLocation(NarrativeCraftAPI.getInstance().getModId(), "textures/gui/sprites/keyframe.png");
+    public static final ResourceLocation KEYFRAME_SELECTED_SPRITE = new ResourceLocation(
+            NarrativeCraftAPI.getInstance().getModId(), "textures/gui/sprites/keyframe-selected.png");
     public static final int SIZE = 7;
 
     protected int x;
@@ -58,15 +58,15 @@ public abstract class Keyframe {
 
     public void drag(double mouseX, int timelineStartX, int timelineWidth, float visibleTicks, float viewStartTick) {
         if (timelineWidth <= 0 || visibleTicks <= 0) return;
-        tick = (int) Math.clamp(
+        tick = (int) MathUtils.clamp(
                 viewStartTick + (mouseX - timelineStartX) / timelineWidth * visibleTicks,
                 0,
                 viewStartTick + visibleTicks);
     }
 
-    public void render(GuiGraphics graphics, DeltaTracker delta) {
+    public void render(GuiGraphics graphics, float delta) {
         ResourceLocation sprite = isSelected ? KEYFRAME_SELECTED_SPRITE : KEYFRAME_SPRITE;
-        graphics.blitSprite(sprite, x, y, SIZE, SIZE);
+        graphics.blit(sprite, x, y, 0, 0, SIZE, SIZE, SIZE, SIZE);
     }
 
     public abstract KeyframeMenu<?> createMenu();

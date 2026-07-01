@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.events.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
@@ -34,21 +33,13 @@ import fr.loudo.narrativecraft.client.editors.interaction.InteractionMakerEditor
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import java.util.List;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import org.joml.Matrix4fStack;
-import org.joml.Matrix4fc;
 
 public class OnRenderWorldEvent {
 
-    public static void renderWorld(Matrix4fc modelViewMatrix, DeltaTracker deltaTracker) {
-        PoseStack poseStack = new PoseStack();
-        Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
-        modelViewStack.pushMatrix();
-        modelViewStack.mul(modelViewMatrix);
-        RenderSystem.applyModelViewMatrix();
-        RenderSystem.disableDepthTest();
+    public static void renderWorld(PoseStack poseStack, float deltaTracker) {
+        poseStack.pushPose();
 
         CutsceneMakerEditorPathRenderer.render(poseStack, deltaTracker);
         CutsceneMakerEditorCameraRenderer.render(poseStack, deltaTracker);
@@ -59,16 +50,15 @@ public class OnRenderWorldEvent {
         renderClientInkActions(poseStack, deltaTracker);
         partialTickInkActions(deltaTracker);
 
-        RenderSystem.enableDepthTest();
-        modelViewStack.popMatrix();
+        poseStack.popPose();
     }
 
-    private static void renderDialog3D(PoseStack poseStack, DeltaTracker deltaTracker) {
+    private static void renderDialog3D(PoseStack poseStack, float deltaTracker) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         List<DialogRenderer3D> dialogs = session.getActiveDialog3DRenderers();
         if (dialogs.isEmpty()) return;
 
-        float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
+        float partialTick = deltaTracker;
         MultiBufferSource.BufferSource bufferSource =
                 Minecraft.getInstance().renderBuffers().bufferSource();
 
@@ -77,17 +67,17 @@ public class OnRenderWorldEvent {
         }
     }
 
-    private static void renderClientInkActions(PoseStack poseStack, DeltaTracker deltaTracker) {
+    private static void renderClientInkActions(PoseStack poseStack, float deltaTracker) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         for (InkAction action : session.getActiveClientInkActions()) {
-            action.render(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
+            action.render(poseStack, deltaTracker);
         }
     }
 
-    private static void partialTickInkActions(DeltaTracker deltaTracker) {
+    private static void partialTickInkActions(float deltaTracker) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         for (InkAction action : session.getActiveClientInkActions()) {
-            action.partialTick(deltaTracker.getGameTimeDeltaPartialTick(true));
+            action.partialTick(deltaTracker);
         }
     }
 }

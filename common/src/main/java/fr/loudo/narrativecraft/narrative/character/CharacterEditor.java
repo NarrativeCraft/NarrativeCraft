@@ -151,7 +151,7 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
 
     private EntityType<?> resolveEntityType(String entityTypeId) {
         return BuiltInRegistries.ENTITY_TYPE
-                .getOptional(ResourceLocation.parse(entityTypeId))
+                .getOptional(ResourceLocation.of(entityTypeId, ':'))
                 .orElse(EntityType.PLAYER);
     }
 }

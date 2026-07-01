@@ -29,8 +29,9 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 public class OnHurtEventFabric implements IFabricEventRegister {
     @Override
     public void register() {
-        ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamageTaken, damageTaken, blocked) -> {
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             OnHurtEvent.onHurt(entity, source);
+            return true;
         });
     }
 }

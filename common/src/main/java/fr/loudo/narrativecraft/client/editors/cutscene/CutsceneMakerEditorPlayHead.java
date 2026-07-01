@@ -24,13 +24,14 @@
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 public class CutsceneMakerEditorPlayHead {
 
     public static final ResourceLocation playHeadLocation =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "playhead");
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "textures/gui/sprites/playhead.png");
     private int y, width, height;
     private int space;
     private boolean isHovered;
@@ -45,13 +46,13 @@ public class CutsceneMakerEditorPlayHead {
 
     public void render(GuiGraphics graphics, int mouseX, int mouseY, int timelineStartX, int timelineWidth) {
         int x = timelineStartX + (int) (ratio * timelineWidth) - width / 2;
-        graphics.blitSprite(playHeadLocation, x, y, width, height);
+        graphics.blit(playHeadLocation, x, y, 0, 0, width, height, width, height);
         isHovered = mouseX >= x - space && mouseX <= x + space + width && mouseY >= y && mouseY <= y + height;
     }
 
     public void onMouseDrag(double mouseX, int timelineStartX, int timelineWidth) {
         if (!isDragging || timelineWidth <= 0) return;
-        ratio = (float) Math.clamp((mouseX - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
+        ratio = (float) MathUtils.clamp((mouseX - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
     }
 
     public void onClick(
@@ -62,7 +63,7 @@ public class CutsceneMakerEditorPlayHead {
             return;
         }
         isDragging = true;
-        ratio = (float) Math.clamp(((mouseX) - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
+        ratio = (float) MathUtils.clamp(((mouseX) - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
     }
 
     public void setY(int y) {
@@ -70,7 +71,7 @@ public class CutsceneMakerEditorPlayHead {
     }
 
     public void setRatio(float ratio) {
-        this.ratio = (float) Math.clamp(ratio, 0.0, 1.0);
+        this.ratio = (float) MathUtils.clamp(ratio, 0.0, 1.0);
     }
 
     public float getRatio() {

@@ -52,8 +52,7 @@ public class DialogData {
     private ResourceLocation backgroundImage = null;
 
     private float scrollSpeed = 0;
-    private ResourceLocation letterSound =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
+    private ResourceLocation letterSound = new ResourceLocation(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
     private boolean soundMuted = false;
 
     private boolean tailVisible = true;

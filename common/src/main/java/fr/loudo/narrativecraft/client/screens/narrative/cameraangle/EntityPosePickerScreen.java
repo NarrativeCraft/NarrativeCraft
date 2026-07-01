@@ -48,7 +48,7 @@ public class EntityPosePickerScreen extends Screen {
 
     @Override
     protected void init() {
-        Pose[] poses = new Pose[] {Pose.STANDING, Pose.CROUCHING, Pose.SLEEPING, Pose.FALL_FLYING, Pose.SHOOTING};
+        Pose[] poses = new Pose[] {Pose.STANDING, Pose.CROUCHING, Pose.SLEEPING, Pose.FALL_FLYING};
         int totalHeight = poses.length * (BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
         int startY = (height - totalHeight) / 2;
         int x = width - BUTTON_WIDTH - MARGIN_RIGHT;
@@ -67,7 +67,7 @@ public class EntityPosePickerScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {}
+    public void renderBackground(GuiGraphics graphics) {}
 
     @Override
     public boolean isPauseScreen() {

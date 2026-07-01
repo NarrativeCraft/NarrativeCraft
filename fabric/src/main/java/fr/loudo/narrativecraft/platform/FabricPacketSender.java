@@ -23,20 +23,26 @@
 
 package fr.loudo.narrativecraft.platform;
 
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import fr.loudo.narrativecraft.platform.services.IPacketSender;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
 public class FabricPacketSender implements IPacketSender {
     @Override
-    public void sendToPlayer(ServerPlayer player, CustomPacketPayload packet) {
-        ServerPlayNetworking.send(player, packet);
+    public void sendToPlayer(ServerPlayer player, NarrativePacket packet) {
+        FriendlyByteBuf buf = PacketByteBufs.create();
+        packet.write(buf);
+        ServerPlayNetworking.send(player, packet.type(), buf);
     }
 
     @Override
-    public void sendToServer(CustomPacketPayload packet) {
-        ClientPlayNetworking.send(packet);
+    public void sendToServer(NarrativePacket packet) {
+        FriendlyByteBuf buf = PacketByteBufs.create();
+        packet.write(buf);
+        ClientPlayNetworking.send(packet.type(), buf);
     }
 }

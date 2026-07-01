@@ -24,22 +24,25 @@
 package fr.loudo.narrativecraft.network.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record BiCutscenePlayHeadPacket(int tick) implements CustomPacketPayload {
+public record BiCutscenePlayHeadPacket(int tick) implements NarrativePacket {
 
-    public static final Type<BiCutscenePlayHeadPacket> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_head_update"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "play_head_update");
 
-    public static final StreamCodec<ByteBuf, BiCutscenePlayHeadPacket> STREAM_CODEC =
-            StreamCodec.composite(ByteBufCodecs.INT, BiCutscenePlayHeadPacket::tick, BiCutscenePlayHeadPacket::new);
+    public static BiCutscenePlayHeadPacket read(FriendlyByteBuf buf) {
+        return new BiCutscenePlayHeadPacket(buf.readInt());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeInt(tick);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

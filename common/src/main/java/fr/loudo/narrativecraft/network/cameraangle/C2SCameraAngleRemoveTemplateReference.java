@@ -25,15 +25,13 @@ package fr.loudo.narrativecraft.network.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleRemoveTemplateReference(
-        UUID chapterId, UUID sceneId, UUID cameraAngleId, UUID templateReferenceId) implements CustomPacketPayload {
+        UUID chapterId, UUID sceneId, UUID cameraAngleId, UUID templateReferenceId) implements NarrativePacket {
 
     public C2SCameraAngleRemoveTemplateReference(CameraAngle cameraAngle, UUID templateReferenceId) {
         this(
@@ -43,23 +41,24 @@ public record C2SCameraAngleRemoveTemplateReference(
                 templateReferenceId);
     }
 
-    public static final Type<C2SCameraAngleRemoveTemplateReference> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_remove_template_reference"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "camera_angle_remove_template_reference");
 
-    public static final StreamCodec<ByteBuf, C2SCameraAngleRemoveTemplateReference> STREAM_CODEC =
-            StreamCodec.composite(
-                    UUIDUtil.STREAM_CODEC,
-                    C2SCameraAngleRemoveTemplateReference::chapterId,
-                    UUIDUtil.STREAM_CODEC,
-                    C2SCameraAngleRemoveTemplateReference::sceneId,
-                    UUIDUtil.STREAM_CODEC,
-                    C2SCameraAngleRemoveTemplateReference::cameraAngleId,
-                    UUIDUtil.STREAM_CODEC,
-                    C2SCameraAngleRemoveTemplateReference::templateReferenceId,
-                    C2SCameraAngleRemoveTemplateReference::new);
+    public static C2SCameraAngleRemoveTemplateReference read(FriendlyByteBuf buf) {
+        return new C2SCameraAngleRemoveTemplateReference(
+                buf.readUUID(), buf.readUUID(), buf.readUUID(), buf.readUUID());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(chapterId);
+        buf.writeUUID(sceneId);
+        buf.writeUUID(cameraAngleId);
+        buf.writeUUID(templateReferenceId);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

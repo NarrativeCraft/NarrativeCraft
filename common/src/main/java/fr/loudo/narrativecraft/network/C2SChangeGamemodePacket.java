@@ -24,25 +24,25 @@
 package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.GameType;
 
-public record C2SChangeGamemodePacket(GameType gameType) implements CustomPacketPayload {
+public record C2SChangeGamemodePacket(GameType gameType) implements NarrativePacket {
 
-    public static final Type<C2SChangeGamemodePacket> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "c2s_change_gamemode"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "c2s_change_gamemode");
 
-    public static final StreamCodec<ByteBuf, C2SChangeGamemodePacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.idMapper(GameType::byId, GameType::getId),
-            C2SChangeGamemodePacket::gameType,
-            C2SChangeGamemodePacket::new);
+    public static C2SChangeGamemodePacket read(FriendlyByteBuf buf) {
+        return new C2SChangeGamemodePacket(buf.readEnum(GameType.class));
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeEnum(gameType);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
 import java.util.function.BiConsumer;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
@@ -64,6 +65,12 @@ public class CameraAngleEditorMenuScreen extends Screen {
         super(Component.literal("Camera Angle Menu"));
         this.editor = editor;
         this.lastScreen = lastScreen;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override

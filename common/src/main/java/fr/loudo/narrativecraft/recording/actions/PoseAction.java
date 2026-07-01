@@ -52,9 +52,6 @@ public class PoseAction extends AbstractAction {
             .put(Pose.SNIFFING, 13)
             .put(Pose.EMERGING, 14)
             .put(Pose.DIGGING, 15)
-            .put(Pose.SLIDING, 16)
-            .put(Pose.SHOOTING, 17)
-            .put(Pose.INHALING, 18)
             .build();
 
     private Pose pose;

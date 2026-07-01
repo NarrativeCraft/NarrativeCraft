@@ -23,9 +23,8 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.events.client.OnRenderWorldEvent;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -51,20 +50,28 @@ public class GameRendererMixinFabric {
                     @At(
                             value = "INVOKE",
                             target =
-                                    "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V"))
+                                    "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V"))
     private void narrativecraft$renderLevel(
             LevelRenderer instance,
-            DeltaTracker deltaTracker,
+            PoseStack poseStack,
+            float partialTick,
+            long finishNanoTime,
             boolean renderBlockOutline,
             Camera camera,
             GameRenderer gameRenderer,
             LightTexture lightTexture,
-            Matrix4f frustumMatrix,
             Matrix4f projectionMatrix) {
         instance.renderLevel(
-                deltaTracker, renderBlockOutline, camera, gameRenderer, lightTexture, frustumMatrix, projectionMatrix);
+                poseStack,
+                partialTick,
+                finishNanoTime,
+                renderBlockOutline,
+                camera,
+                gameRenderer,
+                lightTexture,
+                projectionMatrix);
         ProfilerFiller profiler = this.minecraft.getProfiler();
         profiler.popPush("nc_render_world_fabric");
-        OnRenderWorldEvent.renderWorld(frustumMatrix, deltaTracker);
+        //        OnRenderWorldEvent.renderWorld(poseStack, partialTick);
     }
 }

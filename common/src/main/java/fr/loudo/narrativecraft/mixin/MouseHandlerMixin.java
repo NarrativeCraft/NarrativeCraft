@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MouseHandlerMixin {
 
     @Inject(method = "turnPlayer", at = @At("HEAD"), cancellable = true)
-    private void narrativecraft$turnPlayer(double mousea, CallbackInfo ci) {
+    private void narrativecraft$turnPlayer(CallbackInfo ci) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession.isInStory() && playerSession.inCamera()) {

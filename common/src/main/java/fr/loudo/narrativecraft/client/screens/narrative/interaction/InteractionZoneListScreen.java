@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMaker
 import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
@@ -35,6 +36,12 @@ public class InteractionZoneListScreen extends AbstractInteractionListScreen<Int
 
     public InteractionZoneListScreen(ClientInteractionMakerEditorMaker editor, Screen lastScreen) {
         super(Translation.message("screen.interaction.zones"), editor, lastScreen);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override

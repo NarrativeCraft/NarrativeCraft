@@ -30,7 +30,6 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.rendering.CameraWireframeRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
@@ -43,7 +42,7 @@ public class CameraAngleMakerEditorCameraRenderer {
 
     private static final float NAME_TAG_SCALE = 0.025f;
 
-    public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
+    public static void render(PoseStack poseStack, float deltaTracker) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (!(editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor)) return;
@@ -94,7 +93,7 @@ public class CameraAngleMakerEditorCameraRenderer {
             poseStack.pushPose();
             poseStack.translate(position.x - cameraPos.x, position.y - cameraPos.y + 0.6, position.z - cameraPos.z);
             poseStack.mulPose(minecraft.gameRenderer.getMainCamera().rotation());
-            poseStack.scale(NAME_TAG_SCALE, -NAME_TAG_SCALE, NAME_TAG_SCALE);
+            poseStack.scale(-NAME_TAG_SCALE, -NAME_TAG_SCALE, NAME_TAG_SCALE);
             Matrix4f matrix = poseStack.last().pose();
 
             int width = font.width(cameraView.getName());

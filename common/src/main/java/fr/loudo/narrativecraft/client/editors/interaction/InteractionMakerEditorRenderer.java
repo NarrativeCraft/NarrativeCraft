@@ -39,7 +39,6 @@ import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
@@ -54,13 +53,13 @@ import org.joml.Vector3f;
 
 public class InteractionMakerEditorRenderer {
 
-    private static final ResourceLocation POINT_TEXTURE = ResourceLocation.fromNamespaceAndPath(
-            NarrativeCraftMod.MOD_ID, "textures/interaction/interaction_point.png");
+    private static final ResourceLocation POINT_TEXTURE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "textures/interaction/interaction_point.png");
     private static final float POINT_SPRITE_SCALE = 0.1f;
     private static final float POINT_ANIMATION_SPEED = 6.5f;
     private static final Map<UUID, Float> pointAnimT = new HashMap<>();
 
-    public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
+    public static void render(PoseStack poseStack, float deltaTracker) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
         if (!(editorMaker instanceof ClientInteractionMakerEditorMaker interactionEditor)) return;
@@ -69,7 +68,7 @@ public class InteractionMakerEditorRenderer {
         Vec3 cameraPosition = minecraft.gameRenderer.getMainCamera().getPosition();
         Interaction interaction = interactionEditor.getInteraction();
         boolean isDev = interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT;
-        float deltaSeconds = deltaTracker.getGameTimeDeltaTicks() / 20.0f;
+        float deltaSeconds = Minecraft.getInstance().getDeltaFrameTime() / 20.0f;
 
         RenderSystem.lineWidth(4.0f);
         VertexConsumer lineConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderType.lines());
@@ -171,41 +170,50 @@ public class InteractionMakerEditorRenderer {
             Vec3 worldPosition,
             Minecraft minecraft,
             float scale) {
+
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.beaconBeam(POINT_TEXTURE, true));
+
         poseStack.pushPose();
         poseStack.translate(
                 worldPosition.x - cameraPosition.x,
                 worldPosition.y - cameraPosition.y,
                 worldPosition.z - cameraPosition.z);
+
         poseStack.mulPose(minecraft.gameRenderer.getMainCamera().rotation());
-        poseStack.scale(scale, scale, 1.0f);
+        poseStack.scale(-scale, -scale, 1.0f);
+
         Matrix4f matrix = poseStack.last().pose();
         int light = LightTexture.FULL_BRIGHT;
-        buffer.addVertex(matrix, -0.5f, 0.5f, 0f)
-                .setColor(1f, 1f, 1f, 1f)
-                .setUv(0f, 0f)
-                .setUv1(0, 0)
-                .setLight(light)
-                .setNormal(0, 0, 1);
-        buffer.addVertex(matrix, -0.5f, -0.5f, 0f)
-                .setColor(1f, 1f, 1f, 1f)
-                .setUv(0f, 1f)
-                .setUv1(0, 0)
-                .setLight(light)
-                .setNormal(0, 0, 1);
-        buffer.addVertex(matrix, 0.5f, -0.5f, 0f)
-                .setColor(1f, 1f, 1f, 1f)
-                .setUv(1f, 1f)
-                .setUv1(0, 0)
-                .setLight(light)
-                .setNormal(0, 0, 1);
-        buffer.addVertex(matrix, 0.5f, 0.5f, 0f)
-                .setColor(1f, 1f, 1f, 1f)
-                .setUv(1f, 0f)
-                .setUv1(0, 0)
-                .setLight(light)
-                .setNormal(0, 0, 1);
+        buffer.vertex(matrix, -0.5f, -0.5f, 0f)
+                .color(1f, 1f, 1f, 1f)
+                .uv(0f, 1f)
+                .uv2(light)
+                .normal(0, 0, 1)
+                .endVertex();
+        buffer.vertex(matrix, -0.5f, 0.5f, 0f)
+                .color(1f, 1f, 1f, 1f)
+                .uv(0f, 0f)
+                .uv2(light)
+                .normal(0, 0, 1)
+                .endVertex();
+        buffer.vertex(matrix, 0.5f, 0.5f, 0f)
+                .color(1f, 1f, 1f, 1f)
+                .uv(1f, 0f)
+                .uv2(light)
+                .normal(0, 0, 1)
+                .endVertex();
+        buffer.vertex(matrix, 0.5f, -0.5f, 0f)
+                .color(1f, 1f, 1f, 1f)
+                .uv(1f, 1f)
+                .uv2(light)
+                .normal(0, 0, 1)
+                .endVertex();
+
         poseStack.popPose();
+
+        if (bufferSource instanceof MultiBufferSource.BufferSource coreSource) {
+            coreSource.endBatch(RenderType.beaconBeam(POINT_TEXTURE, true));
+        }
     }
 
     private static void drawNameTag(
@@ -224,7 +232,7 @@ public class InteractionMakerEditorRenderer {
                 worldPosition.y - cameraPosition.y + yOffset,
                 worldPosition.z - cameraPosition.z);
         poseStack.mulPose(minecraft.gameRenderer.getMainCamera().rotation());
-        poseStack.scale(scale, -scale, scale);
+        poseStack.scale(-scale, -scale, scale);
         Matrix4f matrix = poseStack.last().pose();
         Font font = minecraft.font;
         font.drawInBatch(
@@ -237,7 +245,7 @@ public class InteractionMakerEditorRenderer {
                 bufferSource,
                 Font.DisplayMode.SEE_THROUGH,
                 0x40000000,
-                0xF000F0);
+                LightTexture.FULL_BRIGHT);
         poseStack.popPose();
     }
 
@@ -301,12 +309,14 @@ public class InteractionMakerEditorRenderer {
             dz /= length;
         }
         vertexConsumer
-                .addVertex(matrix, from.x, from.y, from.z)
-                .setColor(red, green, blue, alpha)
-                .setNormal(dx, dy, dz);
+                .vertex(matrix, from.x, from.y, from.z)
+                .color(red, green, blue, alpha)
+                .normal(dx, dy, dz)
+                .endVertex();
         vertexConsumer
-                .addVertex(matrix, to.x, to.y, to.z)
-                .setColor(red, green, blue, alpha)
-                .setNormal(dx, dy, dz);
+                .vertex(matrix, to.x, to.y, to.z)
+                .color(red, green, blue, alpha)
+                .normal(dx, dy, dz)
+                .endVertex();
     }
 }

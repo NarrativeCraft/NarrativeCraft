@@ -24,26 +24,9 @@
 package fr.loudo.narrativecraft.narrative.character;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class CharacterStoryPayload extends NarrativeEntryPayload {
-
-    public static final StreamCodec<ByteBuf, CharacterStoryPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getDescription,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getModelType,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getEntityTypeId,
-            MainCharacterAttribute.STREAM_CODEC,
-            CharacterStoryPayload::getMainCharacterAttribute,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getDialogDataJson,
-            CharacterStoryPayload::new);
 
     private final String modelType;
     private final String entityTypeId;
@@ -63,6 +46,26 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
         this.mainCharacterAttribute =
                 mainCharacterAttribute != null ? mainCharacterAttribute : new MainCharacterAttribute();
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
+    }
+
+    public static CharacterStoryPayload read(FriendlyByteBuf buf) {
+        return new CharacterStoryPayload(
+                buf.readUtf(),
+                buf.readUtf(),
+                buf.readUtf(),
+                buf.readUtf(),
+                MainCharacterAttribute.read(buf),
+                buf.readUtf());
+    }
+
+    @Override
+    protected void writeData(FriendlyByteBuf buf) {
+        buf.writeUtf(getName());
+        buf.writeUtf(getDescription());
+        buf.writeUtf(modelType);
+        buf.writeUtf(entityTypeId);
+        mainCharacterAttribute.write(buf);
+        buf.writeUtf(dialogDataJson);
     }
 
     public String getModelType() {

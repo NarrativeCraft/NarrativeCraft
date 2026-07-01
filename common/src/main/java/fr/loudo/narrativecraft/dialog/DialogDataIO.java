@@ -88,11 +88,10 @@ public final class DialogDataIO {
             if (json.has("textColor")) data.setTextColor(json.get("textColor").getAsInt());
             if (json.has("backgroundImage")) {
                 data.setBackgroundImage(
-                        ResourceLocation.parse(json.get("backgroundImage").getAsString()));
+                        ResourceLocation.of(json.get("backgroundImage").getAsString(), ':'));
             }
             if (json.has("letterSound")) {
-                data.setLetterSound(
-                        ResourceLocation.parse(json.get("letterSound").getAsString()));
+                data.setLetterSound(ResourceLocation.of(json.get("letterSound").getAsString(), ':'));
             }
             if (json.has("tailVisible")) {
                 data.setTailVisible(json.get("tailVisible").getAsBoolean());

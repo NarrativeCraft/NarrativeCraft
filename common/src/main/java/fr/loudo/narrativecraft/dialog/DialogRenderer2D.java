@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.dialog;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
@@ -79,10 +78,10 @@ public class DialogRenderer2D extends DialogRenderer {
         data.setWidth(BOX_WIDTH - 50f);
     }
 
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, float deltaTracker) {
         if (animator.isStopped()) return;
 
-        float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
+        float partialTick = deltaTracker;
         float scale = animator.getScale(partialTick, 0.8f, 1f);
         if (scale <= 0f) return;
 
@@ -145,18 +144,22 @@ public class DialogRenderer2D extends DialogRenderer {
         Matrix4f matrix = pose.last().pose();
         float hw = SKIP_INDICATOR_SIZE;
         float hh = SKIP_INDICATOR_SIZE;
-        consumer.addVertex(matrix, -hw, -hh, 0.01f)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, -hw, hh, 0.01f)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, hw, 0, 0.01f)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
-        consumer.addVertex(matrix, -hw, -hh, 0.01f)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setColor(color);
+        consumer.vertex(matrix, -hw, -hh, 0.01f)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, -hw, hh, 0.01f)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, hw, 0, 0.01f)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
+        consumer.vertex(matrix, -hw, -hh, 0.01f)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
 
         pose.popPose();
     }

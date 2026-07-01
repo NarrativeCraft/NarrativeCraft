@@ -24,31 +24,28 @@
 package fr.loudo.narrativecraft.network.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CCutsceneEditorData(UUID cutsceneId, String layersJson, int manualMaxTick)
-        implements CustomPacketPayload {
+public record S2CCutsceneEditorData(UUID cutsceneId, String layersJson, int manualMaxTick) implements NarrativePacket {
 
-    public static final Type<S2CCutsceneEditorData> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_editor_data"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "cutscene_editor_data");
 
-    public static final StreamCodec<ByteBuf, S2CCutsceneEditorData> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            S2CCutsceneEditorData::cutsceneId,
-            ByteBufCodecs.STRING_UTF8,
-            S2CCutsceneEditorData::layersJson,
-            ByteBufCodecs.VAR_INT,
-            S2CCutsceneEditorData::manualMaxTick,
-            S2CCutsceneEditorData::new);
+    public static S2CCutsceneEditorData read(FriendlyByteBuf buf) {
+        return new S2CCutsceneEditorData(buf.readUUID(), buf.readUtf(), buf.readVarInt());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(cutsceneId);
+        buf.writeUtf(layersJson);
+        buf.writeVarInt(manualMaxTick);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

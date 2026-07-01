@@ -24,22 +24,25 @@
 package fr.loudo.narrativecraft.network.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SCutsceneControl(State state) implements CustomPacketPayload {
+public record C2SCutsceneControl(State state) implements NarrativePacket {
 
-    public static final Type<C2SCutsceneControl> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_control"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "cutscene_control");
 
-    public static final StreamCodec<ByteBuf, C2SCutsceneControl> STREAM_CODEC =
-            ByteBufCodecs.BYTE.map(b -> new C2SCutsceneControl(State.values()[b]), p -> (byte) p.state.ordinal());
+    public static C2SCutsceneControl read(FriendlyByteBuf buf) {
+        return new C2SCutsceneControl(buf.readEnum(State.class));
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeEnum(state);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 

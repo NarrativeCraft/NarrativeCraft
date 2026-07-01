@@ -24,15 +24,12 @@
 package fr.loudo.narrativecraft.network.interaction;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public class S2CInteractionEditorData implements CustomPacketPayload {
+public class S2CInteractionEditorData implements NarrativePacket {
 
     private final UUID interactionId;
     private final String dataJson;
@@ -42,15 +39,18 @@ public class S2CInteractionEditorData implements CustomPacketPayload {
         this.dataJson = dataJson;
     }
 
-    public static final Type<S2CInteractionEditorData> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "interaction_editor_data"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "interaction_editor_data");
 
-    public static final StreamCodec<ByteBuf, S2CInteractionEditorData> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            S2CInteractionEditorData::getInteractionId,
-            ByteBufCodecs.STRING_UTF8,
-            S2CInteractionEditorData::getDataJson,
-            S2CInteractionEditorData::new);
+    public static S2CInteractionEditorData read(FriendlyByteBuf buf) {
+        return new S2CInteractionEditorData(buf.readUUID(), buf.readUtf());
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(interactionId);
+        buf.writeUtf(dataJson);
+    }
 
     public UUID getInteractionId() {
         return interactionId;
@@ -61,7 +61,7 @@ public class S2CInteractionEditorData implements CustomPacketPayload {
     }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public ResourceLocation type() {
         return TYPE;
     }
 }

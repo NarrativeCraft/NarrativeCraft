@@ -24,31 +24,28 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SPlayStitchStory(String stitchName, UUID interactionId, boolean oneTime)
-        implements CustomPacketPayload {
+public record C2SPlayStitchStory(String stitchName, UUID interactionId, boolean oneTime) implements NarrativePacket {
 
-    public static final Type<C2SPlayStitchStory> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "play_stitch_story"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "play_stitch_story");
 
-    public static final StreamCodec<ByteBuf, C2SPlayStitchStory> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            C2SPlayStitchStory::stitchName,
-            UUIDUtil.STREAM_CODEC,
-            C2SPlayStitchStory::interactionId,
-            ByteBufCodecs.BOOL,
-            C2SPlayStitchStory::oneTime,
-            C2SPlayStitchStory::new);
+    public static C2SPlayStitchStory read(FriendlyByteBuf buf) {
+        return new C2SPlayStitchStory(buf.readUtf(), buf.readUUID(), buf.readBoolean());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUtf(stitchName);
+        buf.writeUUID(interactionId);
+        buf.writeBoolean(oneTime);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

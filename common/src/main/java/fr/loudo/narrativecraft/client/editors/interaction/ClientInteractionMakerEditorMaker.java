@@ -38,7 +38,6 @@ import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -142,12 +141,12 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         return environment;
     }
 
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, float deltaTracker) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
-        float partialTick = deltaTracker.getGameTimeDeltaTicks();
+        float partialTick = Minecraft.getInstance().getDeltaFrameTime();
 
         if (inCornerPlacementMode) {
             int totalWidth = BUTTON_WIDTH * 4 + BUTTON_GAP * 3;

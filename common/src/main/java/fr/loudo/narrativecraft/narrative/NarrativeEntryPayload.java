@@ -23,32 +23,27 @@
 
 package fr.loudo.narrativecraft.narrative;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
-public class NarrativeEntryPayload {
+public abstract class NarrativeEntryPayload {
     private final String name;
     private final String description;
-
-    public static final StreamCodec<ByteBuf, NarrativeEntryPayload> STREAM_CODEC = new StreamCodec<>() {
-        @Override
-        public NarrativeEntryPayload decode(ByteBuf buffer) {
-            int ordinal = buffer.readInt();
-            NarrativeEntryType type = NarrativeEntryType.values()[ordinal];
-            return type.getCodec().decode(buffer);
-        }
-
-        @Override
-        public void encode(ByteBuf buffer, NarrativeEntryPayload value) {
-            NarrativeEntryType type = NarrativeEntryType.fromClass(value.getClass());
-            buffer.writeInt(type.ordinal());
-            type.getCodec().encode(buffer, value);
-        }
-    };
 
     public NarrativeEntryPayload(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+    public final void write(FriendlyByteBuf buf) {
+        buf.writeInt(NarrativeEntryType.fromClass(getClass()).ordinal());
+        writeData(buf);
+    }
+
+    protected abstract void writeData(FriendlyByteBuf buf);
+
+    public static NarrativeEntryPayload read(FriendlyByteBuf buf) {
+        int ordinal = buf.readInt();
+        return NarrativeEntryType.values()[ordinal].read(buf);
     }
 
     public String getName() {

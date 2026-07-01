@@ -60,7 +60,7 @@ public class ChoiceScreen extends Screen {
 
     @Override
     protected void init() {
-        ResourceLocation soundId = ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
+        ResourceLocation soundId = new ResourceLocation(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(soundId), 1.0f));
 
         buttons.clear();
@@ -164,7 +164,10 @@ public class ChoiceScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {}
+    public void renderDirtBackground(GuiGraphics guiGraphics) {}
+
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics) {}
 
     @Override
     public void onClose() {}

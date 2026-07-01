@@ -49,7 +49,7 @@ public class ChapterEntryEditScreen extends AbstractNarrativeEntryEditScreen<Cha
     @Override
     protected void addCustomFields() {
         if (entry == null) return; // If we're creating a new chapter, don't show chapter index field
-        chapterIndexField = new EditBox(this.font, 20, 20, Translation.message("chapter_index"));
+        chapterIndexField = new EditBox(this.font, 0, 0, 20, 20, Translation.message("chapter_index"));
         chapterIndexField.setValue(entry != null ? String.valueOf(entry.getChapterIndex()) : "");
         widgets.add(chapterIndexField);
 

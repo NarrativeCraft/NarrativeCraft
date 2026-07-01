@@ -24,28 +24,10 @@
 package fr.loudo.narrativecraft.narrative.npc;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class NpcPayload extends NarrativeEntryPayload {
-
-    public static final StreamCodec<ByteBuf, NpcPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getModelType,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getEntityTypeId,
-            UUIDUtil.STREAM_CODEC,
-            NpcPayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            NpcPayload::getChapterId,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getDialogDataJson,
-            NpcPayload::new);
 
     private final String modelType;
     private final String entityTypeId;
@@ -61,6 +43,21 @@ public class NpcPayload extends NarrativeEntryPayload {
         this.sceneId = sceneId;
         this.chapterId = chapterId;
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
+    }
+
+    public static NpcPayload read(FriendlyByteBuf buf) {
+        return new NpcPayload(
+                buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUUID(), buf.readUUID(), buf.readUtf());
+    }
+
+    @Override
+    protected void writeData(FriendlyByteBuf buf) {
+        buf.writeUtf(getName());
+        buf.writeUtf(modelType);
+        buf.writeUtf(entityTypeId);
+        buf.writeUUID(sceneId);
+        buf.writeUUID(chapterId);
+        buf.writeUtf(dialogDataJson);
     }
 
     public String getModelType() {

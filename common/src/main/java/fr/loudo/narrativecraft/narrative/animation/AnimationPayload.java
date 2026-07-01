@@ -24,11 +24,8 @@
 package fr.loudo.narrativecraft.narrative.animation;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class AnimationPayload extends NarrativeEntryPayload {
 
@@ -37,21 +34,6 @@ public class AnimationPayload extends NarrativeEntryPayload {
     private final int totalTick;
     private final UUID characterId;
 
-    public static final StreamCodec<ByteBuf, AnimationPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            AnimationPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            AnimationPayload::getDescription,
-            UUIDUtil.STREAM_CODEC,
-            AnimationPayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            AnimationPayload::getChapterId,
-            ByteBufCodecs.INT,
-            AnimationPayload::getTotalTick,
-            UUIDUtil.STREAM_CODEC,
-            AnimationPayload::getCharacterId,
-            AnimationPayload::new);
-
     public AnimationPayload(
             String name, String description, UUID sceneId, UUID chapterId, int totalTick, UUID characterId) {
         super(name, description);
@@ -59,6 +41,21 @@ public class AnimationPayload extends NarrativeEntryPayload {
         this.chapterId = chapterId;
         this.totalTick = totalTick;
         this.characterId = characterId;
+    }
+
+    public static AnimationPayload read(FriendlyByteBuf buf) {
+        return new AnimationPayload(
+                buf.readUtf(), buf.readUtf(), buf.readUUID(), buf.readUUID(), buf.readInt(), buf.readUUID());
+    }
+
+    @Override
+    protected void writeData(FriendlyByteBuf buf) {
+        buf.writeUtf(getName());
+        buf.writeUtf(getDescription());
+        buf.writeUUID(sceneId);
+        buf.writeUUID(chapterId);
+        buf.writeInt(totalTick);
+        buf.writeUUID(characterId);
     }
 
     public UUID getChapterId() {

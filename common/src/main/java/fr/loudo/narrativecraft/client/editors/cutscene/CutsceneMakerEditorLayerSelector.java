@@ -26,10 +26,11 @@ package fr.loudo.narrativecraft.client.editors.cutscene;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.client.screens.components.LayerSelectionButton;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
@@ -67,7 +68,7 @@ public class CutsceneMakerEditorLayerSelector {
         }
     }
 
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, float deltaTracker) {
         if (!visible) return;
 
         int visibleHeight = Math.min(layerButtons.size() * 20, maxHeight);
@@ -79,7 +80,8 @@ public class CutsceneMakerEditorLayerSelector {
         for (LayerSelectionButton button : layerButtons) {
             button.setPosition(x, currentY);
             currentY += button.getHeight();
-            button.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            button.render(
+                    graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
         }
         graphics.disableScissor();
 
@@ -104,7 +106,7 @@ public class CutsceneMakerEditorLayerSelector {
         if (mousePos[0] < x || mousePos[0] > x + width || mousePos[1] < y - visibleHeight || mousePos[1] > y) return;
 
         int maxScroll = Math.max(0, layerButtons.size() * 20 - maxHeight);
-        scrollOffset = (int) Math.clamp(scrollOffset - deltaY * 20, 0, maxScroll);
+        scrollOffset = (int) MathUtils.clamp(scrollOffset - deltaY * 20, 0, maxScroll);
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {

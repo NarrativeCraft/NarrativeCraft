@@ -31,7 +31,7 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
-import net.minecraft.util.FastColor;
+import fr.loudo.narrativecraft.utils.Utils;
 
 @InkCommand(
         keyword = "border",
@@ -67,7 +67,7 @@ public class BorderInkAction extends InkAction {
                 return InkActionResult.error("Invalid hex color '" + colorHex + "'");
             }
             float opacity = cmd.getFloat("opacity");
-            color = FastColor.ARGB32.color((int) (opacity * 255), rawColor);
+            color = Utils.argb((int) (opacity * 255), rawColor);
         }
 
         float duration = cmd.getFloat("duration");

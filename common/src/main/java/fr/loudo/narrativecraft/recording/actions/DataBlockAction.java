@@ -65,7 +65,7 @@ public abstract class DataBlockAction extends AbstractAction {
         blockPos = reader.readBlockPos();
 
         String blockId = reader.readString();
-        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(blockId));
+        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.of(blockId, ':'));
 
         BlockState state = block.defaultBlockState();
 

@@ -31,7 +31,6 @@ import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer
 import fr.loudo.narrativecraft.client.editors.rendering.CameraWireframeRenderer;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
@@ -39,7 +38,7 @@ import org.joml.Matrix4f;
 
 public class CutsceneMakerEditorCameraRenderer {
 
-    public static void render(PoseStack poseStack, DeltaTracker deltaTracker) {
+    public static void render(PoseStack poseStack, float deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         ClientCutsceneMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();

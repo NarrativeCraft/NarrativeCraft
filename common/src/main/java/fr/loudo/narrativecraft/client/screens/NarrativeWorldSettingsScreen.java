@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.io.IOException;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
@@ -43,6 +44,12 @@ public class NarrativeWorldSettingsScreen extends Screen {
     public NarrativeWorldSettingsScreen(Screen lastScreen) {
         super(Translation.message("screen.world_settings.title"));
         this.lastScreen = lastScreen;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override

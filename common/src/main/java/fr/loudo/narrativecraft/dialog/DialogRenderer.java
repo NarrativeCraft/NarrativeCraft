@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.dialog;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
+import fr.loudo.narrativecraft.utils.MathUtils;
 
 public abstract class DialogRenderer {
 
@@ -115,7 +116,7 @@ public abstract class DialogRenderer {
 
     protected float getSkipProgress(float partialTick) {
         float t = previousSkipProgress + (skipProgress - previousSkipProgress) * partialTick;
-        t = Math.clamp(t, 0f, 1f);
+        t = MathUtils.clamp(t, 0f, 1f);
         return (float) Interpolation.applyEasing(EasingType.EASE_OUT, t);
     }
 

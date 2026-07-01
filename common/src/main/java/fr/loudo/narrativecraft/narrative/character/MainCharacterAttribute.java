@@ -23,9 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class MainCharacterAttribute {
 
@@ -34,13 +32,6 @@ public class MainCharacterAttribute {
         SKIN_OF_PLAYER,
         CLIENT_HAS_CHARACTER_SKIN
     }
-
-    public static final StreamCodec<ByteBuf, MainCharacterAttribute> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.BOOL,
-            MainCharacterAttribute::isMainCharacter,
-            ByteBufCodecs.idMapper(i -> SkinMode.values()[i], SkinMode::ordinal),
-            MainCharacterAttribute::getSkin,
-            MainCharacterAttribute::new);
 
     private boolean mainCharacter;
     private SkinMode skin;
@@ -58,6 +49,15 @@ public class MainCharacterAttribute {
     public MainCharacterAttribute(MainCharacterAttribute other) {
         this.mainCharacter = other.mainCharacter;
         this.skin = other.skin;
+    }
+
+    public static MainCharacterAttribute read(FriendlyByteBuf buf) {
+        return new MainCharacterAttribute(buf.readBoolean(), buf.readEnum(SkinMode.class));
+    }
+
+    public void write(FriendlyByteBuf buf) {
+        buf.writeBoolean(mainCharacter);
+        buf.writeEnum(skin);
     }
 
     public boolean isMainCharacter() {

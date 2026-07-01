@@ -36,18 +36,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
 public class EntityRendererMixinFabric<T extends Entity> {
-    @Inject(
-            method =
-                    "renderNameTag(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/network/chat/Component;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IF)V",
-            at = @At("HEAD"),
-            cancellable = true)
+    @Inject(method = "renderNameTag", at = @At("HEAD"), cancellable = true)
     private void narrativecraft$shouldRenderNameTag(
             T entity,
             Component displayName,
             PoseStack poseStack,
             MultiBufferSource buffer,
             int packedLight,
-            float partialTicks,
             CallbackInfo ci) {
         if (!OnRenderNameTagEvent.shouldRenderTag(entity)) ci.cancel();
     }

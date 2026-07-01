@@ -77,7 +77,7 @@ public class NpcDeserializer extends NarrativeDeserializer<Npc> {
 
         String entityTypeId = jsonObject.get("entityTypeId").getAsString();
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE
-                .getOptional(ResourceLocation.parse(entityTypeId))
+                .getOptional(ResourceLocation.of(entityTypeId, ':'))
                 .orElse(EntityType.PLAYER);
         npc.setEntityType(entityType);
 

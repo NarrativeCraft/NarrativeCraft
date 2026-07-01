@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.client.narrative.story;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +33,7 @@ import net.minecraft.resources.ResourceLocation;
 public class StorySaveIconRenderer {
 
     private static final ResourceLocation SAVE_ICON =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "save");
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "textures/gui/sprites/save.png");
     private static final int ICON_SIZE = 16;
     private static final int MARGIN = 20;
 
@@ -52,10 +51,10 @@ public class StorySaveIconRenderer {
         this.active = true;
     }
 
-    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics guiGraphics, float deltaTracker) {
         if (!active) return;
 
-        elapsedTicks += deltaTracker.getGameTimeDeltaPartialTick(true);
+        elapsedTicks += deltaTracker;
 
         double total = inTicks + stayTicks + outTicks;
         if (elapsedTicks >= total) {
@@ -80,7 +79,7 @@ public class StorySaveIconRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha / 255.0f);
-        guiGraphics.blitSprite(SAVE_ICON, x, y, ICON_SIZE, ICON_SIZE);
+        guiGraphics.blit(SAVE_ICON, x, y, 0, 0, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.disableBlend();
     }

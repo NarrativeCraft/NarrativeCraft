@@ -24,15 +24,12 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CCharacterStoryAction(UUID characterId, Action action) implements CustomPacketPayload {
+public record S2CCharacterStoryAction(UUID characterId, Action action) implements NarrativePacket {
 
     public enum Action {
         ADD,
@@ -40,18 +37,21 @@ public record S2CCharacterStoryAction(UUID characterId, Action action) implement
         CLEAR
     }
 
-    public static final Type<S2CCharacterStoryAction> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character_story_action"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "character_story_action");
 
-    public static final StreamCodec<ByteBuf, S2CCharacterStoryAction> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            S2CCharacterStoryAction::characterId,
-            ByteBufCodecs.idMapper(i -> Action.values()[i], Action::ordinal),
-            S2CCharacterStoryAction::action,
-            S2CCharacterStoryAction::new);
+    public static S2CCharacterStoryAction read(FriendlyByteBuf buf) {
+        return new S2CCharacterStoryAction(buf.readUUID(), buf.readEnum(Action.class));
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(characterId);
+        buf.writeEnum(action);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

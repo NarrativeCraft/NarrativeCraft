@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -58,7 +59,6 @@ public class ChangeItemAction extends AbstractAction {
             .put(EquipmentSlot.LEGS, 4)
             .put(EquipmentSlot.CHEST, 5)
             .put(EquipmentSlot.HEAD, 6)
-            .put(EquipmentSlot.BODY, 7)
             .build();
 
     private final Map<EquipmentSlot, StoredItem> itemsBySlot = new EnumMap<>(EquipmentSlot.class);
@@ -70,7 +70,7 @@ public class ChangeItemAction extends AbstractAction {
     public ChangeItemAction(int tick, LivingEntity entity) {
         super(tick);
 
-        DynamicOps<Tag> ops = entity.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        DynamicOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, entity.level().registryAccess());
 
         for (EquipmentSlot slot : SLOT_IDS.keySet()) {
             ItemStack stack = entity.getItemBySlot(slot).copy();
@@ -88,7 +88,7 @@ public class ChangeItemAction extends AbstractAction {
             ItemStack thisStack = this.getItemStackForComparison(slot);
             ItemStack thatStack = that.getItemStackForComparison(slot);
 
-            if (!ItemStack.isSameItemSameComponents(thisStack, thatStack)) {
+            if (!ItemStack.isSameItem(thisStack, thatStack)) {
                 return true;
             }
         }
@@ -130,7 +130,7 @@ public class ChangeItemAction extends AbstractAction {
         for (int i = 0; i < size; i++) {
             EquipmentSlot slot = SLOT_IDS.inverse().get(reader.readInt());
 
-            ResourceLocation key = ResourceLocation.parse(reader.readString());
+            ResourceLocation key = ResourceLocation.of(reader.readString(), ':');
 
             int typeId = reader.readInt();
             String data = null;
@@ -153,7 +153,7 @@ public class ChangeItemAction extends AbstractAction {
             return ActionResult.IGNORED;
         }
 
-        DynamicOps<Tag> ops = entity.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        DynamicOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, entity.level().registryAccess());
 
         for (Map.Entry<EquipmentSlot, StoredItem> entry : itemsBySlot.entrySet()) {
             EquipmentSlot slot = entry.getKey();
@@ -226,7 +226,7 @@ public class ChangeItemAction extends AbstractAction {
             }
 
             try {
-                return ItemStack.CODEC.parse(ops, tag).getOrThrow();
+                return ItemStack.CODEC.parse(ops, tag).getOrThrow(false, s -> {});
             } catch (Exception e) {
                 return ItemStack.EMPTY;
             }

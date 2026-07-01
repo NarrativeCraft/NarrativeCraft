@@ -24,22 +24,25 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record C2SChoiceSelected(int index) implements CustomPacketPayload {
+public record C2SChoiceSelected(int index) implements NarrativePacket {
 
-    public static final Type<C2SChoiceSelected> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "choice_selected"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "choice_selected");
 
-    public static final StreamCodec<ByteBuf, C2SChoiceSelected> STREAM_CODEC =
-            ByteBufCodecs.VAR_INT.map(C2SChoiceSelected::new, C2SChoiceSelected::index);
+    public static C2SChoiceSelected read(FriendlyByteBuf buf) {
+        return new C2SChoiceSelected(buf.readVarInt());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeVarInt(index);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

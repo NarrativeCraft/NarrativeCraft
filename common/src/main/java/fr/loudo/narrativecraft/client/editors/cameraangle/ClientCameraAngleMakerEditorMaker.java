@@ -51,7 +51,6 @@ import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.*;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -560,7 +559,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         dialogPreviewPanel.renderAnchorPoint(poseStack);
     }
 
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, float deltaTracker) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (previewCameraView != null) {
             previewCameraView.setRoll(rollWidget.getValue());
@@ -591,26 +590,36 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             for (int i = 0; i < 4; i++) {
                 Button b = buttons.get(i);
                 b.setPosition(startX + i * (BUTTON_WIDTH + BUTTON_GAP), y);
-                b.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+                b.render(
+                        graphics,
+                        mousePos[0],
+                        mousePos[1],
+                        Minecraft.getInstance().getDeltaFrameTime());
             }
-            quitButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
-            saveButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            quitButton.render(
+                    graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
+            saveButton.render(
+                    graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
         } else if (!editingCameraViewPosition) {
             leavePreviewButton.setPosition(5, 5);
             editPositionButton.setPosition(leavePreviewButton.getX() + leavePreviewButton.getWidth() + 5, 5);
 
-            leavePreviewButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
-            editPositionButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            leavePreviewButton.render(
+                    graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
+            editPositionButton.render(
+                    graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
 
             if (previewMode == PreviewMode.DIALOG) {
                 dialogPreviewPanel.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
             }
         } else {
             acceptPositionButton.setPosition(5, 5);
-            acceptPositionButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            acceptPositionButton.render(
+                    graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
 
             stopPositionButton.setPosition(acceptPositionButton.getX() + acceptPositionButton.getWidth() + 5, 5);
-            stopPositionButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+            stopPositionButton.render(
+                    graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
         }
 
         if (previewMode == PreviewMode.CAMERA) {

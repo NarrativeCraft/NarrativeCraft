@@ -106,7 +106,10 @@ public class DialogTail {
                 net.minecraft.util.FastColor.ARGB32.red(base),
                 net.minecraft.util.FastColor.ARGB32.green(base),
                 net.minecraft.util.FastColor.ARGB32.blue(base));
-        consumer.addVertex(matrix, x, y, 0).setLight(LightTexture.FULL_BRIGHT).setColor(color);
+        consumer.vertex(matrix, x, y, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .color(color)
+                .endVertex();
     }
 
     private void drawTailTop(Matrix4f m, VertexConsumer c, float topRight, float topLeft, float op) {

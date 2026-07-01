@@ -35,34 +35,27 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.stats.Stat;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
-import org.jetbrains.annotations.NotNull;
 
 // FakePlayer class from Forge
 public class FakePlayer extends ServerPlayer {
     public static final String CHARACTER_ID_PROPERTY = "nc_character_id";
-    private static final ClientInformation DEFAULT_CLIENT_INFO = ClientInformation.createDefault();
     private final boolean isInvulnerable;
 
     public static GameProfile createCharacterProfile(ICharacterStory characterStory, String name) {
-        GameProfile profile = new GameProfile(UUID.randomUUID(), name);
-        profile.getProperties()
-                .put(
-                        CHARACTER_ID_PROPERTY,
-                        new Property(
-                                CHARACTER_ID_PROPERTY, characterStory.getId().toString()));
+        UUID profileId = characterStory.getId();
+        GameProfile profile = new GameProfile(profileId, name);
+        profile.getProperties().put(CHARACTER_ID_PROPERTY, new Property(CHARACTER_ID_PROPERTY, profileId.toString()));
         return profile;
     }
 
     public FakePlayer(ServerLevel level, GameProfile profile, boolean isInvulnerable) {
-        super(level.getServer(), level, profile, DEFAULT_CLIENT_INFO);
+        super(level.getServer(), level, profile);
         this.connection = new FakePlayerNetHandler(level.getServer(), this, profile);
         this.isInvulnerable = isInvulnerable;
         getEntityData().set(PlayerAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
@@ -71,7 +64,7 @@ public class FakePlayer extends ServerPlayer {
     }
 
     @Override
-    public void awardStat(@NotNull Stat stat, int amount) {}
+    public void awardStat(Stat stat, int amount) {}
 
     @Override
     public boolean hurt(DamageSource damageSource, float amount) {
@@ -84,7 +77,7 @@ public class FakePlayer extends ServerPlayer {
                 new DummyConnection(PacketFlow.CLIENTBOUND);
 
         public FakePlayerNetHandler(MinecraftServer server, ServerPlayer player, GameProfile profile) {
-            super(server, DUMMY_CONNECTION, player, new CommonListenerCookie(profile, 0, DEFAULT_CLIENT_INFO, false));
+            super(server, DUMMY_CONNECTION, player);
         }
 
         @Override
@@ -145,10 +138,10 @@ public class FakePlayer extends ServerPlayer {
         public void handleEditBook(ServerboundEditBookPacket packet) {}
 
         @Override
-        public void handleEntityTagQuery(ServerboundEntityTagQueryPacket packet) {}
+        public void handleEntityTagQuery(ServerboundEntityTagQuery packet) {}
 
         @Override
-        public void handleBlockEntityTagQuery(ServerboundBlockEntityTagQueryPacket packet) {}
+        public void handleBlockEntityTagQuery(ServerboundBlockEntityTagQuery packet) {}
 
         @Override
         public void handleMovePlayer(ServerboundMovePlayerPacket packet) {}

@@ -42,7 +42,7 @@ public abstract class MouseHandlerMixinFabric {
 
     @Inject(
             method = "onScroll",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseScrolled(DDDD)Z"))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseScrolled(DDD)Z"))
     private void narrativecraft$onMouseScroll(long windowPointer, double xOffset, double yOffset, CallbackInfo ci) {
         boolean flag = this.minecraft.options.discreteMouseScroll().get();
         double d0 = this.minecraft.options.mouseWheelSensitivity().get();

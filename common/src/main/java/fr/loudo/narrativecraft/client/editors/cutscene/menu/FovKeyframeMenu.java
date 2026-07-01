@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
 import java.util.Locale;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -60,11 +59,11 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
 
     @Override
     protected void renderContent(
-            GuiGraphics graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
+            GuiGraphics graphics, float delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
         graphics.drawString(Minecraft.getInstance().font, "FOV", x, y - 2, 0xFFAAAAAA);
         fieldFov.setPosition(x, y + FIELD_LABEL_HEIGHT);
         fieldFov.setWidth(contentWidth);
-        fieldFov.render(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
+        fieldFov.render(graphics, mouseX, mouseY, Minecraft.getInstance().getDeltaFrameTime());
 
         int easingY = y + FIELD_LABEL_HEIGHT + FIELD_HEIGHT + FIELD_GAP;
         graphics.drawString(Minecraft.getInstance().font, "Easing", x, easingY - 2, 0xFFAAAAAA);

@@ -24,24 +24,10 @@
 package fr.loudo.narrativecraft.narrative.scene;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class ScenePayload extends NarrativeEntryPayload {
-
-    public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ScenePayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            ScenePayload::getDescription,
-            UUIDUtil.STREAM_CODEC,
-            ScenePayload::getChapterId,
-            ByteBufCodecs.INT,
-            ScenePayload::getRank,
-            ScenePayload::new);
 
     private final UUID chapterId;
     private final int rank;
@@ -50,6 +36,18 @@ public class ScenePayload extends NarrativeEntryPayload {
         super(name, description);
         this.chapterId = chapterId;
         this.rank = rank;
+    }
+
+    public static ScenePayload read(FriendlyByteBuf buf) {
+        return new ScenePayload(buf.readUtf(), buf.readUtf(), buf.readUUID(), buf.readInt());
+    }
+
+    @Override
+    protected void writeData(FriendlyByteBuf buf) {
+        buf.writeUtf(getName());
+        buf.writeUtf(getDescription());
+        buf.writeUUID(chapterId);
+        buf.writeInt(rank);
     }
 
     public UUID getChapterId() {

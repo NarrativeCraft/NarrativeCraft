@@ -25,15 +25,13 @@ package fr.loudo.narrativecraft.network.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleRemovePlacement(UUID chapterId, UUID sceneId, UUID cameraAngleId, UUID placementId)
-        implements CustomPacketPayload {
+        implements NarrativePacket {
 
     public C2SCameraAngleRemovePlacement(CameraAngle cameraAngle, UUID placementId) {
         this(
@@ -43,22 +41,23 @@ public record C2SCameraAngleRemovePlacement(UUID chapterId, UUID sceneId, UUID c
                 placementId);
     }
 
-    public static final Type<C2SCameraAngleRemovePlacement> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_remove_placement"));
+    public static final ResourceLocation TYPE =
+            new ResourceLocation(NarrativeCraftMod.MOD_ID, "camera_angle_remove_placement");
 
-    public static final StreamCodec<ByteBuf, C2SCameraAngleRemovePlacement> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleRemovePlacement::chapterId,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleRemovePlacement::sceneId,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleRemovePlacement::cameraAngleId,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleRemovePlacement::placementId,
-            C2SCameraAngleRemovePlacement::new);
+    public static C2SCameraAngleRemovePlacement read(FriendlyByteBuf buf) {
+        return new C2SCameraAngleRemovePlacement(buf.readUUID(), buf.readUUID(), buf.readUUID(), buf.readUUID());
+    }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(chapterId);
+        buf.writeUUID(sceneId);
+        buf.writeUUID(cameraAngleId);
+        buf.writeUUID(placementId);
+    }
+
+    @Override
+    public ResourceLocation type() {
         return TYPE;
     }
 }

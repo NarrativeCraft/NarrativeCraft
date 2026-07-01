@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import java.util.List;
 import java.util.Locale;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -79,12 +78,12 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
 
     @Override
     protected void renderContent(
-            GuiGraphics graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
+            GuiGraphics graphics, float delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
         String[] labels = {"X", "Y", "Z", "Pitch", "Yaw", "Rotate"};
         EditBox[] boxes = {fieldX, fieldY, fieldZ, fieldPitch, fieldYaw, fieldRotate};
 
         int currentY = y;
-        float partialTick = delta.getGameTimeDeltaTicks();
+        float partialTick = Minecraft.getInstance().getDeltaFrameTime();
         for (int i = 0; i < FIELD_COUNT; i++) {
             graphics.drawString(Minecraft.getInstance().font, labels[i], x, currentY - 2, 0xFFAAAAAA);
             currentY += FIELD_LABEL_HEIGHT;

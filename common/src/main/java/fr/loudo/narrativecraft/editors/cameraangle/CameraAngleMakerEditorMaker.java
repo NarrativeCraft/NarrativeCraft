@@ -54,6 +54,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -337,6 +338,8 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             player.connection.send(new ClientboundPlayerInfoUpdatePacket(
                     ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
             level.addNewPlayer(fakePlayer);
+            player.connection.send(
+                    new ClientboundRotateHeadPacket(entity, (byte) (fakePlayer.getYHeadRot() * 256 / 360)));
         } else {
             entity.setInvulnerable(true);
             if (entity instanceof Mob mob) {
@@ -429,15 +432,15 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         byte newMask = pose == Pose.CROUCHING ? (byte) (currentMask | 0x02) : (byte) (currentMask & ~0x02);
         entityData.set(EntityAccessor.getDATA_SHARED_FLAGS_ID(), newMask);
 
-        if (pose == Pose.SHOOTING && entity instanceof LivingEntity livingEntity) {
-            byte currentLivingFlags = entityData.get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS());
-            byte newLivingFlags = 0;
-            if (currentLivingFlags == 0) {
-                if (!livingEntity.getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) newLivingFlags = 3;
-                else if (!livingEntity.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) newLivingFlags = 1;
-            }
-            entityData.set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), newLivingFlags);
-        }
+        //        if (pose == Pose.SHOOTING && entity instanceof LivingEntity livingEntity) {
+        //            byte currentLivingFlags = entityData.get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS());
+        //            byte newLivingFlags = 0;
+        //            if (currentLivingFlags == 0) {
+        //                if (!livingEntity.getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) newLivingFlags = 3;
+        //                else if (!livingEntity.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) newLivingFlags = 1;
+        //            }
+        //            entityData.set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), newLivingFlags);
+        //        }
 
         characterPlacement.setPose(pose);
     }

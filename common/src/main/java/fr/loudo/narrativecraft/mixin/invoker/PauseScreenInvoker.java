@@ -21,18 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.mixin.invoker;
 
-import fr.loudo.narrativecraft.network.story.C2SPlayStory;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.client.gui.screens.PauseScreen;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-public class BiPacketRegister {
+@Mixin(PauseScreen.class)
+public interface PauseScreenInvoker {
 
-    public static void register() {
-        PayloadTypeRegistry.playS2C()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S()
-                .register(BiSyncNarrativeEntryPacket.TYPE, BiSyncNarrativeEntryPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S().register(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC);
-    }
+    @Invoker
+    void callOnDisconnect();
 }

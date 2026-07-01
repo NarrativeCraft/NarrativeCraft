@@ -32,10 +32,10 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.character.SkinModel;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.io.File;
 import java.util.UUID;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
@@ -45,7 +45,7 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
     private final CharacterType characterType = CharacterType.NPC;
     private DialogData dialogData = new DialogData();
     private EntityType<?> entityType = EntityType.PLAYER;
-    private PlayerSkin.Model modelType;
+    private SkinModel modelType;
 
     public Npc(UUID id, String name, Scene scene) {
         super(id, name, "");
@@ -86,14 +86,14 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
         this.entityType = entityType;
     }
 
-    public PlayerSkin.Model getModelType() {
+    public SkinModel getModelType() {
         if (modelType == null) {
-            return PlayerSkin.Model.WIDE;
+            return SkinModel.WIDE;
         }
         return modelType;
     }
 
-    public void setModelType(PlayerSkin.Model modelType) {
+    public void setModelType(SkinModel modelType) {
         this.modelType = modelType;
     }
 

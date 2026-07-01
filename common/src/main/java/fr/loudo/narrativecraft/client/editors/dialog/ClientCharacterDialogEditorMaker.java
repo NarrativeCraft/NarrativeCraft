@@ -42,7 +42,6 @@ import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.List;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -155,7 +154,7 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
         }
     }
 
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, float deltaTracker) {
         if (rendererData != null) {
             rendererData.copyFrom(
                     DialogData.from(NarrativeCraftMod.getInstance().getGlobalDialogData(), working));
@@ -167,8 +166,10 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
         closeButton.setPosition(5, 5);
         saveButton.setPosition(closeButton.getX() + closeButton.getWidth() + 5, 5);
 
-        closeButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
-        saveButton.render(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+        closeButton.render(
+                graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
+        saveButton.render(
+                graphics, mousePos[0], mousePos[1], Minecraft.getInstance().getDeltaFrameTime());
 
         previewPanel.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
         if (advancedPanel.isVisible()) {

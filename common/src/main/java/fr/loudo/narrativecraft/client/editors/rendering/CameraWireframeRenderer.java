@@ -100,12 +100,14 @@ public class CameraWireframeRenderer {
             dz /= length;
         }
         vertexConsumer
-                .addVertex(matrix, from.x, from.y, from.z)
-                .setColor(red, green, blue, alpha)
-                .setNormal(dx, dy, dz);
+                .vertex(matrix, from.x, from.y, from.z)
+                .color(red, green, blue, alpha)
+                .normal(dx, dy, dz)
+                .endVertex();
         vertexConsumer
-                .addVertex(matrix, to.x, to.y, to.z)
-                .setColor(red, green, blue, alpha)
-                .setNormal(dx, dy, dz);
+                .vertex(matrix, to.x, to.y, to.z)
+                .color(red, green, blue, alpha)
+                .normal(dx, dy, dz)
+                .endVertex();
     }
 }

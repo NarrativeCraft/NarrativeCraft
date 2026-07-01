@@ -27,7 +27,6 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 
 public class CutsceneEditorPlayback {
@@ -58,10 +57,10 @@ public class CutsceneEditorPlayback {
         playerSession.getCutsceneDataSession().setKeyframePosition(null);
     }
 
-    public void tick(DeltaTracker delta) {
+    public void tick(float delta) {
         if (!playing || dragPause || totalTick <= 0 || Minecraft.getInstance().isPaused()) return;
 
-        currentTick += delta.getGameTimeDeltaTicks();
+        currentTick += Minecraft.getInstance().getDeltaFrameTime();
 
         if (currentTick >= totalTick) {
             currentTick = totalTick;

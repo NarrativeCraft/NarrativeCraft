@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -53,6 +54,12 @@ public class SceneMenuScreen extends Screen {
         super(Translation.message("screen.scene_menu.title"));
         this.lastScreen = lastScreen;
         this.scene = scene;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override

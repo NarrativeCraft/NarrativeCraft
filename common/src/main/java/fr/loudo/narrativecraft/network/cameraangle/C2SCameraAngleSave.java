@@ -25,15 +25,12 @@ package fr.loudo.narrativecraft.network.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public class C2SCameraAngleSave implements CustomPacketPayload {
+public class C2SCameraAngleSave implements NarrativePacket {
 
     private final UUID chapterId;
     private final UUID sceneId;
@@ -54,19 +51,19 @@ public class C2SCameraAngleSave implements CustomPacketPayload {
         this.dataJson = dataJson;
     }
 
-    public static final Type<C2SCameraAngleSave> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_save"));
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "camera_angle_save");
 
-    public static final StreamCodec<ByteBuf, C2SCameraAngleSave> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleSave::getChapterId,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleSave::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            C2SCameraAngleSave::getCameraAngleId,
-            ByteBufCodecs.STRING_UTF8,
-            C2SCameraAngleSave::getDataJson,
-            C2SCameraAngleSave::new);
+    public static C2SCameraAngleSave read(FriendlyByteBuf buf) {
+        return new C2SCameraAngleSave(buf.readUUID(), buf.readUUID(), buf.readUUID(), buf.readUtf());
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(chapterId);
+        buf.writeUUID(sceneId);
+        buf.writeUUID(cameraAngleId);
+        buf.writeUtf(dataJson);
+    }
 
     public UUID getChapterId() {
         return chapterId;
@@ -85,7 +82,7 @@ public class C2SCameraAngleSave implements CustomPacketPayload {
     }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public ResourceLocation type() {
         return TYPE;
     }
 }

@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -63,13 +62,13 @@ public abstract class KeyframeMenu<T extends Keyframe> {
     protected abstract int getContentHeight();
 
     protected abstract void renderContent(
-            GuiGraphics graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY);
+            GuiGraphics graphics, float delta, int x, int y, int contentWidth, int mouseX, int mouseY);
 
     protected abstract void applyChanges();
 
     protected abstract void initContent();
 
-    public void render(GuiGraphics graphics, DeltaTracker delta, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
         if (!visible) return;
         Minecraft mc = Minecraft.getInstance();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
@@ -84,8 +83,8 @@ public abstract class KeyframeMenu<T extends Keyframe> {
         int btnY = y + PADDING + getContentHeight() + PADDING;
         editButton.setPosition(x + PADDING, btnY);
         deleteButton.setPosition(x + PADDING * 2 + BUTTON_WIDTH, btnY);
-        editButton.render(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
-        deleteButton.render(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
+        editButton.render(graphics, mouseX, mouseY, Minecraft.getInstance().getDeltaFrameTime());
+        deleteButton.render(graphics, mouseX, mouseY, Minecraft.getInstance().getDeltaFrameTime());
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {

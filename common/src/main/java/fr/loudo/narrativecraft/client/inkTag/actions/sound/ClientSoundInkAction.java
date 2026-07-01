@@ -130,7 +130,7 @@ public class ClientSoundInkAction extends SoundInkAction {
 
     private SoundInkInstance createSoundInstance() {
         return new SoundInkInstance(
-                ResourceLocation.fromNamespaceAndPath(identifier, soundName),
+                new ResourceLocation(identifier, soundName),
                 SoundSource.MASTER,
                 volume,
                 pitch,
