@@ -24,11 +24,14 @@
 package fr.loudo.narrativecraft.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.events.client.OnHudRender;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -106,5 +109,22 @@ public class GameRendererMixin {
         OnHudRender.saveIconHudRender(graphics, partialTick);
         OnHudRender.dialogHudRender(graphics, partialTick);
         return graphics;
+    }
+
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getXRot()F"))
+    private void narrativecraft$rotateCamera(
+            float partialTicks, long finishTimeNano, PoseStack poseStack, CallbackInfo ci) {
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        if (playerSession == null) return;
+        KeyframePosition keyframePosition =
+                playerSession.getCutsceneDataSession().getKeyframePosition();
+        if (keyframePosition != null) {
+            poseStack.mulPose(Axis.ZP.rotation((float) Math.toRadians(keyframePosition.getRotation().z)));
+        }
+        CameraView cameraView = playerSession.getCameraView();
+        if (cameraView != null) {
+            poseStack.mulPose(Axis.ZP.rotation((float) Math.toRadians(cameraView.getRotation().z)));
+        }
     }
 }
