@@ -23,12 +23,16 @@
 
 package fr.loudo.narrativecraft;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandlerFabric;
 import fr.loudo.narrativecraft.register.ClientFabricEventList;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
 
 public class NarrativeCraftFabricClient implements ClientModInitializer {
 
@@ -43,5 +47,21 @@ public class NarrativeCraftFabricClient implements ClientModInitializer {
         clientFabricEventList.register();
 
         NarrativeClientSettings.init(FabricLoader.getInstance().getConfigDir());
+
+        NarrativeCraftMod.dialogRenderType = RenderType.create(
+                "narrativecraft_dialog_background",
+                DefaultVertexFormat.POSITION_COLOR,
+                VertexFormat.Mode.QUADS,
+                1536,
+                false,
+                true,
+                RenderType.CompositeState.builder()
+                        .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
+                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                        .setTextureState(RenderStateShard.NO_TEXTURE)
+                        .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
+                        .setCullState(RenderStateShard.NO_CULL)
+                        .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                        .createCompositeState(false));
     }
 }
