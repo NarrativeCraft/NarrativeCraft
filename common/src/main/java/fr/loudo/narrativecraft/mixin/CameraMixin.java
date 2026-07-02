@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
+import fr.loudo.narrativecraft.utils.UtilsClient;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -114,6 +115,7 @@ public abstract class CameraMixin {
     }
 
     private void narrativecraft$overrideCamera(Vec3 position, Vec3 rotation) {
+        UtilsClient.setHudHidden(true);
         this.setPosition(position);
         this.setRotation((float) rotation.y, (float) rotation.x);
         this.rotation.rotateZ((float) Math.toRadians(rotation.z()));

@@ -5,3 +5,4 @@
 ### Fixes
 
 - Fabric server not launching
+- Can un-hide hud in a cutscene
