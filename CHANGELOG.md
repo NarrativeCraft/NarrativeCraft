@@ -2,6 +2,10 @@
 
 ## [2.0.12]
 
+### Feature
+
+- Putting `%user%` in your dialog is now replaced by the name of the player
+
 ### Fixes
 
 - Fabric server not launching
