@@ -171,18 +171,22 @@ public class DialogRenderer3D extends DialogRenderer {
             VertexConsumer consumer = bufferSource.getBuffer(RenderType.textSeeThrough(data.getBackgroundImage()));
             consumer.vertex(matrix, 0, 0, 0)
                     .color(color)
+                    .uv(0f, 0f)
                     .uv2(LightTexture.FULL_BRIGHT)
                     .endVertex();
             consumer.vertex(matrix, 0, totalHeight, 0)
                     .color(color)
+                    .uv(0f, 1f)
                     .uv2(LightTexture.FULL_BRIGHT)
                     .endVertex();
             consumer.vertex(matrix, totalWidth, totalHeight, 0)
                     .color(color)
+                    .uv(1f, 1f)
                     .uv2(LightTexture.FULL_BRIGHT)
                     .endVertex();
             consumer.vertex(matrix, totalWidth, 0, 0)
                     .color(color)
+                    .uv(1f, 0f)
                     .uv2(LightTexture.FULL_BRIGHT)
                     .endVertex();
         } else {
