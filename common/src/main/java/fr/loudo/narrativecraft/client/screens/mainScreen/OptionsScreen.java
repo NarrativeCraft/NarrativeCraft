@@ -62,23 +62,7 @@ public class OptionsScreen extends Screen {
         int middleX = width / 2 - ELEMENT_WIDTH / 2;
 
         AbstractSliderButton textSpeedSlider =
-                new AbstractSliderButton(
-                        middleX,
-                        currentY,
-                        ELEMENT_WIDTH,
-                        ELEMENT_HEIGHT,
-                        buildTextSpeedLabel(NarrativeClientSettings.textSpeed),
-                        (NarrativeClientSettings.textSpeed - 1.0) / 4.0) {
-                    @Override
-                    protected void updateMessage() {
-                        setMessage(buildTextSpeedLabel(sliderValueToSpeed(value)));
-                    }
-
-                    @Override
-                    protected void applyValue() {
-                        NarrativeClientSettings.textSpeed = sliderValueToSpeed(value);
-                    }
-                };
+                new TextSpeedSlider(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT);
         addRenderableWidget(textSpeedSlider);
 
         currentY += ELEMENT_HEIGHT + ELEMENT_GAP;
@@ -121,6 +105,29 @@ public class OptionsScreen extends Screen {
 
     private static Component buildTextSpeedLabel(double speed) {
         return Translation.message("screen.main.options.text_speed", String.format(Locale.ROOT, "%.2f", speed));
+    }
+
+    private static final class TextSpeedSlider extends AbstractSliderButton {
+
+        private TextSpeedSlider(int x, int y, int width, int height) {
+            super(
+                    x,
+                    y,
+                    width,
+                    height,
+                    buildTextSpeedLabel(NarrativeClientSettings.textSpeed),
+                    (NarrativeClientSettings.textSpeed - 1.0) / 4.0);
+        }
+
+        @Override
+        protected void updateMessage() {
+            setMessage(buildTextSpeedLabel(sliderValueToSpeed(value)));
+        }
+
+        @Override
+        protected void applyValue() {
+            NarrativeClientSettings.textSpeed = sliderValueToSpeed(value);
+        }
     }
 
     @Override
