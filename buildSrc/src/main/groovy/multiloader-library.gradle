@@ -1,0 +1,33 @@
+plugins {
+    id 'maven-publish'
+}
+
+dependencies {
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
+    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifactId base.archivesName.get()
+            version "${version}+mc${minecraft_version}"
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = 'Reposilite'
+            url = 'https://maven.loudo.dev'
+            credentials {
+                username = findProperty('reposiliteUser') ?: ''
+                password = findProperty('reposilitePassword') ?: ''
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+}
