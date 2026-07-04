@@ -61,8 +61,7 @@ public class OptionsScreen extends Screen {
         int currentY = height / 3;
         int middleX = width / 2 - ELEMENT_WIDTH / 2;
 
-        AbstractSliderButton textSpeedSlider =
-                new TextSpeedSlider(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT);
+        AbstractSliderButton textSpeedSlider = new TextSpeedSlider(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT);
         addRenderableWidget(textSpeedSlider);
 
         currentY += ELEMENT_HEIGHT + ELEMENT_GAP;
