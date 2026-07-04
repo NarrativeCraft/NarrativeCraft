@@ -27,6 +27,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.UUID;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
@@ -241,6 +242,7 @@ public class FakePlayer extends ServerPlayer {
     private static class DummyConnection extends net.minecraft.network.Connection {
         public DummyConnection(PacketFlow packetFlow) {
             super(packetFlow);
+            new EmbeddedChannel(this);
         }
     }
 }
