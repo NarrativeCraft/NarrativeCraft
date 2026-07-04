@@ -1,7 +1,7 @@
 plugins {
     id 'multiloader-common'
     id 'net.neoforged.moddev'
-    id 'maven-publish'
+    id 'multiloader-library'
 }
 
 base {
@@ -22,13 +22,8 @@ neoForge {
 }
 
 dependencies {
-    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-    // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
-    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
-    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
-
-    implementation "com.bladecoder.ink:blade-ink:1.3.2"
-    implementation "com.bladecoder.ink:blade-ink-compiler:1.3.2"
+    implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}"
+    implementation "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}"
     implementation project(':api')
 }
 
@@ -57,29 +52,6 @@ sourceSets.configureEach {
         configurations.named("$variant") {
             attributes {
                 attribute(loaderAttribute, 'common')
-            }
-        }
-    }
-}
-
-publishing {
-    publications {
-        register('mavenJava', MavenPublication) {
-            artifactId base.archivesName.get()
-            version "${version}+mc${minecraft_version}"
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            name = 'Reposilite'
-            url = 'https://maven.loudo.dev'
-            credentials {
-                username = findProperty('reposiliteUser') ?: ''
-                password = findProperty('reposilitePassword') ?: ''
-            }
-            authentication {
-                basic(BasicAuthentication)
             }
         }
     }
