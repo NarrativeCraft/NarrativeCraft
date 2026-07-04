@@ -43,3 +43,22 @@ tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }
+
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+def publishedVariants = ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements']
+configurations.configureEach {
+    if (name in publishedVariants) {
+        attributes {
+            attribute(loaderAttribute, project.name)
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { name ->
+        configurations.named(name) {
+            attributes {
+                attribute(loaderAttribute, project.name)
+            }
+        }
+    }
+}
