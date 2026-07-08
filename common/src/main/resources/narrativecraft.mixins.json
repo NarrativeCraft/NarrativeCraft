@@ -6,6 +6,7 @@
   "compatibilityLevel": "JAVA_18",
   "mixins": [
     "EntityMixin",
+    "ItemEntityMixin",
     "LivingEntityMixin",
     "ServerLevelMixin",
     "accessor.BoatAccessor",
