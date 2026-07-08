@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.14]
+
+### Fixes
+
+- Can't drop item with NeoForge
+
 ## [2.0.11]
 
 ### Feature
