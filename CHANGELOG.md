@@ -1,7 +1,7 @@
 # Changelog
 
-## [2.0.13]
+## [2.0.14]
 
 ### Fixes
 
-- Crash with other mod trying to access a null channel for a fake player
+- Can't drop item with NeoForge
