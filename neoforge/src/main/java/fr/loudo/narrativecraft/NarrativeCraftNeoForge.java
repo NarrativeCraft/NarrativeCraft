@@ -23,35 +23,13 @@
 
 package fr.loudo.narrativecraft;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.loading.FMLPaths;
 
 @Mod(NarrativeCraftMod.MOD_ID)
 public class NarrativeCraftNeoForge {
 
     public NarrativeCraftNeoForge(IEventBus eventBus) {
         NarrativeCraftMod.commonInit();
-        NarrativeClientSettings.init(FMLPaths.CONFIGDIR.get());
-        NarrativeCraftMod.dialogRenderType = RenderType.create(
-                "narrativecraft_dialog_background",
-                DefaultVertexFormat.POSITION_COLOR,
-                VertexFormat.Mode.QUADS,
-                1536,
-                false,
-                true,
-                RenderType.CompositeState.builder()
-                        .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
-                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                        .setTextureState(RenderStateShard.NO_TEXTURE)
-                        .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                        .setCullState(RenderStateShard.NO_CULL)
-                        .setWriteMaskState(RenderStateShard.COLOR_WRITE)
-                        .createCompositeState(false));
     }
 }

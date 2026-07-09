@@ -13,10 +13,10 @@
     "accessor.AbstractHorseAccessor",
     "accessor.PlayerAccessor",
     "accessor.EntityAccessor",
-    "accessor.LivingEntityAccessor",
-    "accessor.TextureManagerAccessor"
+    "accessor.LivingEntityAccessor"
   ],
   "client": [
+    "accessor.TextureManagerAccessor",
     "CameraMixin",
     "GameRendererMixin",
     "LocalPlayerMixin",

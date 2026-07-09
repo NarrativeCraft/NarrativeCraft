@@ -26,11 +26,12 @@ package fr.loudo.narrativecraft.events.client;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.keys.ModKeys;
 import net.minecraft.client.KeyMapping;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod(value = NarrativeCraftMod.MOD_ID, dist = Dist.CLIENT)
 public class OnKeyRegisterEventNeoForge {
 
     public OnKeyRegisterEventNeoForge(IEventBus bus) {

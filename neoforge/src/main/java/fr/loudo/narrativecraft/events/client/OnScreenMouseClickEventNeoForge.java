@@ -24,12 +24,13 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod(value = NarrativeCraftMod.MOD_ID, dist = Dist.CLIENT)
 public class OnScreenMouseClickEventNeoForge {
     public OnScreenMouseClickEventNeoForge(IEventBus bus) {
         NeoForge.EVENT_BUS.addListener(OnScreenMouseClickEventNeoForge::onMouseClick);
