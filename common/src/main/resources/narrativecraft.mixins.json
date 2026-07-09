@@ -13,8 +13,7 @@
     "accessor.BoatAccessor",
     "accessor.EntityAccessor",
     "accessor.LivingEntityAccessor",
-    "accessor.PlayerAccessor",
-    "accessor.TextureManagerAccessor"
+    "accessor.PlayerAccessor"
   ],
   "client": [
     "CameraMixin",
@@ -26,6 +25,7 @@
     "PlayerInfoMixin",
     "SoundEngineMixin",
     "SoundManagerMixin",
+    "accessor.TextureManagerAccessor",
     "invoker.PauseScreenInvoker"
   ],
   "server": [],
