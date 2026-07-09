@@ -23,16 +23,13 @@
 
 package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.loading.FMLPaths;
 
 @Mod(NarrativeCraftMod.MOD_ID)
 public class NarrativeCraftNeoForge {
 
     public NarrativeCraftNeoForge(IEventBus eventBus) {
         NarrativeCraftMod.commonInit();
-        NarrativeClientSettings.init(FMLPaths.CONFIGDIR.get());
     }
 }

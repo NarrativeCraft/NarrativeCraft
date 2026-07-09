@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
+import java.util.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -44,8 +45,6 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.storage.TagValueInput;
-
-import java.util.*;
 
 public class PlaybackContext implements IPlaybackContext {
 
@@ -120,7 +119,10 @@ public class PlaybackContext implements IPlaybackContext {
             entity.setUUID(UUID.randomUUID());
         }
 
-        if (hasCharacter && isCharacterEntity && entity instanceof LivingEntity && characterStory.getCharacterType() == CharacterType.NORMAL) {
+        if (hasCharacter
+                && isCharacterEntity
+                && entity instanceof LivingEntity
+                && characterStory.getCharacterType() == CharacterType.NORMAL) {
             String name = characterStory.getName();
             if (name != null && !name.isBlank()) {
                 entity.setCustomName(Component.literal(name));

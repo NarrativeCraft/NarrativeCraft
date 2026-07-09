@@ -21,23 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.client;
+package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.fml.loading.FMLPaths;
 
 @Mod(value = NarrativeCraftMod.MOD_ID, dist = Dist.CLIENT)
-public class OnScreenMouseScrollEventNeoForge {
+public class NarrativeCraftNeoForgeClient {
 
-    public OnScreenMouseScrollEventNeoForge(IEventBus modBus) {
-        NeoForge.EVENT_BUS.addListener(OnScreenMouseScrollEventNeoForge::onMouseScroll);
-    }
-
-    private static void onMouseScroll(ScreenEvent.MouseScrolled.Post event) {
-        OnScreenMouseScrollEvent.onCutsceneLayerMouseScroll(event.getScrollDeltaX(), event.getScrollDeltaY());
+    public NarrativeCraftNeoForgeClient(IEventBus eventBus) {
+        NarrativeClientSettings.init(FMLPaths.CONFIGDIR.get());
     }
 }
