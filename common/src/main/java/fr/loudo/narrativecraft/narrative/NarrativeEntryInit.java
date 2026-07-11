@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.commands.LocaleCommand;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
@@ -74,11 +75,33 @@ public class NarrativeEntryInit {
         NarrativeCraftMod.getInstance().setMainScreenData(file.getMainScreenData());
         NarrativeCraftMod.getInstance().setGlobalDialogData(file.getGlobalDialogData());
 
-        try {
-            NarrativeCraftMod.getInstance().setCompiledStoryJson(StoryCompilerHandler.compileToJson());
-        } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Failed to compile story (init process)", e);
+        compileStories();
+    }
+
+    private static void compileStories() {
+        StoryCompilerHandler.LibraryResult result = StoryCompilerHandler.compileLibrary();
+
+        if (result.getDefaultError() != null) {
+            NarrativeCraftMod.LOGGER.error("Failed to compile story (init process): {}", result.getDefaultError());
         }
+        for (StoryCompilerHandler.TagError tagError : result.getDefaultTagErrors()) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Invalid ink tag: {}", tagError.toMessage().getString());
+        }
+        result.getLocaleErrors()
+                .forEach((locale, error) ->
+                        NarrativeCraftMod.LOGGER.error("Failed to compile locale '{}': {}", locale, error));
+        result.getLocaleTagErrors()
+                .forEach((locale, tagErrors) -> NarrativeCraftMod.LOGGER.error(
+                        "Locale '{}' has {} invalid ink tag(s) and was skipped", locale, tagErrors.size()));
+        for (String locale : result.getStructureMismatches()) {
+            NarrativeCraftMod.LOGGER.warn(
+                    "Locale '{}' has a different structure than the default story: saves are not portable between them",
+                    locale);
+        }
+
+        if (!result.isDefaultCompiled()) return;
+        NarrativeCraftMod.getInstance().setStoryLibrary(result.getLibrary());
     }
 
     private static void chapters() {
@@ -203,6 +226,7 @@ public class NarrativeEntryInit {
 
     public static void sendDataToPlayer(ServerPlayer player) {
         Services.PACKET.sendToPlayer(player, S2CNarrativeDataClear.INSTANCE);
+        LocaleCommand.sendLocales(player);
         CameraAngle mainScreenData = NarrativeCraftMod.getInstance().getMainScreenData();
         if (mainScreenData != null) {
             Services.PACKET.sendToPlayer(

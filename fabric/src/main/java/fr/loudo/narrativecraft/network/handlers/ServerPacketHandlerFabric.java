@@ -50,6 +50,7 @@ import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
+import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
@@ -139,6 +140,9 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SChangeGamemodePacket.TYPE, (packet, context) -> {
             ServerPacketHandler.changeGamemode(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SSetStoryLocale.TYPE, (packet, context) -> {
+            ServerPacketHandler.setStoryLocale(packet, context.player());
         });
     }
 }

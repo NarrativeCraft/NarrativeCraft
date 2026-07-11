@@ -100,25 +100,28 @@ public class InkFileGenerator {
     }
 
     public static void regenerateMainInk() {
-        File mainDirectory = NarrativeCraftMod.getInstance().getFile().getInit().getMainDirectory();
+        writeMainInk(getMainDirectory());
+    }
+
+    public static void regenerateLocaleMainInk(String locale) {
+        writeMainInk(NarrativeCraftMod.getInstance().getFile().getInit().getLocaleDirectory(locale));
+    }
+
+    public static List<File> collectStoryInkFiles() {
         File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
-        File mainInkFile = getMainFile();
+        List<File> inkFiles = new ArrayList<>();
 
         File[] chapterDirs = chaptersFolder.listFiles(File::isDirectory);
-        if (chapterDirs == null) chapterDirs = new File[0];
+        if (chapterDirs == null) return inkFiles;
 
         Arrays.sort(chapterDirs, Comparator.comparingInt(dir -> extractLeadingInt(dir.getName())));
-
-        List<String> includes = new ArrayList<>();
 
         for (File chapterDir : chapterDirs) {
             File[] chapterInkFiles =
                     chapterDir.listFiles(f -> f.isFile() && f.getName().matches("chapter_\\d+\\.ink"));
             if (chapterInkFiles != null) {
                 Arrays.sort(chapterInkFiles, Comparator.comparing(File::getName));
-                for (File inkFile : chapterInkFiles) {
-                    includes.add(toRelativePath(mainDirectory, inkFile));
-                }
+                inkFiles.addAll(Arrays.asList(chapterInkFiles));
             }
 
             File scenesDir = new File(chapterDir, NarrativeCraftFileDefault.SCENES_FOLDER_NAME);
@@ -134,30 +137,48 @@ public class InkFileGenerator {
                         && f.getName().endsWith(NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE)
                         && !f.getName().matches("chapter_\\d+\\.ink"));
                 if (sceneInkFiles == null) continue;
-                for (File inkFile : sceneInkFiles) {
-                    includes.add(toRelativePath(mainDirectory, inkFile));
-                }
+                Arrays.sort(sceneInkFiles, Comparator.comparing(File::getName));
+                inkFiles.addAll(Arrays.asList(sceneInkFiles));
             }
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("INCLUDE ").append(NarrativeCraftFileInit.VARS_INK_NAME).append("\n");
-        sb.append("INCLUDE ").append(NarrativeCraftFileInit.FUNCTIONS_INK_NAME).append("\n");
-        for (String include : includes) {
-            sb.append("INCLUDE ").append(include).append("\n");
-        }
-        sb.append("\n-> chapter_1\n");
+        return inkFiles;
+    }
 
+    private static void writeMainInk(File inkRoot) {
+        File mainDirectory = getMainDirectory();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("INCLUDE ").append(NarrativeCraftFileInit.VARS_INK_NAME).append("\n");
+        builder.append("INCLUDE ")
+                .append(NarrativeCraftFileInit.FUNCTIONS_INK_NAME)
+                .append("\n");
+        for (File storyInkFile : collectStoryInkFiles()) {
+            builder.append("INCLUDE ")
+                    .append(toRelativePath(mainDirectory, storyInkFile))
+                    .append("\n");
+        }
+        builder.append("\n-> chapter_1\n");
+
+        File mainInkFile = new File(inkRoot, NarrativeCraftFileInit.MAIN_INK_NAME);
         try {
-            Files.writeString(mainInkFile.toPath(), sb.toString());
+            Files.createDirectories(inkRoot.toPath());
+            Files.writeString(mainInkFile.toPath(), builder.toString());
         } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to regenerate main.ink", e);
+            NarrativeCraftMod.LOGGER.error("Failed to regenerate {}", mainInkFile, e);
         }
     }
 
     public static File getMainFile() {
-        File mainDirectory = NarrativeCraftMod.getInstance().getFile().getInit().getMainDirectory();
-        return new File(mainDirectory, NarrativeCraftFileInit.MAIN_INK_NAME);
+        return getSourceFile(NarrativeCraftFileInit.MAIN_INK_NAME);
+    }
+
+    private static File getSourceFile(String name) {
+        return new File(getMainDirectory(), name);
+    }
+
+    private static File getMainDirectory() {
+        return NarrativeCraftMod.getInstance().getFile().getInit().getMainDirectory();
     }
 
     private static String toRelativePath(File base, File target) {

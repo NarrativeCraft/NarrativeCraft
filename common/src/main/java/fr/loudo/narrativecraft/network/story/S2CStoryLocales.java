@@ -21,27 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.network.story;
 
-import fr.loudo.narrativecraft.commands.*;
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.platform.Services;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import java.util.List;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
-public class OnCommandRegisterEventFabric implements IFabricEventRegister {
+public record S2CStoryLocales(List<String> locales, String defaultLocale) implements CustomPacketPayload {
+
+    public static final Type<S2CStoryLocales> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "story_locales"));
+
+    public static final StreamCodec<ByteBuf, S2CStoryLocales> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()),
+            S2CStoryLocales::locales,
+            ByteBufCodecs.STRING_UTF8,
+            S2CStoryLocales::defaultLocale,
+            S2CStoryLocales::new);
 
     @Override
-    public void register() {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
-            RecordCommand.register(commandDispatcher);
-            PlayerSessionCommand.register(commandDispatcher);
-            PlaybackCommand.register(commandDispatcher);
-            StoryCommand.register(commandDispatcher);
-            LocaleCommand.register(commandDispatcher);
-            AddonsCommand.register(commandDispatcher);
-            if (Services.PLATFORM.isDevelopmentEnvironment()) {
-                TestCommand.register(commandDispatcher);
-            }
-        });
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

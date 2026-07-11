@@ -26,21 +26,25 @@ package fr.loudo.narrativecraft.narrative.story;
 import com.bladecoder.ink.compiler.Compiler;
 import com.bladecoder.ink.compiler.IFileHandler;
 import com.bladecoder.ink.runtime.Story;
+import com.google.gson.*;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.InkFileGenerator;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileInit;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.locale.StoryLocaleManager;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -55,16 +59,146 @@ public class StoryCompilerHandler {
     }
 
     public static Story compile() throws IOException {
-        File mainInkFile = InkFileGenerator.getMainFile();
+        return compile(InkFileGenerator.getMainFile());
+    }
+
+    public static LibraryResult compileLibrary() {
+        try {
+            StoryLocaleManager.syncAll();
+        } catch (IOException exception) {
+            NarrativeCraftMod.LOGGER.error("Failed to sync locale ink trees", exception);
+        }
+
+        String defaultLocale = StoryLocaleManager.getDefaultLocale();
+        LibraryResult result = new LibraryResult(new StoryLibrary(defaultLocale));
+
+        CompiledStory defaultStory;
+        try {
+            defaultStory = compileLocale(defaultLocale);
+        } catch (Exception exception) {
+            result.defaultError = exception.getMessage();
+            return result;
+        }
+
+        result.defaultTagErrors.addAll(validateTags(null));
+        if (!result.defaultTagErrors.isEmpty()) {
+            return result;
+        }
+
+        result.library.add(defaultStory);
+
+        for (String locale : StoryLocaleManager.listLocales()) {
+            CompiledStory compiledStory;
+            try {
+                compiledStory = compileLocale(locale);
+            } catch (Exception exception) {
+                result.localeErrors.put(locale, exception.getMessage());
+                continue;
+            }
+
+            List<TagError> tagErrors = validateTags(locale);
+            if (!tagErrors.isEmpty()) {
+                result.localeTagErrors.put(locale, tagErrors);
+                continue;
+            }
+
+            result.library.add(compiledStory);
+            if (!compiledStory.structureHash().equals(defaultStory.structureHash())) {
+                result.structureMismatches.add(locale);
+            }
+        }
+
+        return result;
+    }
+
+    public static CompiledStory compileLocale(String locale) throws Exception {
+        File mainInkFile = StoryLocaleManager.isDefaultLocale(locale)
+                ? InkFileGenerator.getMainFile()
+                : new File(
+                        NarrativeCraftMod.getInstance().getFile().getInit().getLocaleDirectory(locale),
+                        NarrativeCraftFileInit.MAIN_INK_NAME);
+
+        String json = compile(mainInkFile).toJson();
+        return new CompiledStory(locale, json, structureHash(json));
+    }
+
+    private static Story compile(File mainInkFile) throws IOException {
         String mainContent = Files.readString(mainInkFile.toPath());
         Compiler.Options options = new Compiler.Options();
         options.fileHandler = new FileHandler(mainInkFile.getParentFile());
         return new Compiler(mainContent, options).compile();
     }
 
+    /**
+     * Fingerprint of the <i>structure</i> of a compiled story, ignoring its text.
+     *
+     * <p>A save only stores the ink state, which points at the story content by container path and
+     * index ("element 3 of knot chapter_1_wake"), never by text. Replacing a line with its
+     * translation therefore leaves every index untouched, but splitting a line in two, adding a
+     * choice or a tag shifts them all - and ink silently resumes at the wrong place instead of
+     * failing.
+     *
+     * <p>Hashing the compiled json with all its text blanked out ({@link #neutralizeText}) yields a
+     * value that is equal for two locales exactly when their states are interchangeable. It is what
+     * lets a player switch language mid-game when it is provably safe, and what warns the author
+     * when a translation drifted structurally.
+     */
+    public static String structureHash(String compiledJson) {
+        JsonElement neutralized = neutralizeText(JsonParser.parseString(compiledJson));
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(neutralized.toString().getBytes(StandardCharsets.UTF_8));
+            StringBuilder hash = new StringBuilder();
+            for (byte value : digest) {
+                hash.append(String.format("%02x", value));
+            }
+            return hash.toString();
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 is not available", exception);
+        }
+    }
+
+    /**
+     * Rebuilds the compiled json with every text value replaced by a placeholder, keeping the shape
+     * of the tree intact.
+     *
+     * <p>In the ink runtime format a piece of text is a string starting with '^' ("^Hello Alice."),
+     * which makes it trivially distinguishable from the structural strings around it (container
+     * names, divert targets, commands). Blanking those to a bare "^" drops the wording while keeping
+     * one element per line: the result is identical between two locales that only differ by
+     * translation, and differs as soon as the content itself was reshaped.
+     */
+    private static JsonElement neutralizeText(JsonElement element) {
+        if (element.isJsonArray()) {
+            JsonArray neutralized = new JsonArray();
+            for (JsonElement child : element.getAsJsonArray()) {
+                neutralized.add(neutralizeText(child));
+            }
+            return neutralized;
+        }
+        if (element.isJsonObject()) {
+            JsonObject neutralized = new JsonObject();
+            for (Map.Entry<String, JsonElement> entry :
+                    element.getAsJsonObject().entrySet()) {
+                neutralized.add(entry.getKey(), neutralizeText(entry.getValue()));
+            }
+            return neutralized;
+        }
+        if (element.isJsonPrimitive()
+                && element.getAsJsonPrimitive().isString()
+                && element.getAsString().startsWith("^")) {
+            return new JsonPrimitive("^");
+        }
+        return element;
+    }
+
     private static final Pattern TAG_PATTERN = Pattern.compile("#([^#\\n]+)");
 
     public static List<TagError> validateTags() {
+        return validateTags(null);
+    }
+
+    public static List<TagError> validateTags(@Nullable String locale) {
         List<TagError> errors = new ArrayList<>();
         InkTagDispatcherImpl dispatcher = NarrativeCraftMod.getInstance().getInkTagDispatcher();
 
@@ -74,18 +208,28 @@ public class StoryCompilerHandler {
             File chapterInkFile = new File(
                     chapterDir,
                     "chapter_" + chapter.getChapterIndex() + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE);
-            validateInkFile(chapterInkFile, chapter, null, dispatcher, errors);
+            validateInkFile(localeCounterpart(chapterInkFile, locale), chapter, null, dispatcher, errors);
 
             for (Scene scene : chapter.getSceneManager().getList()) {
                 File sceneInkFile = new File(
                         NarrativeCraftFileUtil.getSceneFolder(scene),
                         scene.getName().toLowerCase(Locale.ROOT).replace(' ', '_')
                                 + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE);
-                validateInkFile(sceneInkFile, chapter, scene, dispatcher, errors);
+                validateInkFile(localeCounterpart(sceneInkFile, locale), chapter, scene, dispatcher, errors);
             }
         }
 
         return errors;
+    }
+
+    private static File localeCounterpart(File sourceInkFile, @Nullable String locale) {
+        File inkRoot = StoryLocaleManager.inkRootOf(locale);
+        File mainDirectory = NarrativeCraftMod.getInstance().getFile().getInit().getMainDirectory();
+        if (inkRoot.equals(mainDirectory)) return sourceInkFile;
+
+        String relativePath =
+                mainDirectory.toPath().relativize(sourceInkFile.toPath()).toString();
+        return new File(inkRoot, relativePath);
     }
 
     private static void validateInkFile(
@@ -171,6 +315,51 @@ public class StoryCompilerHandler {
         return TAG_PATTERN.matcher(line).results().anyMatch(m -> m.group(1)
                 .trim()
                 .equals("on_enter"));
+    }
+
+    public static class LibraryResult {
+
+        private final StoryLibrary library;
+        private final List<TagError> defaultTagErrors = new ArrayList<>();
+        private final Map<String, String> localeErrors = new LinkedHashMap<>();
+        private final Map<String, List<TagError>> localeTagErrors = new LinkedHashMap<>();
+        private final List<String> structureMismatches = new ArrayList<>();
+
+        @Nullable
+        private String defaultError;
+
+        private LibraryResult(StoryLibrary library) {
+            this.library = library;
+        }
+
+        public boolean isDefaultCompiled() {
+            return defaultError == null && defaultTagErrors.isEmpty();
+        }
+
+        public StoryLibrary getLibrary() {
+            return library;
+        }
+
+        @Nullable
+        public String getDefaultError() {
+            return defaultError;
+        }
+
+        public List<TagError> getDefaultTagErrors() {
+            return defaultTagErrors;
+        }
+
+        public Map<String, String> getLocaleErrors() {
+            return localeErrors;
+        }
+
+        public Map<String, List<TagError>> getLocaleTagErrors() {
+            return localeTagErrors;
+        }
+
+        public List<String> getStructureMismatches() {
+            return structureMismatches;
+        }
     }
 
     static class FileHandler implements IFileHandler {

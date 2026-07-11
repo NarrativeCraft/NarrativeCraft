@@ -24,7 +24,10 @@
 package fr.loudo.narrativecraft.client.screens.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.settings.ClientStoryLocales;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
+import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.io.IOException;
 import java.util.Locale;
@@ -84,6 +87,14 @@ public class OptionsScreen extends Screen {
 
         currentY += autoSkip.getHeight() + ELEMENT_GAP;
 
+        if (ClientStoryLocales.getAvailable().size() > 1) {
+            addRenderableWidget(
+                    Button.builder(buildLocaleLabel(), button -> minecraft.setScreen(new SelectLocaleScreen(this)))
+                            .bounds(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT)
+                            .build());
+            currentY += ELEMENT_HEIGHT + ELEMENT_GAP;
+        }
+
         addRenderableWidget(Button.builder(
                         Translation.message("screen.main.options.minecraft_options"),
                         button -> minecraft.setScreen(
@@ -93,6 +104,8 @@ public class OptionsScreen extends Screen {
 
         addRenderableWidget(Button.builder(Translation.message("screen.main.options.done"), button -> {
                     minecraft.setScreen(lastScreen);
+                    Services.PACKET.sendToServer(
+                            new C2SSetStoryLocale(ClientStoryLocales.resolve(NarrativeClientSettings.storyLocale)));
                     try {
                         NarrativeClientSettings.save();
                     } catch (IOException e) {
@@ -107,6 +120,11 @@ public class OptionsScreen extends Screen {
 
     private static float sliderValueToSpeed(double sliderValue) {
         return (float) Math.clamp(sliderValue * 4.0 + 1.0, 1.0, 5.0);
+    }
+
+    private static Component buildLocaleLabel() {
+        String locale = ClientStoryLocales.resolve(NarrativeClientSettings.storyLocale);
+        return Translation.message("screen.main.options.language", SelectLocaleScreen.getLocaleName(locale));
     }
 
     private static Component buildTextSpeedLabel(double speed) {

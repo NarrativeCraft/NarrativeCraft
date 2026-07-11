@@ -39,6 +39,7 @@ import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
+import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
@@ -80,5 +81,6 @@ public class ServerPacketRegisterFabric {
         PayloadTypeRegistry.playC2S().register(C2SEnterDialogEditor.TYPE, C2SEnterDialogEditor.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(C2SStopStory.TYPE, C2SStopStory.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(C2SChangeGamemodePacket.TYPE, C2SChangeGamemodePacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(C2SSetStoryLocale.TYPE, C2SSetStoryLocale.STREAM_CODEC);
     }
 }

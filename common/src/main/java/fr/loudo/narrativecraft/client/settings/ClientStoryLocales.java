@@ -21,27 +21,32 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.client.settings;
 
-import fr.loudo.narrativecraft.commands.*;
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.platform.Services;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
+import java.util.List;
 
-public class OnCommandRegisterEventFabric implements IFabricEventRegister {
+public final class ClientStoryLocales {
 
-    @Override
-    public void register() {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
-            RecordCommand.register(commandDispatcher);
-            PlayerSessionCommand.register(commandDispatcher);
-            PlaybackCommand.register(commandDispatcher);
-            StoryCommand.register(commandDispatcher);
-            LocaleCommand.register(commandDispatcher);
-            AddonsCommand.register(commandDispatcher);
-            if (Services.PLATFORM.isDevelopmentEnvironment()) {
-                TestCommand.register(commandDispatcher);
-            }
-        });
+    private static List<String> available = List.of();
+    private static String defaultLocale = NarrativeServerSettings.DEFAULT_LOCALE;
+
+    private ClientStoryLocales() {}
+
+    public static void set(List<String> locales, String defaultLocale) {
+        ClientStoryLocales.available = List.copyOf(locales);
+        ClientStoryLocales.defaultLocale = defaultLocale;
+    }
+
+    public static List<String> getAvailable() {
+        return available;
+    }
+
+    public static String getDefaultLocale() {
+        return defaultLocale;
+    }
+
+    public static String resolve(String locale) {
+        return available.contains(locale) ? locale : defaultLocale;
     }
 }

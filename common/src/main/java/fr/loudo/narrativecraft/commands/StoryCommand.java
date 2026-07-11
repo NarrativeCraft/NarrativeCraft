@@ -94,17 +94,17 @@ public class StoryCommand {
         context.getSource()
                 .sendSystemMessage(Translation.message("story.compiling").withStyle(ChatFormatting.YELLOW));
 
-        String compiledJson;
-        try {
-            compiledJson = StoryCompilerHandler.compileToJson();
-        } catch (Exception e) {
+        StoryCompilerHandler.LibraryResult result = StoryCompilerHandler.compileLibrary();
+
+        if (result.getDefaultError() != null) {
             context.getSource().sendSystemMessage(Component.empty());
-            NarrativeCraftMod.LOGGER.error("Failed to compile story", e);
-            context.getSource().sendFailure(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
+            NarrativeCraftMod.LOGGER.error("Failed to compile story: {}", result.getDefaultError());
+            context.getSource()
+                    .sendFailure(Component.literal(result.getDefaultError()).withStyle(ChatFormatting.RED));
             return 0;
         }
 
-        List<StoryCompilerHandler.TagError> tagErrors = StoryCompilerHandler.validateTags();
+        List<StoryCompilerHandler.TagError> tagErrors = result.getDefaultTagErrors();
         if (!tagErrors.isEmpty()) {
             for (StoryCompilerHandler.TagError tagError : tagErrors) {
                 context.getSource().sendFailure(tagError.toMessage());
@@ -118,16 +118,44 @@ public class StoryCommand {
             return 0;
         }
 
-        NarrativeCraftMod.getInstance().setCompiledStoryJson(compiledJson);
+        NarrativeCraftMod.getInstance().setStoryLibrary(result.getLibrary());
+        reportLocaleIssues(context, result);
+        LocaleCommand.broadcastLocales();
+
         context.getSource()
                 .sendSuccess(() -> Translation.message("story.compiled").withStyle(ChatFormatting.GREEN), false);
 
         return Command.SINGLE_SUCCESS;
     }
 
+    private static void reportLocaleIssues(
+            CommandContext<CommandSourceStack> context, StoryCompilerHandler.LibraryResult result) {
+        result.getLocaleErrors().forEach((locale, error) -> context.getSource()
+                .sendFailure(Translation.message(
+                                "locale.compile_failed", Component.literal(locale), Component.literal(error))
+                        .withStyle(ChatFormatting.RED)));
+
+        result.getLocaleTagErrors().forEach((locale, tagErrors) -> {
+            for (StoryCompilerHandler.TagError tagError : tagErrors) {
+                context.getSource().sendFailure(tagError.toMessage());
+            }
+            context.getSource()
+                    .sendFailure(Translation.message(
+                                    "locale.tag_errors",
+                                    Component.literal(locale),
+                                    Component.literal(String.valueOf(tagErrors.size())))
+                            .withStyle(ChatFormatting.RED));
+        });
+
+        for (String locale : result.getStructureMismatches()) {
+            context.getSource()
+                    .sendSystemMessage(Translation.message("locale.structure_mismatch", Component.literal(locale))
+                            .withStyle(ChatFormatting.GOLD));
+        }
+    }
+
     private static int playFor(CommandContext<CommandSourceStack> context, ServerPlayer target, String knotPath) {
-        String compiledJson = NarrativeCraftMod.getInstance().getCompiledStoryJson();
-        if (compiledJson == null) {
+        if (!NarrativeCraftMod.getInstance().hasCompiledStory()) {
             context.getSource()
                     .sendFailure(Translation.message("story.not_compiled").withStyle(ChatFormatting.RED));
             return 0;
