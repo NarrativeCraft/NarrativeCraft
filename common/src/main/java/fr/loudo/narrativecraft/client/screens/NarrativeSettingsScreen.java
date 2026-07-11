@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -70,12 +71,20 @@ public class NarrativeSettingsScreen extends Screen {
                 .bounds(width / 2 - BUTTON_WIDTH / 2, 10, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
         addRenderableWidget(mainScreenMakerEditor);
+        mainScreenMakerEditor.active = minecraft.hasSingleplayerServer();
+        if (!minecraft.hasSingleplayerServer()) {
+            mainScreenMakerEditor.setTooltip(Tooltip.create(Translation.message("screen.world_settings.tooltip.main_screen")));
+        }
 
         Button worldSettings = Button.builder(
                         Translation.message("screen.settings.world_settings"),
                         button -> minecraft.setScreen(new NarrativeWorldSettingsScreen(this)))
                 .bounds(width / 2 - BUTTON_WIDTH / 2, 10 + BUTTON_HEIGHT + 5, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
+        worldSettings.active = minecraft.hasSingleplayerServer();
+        if (!minecraft.hasSingleplayerServer()) {
+            worldSettings.setTooltip(Tooltip.create(Translation.message("screen.world_settings.tooltip.main_screen")));
+        }
         addRenderableWidget(worldSettings);
     }
 }

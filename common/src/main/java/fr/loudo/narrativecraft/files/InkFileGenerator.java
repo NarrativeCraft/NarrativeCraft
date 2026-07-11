@@ -51,7 +51,8 @@ public class InkFileGenerator {
     public static void generateSceneInkFile(Scene scene) {
         File inkFile = new File(NarrativeCraftFileUtil.getSceneFolder(scene), sceneInkFileName(scene));
         try {
-            String content = "=== " + sceneKnotName(scene) + " ===\n# on_enter\n-> END\n";
+            String knotName = sceneKnotName(scene);
+            String content = "=== " + knotName + " ===\n# on_enter " + knotName + "\n-> END\n";
             Files.writeString(inkFile.toPath(), content);
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to write scene ink file for {}", scene.getName(), e);

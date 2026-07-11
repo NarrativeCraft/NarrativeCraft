@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl.DispatchResult;
+import fr.loudo.narrativecraft.narrative.inkTag.actions.OnEnterInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.platform.Services;
@@ -189,6 +190,8 @@ public final class InkTagHandler {
             }
 
             if (dispatchResult == null) continue; // unknown keyword, already logged
+            if (dispatchResult.action() instanceof OnEnterInkAction)
+                return true; // prevent searching blocking tags on a new scene
 
             InkAction action = dispatchResult.action();
             if (action.isBlocking()) {
