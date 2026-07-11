@@ -1,7 +1,7 @@
 # Changelog
 
-## [2.0.15]
+## [2.1.0]
 
 ### Fixes
 
-- NeoForge server not starting
+- Can't create characters in NeoForge dedicated server 1.21.1
