@@ -21,41 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.editors.cutscene.layers;
+package fr.loudo.narrativecraft.editors.cutscene.keyframes;
 
-/**
- * Represents a layer instance on the cutscene timeline.
- *
- * <p>Each layer holds a sequence of keyframes and belongs to a specific
- * {@link ICutsceneLayerType}. Extend {@link CutsceneLayer} rather than
- * implementing this interface directly.</p>
- */
-public interface ICutsceneLayer {
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.client.editors.cutscene.menu.TextKeyframeMenu;
+import java.util.ArrayList;
+import java.util.List;
 
-    /**
-     * @return the id of the {@link ICutsceneLayerType} that created this layer
-     */
-    String getTypeId();
+public class TextKeyframe extends Keyframe {
 
-    /**
-     * @return the type descriptor that created this layer
-     */
-    ICutsceneLayerType getType();
+    private final List<String> tags = new ArrayList<>();
 
-    /**
-     * Executes this layer at the given tick: applies whatever effect the layer produces
-     * (e.g. camera movement, entity animation) if the tick falls within its keyframe range or keyframe tick.
-     *
-     * @param tick the current playback position (fractional ticks)
-     * @return {@code true} if this layer handled the tick, {@code false} if the tick is outside its range
-     */
-    default boolean execute(float tick) {
-        return false;
+    public TextKeyframe(CutsceneLayer layer, int tick) {
+        super(layer, tick);
     }
 
-    /**
-     * Called when the cutscene playback stops, so the layer can release whatever it started
-     * (running effects, spawned actions, cached playback state).
-     */
-    default void stop() {}
+    @Override
+    public KeyframeMenu<TextKeyframe> createMenu() {
+        return new TextKeyframeMenu(this);
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags.clear();
+        this.tags.addAll(tags);
+    }
 }

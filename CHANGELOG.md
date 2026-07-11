@@ -5,6 +5,7 @@
 ### Features
 
 - One keyframe for Fov Layer is now parsed and executed
+- Text layer : render text on screen during a cutscene
 
 ### Fixes
 

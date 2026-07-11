@@ -24,100 +24,92 @@
 package fr.loudo.narrativecraft.client.editors.cutscene.menu;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
-import java.util.Locale;
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.TextKeyframe;
+import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
-public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
+public class TextKeyframeMenu extends KeyframeMenu<TextKeyframe> {
 
     private static final int FIELD_LABEL_HEIGHT = 7;
-    private static final int FIELD_HEIGHT = 12;
-    private static final int FIELD_GAP = 4;
+    private static final int FIELD_HEIGHT = 70;
 
-    private EditBox fieldFov;
-    private EasingDropdown easingDropdown;
+    private MultiLineEditBox tagsBox;
 
-    public FovKeyframeMenu(FovKeyframe keyframe) {
+    public TextKeyframeMenu(TextKeyframe keyframe) {
         super(keyframe);
     }
 
     @Override
     protected void initContent() {
+        width = 250;
         int fieldWidth = width - padding * 2;
-        fieldFov = new EditBox(Minecraft.getInstance().font, 0, 0, fieldWidth, FIELD_HEIGHT, Component.empty());
-        fieldFov.setValue(String.format(Locale.US, "%.2f", keyframe.getFov()));
-        easingDropdown = new EasingDropdown(keyframe.getEasing());
+        tagsBox = MultiLineEditBox.builder()
+                .setPlaceholder(Component.literal("text id create \"Hello\""))
+                .build(Minecraft.getInstance().font, fieldWidth, FIELD_HEIGHT, Component.empty());
+        tagsBox.setValue(String.join("\n", keyframe.getTags()));
     }
 
     @Override
     protected int getContentHeight() {
-        return FIELD_LABEL_HEIGHT + FIELD_HEIGHT + FIELD_GAP + FIELD_LABEL_HEIGHT + easingDropdown.getHeight();
+        return FIELD_LABEL_HEIGHT + FIELD_HEIGHT;
     }
 
     @Override
     protected void renderContent(
             GuiGraphicsExtractor graphics, DeltaTracker delta, int x, int y, int contentWidth, int mouseX, int mouseY) {
-        graphics.text(Minecraft.getInstance().font, "FOV", x, y - 2, 0xFFAAAAAA);
-        fieldFov.setPosition(x, y + FIELD_LABEL_HEIGHT);
-        fieldFov.setWidth(contentWidth);
-        fieldFov.extractRenderState(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
-
-        int easingY = y + FIELD_LABEL_HEIGHT + FIELD_HEIGHT + FIELD_GAP;
-        graphics.text(Minecraft.getInstance().font, "Easing", x, easingY - 2, 0xFFAAAAAA);
-        easingDropdown.setPosition(x, easingY + FIELD_LABEL_HEIGHT);
-        easingDropdown.setWidth(contentWidth);
-        easingDropdown.render(graphics, mouseX, mouseY);
+        graphics.text(Minecraft.getInstance().font, "Tags", x, y - 2, 0xFFAAAAAA);
+        tagsBox.setPosition(x, y + FIELD_LABEL_HEIGHT);
+        tagsBox.extractRenderState(graphics, mouseX, mouseY, delta.getGameTimeDeltaTicks());
     }
 
     @Override
     protected void onContentMouseClicked(
             MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
-        if (easingDropdown.mouseClicked(event)) {
-            fieldFov.setFocused(false);
-            return;
-        }
-        easingDropdown.close();
-        boolean hovered = event.x() >= fieldFov.getX()
-                && event.x() < fieldFov.getX() + fieldFov.getWidth()
-                && event.y() >= fieldFov.getY()
-                && event.y() < fieldFov.getY() + fieldFov.getHeight();
-        fieldFov.setFocused(hovered);
-        if (hovered) fieldFov.mouseClicked(event, isDoubleClick);
+        boolean hovered = event.x() >= tagsBox.getX()
+                && event.x() < tagsBox.getX() + tagsBox.getWidth()
+                && event.y() >= tagsBox.getY()
+                && event.y() < tagsBox.getY() + tagsBox.getHeight();
+        tagsBox.setFocused(hovered);
+        if (hovered) tagsBox.mouseClicked(event, isDoubleClick);
     }
 
     @Override
     public void mouseScrolled(double amount) {
-        easingDropdown.mouseScrolled(amount);
+        int[] mousePosition = UtilsClient.getScaledMousePos();
+        tagsBox.mouseScrolled(mousePosition[0], mousePosition[1], 0, amount);
     }
 
     @Override
     public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
-        if (fieldFov.isFocused()) fieldFov.mouseDragged(event, dragX, dragY);
+        if (tagsBox.isFocused()) tagsBox.mouseDragged(event, dragX, dragY);
     }
 
     @Override
     public void charTyped(CharacterEvent event) {
-        if (fieldFov.isFocused()) fieldFov.charTyped(event);
+        if (tagsBox.isFocused()) tagsBox.charTyped(event);
     }
 
     @Override
     public void keyPressed(KeyEvent event) {
-        if (fieldFov.isFocused()) fieldFov.keyPressed(event);
+        if (tagsBox.isFocused()) tagsBox.keyPressed(event);
     }
 
     @Override
     protected void applyChanges() {
-        try {
-            keyframe.setFov(Float.parseFloat(fieldFov.getValue()));
-        } catch (NumberFormatException ignored) {
+        List<String> tags = new ArrayList<>();
+        for (String line : tagsBox.getValue().split("\n")) {
+            if (line.isBlank()) continue;
+            tags.add(line.trim());
         }
-        keyframe.setEasing(easingDropdown.getSelected());
+        keyframe.setTags(tags);
     }
 }

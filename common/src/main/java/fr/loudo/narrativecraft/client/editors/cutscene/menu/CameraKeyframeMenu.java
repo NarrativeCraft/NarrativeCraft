@@ -58,7 +58,7 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
     protected void initContent() {
         KeyframePosition pos = keyframe.getPosition();
         Minecraft mc = Minecraft.getInstance();
-        int fieldWidth = WIDTH - PADDING * 2;
+        int fieldWidth = width - padding * 2;
         fieldX = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getPosition().x));
         fieldY = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getPosition().y));
         fieldZ = createField(mc, fieldWidth, String.format(Locale.US, "%.2f", pos.getPosition().z));
