@@ -43,6 +43,7 @@ public class OnCommandRegisterEventNeoForge {
         PlayerSessionCommand.register(event.getDispatcher());
         PlaybackCommand.register(event.getDispatcher());
         StoryCommand.register(event.getDispatcher());
+        LocaleCommand.register(event.getDispatcher());
         AddonsCommand.register(event.getDispatcher());
         if (Services.PLATFORM.isDevelopmentEnvironment()) {
             TestCommand.register(event.getDispatcher());
