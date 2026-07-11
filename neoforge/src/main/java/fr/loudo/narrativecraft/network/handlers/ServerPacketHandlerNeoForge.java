@@ -49,6 +49,7 @@ import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
+import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -174,5 +175,9 @@ public class ServerPacketHandlerNeoForge {
 
     public static void stopStory(C2SStopStory packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.stopStory(packet, context.player()));
+    }
+
+    public static void setStoryLocale(C2SSetStoryLocale packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.setStoryLocale(packet, context.player()));
     }
 }

@@ -47,6 +47,9 @@ public class PlayerSession extends AbstractPlayerSession {
     @Nullable
     private StoryHandler storyHandler;
 
+    @Nullable
+    private String storyLocale;
+
     public PlayerSession(ServerPlayer player, Chapter chapter, Scene scene) {
         super(chapter, scene);
         this.player = player;
@@ -107,5 +110,14 @@ public class PlayerSession extends AbstractPlayerSession {
 
     public List<UUID> getCharacterIdsSkinLoaded() {
         return characterIdsSkinLoaded;
+    }
+
+    @Nullable
+    public String getStoryLocale() {
+        return storyLocale;
+    }
+
+    public void setStoryLocale(@Nullable String storyLocale) {
+        this.storyLocale = storyLocale;
     }
 }

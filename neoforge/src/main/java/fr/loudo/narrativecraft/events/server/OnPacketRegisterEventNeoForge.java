@@ -110,6 +110,8 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playToClient(
                 S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC, ClientPacketHandlerNeoForge::showChoices);
         registrar.playToClient(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC, ClientPacketHandlerNeoForge::stopStory);
+        registrar.playToClient(
+                S2CStoryLocales.TYPE, S2CStoryLocales.STREAM_CODEC, ClientPacketHandlerNeoForge::storyLocales);
         registrar.playToClient(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC, ClientPacketHandlerNeoForge::dialogStop);
         registrar.playToClient(
                 S2CCharacterStoryAction.TYPE,
@@ -201,6 +203,8 @@ public class OnPacketRegisterEventNeoForge {
                 C2SEnterDialogEditor.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::enterDialogEditor);
         registrar.playToServer(C2SStopStory.TYPE, C2SStopStory.STREAM_CODEC, ServerPacketHandlerNeoForge::stopStory);
+        registrar.playToServer(
+                C2SSetStoryLocale.TYPE, C2SSetStoryLocale.STREAM_CODEC, ServerPacketHandlerNeoForge::setStoryLocale);
     }
 
     private static void registerBiPackets(PayloadRegistrar registrar) {

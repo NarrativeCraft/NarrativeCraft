@@ -31,6 +31,7 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
     public static final String CHARACTERS_DIRECTORY_NAME = "characters";
     public static final String DATA_DIRECTORY_NAME = "data";
     public static final String SAVES_DIRECTORY_NAME = "saves";
+    public static final String LOCALES_DIRECTORY_NAME = "locales";
     public static final String MAIN_SCREEN_DATA_NAME = "main_screen" + EXTENSION_DATA_FILE;
     public static final String GLOBAL_DIALOG_DATA_NAME = "dialog_data" + EXTENSION_DATA_FILE;
     public static final String MAIN_INK_NAME = "main" + EXTENSION_SCRIPT_FILE;
@@ -74,6 +75,14 @@ public class NarrativeCraftFileInit extends NarrativeCraftFileDefault {
 
     public File getSavesDirectory() {
         return createDirectory(mainDirectory, SAVES_DIRECTORY_NAME);
+    }
+
+    public File getLocalesDirectory() {
+        return createDirectory(mainDirectory, LOCALES_DIRECTORY_NAME);
+    }
+
+    public File getLocaleDirectory(String locale) {
+        return new File(getLocalesDirectory(), locale);
     }
 
     public File getMainInk() {

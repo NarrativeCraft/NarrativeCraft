@@ -84,6 +84,18 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
         boolean finishedStory =
                 obj.has("finishedStory") && obj.get("finishedStory").getAsBoolean();
 
+        String savedLocale = obj.has("locale") ? obj.get("locale").getAsString() : null;
+        String savedStructureHash =
+                obj.has("structureHash") ? obj.get("structureHash").getAsString() : null;
+
+        StoryLibrary storyLibrary = NarrativeCraftMod.getInstance().getStoryLibrary();
+        CompiledStory compiledStory = storyLibrary == null
+                ? null
+                : storyLibrary.resolveForSave(playerSession.getStoryLocale(), savedLocale, savedStructureHash);
+        if (compiledStory == null) {
+            throw new JsonParseException("No compiled story matching the save (locale '" + savedLocale + "')");
+        }
+
         ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
         Chapter firstChapter = chapterManager.getList().get(0);
         UUID chapterId =
@@ -103,6 +115,7 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
         try {
             return new StoryHandler(
                     playerSession,
+                    compiledStory,
                     storyState,
                     characterDialogData,
                     interactionIds,

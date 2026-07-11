@@ -37,7 +37,10 @@ public class NarrativeServerSettings {
     private static final Properties PROPS = new Properties();
     private static Path settingsFile;
 
+    public static final String DEFAULT_LOCALE = "en_us";
+
     public static boolean showMainScreenOnJoin = false;
+    public static String defaultLocale = DEFAULT_LOCALE;
 
     public static void init(Path dataDir) {
         settingsFile = dataDir.resolve(FILE_NAME);
@@ -73,9 +76,11 @@ public class NarrativeServerSettings {
 
     private static void loadFromProps() {
         showMainScreenOnJoin = Boolean.parseBoolean(PROPS.getProperty("showMainScreenOnJoin", "false"));
+        defaultLocale = PROPS.getProperty("defaultLocale", DEFAULT_LOCALE);
     }
 
     private static void setToProps() {
         PROPS.setProperty("showMainScreenOnJoin", String.valueOf(showMainScreenOnJoin));
+        PROPS.setProperty("defaultLocale", defaultLocale);
     }
 }

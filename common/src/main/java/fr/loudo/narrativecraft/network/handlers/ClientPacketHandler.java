@@ -41,6 +41,8 @@ import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegist
 import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.settings.ClientStoryLocales;
+import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import fr.loudo.narrativecraft.dialog.*;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
@@ -67,12 +69,15 @@ import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
 import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
+import fr.loudo.narrativecraft.network.story.S2CStoryLocales;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -244,6 +249,23 @@ public class ClientPacketHandler {
 
         action.execute(session);
         session.addClientInkAction(action);
+    }
+
+    public static void storyLocales(S2CStoryLocales packet) {
+        ClientStoryLocales.set(packet.locales(), packet.defaultLocale());
+
+        if (NarrativeClientSettings.storyLocale.isEmpty()) {
+            NarrativeClientSettings.storyLocale =
+                    ClientStoryLocales.resolve(MINECRAFT.getLanguageManager().getSelected());
+            try {
+                NarrativeClientSettings.save();
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Failed to save user settings!", e);
+            }
+        }
+
+        Services.PACKET.sendToServer(
+                new C2SSetStoryLocale(ClientStoryLocales.resolve(NarrativeClientSettings.storyLocale)));
     }
 
     public static void stopAllInkActions() {
