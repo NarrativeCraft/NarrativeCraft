@@ -31,11 +31,11 @@ import net.minecraft.util.FastColor;
 
 public abstract class KeyframeMenu<T extends Keyframe> {
 
-    protected static final int WIDTH = 110;
-    protected static final int PADDING = 5;
-    protected static final int BUTTON_HEIGHT = 14;
-    private static final int BUTTON_WIDTH = (WIDTH - PADDING * 3) / 2;
-    private static final int BACKGROUND_COLOR = FastColor.ARGB32.color(180, 0, 0, 0);
+    protected int width = 110;
+    protected int padding = 5;
+    protected int buttonHeight = 14;
+    protected int buttonWidth;
+    protected int backgroundColor;
 
     protected final T keyframe;
     private final Button editButton;
@@ -44,19 +44,21 @@ public abstract class KeyframeMenu<T extends Keyframe> {
 
     protected KeyframeMenu(T keyframe) {
         this.keyframe = keyframe;
+        initContent();
+        buttonWidth = (width - padding * 3) / 2;
+        backgroundColor = FastColor.ARGB32.color(180, 0, 0, 0);
         this.editButton = Button.builder(Component.literal("Edit"), b -> {
                     applyChanges();
                     close();
                 })
-                .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                .size(buttonWidth, buttonHeight)
                 .build();
         this.deleteButton = Button.builder(Component.literal("Delete"), b -> {
                     keyframe.getLayer().removeKeyframe(keyframe);
                     close();
                 })
-                .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                .size(buttonWidth, buttonHeight)
                 .build();
-        initContent();
     }
 
     protected abstract int getContentHeight();
@@ -72,17 +74,17 @@ public abstract class KeyframeMenu<T extends Keyframe> {
         if (!visible) return;
         Minecraft mc = Minecraft.getInstance();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
-        int totalHeight = PADDING + getContentHeight() + PADDING + BUTTON_HEIGHT + PADDING;
-        int x = screenWidth - WIDTH - PADDING;
-        int y = PADDING;
+        int totalHeight = padding + getContentHeight() + padding + buttonHeight + padding;
+        int x = screenWidth - width - padding;
+        int y = padding;
 
-        graphics.fill(x, y, x + WIDTH, y + totalHeight, BACKGROUND_COLOR);
+        graphics.fill(x, y, x + width, y + totalHeight, backgroundColor);
 
-        renderContent(graphics, delta, x + PADDING, y + PADDING, WIDTH - PADDING * 2, mouseX, mouseY);
+        renderContent(graphics, delta, x + padding, y + padding, width - padding * 2, mouseX, mouseY);
 
-        int btnY = y + PADDING + getContentHeight() + PADDING;
-        editButton.setPosition(x + PADDING, btnY);
-        deleteButton.setPosition(x + PADDING * 2 + BUTTON_WIDTH, btnY);
+        int btnY = y + padding + getContentHeight() + padding;
+        editButton.setPosition(x + padding, btnY);
+        deleteButton.setPosition(x + padding * 2 + buttonWidth, btnY);
         editButton.render(graphics, mouseX, mouseY, Minecraft.getInstance().getDeltaFrameTime());
         deleteButton.render(graphics, mouseX, mouseY, Minecraft.getInstance().getDeltaFrameTime());
     }
@@ -91,15 +93,15 @@ public abstract class KeyframeMenu<T extends Keyframe> {
         if (!visible) return false;
         Minecraft mc = Minecraft.getInstance();
         int screenWidth = mc.getWindow().getGuiScaledWidth();
-        int totalHeight = PADDING + getContentHeight() + PADDING + BUTTON_HEIGHT + PADDING;
-        int x = screenWidth - WIDTH - PADDING;
-        int y = PADDING;
+        int totalHeight = padding + getContentHeight() + padding + buttonHeight + padding;
+        int x = screenWidth - width - padding;
+        int y = padding;
 
         if (!isOnMenu((mouseX), (mouseY), x, y, totalHeight)) return false;
 
         editButton.mouseClicked(mouseX, mouseY, button);
         deleteButton.mouseClicked(mouseX, mouseY, button);
-        onContentMouseClicked(mouseX, mouseY, button, isDoubleClick, x + PADDING, y + PADDING, WIDTH - PADDING * 2);
+        onContentMouseClicked(mouseX, mouseY, button, isDoubleClick, x + padding, y + padding, width - padding * 2);
         return true;
     }
 
@@ -121,7 +123,7 @@ public abstract class KeyframeMenu<T extends Keyframe> {
     public void keyPressed(int keyCode, int scanCode, int modifiers) {}
 
     private boolean isOnMenu(double mouseX, double mouseY, int x, int y, int totalHeight) {
-        return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + totalHeight;
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + totalHeight;
     }
 
     public boolean isVisible() {

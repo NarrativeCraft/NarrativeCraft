@@ -119,6 +119,6 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
      */
     protected boolean isExactTick(float tick) {
         if (keyframes.isEmpty()) return false;
-        return keyframes.stream().mapToInt(Keyframe::getTick).max().getAsInt() == tick;
+        return keyframes.stream().mapToInt(Keyframe::getTick).max().getAsInt() == (int) tick;
     }
 }
