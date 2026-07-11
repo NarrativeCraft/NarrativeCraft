@@ -38,16 +38,21 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import javax.annotation.Nullable;
 
 @InkCommand(
         keyword = "on_enter",
         description = "Registers a one-shot callback that runs the next time the player enters this scene.",
-        syntax = "on_enter",
+        syntax = "on_enter <knot:string>",
         side = Side.SERVER)
 public class OnEnterInkAction extends InkAction {
 
+    @Nullable
+    private String knot;
+
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
+        knot = cmd.getString("knot");
         return InkActionResult.ok();
     }
 
@@ -57,15 +62,12 @@ public class OnEnterInkAction extends InkAction {
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
 
-        String currentPath = storyHandler.getStory().getState().getCurrentPathString();
-        if (currentPath == null) return InkActionResult.ignored();
+        if (knot == null) return InkActionResult.error("Missing knot name");
 
-        String knotName = currentPath.split("\\.")[0];
-
-        Chapter chapter = StoryHandler.getChapterFromKnotName(knotName);
+        Chapter chapter = StoryHandler.getChapterFromKnotName(knot);
         if (chapter == null) return InkActionResult.ignored();
 
-        Scene scene = StoryHandler.getSceneFromKnotName(chapter, knotName);
+        Scene scene = StoryHandler.getSceneFromKnotName(chapter, knot);
         if (scene == null) return InkActionResult.ignored();
 
         if (chapter.getId().equals(session.getChapter().getId())

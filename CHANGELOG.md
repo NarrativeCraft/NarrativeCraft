@@ -5,8 +5,8 @@
 ### Features
 
 - One keyframe for Fov Layer is now parsed and executed
-- Text layer : render text on screen during a cutscene
-- Sound layer : play a sound during a cutscene
+- Text layer : render text on screen during a cutscene #22
+- Sound layer : play a sound during a cutscene #21
 - Locale support (multiple languages of your story in one world)
 
 ### Fixes
@@ -14,3 +14,4 @@
 - Can't create characters in NeoForge dedicated server 1.21.1
 - Text from text tag not centered correctly on screen
 - Fake player/entity playback delta, ground detection and step sounds not correctly working
+- Scene with only tags not detected as a new scene #20
