@@ -32,8 +32,8 @@ import java.util.List;
 public abstract class CutsceneLayer implements ICutsceneLayer {
 
     protected final ICutsceneLayerType layerType;
-    private final List<Keyframe> keyframes = new ArrayList<>();
-    private int sortIndex = 0;
+    protected final List<Keyframe> keyframes = new ArrayList<>();
+    protected int sortIndex = 0;
 
     public CutsceneLayer(ICutsceneLayerType layerType) {
         this.layerType = layerType;
@@ -97,9 +97,19 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
      */
     protected boolean isTickCoveredBy(float tick) {
         if (keyframes.isEmpty()) return false;
-        int first = keyframes.stream().mapToInt(Keyframe::getTick).min().getAsInt();
-        int last = keyframes.stream().mapToInt(Keyframe::getTick).max().getAsInt();
+        int first = getFirstKeyframeTick();
+        int last = getLastKeyframeTick();
         return tick >= first && tick <= last;
+    }
+
+    protected int getFirstKeyframeTick() {
+        if (keyframes.isEmpty()) return -1;
+        return keyframes.stream().mapToInt(Keyframe::getTick).min().getAsInt();
+    }
+
+    protected int getLastKeyframeTick() {
+        if (keyframes.isEmpty()) return -1;
+        return keyframes.stream().mapToInt(Keyframe::getTick).max().getAsInt();
     }
 
     /**
