@@ -10,6 +10,7 @@
 ### Fixes
 
 - Can't create characters in NeoForge dedicated server 1.21.1
+- Text from text tag not centered correctly on screen
 
 ## [2.0.14]
 

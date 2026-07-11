@@ -221,7 +221,7 @@ public class DialogScrollText {
         float maxY = 0f;
         for (int i = 0; i < letters.size(); i++) {
             LetterEntry entry = letters.get(i);
-            if (entry.letter.isEmpty() || entry.letter.equals("\n")) continue;
+            if (entry.letter.isEmpty() || entry.letter.equals("\n") || entry.letter.equals(" ")) continue;
             float[] pos = positions.get(i);
             float right = pos[0] + font.width(entry.letter);
             float bottom = pos[1] + font.lineHeight;
