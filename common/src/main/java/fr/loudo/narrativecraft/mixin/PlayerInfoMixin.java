@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.mixin.accessor.TextureManagerAccessor;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
+import fr.loudo.narrativecraft.narrative.character.PlayerModelType;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +114,9 @@ public abstract class PlayerInfoMixin {
 
         if (!narrativecraft$isDynamicTextureLoaded(skinPath)) return Optional.empty();
 
-        return Optional.of(new PlayerSkin(skinPath, null, null, null, characterStory.getModelType(), false));
+        PlayerSkin.Model model =
+                characterStory.getModelType() == PlayerModelType.SLIM ? PlayerSkin.Model.SLIM : PlayerSkin.Model.WIDE;
+        return Optional.of(new PlayerSkin(skinPath, null, null, null, model, false));
     }
 
     private Optional<PlayerSkin> narrativecraft$resolveLocalPlayerSkin() {

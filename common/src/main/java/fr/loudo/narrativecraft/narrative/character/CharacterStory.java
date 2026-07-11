@@ -33,7 +33,6 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.io.File;
 import java.util.UUID;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
@@ -44,7 +43,7 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
     private final CharacterType characterType = CharacterType.NORMAL;
     private DialogData dialogData = new DialogData();
     private EntityType<?> entityType = EntityType.PLAYER;
-    private PlayerSkin.Model modelType;
+    private PlayerModelType modelType;
     private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
 
     public CharacterStory(String name, String description) {
@@ -85,14 +84,14 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
         this.entityType = entityType;
     }
 
-    public PlayerSkin.Model getModelType() {
+    public PlayerModelType getModelType() {
         if (modelType == null) {
-            return PlayerSkin.Model.WIDE;
+            return PlayerModelType.WIDE;
         }
         return modelType;
     }
 
-    public void setModelType(PlayerSkin.Model modelType) {
+    public void setModelType(PlayerModelType modelType) {
         this.modelType = modelType;
     }
 

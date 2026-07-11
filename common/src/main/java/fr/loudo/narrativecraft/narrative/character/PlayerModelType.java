@@ -23,27 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
-import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
-import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import net.minecraft.world.entity.EntityType;
-
-public interface ICharacterStory extends ICharacter {
-
-    String getDescription();
-
-    DialogData getDialogData();
-
-    void setDialogData(DialogData dialogData);
-
-    Scene getScene();
-
-    File getSkinFile();
-
-    EntityType<?> getEntityType();
-
-    PlayerModelType getModelType();
-
-    CharacterType getCharacterType();
+public enum PlayerModelType {
+    WIDE,
+    SLIM
 }

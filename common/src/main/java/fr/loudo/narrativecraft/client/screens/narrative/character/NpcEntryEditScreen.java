@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
 import fr.loudo.narrativecraft.client.screens.AbstractNarrativeEntryEditScreen;
 import fr.loudo.narrativecraft.client.screens.ClearScreen;
+import fr.loudo.narrativecraft.narrative.character.PlayerModelType;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
@@ -36,7 +37,6 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
@@ -45,20 +45,20 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
 
     private final Scene scene;
     private EntityType<?> selectedEntityType;
-    private PlayerSkin.Model selectedModelType;
+    private PlayerModelType selectedModelType;
 
     public NpcEntryEditScreen(Scene scene, Screen lastScreen) {
         super(lastScreen);
         this.scene = scene;
         this.selectedEntityType = EntityType.PLAYER;
-        this.selectedModelType = PlayerSkin.Model.WIDE;
+        this.selectedModelType = PlayerModelType.WIDE;
     }
 
     public NpcEntryEditScreen(Npc entry, Screen lastScreen) {
         super(entry, lastScreen);
         this.scene = entry.getScene();
         this.selectedEntityType = entry.getEntityType();
-        this.selectedModelType = entry.getModelType() != null ? entry.getModelType() : PlayerSkin.Model.WIDE;
+        this.selectedModelType = entry.getModelType() != null ? entry.getModelType() : PlayerModelType.WIDE;
     }
 
     @Override
@@ -98,9 +98,9 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
 
         Button modelTypeButton = Button.builder(
                         Translation.message("screen.character.model_type", selectedModelType.name()), b -> {
-                            selectedModelType = selectedModelType == PlayerSkin.Model.WIDE
-                                    ? PlayerSkin.Model.SLIM
-                                    : PlayerSkin.Model.WIDE;
+                            selectedModelType = selectedModelType == PlayerModelType.WIDE
+                                    ? PlayerModelType.SLIM
+                                    : PlayerModelType.WIDE;
                             b.setMessage(Translation.message("screen.character.model_type", selectedModelType.name()));
                         })
                 .size(GLOBAL_WIDTH, 20)
