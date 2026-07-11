@@ -63,10 +63,16 @@ public class StoryCompilerHandler {
     }
 
     public static LibraryResult compileLibrary() {
+        migrateOnEnterTags(null);
+
         try {
             StoryLocaleManager.syncAll();
         } catch (IOException exception) {
             NarrativeCraftMod.LOGGER.error("Failed to sync locale ink trees", exception);
+        }
+
+        for (String locale : StoryLocaleManager.listLocales()) {
+            migrateOnEnterTags(locale);
         }
 
         String defaultLocale = StoryLocaleManager.getDefaultLocale();
@@ -193,6 +199,7 @@ public class StoryCompilerHandler {
     }
 
     private static final Pattern TAG_PATTERN = Pattern.compile("#([^#\\n]+)");
+    private static final String ON_ENTER_KEYWORD = "on_enter";
 
     public static List<TagError> validateTags() {
         return validateTags(null);
@@ -312,9 +319,60 @@ public class StoryCompilerHandler {
     }
 
     private static boolean lineContainsOnEnterTag(String line) {
-        return TAG_PATTERN.matcher(line).results().anyMatch(m -> m.group(1)
-                .trim()
-                .equals("on_enter"));
+        return TAG_PATTERN.matcher(line).results().anyMatch(m -> isOnEnterTag(m.group(1)));
+    }
+
+    private static boolean isOnEnterTag(String rawTag) {
+        String trimmed = rawTag.trim();
+        return trimmed.equals(ON_ENTER_KEYWORD) || trimmed.startsWith(ON_ENTER_KEYWORD + " ");
+    }
+
+    public static void migrateOnEnterTags(@Nullable String locale) {
+        for (Chapter chapter :
+                NarrativeCraftMod.getInstance().getChapterManager().getList()) {
+            for (Scene scene : chapter.getSceneManager().getList()) {
+                File sceneInkFile = new File(
+                        NarrativeCraftFileUtil.getSceneFolder(scene),
+                        scene.getName().toLowerCase(Locale.ROOT).replace(' ', '_')
+                                + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE);
+                migrateOnEnterTags(localeCounterpart(sceneInkFile, locale), scene);
+            }
+        }
+    }
+
+    private static void migrateOnEnterTags(File sceneInkFile, Scene scene) {
+        if (!sceneInkFile.isFile()) return;
+
+        String content;
+        try {
+            content = Files.readString(sceneInkFile.toPath());
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Failed to read ink file for on_enter migration: {}", sceneInkFile, e);
+            return;
+        }
+
+        String expectedTag = ON_ENTER_KEYWORD + " " + scene.knotName();
+        StringBuilder migrated = new StringBuilder();
+        Matcher matcher = TAG_PATTERN.matcher(content);
+        boolean changed = false;
+
+        while (matcher.find()) {
+            String rawTag = matcher.group(1);
+            if (!isOnEnterTag(rawTag) || rawTag.trim().equals(expectedTag)) continue;
+
+            String trailingSpaces = rawTag.substring(rawTag.stripTrailing().length());
+            matcher.appendReplacement(migrated, Matcher.quoteReplacement("# " + expectedTag + trailingSpaces));
+            changed = true;
+        }
+
+        if (!changed) return;
+        matcher.appendTail(migrated);
+
+        try {
+            Files.writeString(sceneInkFile.toPath(), migrated.toString());
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Failed to migrate the on_enter tag of {}", sceneInkFile, e);
+        }
     }
 
     public static class LibraryResult {
