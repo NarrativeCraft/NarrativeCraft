@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeSegment;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import java.util.List;
@@ -51,12 +52,23 @@ public class FovLayer extends CutsceneLayer {
     }
 
     @Override
+    protected boolean isTickCoveredBy(float tick) {
+        int first = getFirstKeyframeTick();
+        int last = getLastKeyframeTick();
+        if (tick >= first && first == last) return true;
+        if (tick >= last) return true;
+        return super.isTickCoveredBy(tick);
+    }
+
+    @Override
     public boolean execute(float tick) {
-        if (!isTickCoveredBy(tick)) return false;
-        ClientNarrativeCraftMod.getInstance()
-                .getPlayerSession()
-                .getCutsceneDataSession()
-                .setFov(getInterpolatedFov(tick));
+        CutsceneDataSession cutsceneDataSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getCutsceneDataSession();
+        if (!isTickCoveredBy(tick)) {
+            cutsceneDataSession.setFov(-1);
+            return false;
+        }
+        cutsceneDataSession.setFov(getInterpolatedFov(tick));
         return true;
     }
 
