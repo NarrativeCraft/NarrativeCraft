@@ -21,27 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.commands.*;
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.platform.Services;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+package fr.loudo.narrativecraft.network.story;
 
-public class OnCommandRegisterEventFabric implements IFabricEventRegister {
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+
+public record C2SSetStoryLocale(String locale) implements NarrativePacket {
+
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "set_story_locale");
+
+    public static C2SSetStoryLocale read(FriendlyByteBuf buf) {
+        return new C2SSetStoryLocale(buf.readUtf());
+    }
 
     @Override
-    public void register() {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
-            RecordCommand.register(commandDispatcher);
-            PlayerSessionCommand.register(commandDispatcher);
-            PlaybackCommand.register(commandDispatcher);
-            StoryCommand.register(commandDispatcher);
-            LocaleCommand.register(commandDispatcher);
-            AddonsCommand.register(commandDispatcher);
-            if (Services.PLATFORM.isDevelopmentEnvironment()) {
-                TestCommand.register(commandDispatcher);
-            }
-        });
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUtf(locale);
+    }
+
+    @Override
+    public ResourceLocation type() {
+        return TYPE;
     }
 }

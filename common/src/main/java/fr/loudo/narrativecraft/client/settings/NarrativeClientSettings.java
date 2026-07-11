@@ -39,6 +39,7 @@ public class NarrativeClientSettings {
 
     public static float textSpeed = 1.5f;
     public static boolean autoSkip = false;
+    public static String storyLocale = "";
 
     public static void init(Path configDir) {
         configFile = configDir.resolve(FILE_NAME);
@@ -75,10 +76,12 @@ public class NarrativeClientSettings {
     private static void loadFromProps() {
         textSpeed = Float.parseFloat(PROPS.getProperty("textSpeed", "1.5"));
         autoSkip = Boolean.parseBoolean(PROPS.getProperty("autoSkip", "false"));
+        storyLocale = PROPS.getProperty("storyLocale", "");
     }
 
     private static void setToProps() {
         PROPS.setProperty("textSpeed", String.valueOf(textSpeed));
         PROPS.setProperty("autoSkip", String.valueOf(autoSkip));
+        PROPS.setProperty("storyLocale", storyLocale);
     }
 }

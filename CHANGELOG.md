@@ -7,6 +7,7 @@
 - One keyframe for Fov Layer is now parsed and executed
 - Text layer : render text on screen during a cutscene
 - Sound layer : play a sound during a cutscene
+- Locale support (multiple languages of your story in one world)
 
 ### Fixes
 

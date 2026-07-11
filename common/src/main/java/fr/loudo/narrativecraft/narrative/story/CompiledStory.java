@@ -21,27 +21,6 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.narrative.story;
 
-import fr.loudo.narrativecraft.commands.*;
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.platform.Services;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-
-public class OnCommandRegisterEventFabric implements IFabricEventRegister {
-
-    @Override
-    public void register() {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
-            RecordCommand.register(commandDispatcher);
-            PlayerSessionCommand.register(commandDispatcher);
-            PlaybackCommand.register(commandDispatcher);
-            StoryCommand.register(commandDispatcher);
-            LocaleCommand.register(commandDispatcher);
-            AddonsCommand.register(commandDispatcher);
-            if (Services.PLATFORM.isDevelopmentEnvironment()) {
-                TestCommand.register(commandDispatcher);
-            }
-        });
-    }
-}
+public record CompiledStory(String locale, String json, String structureHash) {}

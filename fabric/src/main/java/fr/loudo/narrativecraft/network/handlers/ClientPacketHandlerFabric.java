@@ -43,6 +43,7 @@ import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.network.story.S2CStopStory;
+import fr.loudo.narrativecraft.network.story.S2CStoryLocales;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
@@ -257,6 +258,12 @@ public class ClientPacketHandlerFabric {
             S2CSessionClear packet = S2CSessionClear.read(buf);
             client.execute(() -> {
                 ClientPacketHandler.sessionClear();
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CStoryLocales.TYPE, (client, handler, buf, responseSender) -> {
+            S2CStoryLocales packet = S2CStoryLocales.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.storyLocales(packet);
             });
         });
     }

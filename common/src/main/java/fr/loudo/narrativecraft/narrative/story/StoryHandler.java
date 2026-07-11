@@ -69,6 +69,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     private static final String TAG_2D = "[2D]";
 
     private final PlayerSession playerSession;
+    private final CompiledStory compiledStory;
     private final Story story;
     private final InkTagHandler inkTagHandler;
     private final Map<String, Entity> characterEntities = new HashMap<>();
@@ -83,17 +84,13 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     private boolean loadedFromSave = false;
 
     public StoryHandler(PlayerSession playerSession) throws Exception {
-        this.playerSession = playerSession;
-        this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
-        this.inkTagHandler = new InkTagHandler(playerSession, this, story);
-        story.onError = (message, type) -> {
-            onError(new InkTagHandlerException(type.name() + ": " + message));
-        };
+        this(playerSession, resolveStory(playerSession));
     }
 
-    public StoryHandler(PlayerSession playerSession, String saveJson) throws Exception {
+    private StoryHandler(PlayerSession playerSession, CompiledStory compiledStory) throws Exception {
         this.playerSession = playerSession;
-        this.story = new Story(saveJson);
+        this.compiledStory = compiledStory;
+        this.story = new Story(compiledStory.json());
         this.inkTagHandler = new InkTagHandler(playerSession, this, story);
         story.onError = (message, type) -> {
             onError(new InkTagHandlerException(type.name() + ": " + message));
@@ -102,6 +99,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     StoryHandler(
             PlayerSession playerSession,
+            CompiledStory compiledStory,
             String storyState,
             Map<String, DialogData> characterDialogData,
             Set<UUID> interactionIds,
@@ -110,10 +108,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             boolean ended,
             boolean finishedStory)
             throws Exception {
-        this.playerSession = playerSession;
-        this.story = new Story(NarrativeCraftMod.getInstance().getCompiledStoryJson());
+        this(playerSession, compiledStory);
         this.story.getState().loadJson(storyState);
-        this.inkTagHandler = new InkTagHandler(playerSession, this, story);
         this.characterDialogData.putAll(characterDialogData);
         this.interactionIds.addAll(interactionIds);
         this.lastCharacterSpoke = lastCharacterSpoke;
@@ -121,9 +117,16 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         this.ended = ended;
         this.finishedStory = finishedStory;
         this.loadedFromSave = true;
-        story.onError = (message, type) -> {
-            onError(new InkTagHandlerException(type.name() + ": " + message));
-        };
+    }
+
+    private static CompiledStory resolveStory(PlayerSession playerSession) throws Exception {
+        StoryLibrary storyLibrary = NarrativeCraftMod.getInstance().getStoryLibrary();
+        CompiledStory compiledStory =
+                storyLibrary == null ? null : storyLibrary.resolve(playerSession.getStoryLocale());
+        if (compiledStory == null) {
+            throw new Exception("The story is not compiled!");
+        }
+        return compiledStory;
     }
 
     public void start() throws Exception {
@@ -273,6 +276,14 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public Story getStory() {
         return story;
+    }
+
+    public String getStoryLocale() {
+        return compiledStory.locale();
+    }
+
+    public String getStoryStructureHash() {
+        return compiledStory.structureHash();
     }
 
     public InkTagHandler getInkTagHandler() {

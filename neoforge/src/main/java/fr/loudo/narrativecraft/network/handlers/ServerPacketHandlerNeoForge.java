@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.network.C2SChangeGamemodePacket;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
@@ -50,6 +49,7 @@ import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
+import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -177,7 +177,7 @@ public class ServerPacketHandlerNeoForge {
         context.enqueueWork(() -> ServerPacketHandler.stopStory(packet, context.player()));
     }
 
-    public static void changeGamemode(C2SChangeGamemodePacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> ServerPacketHandler.changeGamemode(packet, context.player()));
+    public static void setStoryLocale(C2SSetStoryLocale packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.setStoryLocale(packet, context.player()));
     }
 }

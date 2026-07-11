@@ -43,6 +43,7 @@ import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.network.story.S2CStopStory;
+import fr.loudo.narrativecraft.network.story.S2CStoryLocales;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
@@ -139,6 +140,10 @@ public class ClientPacketHandlerNeoForge {
 
     public static void stopStory(S2CStopStory packet, IPayloadContext context) {
         context.enqueueWork(ClientPacketHandler::stopStory);
+    }
+
+    public static void storyLocales(S2CStoryLocales packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.storyLocales(packet));
     }
 
     public static void dialogStop(S2CDialogStop packet, IPayloadContext context) {

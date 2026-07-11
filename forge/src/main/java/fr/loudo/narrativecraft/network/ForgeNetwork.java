@@ -175,6 +175,7 @@ public final class ForgeNetwork {
                 S2CNotifyClientPlayStory::read,
                 ClientPacketHandler::notifyClientPlayStory);
         clientRun(S2CSessionClear.TYPE, S2CSessionClear::read, ClientPacketHandler::sessionClear);
+        client(S2CStoryLocales.TYPE, S2CStoryLocales::read, ClientPacketHandler::storyLocales);
     }
 
     private static void registerServer() {
@@ -230,5 +231,6 @@ public final class ForgeNetwork {
         server(C2SEnterDialogEditor.TYPE, C2SEnterDialogEditor::read, ServerPacketHandler::enterDialogEditor);
         server(C2SStopStory.TYPE, C2SStopStory::read, ServerPacketHandler::stopStory);
         server(C2SChangeGamemodePacket.TYPE, C2SChangeGamemodePacket::read, ServerPacketHandler::changeGamemode);
+        server(C2SSetStoryLocale.TYPE, C2SSetStoryLocale::read, ServerPacketHandler::setStoryLocale);
     }
 }

@@ -40,6 +40,7 @@ public class OnCommandRegisterEventForge {
         PlaybackCommand.register(event.getDispatcher());
         StoryCommand.register(event.getDispatcher());
         AddonsCommand.register(event.getDispatcher());
+        LocaleCommand.register(event.getDispatcher());
         if (Services.PLATFORM.isDevelopmentEnvironment()) {
             TestCommand.register(event.getDispatcher());
         }
