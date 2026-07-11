@@ -21,14 +21,49 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.utils;
+package fr.loudo.narrativecraft.editors.cutscene.keyframes;
 
-import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.resources.ResourceLocation;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.client.editors.cutscene.menu.SoundKeyframeMenu;
 
-public interface VolumeAudio {
+public class SoundKeyframe extends Keyframe {
 
-    void narrativecraft$setVolume(SoundInstance soundInstance, float volume);
+    private String soundId = "";
+    private float volume = 1f;
+    private float pitch = 1f;
 
-    void narrativecraft$setVolume(ResourceLocation source, float volume);
+    public SoundKeyframe(CutsceneLayer layer, int tick) {
+        super(layer, tick);
+    }
+
+    @Override
+    public KeyframeMenu<SoundKeyframe> createMenu() {
+        return new SoundKeyframeMenu(this);
+    }
+
+    public String getSoundId() {
+        return soundId;
+    }
+
+    public void setSoundId(String soundId) {
+        this.soundId = soundId;
+    }
+
+    public float getVolume() {
+        return volume;
+    }
+
+    public void setVolume(float volume) {
+        this.volume = volume;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
 }

@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.editors.cutscene;
 
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayerType;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.fov.FovLayerType;
+import fr.loudo.narrativecraft.client.editors.cutscene.layers.sound.SoundLayerType;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.text.TextLayerType;
 
 public class CutsceneLayerRegister {
@@ -33,5 +34,6 @@ public class CutsceneLayerRegister {
         registry.register(new CameraLayerType());
         registry.register(new FovLayerType());
         registry.register(new TextLayerType());
+        registry.register(new SoundLayerType());
     }
 }
