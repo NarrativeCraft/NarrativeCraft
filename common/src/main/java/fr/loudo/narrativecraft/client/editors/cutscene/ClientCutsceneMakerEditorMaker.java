@@ -190,6 +190,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
     @Override
     public void stop() {
+        playback.pause();
         playerSession.getCutsceneDataSession().reset();
     }
 
