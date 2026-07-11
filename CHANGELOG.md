@@ -12,6 +12,7 @@
 
 - Can't create characters in NeoForge dedicated server 1.21.1
 - Text from text tag not centered correctly on screen
+- Fake player/entity playback delta, ground detection and step sounds not correctly working
 
 ## [2.0.14]
 
