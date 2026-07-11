@@ -27,13 +27,17 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
-import java.io.IOException;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.Vec3;
+
+import java.io.IOException;
 
 public class MovementAction extends AbstractAction {
 
     public static final String ID = "movement";
+
+    private static final double MAX_INTERPOLATED_MOVEMENT_SQUARED = 64.0;
 
     private Vec3 pos;
     private float pitch, yaw, headYaw;
@@ -53,7 +57,17 @@ public class MovementAction extends AbstractAction {
     @Override
     public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         Entity entity = context.getEntity();
-        entity.setPos(pos);
+        Vec3 movement = pos.subtract(entity.position());
+
+        if (movement.lengthSqr() > MAX_INTERPOLATED_MOVEMENT_SQUARED) {
+            entity.setDeltaMovement(Vec3.ZERO);
+            entity.setPos(pos);
+        } else {
+            entity.setDeltaMovement(movement);
+            entity.move(MoverType.SELF, movement);
+            entity.setPos(pos);
+        }
+
         entity.setXRot(pitch);
         entity.setYRot(yaw);
         entity.setYHeadRot(headYaw);
