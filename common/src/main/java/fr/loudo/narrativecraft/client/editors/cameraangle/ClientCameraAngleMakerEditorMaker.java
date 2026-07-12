@@ -50,10 +50,8 @@ import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.*;
-import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -61,7 +59,6 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.network.chat.Component;
@@ -556,11 +553,6 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private void stopNewCameraPosition() {
         editingCameraViewPosition = false;
-        ClientLevel level = minecraft.level;
-        if (level == null) return;
-        Options options = minecraft.options;
-        Camera camera = minecraft.gameRenderer.mainCamera();
-        minecraft.levelRenderer.invalidateCompiledGeometry(level, options, camera, minecraft.getBlockColors());
     }
 
     public CameraView getPreviewCamera() {

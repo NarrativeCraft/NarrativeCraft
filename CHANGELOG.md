@@ -17,6 +17,7 @@
 - Fake player/entity playback delta, ground detection and step sounds not correctly working
 - Scene with only tags not detected as a new scene #20
 - Shortcuts in keyframe menus and cutscene layers conflicting
+- Editing camera angle position and full world is air - 26.2
 
 ### Misc
 
