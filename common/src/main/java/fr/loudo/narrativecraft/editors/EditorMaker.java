@@ -24,6 +24,8 @@
 package fr.loudo.narrativecraft.editors;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
 
 public interface EditorMaker {
 
@@ -36,4 +38,14 @@ public interface EditorMaker {
     void teleportToEditorOrigin();
 
     NarrativeEnvironment getEnvironment();
+
+    default void render(GuiGraphics graphics, DeltaTracker deltaTracker) {}
+
+    default void charTyped(char codePoint, int modifiers) {}
+
+    default void keyPressed(int keyCode, int scanCode, int modifiers) {}
+
+    default void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {}
+
+    default void mouseReleased(double mouseX, double mouseY, int button) {}
 }

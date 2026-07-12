@@ -470,6 +470,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         scrollOffset = (int) Math.clamp(scrollOffset - deltaY * LAYER_HEIGHT, 0, maxScroll);
     }
 
+    @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         playback.tick(deltaTracker);
 
@@ -510,6 +511,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                 mousePos[1]);
     }
 
+    @Override
     public void charTyped(char codePoint, int modifiers) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (openMenu != null && openMenu.isVisible()) {
@@ -517,12 +519,14 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (openMenu != null && openMenu.isVisible() && openMenu.keyPressed(keyCode, scanCode, modifiers)) return;
         shortcuts.handleKeyPressed(keyCode, scanCode, modifiers);
     }
 
+    @Override
     public void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
@@ -636,6 +640,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         rollWidget.mouseReleased();

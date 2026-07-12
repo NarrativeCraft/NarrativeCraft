@@ -47,9 +47,7 @@ public class GuiMixinFabric {
         graphics.pose().pushPose();
         graphics.pose().translate(0, 0, 5000f);
 
-        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
-        OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
-        OnHudRender.interactionHudRender(graphics, deltaTracker);
+        OnHudRender.editorHudRender(graphics, deltaTracker);
         OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
         OnHudRender.saveIconHudRender(graphics, deltaTracker);
         OnHudRender.dialogHudRender(graphics, deltaTracker);

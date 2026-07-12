@@ -560,6 +560,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         dialogPreviewPanel.renderAnchorPoint(poseStack);
     }
 
+    @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (previewCameraView != null) {
@@ -623,6 +624,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (!renderingHud || !clearScreenOpened()) return;
@@ -653,6 +655,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (!renderingHud || !clearScreenOpened()) return;
@@ -675,6 +678,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         return minecraft.screen != null && minecraft.screen instanceof ClearScreen;
     }
 
+    @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (previewMode == PreviewMode.DIALOG) {
@@ -704,6 +708,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         renderingHud = !renderingHud;
     }
 
+    @Override
     public void charTyped(char codePoint, int modifiers) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (previewMode == PreviewMode.DIALOG) {
