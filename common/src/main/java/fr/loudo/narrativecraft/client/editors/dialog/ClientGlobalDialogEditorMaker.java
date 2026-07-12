@@ -148,6 +148,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         int[] mousePos = UtilsClient.getScaledMousePos();
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
@@ -165,6 +166,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
         if (!clearScreenOpened()) return;
         if (advancedPanel.isVisible() && advancedPanel.mouseClicked(event)) {
@@ -178,6 +180,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void mouseReleased(MouseButtonEvent event) {
         if (!clearScreenOpened()) return;
         previewPanel.mouseReleased();
@@ -188,6 +191,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
         previewPanel.mouseDragged(event.y());
     }
 
+    @Override
     public void keyPressed(KeyEvent event) {
         previewPanel.keyPressed(event);
         if (previewPanel.isAnyBoxFocused()) return;
@@ -196,6 +200,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void charTyped(CharacterEvent event) {
         previewPanel.charTyped(event);
         if (advancedPanel.isVisible()) {

@@ -24,10 +24,6 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
-import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
 import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -41,28 +37,16 @@ public class OnScreenKeyEvent {
     public static void onCharTyped(CharacterEvent event) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.charTyped(event);
-        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.charTyped(event);
-        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
-            globalDialogEditor.charTyped(event);
-        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
-            characterDialogEditor.charTyped(event);
+        if (editorMaker != null) {
+            editorMaker.charTyped(event);
         }
     }
 
     public static void onKeyPressed(KeyEvent event) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.keyPressed(event);
-        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.keyPressed(event);
-        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
-            globalDialogEditor.keyPressed(event);
-        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
-            characterDialogEditor.keyPressed(event);
+        if (editorMaker != null) {
+            editorMaker.keyPressed(event);
         }
 
         if (ModKeys.DIALOG_ADVANCE.matches(event)

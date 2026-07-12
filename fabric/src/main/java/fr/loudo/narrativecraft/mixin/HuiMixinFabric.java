@@ -37,9 +37,7 @@ public class HuiMixinFabric {
 
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     private void narrativecraft$renderHud(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
-        OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
-        OnHudRender.interactionHudRender(graphics, deltaTracker);
+        OnHudRender.editorHudRender(graphics, deltaTracker);
         OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
         OnHudRender.saveIconHudRender(graphics, deltaTracker);
         OnHudRender.dialogHudRender(graphics, deltaTracker);

@@ -43,9 +43,7 @@ public class OnHudRenderEventNeoForge {
         GuiGraphicsExtractor graphics = event.getGuiGraphics();
         DeltaTracker deltaTracker = event.getPartialTick();
 
-        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
-        OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
-        OnHudRender.interactionHudRender(graphics, deltaTracker);
+        OnHudRender.editorHudRender(graphics, deltaTracker);
         OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
         OnHudRender.saveIconHudRender(graphics, deltaTracker);
         OnHudRender.dialogHudRender(graphics, deltaTracker);
