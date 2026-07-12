@@ -25,7 +25,10 @@ package fr.loudo.narrativecraft.dialog;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
+import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.MathUtils;
 
 public abstract class DialogRenderer {
@@ -47,6 +50,20 @@ public abstract class DialogRenderer {
     private static final float SKIP_APPEAR_TICKS = 10f;
     private float skipProgress = 0f;
     private float previousSkipProgress = 0f;
+
+    public static void advanceNextDialog() {
+        DialogRenderer dialogRenderer =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession().getMainDialog();
+        if (dialogRenderer != null) {
+            if (dialogRenderer.isAnimating()) return;
+            if (!dialogRenderer.isTextFinished()) {
+                dialogRenderer.forceFinishText();
+                return;
+            }
+
+            Services.PACKET.sendToServer(new C2SDialogueFinished());
+        }
+    }
 
     protected DialogRenderer(DialogData data) {
         this.data = data;

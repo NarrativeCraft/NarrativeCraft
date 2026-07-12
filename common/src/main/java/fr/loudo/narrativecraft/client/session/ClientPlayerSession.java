@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.AbstractPlayerSession;
 import java.util.*;
+import net.minecraft.client.Minecraft;
 
 public class ClientPlayerSession extends AbstractPlayerSession {
 
@@ -116,6 +117,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public void removeDialog2D(DialogRenderer2D renderer) {
         activeDialog2DRenderers.remove(renderer);
+        Minecraft.getInstance().setScreen(null);
     }
 
     public void removeDialog3D(DialogRenderer3D renderer) {

@@ -38,7 +38,6 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
-import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -92,27 +91,13 @@ public class PressKeyListener {
         ModKeys.handleKeyPress(
                 InputConstants.MOUSE_BUTTON_LEFT,
                 minecraft.mouseHandler.isLeftPressed(),
-                PressKeyListener::handleAdvanceStory,
+                DialogRenderer::advanceNextDialog,
                 PressKeyListener::handleInteractionPoints);
 
         ModKeys.handleKeyPress(
                 InputConstants.MOUSE_BUTTON_RIGHT,
                 minecraft.mouseHandler.isRightPressed(),
                 PressKeyListener::handleInteractionPoints);
-    }
-
-    private static void handleAdvanceStory() {
-        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        DialogRenderer dialogRenderer = session.getMainDialog();
-        if (dialogRenderer != null) {
-            if (dialogRenderer.isAnimating()) return;
-            if (!dialogRenderer.isTextFinished()) {
-                dialogRenderer.forceFinishText();
-                return;
-            }
-
-            Services.PACKET.sendToServer(new C2SDialogueFinished());
-        }
     }
 
     private static void handleInteractionPoints() {
