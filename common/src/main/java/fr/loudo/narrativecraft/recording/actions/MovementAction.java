@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementAction extends AbstractAction {
@@ -70,6 +71,7 @@ public class MovementAction extends AbstractAction {
         entity.setXRot(pitch);
         entity.setYRot(yaw);
         entity.setYHeadRot(headYaw);
+        entity.setOnGround(isOnGround(entity));
 
         return ActionResult.OK;
     }
@@ -110,5 +112,10 @@ public class MovementAction extends AbstractAction {
     @Override
     public boolean shouldExecuteOnRewind() {
         return true;
+    }
+
+    private boolean isOnGround(Entity entity) {
+        AABB box = entity.getBoundingBox().deflate(0.001).move(0, -0.05, 0);
+        return !entity.level().noCollision(entity, box);
     }
 }
