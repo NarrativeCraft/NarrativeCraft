@@ -193,6 +193,7 @@
   "narrativecraft.screen.main.options.auto_skip": "Auto-Skip",
   "narrativecraft.screen.main.options.minecraft_options": "Minecraft Options",
   "narrativecraft.screen.main.options.language": "Story Language: %s",
+  "narrativecraft.screen.main.options.language_disabled": "You can't change the language while in the story!",
   "narrativecraft.screen.locale_select.title": "Select a language",
   "narrativecraft.screen.main.options.done": "Done",
   "narrativecraft.story.locale_set": "Story language set to %s for %s.",
