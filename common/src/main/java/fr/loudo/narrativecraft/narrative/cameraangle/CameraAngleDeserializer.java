@@ -212,7 +212,8 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
         TemplateSourceType sourceType =
                 TemplateSourceType.valueOf(json.get("sourceType").getAsString());
         UUID refId = UUID.fromString(json.get("characterId").getAsString());
+        String displayName = json.has("displayName") ? json.get("displayName").getAsString() : "";
 
-        return new TemplateReference(id, sourceType, refId);
+        return new TemplateReference(id, sourceType, refId, displayName);
     }
 }

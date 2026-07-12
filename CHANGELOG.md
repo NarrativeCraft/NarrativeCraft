@@ -22,6 +22,7 @@
 
 - Easing is now taken from the 2nd keyframe not the first one
 - Player can't move if a 2d dialog is rendered on screen if in gameplay mode
+- Template tab in camera angle maker shows display name instead of short uuid (does not apply to old data)
 
 ## [2.0.14]
 

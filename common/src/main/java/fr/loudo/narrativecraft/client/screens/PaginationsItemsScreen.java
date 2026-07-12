@@ -141,7 +141,8 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
             this.addRenderableWidget(resetButton);
         }
 
-        int searchBarBottom = searchY + 20 + gap;
+        int headerHeight = addHeaderWidgets(middleX, searchY + 20 + 5);
+        int searchBarBottom = searchY + 20 + (headerHeight > 0 ? headerHeight + 5 : 0) + gap;
 
         int totalContentHeight = itemsToDisplay.isEmpty()
                 ? 0
@@ -218,6 +219,10 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
                     this.width / 2 - emptyText.getWidth() / 2, this.height / 2 - this.font.lineHeight / 2);
             this.addRenderableWidget(emptyText);
         }
+    }
+
+    protected int addHeaderWidgets(int x, int y) {
+        return 0;
     }
 
     public void addWidgetsForItem(int x, int y, T item) {

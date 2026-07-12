@@ -32,7 +32,13 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public record C2SCameraAngleAddTemplateReference(
-        UUID chapterId, UUID sceneId, UUID cameraAngleId, String sourceType, UUID refId, UUID templateReferenceId)
+        UUID chapterId,
+        UUID sceneId,
+        UUID cameraAngleId,
+        String sourceType,
+        UUID refId,
+        UUID templateReferenceId,
+        String displayName)
         implements NarrativePacket {
 
     public C2SCameraAngleAddTemplateReference(CameraAngle cameraAngle, TemplateReference reference) {
@@ -42,7 +48,8 @@ public record C2SCameraAngleAddTemplateReference(
                 cameraAngle.getId(),
                 reference.sourceType().name(),
                 reference.refId(),
-                reference.id());
+                reference.id(),
+                reference.displayName());
     }
 
     public static final ResourceLocation TYPE =
@@ -50,7 +57,13 @@ public record C2SCameraAngleAddTemplateReference(
 
     public static C2SCameraAngleAddTemplateReference read(FriendlyByteBuf buf) {
         return new C2SCameraAngleAddTemplateReference(
-                buf.readUUID(), buf.readUUID(), buf.readUUID(), buf.readUtf(), buf.readUUID(), buf.readUUID());
+                buf.readUUID(),
+                buf.readUUID(),
+                buf.readUUID(),
+                buf.readUtf(),
+                buf.readUUID(),
+                buf.readUUID(),
+                buf.readUtf());
     }
 
     @Override
@@ -61,6 +74,7 @@ public record C2SCameraAngleAddTemplateReference(
         buf.writeUtf(sourceType);
         buf.writeUUID(refId);
         buf.writeUUID(templateReferenceId);
+        buf.writeUtf(displayName);
     }
 
     @Override
