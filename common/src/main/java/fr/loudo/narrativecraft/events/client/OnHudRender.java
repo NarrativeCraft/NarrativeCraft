@@ -25,11 +25,6 @@ package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
-import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
-import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -38,31 +33,11 @@ import net.minecraft.client.gui.GuiGraphics;
 
 public class OnHudRender {
 
-    public static void cutsceneHudRender(GuiGraphics graphics, float deltaTracker) {
+    public static void editorHudRender(GuiGraphics graphics, float deltaTracker) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.render(graphics, deltaTracker);
-        }
-    }
-
-    public static void cameraAngleHudRender(GuiGraphics graphics, float deltaTracker) {
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.render(graphics, deltaTracker);
-        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
-            globalDialogEditor.render(graphics, deltaTracker);
-        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
-            characterDialogEditor.render(graphics, deltaTracker);
-        }
-    }
-
-    public static void interactionHudRender(GuiGraphics graphics, float deltaTracker) {
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker instanceof ClientInteractionMakerEditorMaker interactionEditor) {
-            interactionEditor.render(graphics, deltaTracker);
+        if (editorMaker != null) {
+            editorMaker.render(graphics, deltaTracker);
         }
     }
 

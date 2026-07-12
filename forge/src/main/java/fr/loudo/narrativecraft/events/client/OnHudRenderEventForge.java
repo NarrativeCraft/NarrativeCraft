@@ -40,9 +40,7 @@ public class OnHudRenderEventForge {
         //        graphics.pose().pushPose();
         //        graphics.pose().translate(0, 0, 5000f);
         //
-        //        OnHudRender.cutsceneHudRender(graphics, partialTick);
-        //        OnHudRender.cameraAngleHudRender(graphics, partialTick);
-        //        OnHudRender.interactionHudRender(graphics, partialTick);
+        //        OnHudRender.editorHudRender(graphics, partialTick);
         //        OnHudRender.clientInkActionsHudRender(graphics, partialTick);
         //        OnHudRender.saveIconHudRender(graphics, partialTick);
         //        OnHudRender.dialogHudRender(graphics, partialTick);

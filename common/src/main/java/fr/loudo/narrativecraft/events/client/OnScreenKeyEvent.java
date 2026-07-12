@@ -24,10 +24,6 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
-import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
 import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -39,28 +35,16 @@ public class OnScreenKeyEvent {
     public static void onCharTyped(char codePoint, int modifiers) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.charTyped(codePoint, modifiers);
-        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.charTyped(codePoint, modifiers);
-        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
-            globalDialogEditor.charTyped(codePoint, modifiers);
-        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
-            characterDialogEditor.charTyped(codePoint, modifiers);
+        if (editorMaker != null) {
+            editorMaker.charTyped(codePoint, modifiers);
         }
     }
 
     public static void onKeyPressed(int keyCode, int scanCode, int modifiers) {
         EditorMaker editorMaker =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker instanceof ClientCutsceneMakerEditorMaker cutsceneEditor) {
-            cutsceneEditor.keyPressed(keyCode, scanCode, modifiers);
-        } else if (editorMaker instanceof ClientCameraAngleMakerEditorMaker cameraAngleEditor) {
-            cameraAngleEditor.keyPressed(keyCode, scanCode, modifiers);
-        } else if (editorMaker instanceof ClientGlobalDialogEditorMaker globalDialogEditor) {
-            globalDialogEditor.keyPressed(keyCode, scanCode, modifiers);
-        } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
-            characterDialogEditor.keyPressed(keyCode, scanCode, modifiers);
+        if (editorMaker != null) {
+            editorMaker.keyPressed(keyCode, scanCode, modifiers);
         }
 
         if (ModKeys.DIALOG_ADVANCE.matches(keyCode, scanCode)

@@ -100,9 +100,7 @@ public class GameRendererMixin {
     private void narrativecraft$renderAlwaysOnTop(
             float partialTick, long nanoTime, boolean renderLevel, CallbackInfo ci) {
         GuiGraphics graphics = new GuiGraphics(this.minecraft, this.renderBuffers.bufferSource());
-        OnHudRender.cutsceneHudRender(graphics, partialTick);
-        OnHudRender.cameraAngleHudRender(graphics, partialTick);
-        OnHudRender.interactionHudRender(graphics, partialTick);
+        OnHudRender.editorHudRender(graphics, partialTick);
         OnHudRender.clientInkActionsHudRender(graphics, partialTick);
         OnHudRender.saveIconHudRender(graphics, partialTick);
         OnHudRender.dialogHudRender(graphics, partialTick);

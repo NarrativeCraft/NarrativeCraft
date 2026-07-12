@@ -25,13 +25,14 @@ package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod(value = NarrativeCraftMod.MOD_ID, dist = Dist.CLIENT)
 public class OnHudRenderEventNeoForge {
 
     public OnHudRenderEventNeoForge(IEventBus eventBus) {
@@ -39,19 +40,12 @@ public class OnHudRenderEventNeoForge {
     }
 
     private static void onHudRender(RenderGuiEvent.Post event) {
-        GuiGraphics graphics = event.getGuiGraphics();
+        GuiGraphicsExtractor graphics = event.getGuiGraphics();
         DeltaTracker deltaTracker = event.getPartialTick();
 
-        graphics.pose().pushPose();
-        graphics.pose().translate(0, 0, 5000f);
-
-        OnHudRender.cutsceneHudRender(graphics, deltaTracker);
-        OnHudRender.cameraAngleHudRender(graphics, deltaTracker);
-        OnHudRender.interactionHudRender(graphics, deltaTracker);
+        OnHudRender.editorHudRender(graphics, deltaTracker);
         OnHudRender.clientInkActionsHudRender(graphics, deltaTracker);
         OnHudRender.saveIconHudRender(graphics, deltaTracker);
         OnHudRender.dialogHudRender(graphics, deltaTracker);
-
-        graphics.pose().popPose();
     }
 }

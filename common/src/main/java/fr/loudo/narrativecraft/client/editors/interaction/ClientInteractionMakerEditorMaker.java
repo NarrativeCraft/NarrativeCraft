@@ -141,6 +141,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         return environment;
     }
 
+    @Override
     public void render(GuiGraphics graphics, float deltaTracker) {
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
         int[] mousePos = UtilsClient.getScaledMousePos();
@@ -205,6 +206,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         }
     }
 
+    @Override
     public void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (!clearScreenOpened() || environment != NarrativeEnvironment.DEVELOPMENT) return;
         List<Button> activeButtons;
