@@ -9,6 +9,7 @@
 - Sound layer : play a sound during a cutscene #21
 - Locale support (multiple languages of your story in one world)
 - Added 3 actions in text tag : shadow, mute and text align
+- Added 2 keybinds to start recording and stop it
 
 ### Fixes
 

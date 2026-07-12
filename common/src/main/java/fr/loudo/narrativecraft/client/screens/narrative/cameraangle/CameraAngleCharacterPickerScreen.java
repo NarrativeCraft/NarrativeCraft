@@ -31,14 +31,13 @@ import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public class CameraAngleCharacterPickerScreen
         extends AbstractNarrativeEntryPickerScreen<CameraAngleCharacterPickerScreen.Entry> {
@@ -81,14 +80,9 @@ public class CameraAngleCharacterPickerScreen
     @Override
     protected int addHeaderWidgets(int x, int y) {
         int filterButtonWidth = (buttonWidth - FILTER_BUTTON_GAP) / 2;
+        addFilterButton(Translation.message("character"), CharacterType.NORMAL, x, y, filterButtonWidth);
         addFilterButton(
-                Translation.message("screen.camera_angle_editor.filter.characters"),
-                CharacterType.NORMAL,
-                x,
-                y,
-                filterButtonWidth);
-        addFilterButton(
-                Translation.message("screen.camera_angle_editor.filter.npc"),
+                Translation.message("npc"),
                 CharacterType.NPC,
                 x + filterButtonWidth + FILTER_BUTTON_GAP,
                 y,
