@@ -248,7 +248,8 @@ public class DialogScrollText {
             int color = applyOpacity(data.getTextColor(), 1f);
 
             GuiGraphicsExtractorExtension graphicsExtension = new GuiGraphicsExtractorExtension(graphics);
-            graphicsExtension.text(font, entry.letter, pos[0] + offset.x, pos[1] + offset.y, color, false);
+            graphicsExtension.text(
+                    font, entry.letter, pos[0] + offset.x, pos[1] + offset.y, color, data.isTextShadow());
         }
     }
 

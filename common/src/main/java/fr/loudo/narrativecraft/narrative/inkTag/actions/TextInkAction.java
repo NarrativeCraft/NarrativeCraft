@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.utils.FadeState;
 import javax.annotation.Nullable;
 import net.minecraft.world.phys.Vec2;
@@ -66,6 +67,8 @@ public class TextInkAction extends InkAction {
     protected boolean noRemove = false;
     protected float scrollSpeed = 1.5f;
     protected Vec2 space = new Vec2(0, 0);
+    protected boolean shadow, mute;
+    protected DialogData.TextAlignment textAlignment = DialogData.TextAlignment.CENTER;
 
     @Nullable
     protected FadeState fadeState;
@@ -168,6 +171,16 @@ public class TextInkAction extends InkAction {
                     return InkActionResult.error("Invalid width value '" + value1 + "'");
                 }
             }
+            case "text_alignment" -> {
+                if (value1 == null || value1.isEmpty()) {
+                    return InkActionResult.error("'text_alignment' requires an value (value1) [LEFT, CENTER, RIGHT]");
+                }
+                try {
+                    textAlignment = DialogData.TextAlignment.valueOf(value1.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return InkActionResult.error("Invalid text_alignment value '" + value1 + "' [LEFT, CENTER, RIGHT]");
+                }
+            }
             case "fade" -> {
                 if (value1 == null || value2 == null || value3 == null) {
                     return InkActionResult.error("'fade' requires fadeIn, stay, and fadeOut values");
@@ -217,6 +230,16 @@ public class TextInkAction extends InkAction {
                 }
                 noTyping = false;
                 if (cmd.flag("block")) blocking = true;
+            }
+            case "shadow" -> {
+                if (value1 != null && !value1.isEmpty()) {
+                    shadow = Boolean.parseBoolean(value1);
+                }
+            }
+            case "mute" -> {
+                if (value1 != null && !value1.isEmpty()) {
+                    mute = Boolean.parseBoolean(value1);
+                }
             }
             default -> {
                 return InkActionResult.error("Unknown text action '" + action + "'");

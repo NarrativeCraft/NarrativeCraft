@@ -96,7 +96,6 @@ public class ClientTextInkAction extends TextInkAction {
         float currentOpacity = computeOpacity(partialTick);
         int adjustedAlpha = (int) (ARGB.alpha(ARGB.color(255, color)) * currentOpacity);
         dialogData.setTextColor(ARGB.color(adjustedAlpha, color));
-        dialogData.setTextAlignment(computeTextAlignment());
 
         Font font = Minecraft.getInstance().font;
         cachedTextDimensions = scrollText.computeTextDimensions(width, font, dialogData);
@@ -123,6 +122,7 @@ public class ClientTextInkAction extends TextInkAction {
             dialogData = new DialogData();
             dialogData.setWidth(width);
             dialogData.setTextColor(ARGB.color(255, color));
+            dialogData.setTextAlignment(textAlignment);
             scrollText = new DialogScrollText(dialogData.getLetterSound(), dialogData.isSoundMuted());
             scrollText.setText(text);
             if (noTyping) scrollText.forceFinish();
@@ -174,6 +174,11 @@ public class ClientTextInkAction extends TextInkAction {
                 existing.dialogData.setWidth(width);
                 isRunning = false;
             }
+            case "text_alignment" -> {
+                existing.textAlignment = textAlignment;
+                existing.dialogData.setTextAlignment(textAlignment);
+                isRunning = false;
+            }
             case "fade" -> {
                 existing.fadeState = fadeState;
                 existing.fadeInSeconds = fadeInSeconds;
@@ -208,6 +213,17 @@ public class ClientTextInkAction extends TextInkAction {
                     monitoredInstance = existing;
                 }
             }
+            case "shadow" -> {
+                existing.shadow = shadow;
+                existing.dialogData.setTextShadow(shadow);
+                isRunning = false;
+            }
+            case "mute" -> {
+                existing.mute = mute;
+                existing.dialogData.setSoundMuted(mute);
+                existing.scrollText.setMutedSound(mute);
+                isRunning = false;
+            }
         }
 
         return blocking ? InkActionResult.block() : InkActionResult.ok();
@@ -220,14 +236,6 @@ public class ClientTextInkAction extends TextInkAction {
             case FADE_IN -> (float) Interpolation.lerp(0.0, opacity, t);
             case STAY -> opacity;
             case FADE_OUT -> (float) Interpolation.lerp(opacity, 0.0, t);
-        };
-    }
-
-    private DialogData.TextAlignment computeTextAlignment() {
-        return switch (position) {
-            case TOP_LEFT, MIDDLE_LEFT, BOTTOM_LEFT -> DialogData.TextAlignment.LEFT;
-            case TOP, MIDDLE, BOTTOM -> DialogData.TextAlignment.CENTER;
-            case TOP_RIGHT, MIDDLE_RIGHT, BOTTOM_RIGHT -> DialogData.TextAlignment.RIGHT;
         };
     }
 
