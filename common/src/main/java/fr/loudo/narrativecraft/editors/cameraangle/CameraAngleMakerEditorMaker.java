@@ -375,7 +375,6 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             entity.remove(Entity.RemovalReason.DISCARDED);
         }
         characterPlacements.removeIf(p -> p.getId().equals(placementId));
-        cameraAngle.getCharacterPlacements().removeIf(p -> p.getId().equals(placementId));
     }
 
     public void removeTemplateReference(UUID templateReferenceId) {
@@ -385,7 +384,6 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                 removePlacement(placementId);
             }
         }
-        cameraAngle.getTemplateReferences().removeIf(ref -> ref.id().equals(templateReferenceId));
     }
 
     public List<Entity> getEntities() {
