@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.narrative.story.StoryLibrary;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
@@ -87,7 +88,56 @@ public class StoryCommand {
                                         .executes(ctx -> {
                                             ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
                                             return stopFor(ctx, target);
-                                        })))));
+                                        })))
+                        .then(Commands.literal("locale")
+                                .then(Commands.argument("locale", StringArgumentType.word())
+                                        .suggests(CommandSuggestions::suggestStoryLocales)
+                                        .executes(ctx -> {
+                                            ServerPlayer player =
+                                                    ctx.getSource().getPlayerOrException();
+                                            return setLocaleFor(
+                                                    ctx, player, StringArgumentType.getString(ctx, "locale"));
+                                        })
+                                        .then(Commands.argument("target", EntityArgument.player())
+                                                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+                                                .executes(ctx -> {
+                                                    ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+                                                    return setLocaleFor(
+                                                            ctx, target, StringArgumentType.getString(ctx, "locale"));
+                                                }))))));
+    }
+
+    private static int setLocaleFor(CommandContext<CommandSourceStack> context, ServerPlayer target, String locale) {
+        StoryLibrary storyLibrary = NarrativeCraftMod.getInstance().getStoryLibrary();
+        if (storyLibrary == null || !storyLibrary.getLocales().contains(locale)) {
+            context.getSource()
+                    .sendFailure(Translation.message("locale.not_exists", Component.literal(locale))
+                            .withStyle(ChatFormatting.RED));
+            return 0;
+        }
+
+        PlayerSession session =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(target);
+        if (session == null) return 0;
+
+        session.setStoryLocale(locale);
+        context.getSource()
+                .sendSuccess(
+                        () -> Translation.message(
+                                        "story.locale_set",
+                                        Component.literal(locale).withStyle(ChatFormatting.GOLD),
+                                        target.getName())
+                                .withStyle(ChatFormatting.GREEN),
+                        false);
+
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler != null && !locale.equals(storyHandler.getStoryLocale())) {
+            context.getSource()
+                    .sendSystemMessage(
+                            Translation.message("locale.applies_next_load").withStyle(ChatFormatting.YELLOW));
+        }
+
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int reload(CommandContext<CommandSourceStack> context) {

@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.story.StoryLibrary;
 import fr.loudo.narrativecraft.narrative.story.locale.StoryLocaleManager;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
@@ -49,6 +50,17 @@ public class CommandSuggestions {
     public static CompletableFuture<Suggestions> suggestLocales(
             CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         for (String locale : StoryLocaleManager.listLocales()) {
+            builder.suggest(locale);
+        }
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestStoryLocales(
+            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        StoryLibrary storyLibrary = NarrativeCraftMod.getInstance().getStoryLibrary();
+        if (storyLibrary == null) return builder.buildFuture();
+
+        for (String locale : storyLibrary.getLocales()) {
             builder.suggest(locale);
         }
         return builder.buildFuture();

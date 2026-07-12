@@ -193,6 +193,7 @@
   "narrativecraft.screen.main.options.language": "Story Language: %s",
   "narrativecraft.screen.locale_select.title": "Select a language",
   "narrativecraft.screen.main.options.done": "Done",
+  "narrativecraft.story.locale_set": "Story language set to %s for %s.",
   "narrativecraft.locale": "Language",
   "narrativecraft.locale.list": "Default locale: %s. Translations: %s",
   "narrativecraft.locale.added": "Locale %s created. Translate its ink files, then run /nc story reload.",
