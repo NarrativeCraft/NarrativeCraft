@@ -21,7 +21,6 @@
  * SOFTWARE.
  */
 
-
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;

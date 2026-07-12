@@ -118,7 +118,10 @@ public class PlaybackContext implements IPlaybackContext {
             entity.setUUID(UUID.randomUUID());
         }
 
-        if (hasCharacter && isCharacterEntity && entity instanceof LivingEntity && characterStory.getCharacterType() == CharacterType.NORMAL) {
+        if (hasCharacter
+                && isCharacterEntity
+                && entity instanceof LivingEntity
+                && characterStory.getCharacterType() == CharacterType.NORMAL) {
             String name = characterStory.getName();
             if (name != null && !name.isBlank()) {
                 entity.setCustomName(Component.literal(name));
