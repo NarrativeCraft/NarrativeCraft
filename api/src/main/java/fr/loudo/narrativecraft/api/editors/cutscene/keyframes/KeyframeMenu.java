@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
@@ -105,22 +106,39 @@ public abstract class KeyframeMenu<T extends Keyframe> {
         return true;
     }
 
-    protected void onContentMouseClicked(
+    protected boolean onContentMouseClicked(
             double mouseX,
             double mouseY,
             int button,
             boolean isDoubleClick,
             int contentX,
             int contentY,
-            int contentWidth) {}
+            int contentWidth) {
+        return false;
+    }
 
-    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {}
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return false;
+    }
 
-    public void mouseScrolled(double amount) {}
+    public boolean mouseScrolled(double amount) {
+        return false;
+    }
 
-    public void charTyped(char codePoint, int modifiers) {}
+    public boolean charTyped(char codePoint, int modifiers) {
+        return false;
+    }
 
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {}
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return false;
+    }
+
+    protected boolean isHovered(double mouseX, double mouseY, AbstractWidget widget) {
+        return mouseX >= widget.getX()
+                && mouseX < widget.getX() + widget.getWidth()
+                && mouseY >= widget.getY()
+                && mouseY < widget.getY() + widget.getHeight();
+    }
 
     private boolean isOnMenu(double mouseX, double mouseY, int x, int y, int totalHeight) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + totalHeight;

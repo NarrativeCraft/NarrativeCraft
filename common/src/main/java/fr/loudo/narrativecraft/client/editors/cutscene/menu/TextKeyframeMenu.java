@@ -73,7 +73,7 @@ public class TextKeyframeMenu extends KeyframeMenu<TextKeyframe> {
     }
 
     @Override
-    protected void onContentMouseClicked(
+    protected boolean onContentMouseClicked(
             double mouseX,
             double mouseY,
             int button,
@@ -81,33 +81,34 @@ public class TextKeyframeMenu extends KeyframeMenu<TextKeyframe> {
             int contentX,
             int contentY,
             int contentWidth) {
-        boolean hovered = mouseX >= tagsBox.getX()
-                && mouseX < tagsBox.getX() + tagsBox.getWidth()
-                && mouseY >= tagsBox.getY()
-                && mouseY < tagsBox.getY() + tagsBox.getHeight();
+        boolean hovered = isHovered(mouseX, mouseY, tagsBox);
         tagsBox.setFocused(hovered);
         if (hovered) tagsBox.mouseClicked(mouseX, mouseY, button);
+        return hovered;
     }
 
     @Override
-    public void mouseScrolled(double amount) {
+    public boolean mouseScrolled(double amount) {
         int[] mousePosition = UtilsClient.getScaledMousePos();
-        tagsBox.mouseScrolled(mousePosition[0], mousePosition[1], amount);
+        return tagsBox.mouseScrolled(mousePosition[0], mousePosition[1], amount);
     }
 
     @Override
-    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (tagsBox.isFocused()) tagsBox.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (tagsBox.isFocused()) return tagsBox.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return false;
     }
 
     @Override
-    public void charTyped(char codePoint, int modifiers) {
-        if (tagsBox.isFocused()) tagsBox.charTyped(codePoint, modifiers);
+    public boolean charTyped(char codePoint, int modifiers) {
+        if (tagsBox.isFocused()) return tagsBox.charTyped(codePoint, modifiers);
+        return false;
     }
 
     @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (tagsBox.isFocused()) tagsBox.keyPressed(keyCode, scanCode, modifiers);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (tagsBox.isFocused()) return tagsBox.keyPressed(keyCode, scanCode, modifiers);
+        return false;
     }
 
     @Override

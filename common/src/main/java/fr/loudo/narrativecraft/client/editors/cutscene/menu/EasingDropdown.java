@@ -108,10 +108,11 @@ public class EasingDropdown {
         return false;
     }
 
-    public void mouseScrolled(double amount) {
-        if (!open) return;
+    public boolean mouseScrolled(double amount) {
+        if (!open) return false;
         int maxScroll = Math.max(0, values.length - MAX_VISIBLE);
         scrollOffset = (int) MathUtils.clamp(scrollOffset - amount, 0, maxScroll);
+        return true;
     }
 
     public void close() {
