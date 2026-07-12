@@ -89,6 +89,13 @@ public class PressKeyListener {
             editor.getRollWidget().toggle();
         }
 
+        if (ModKeys.START_RECORDING.consumeClick()) {
+            minecraft.getConnection().sendCommand("nc record start");
+        }
+        if (ModKeys.STOP_RECORDING.consumeClick()) {
+            minecraft.getConnection().sendCommand("nc record stop");
+        }
+
         ModKeys.handleKeyPress(
                 InputConstants.MOUSE_BUTTON_LEFT,
                 minecraft.mouseHandler.isLeftPressed(),

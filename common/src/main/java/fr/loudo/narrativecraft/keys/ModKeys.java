@@ -50,6 +50,10 @@ public class ModKeys {
             registerKey("narrativecraft.key.toggle_camera_roll", InputConstants.KEY_R);
     public static final KeyMapping DIALOG_ADVANCE =
             registerKey("narrativecraft.key.dialog_advance", InputConstants.KEY_RETURN);
+    public static final KeyMapping START_RECORDING =
+            registerKey("narrativecraft.key.start_recording", InputConstants.KEY_V);
+    public static final KeyMapping STOP_RECORDING =
+            registerKey("narrativecraft.key.stop_recording", InputConstants.KEY_B);
 
     private static KeyMapping registerKey(String translationKey, int code) {
         KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);
