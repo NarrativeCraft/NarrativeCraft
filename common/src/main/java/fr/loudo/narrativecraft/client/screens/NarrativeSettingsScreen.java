@@ -73,7 +73,8 @@ public class NarrativeSettingsScreen extends Screen {
         addRenderableWidget(mainScreenMakerEditor);
         mainScreenMakerEditor.active = minecraft.hasSingleplayerServer();
         if (!minecraft.hasSingleplayerServer()) {
-            mainScreenMakerEditor.setTooltip(Tooltip.create(Translation.message("screen.world_settings.tooltip.main_screen")));
+            mainScreenMakerEditor.setTooltip(
+                    Tooltip.create(Translation.message("screen.world_settings.tooltip.main_screen")));
         }
 
         Button worldSettings = Button.builder(
