@@ -74,7 +74,7 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
     }
 
     @Override
-    protected void onContentMouseClicked(
+    protected boolean onContentMouseClicked(
             double mouseX,
             double mouseY,
             int button,
@@ -84,35 +84,36 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
             int contentWidth) {
         if (easingDropdown.mouseClicked(mouseX, mouseY, button)) {
             fieldFov.setFocused(false);
-            return;
+            return true;
         }
         easingDropdown.close();
-        boolean hovered = (mouseX) >= fieldFov.getX()
-                && (mouseX) < fieldFov.getX() + fieldFov.getWidth()
-                && (mouseY) >= fieldFov.getY()
-                && (mouseY) < fieldFov.getY() + fieldFov.getHeight();
+        boolean hovered = isHovered(mouseX, mouseY, fieldFov);
         fieldFov.setFocused(hovered);
         if (hovered) fieldFov.mouseClicked(mouseX, mouseY, button);
+        return hovered;
     }
 
     @Override
-    public void mouseScrolled(double amount) {
-        easingDropdown.mouseScrolled(amount);
+    public boolean mouseScrolled(double amount) {
+        return easingDropdown.mouseScrolled(amount);
     }
 
     @Override
-    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (fieldFov.isFocused()) fieldFov.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (fieldFov.isFocused()) return fieldFov.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return false;
     }
 
     @Override
-    public void charTyped(char codePoint, int modifiers) {
-        if (fieldFov.isFocused()) fieldFov.charTyped(codePoint, modifiers);
+    public boolean charTyped(char codePoint, int modifiers) {
+        if (fieldFov.isFocused()) return fieldFov.charTyped(codePoint, modifiers);
+        return false;
     }
 
     @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (fieldFov.isFocused()) fieldFov.keyPressed(keyCode, scanCode, modifiers);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (fieldFov.isFocused()) return fieldFov.keyPressed(keyCode, scanCode, modifiers);
+        return false;
     }
 
     @Override
