@@ -120,7 +120,7 @@ public class PlaybackContext implements IPlaybackContext {
         }
 
         if (hasCharacter
-                && isCharacterEntity
+                && !isCharacterEntity
                 && entity instanceof LivingEntity
                 && characterStory.getCharacterType() == CharacterType.NORMAL) {
             String name = characterStory.getName();
