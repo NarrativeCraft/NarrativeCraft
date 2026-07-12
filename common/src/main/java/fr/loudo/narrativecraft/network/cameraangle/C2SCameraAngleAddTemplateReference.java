@@ -35,7 +35,13 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 public record C2SCameraAngleAddTemplateReference(
-        UUID chapterId, UUID sceneId, UUID cameraAngleId, String sourceType, UUID refId, UUID templateReferenceId)
+        UUID chapterId,
+        UUID sceneId,
+        UUID cameraAngleId,
+        String sourceType,
+        UUID refId,
+        UUID templateReferenceId,
+        String displayName)
         implements CustomPacketPayload {
 
     public C2SCameraAngleAddTemplateReference(CameraAngle cameraAngle, TemplateReference reference) {
@@ -45,7 +51,8 @@ public record C2SCameraAngleAddTemplateReference(
                 cameraAngle.getId(),
                 reference.sourceType().name(),
                 reference.refId(),
-                reference.id());
+                reference.id(),
+                reference.displayName());
     }
 
     public static final Type<C2SCameraAngleAddTemplateReference> TYPE = new Type<>(
@@ -64,6 +71,8 @@ public record C2SCameraAngleAddTemplateReference(
             C2SCameraAngleAddTemplateReference::refId,
             UUIDUtil.STREAM_CODEC,
             C2SCameraAngleAddTemplateReference::templateReferenceId,
+            ByteBufCodecs.STRING_UTF8,
+            C2SCameraAngleAddTemplateReference::displayName,
             C2SCameraAngleAddTemplateReference::new);
 
     @Override

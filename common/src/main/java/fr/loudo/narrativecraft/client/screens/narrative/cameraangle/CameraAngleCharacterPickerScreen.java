@@ -35,10 +35,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public class CameraAngleCharacterPickerScreen
         extends AbstractNarrativeEntryPickerScreen<CameraAngleCharacterPickerScreen.Entry> {
+
+    private static final int FILTER_BUTTON_HEIGHT = 20;
+    private static final int FILTER_BUTTON_GAP = 4;
+
+    private final List<Entry> allEntries;
+    private CharacterType filter = CharacterType.NORMAL;
 
     public CameraAngleCharacterPickerScreen(Scene scene, Screen lastScreen, Consumer<CharacterPick> onPick) {
         super(
@@ -46,6 +54,7 @@ public class CameraAngleCharacterPickerScreen
                 buildEntries(scene),
                 lastScreen,
                 entry -> onPick.accept(new CharacterPick(entry.type(), entry.characterId())));
+        this.allEntries = this.list;
     }
 
     private static List<Entry> buildEntries(Scene scene) {
@@ -60,6 +69,42 @@ public class CameraAngleCharacterPickerScreen
             }
         }
         return entries;
+    }
+
+    @Override
+    protected void init() {
+        this.list = allEntries.stream().filter(entry -> entry.type() == filter).toList();
+        super.init();
+    }
+
+    @Override
+    protected int addHeaderWidgets(int x, int y) {
+        int filterButtonWidth = (buttonWidth - FILTER_BUTTON_GAP) / 2;
+        addFilterButton(
+                Translation.message("screen.camera_angle_editor.filter.characters"),
+                CharacterType.NORMAL,
+                x,
+                y,
+                filterButtonWidth);
+        addFilterButton(
+                Translation.message("screen.camera_angle_editor.filter.npc"),
+                CharacterType.NPC,
+                x + filterButtonWidth + FILTER_BUTTON_GAP,
+                y,
+                filterButtonWidth);
+        return FILTER_BUTTON_HEIGHT;
+    }
+
+    private void addFilterButton(Component label, CharacterType type, int x, int y, int width) {
+        Button button = Button.builder(label, b -> {
+                    filter = type;
+                    page = 1;
+                    reload();
+                })
+                .bounds(x, y, width, FILTER_BUTTON_HEIGHT)
+                .build();
+        button.active = filter != type;
+        this.addRenderableWidget(button);
     }
 
     @Override

@@ -54,7 +54,7 @@ public class CameraAngleTemplatePickerScreen
                 Translation.message("screen.camera_angle_editor.add_template"),
                 new ArrayList<>(),
                 lastScreen,
-                entry -> onPick.accept(new TemplatePick(entry.sourceType(), entry.refId())));
+                entry -> onPick.accept(new TemplatePick(entry.sourceType(), entry.refId(), entry.displayName())));
         this.allEntries = buildEntries(scene);
     }
 

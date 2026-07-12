@@ -64,6 +64,8 @@
 
   "narrativecraft.screen.camera_angle_editor.add_camera": "Add camera",
   "narrativecraft.screen.camera_angle_editor.add_character": "Add character / NPC",
+  "narrativecraft.screen.camera_angle_editor.filter.characters": "Characters",
+  "narrativecraft.screen.camera_angle_editor.filter.npc": "NPC",
   "narrativecraft.screen.camera_angle_editor.add_template": "Add template",
   "narrativecraft.screen.camera_angle_editor.open_menu": "Open menu",
   "narrativecraft.screen.camera_angle_editor.camera_name_prompt": "Camera name",

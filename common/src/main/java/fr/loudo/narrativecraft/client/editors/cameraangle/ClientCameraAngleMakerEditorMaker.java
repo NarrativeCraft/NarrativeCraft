@@ -334,12 +334,12 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     private void openTemplatePicker() {
         minecraft.gui.setScreen(
                 new CameraAngleTemplatePickerScreen(cameraAngle.getScene(), minecraft.gui.screen(), pick -> {
-                    addTemplateReference(pick.sourceType(), pick.refId());
+                    addTemplateReference(pick.sourceType(), pick.refId(), pick.displayName());
                 }));
     }
 
-    public void addTemplateReference(TemplateSourceType sourceType, UUID refId) {
-        TemplateReference reference = new TemplateReference(sourceType, refId);
+    public void addTemplateReference(TemplateSourceType sourceType, UUID refId, String displayName) {
+        TemplateReference reference = new TemplateReference(sourceType, refId, displayName);
         templateReferences.add(reference);
         Services.PACKET.sendToServer(new C2SCameraAngleAddTemplateReference(cameraAngle, reference));
     }
@@ -772,5 +772,5 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     public record CharacterPick(CharacterType type, UUID characterId) {}
 
-    public record TemplatePick(TemplateSourceType sourceType, UUID refId) {}
+    public record TemplatePick(TemplateSourceType sourceType, UUID refId, String displayName) {}
 }

@@ -26,11 +26,13 @@ package fr.loudo.narrativecraft.client.screens.narrative.cameraangle;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.cameraangle.CharacterPlacement;
+import fr.loudo.narrativecraft.narrative.cameraangle.TemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
@@ -162,7 +164,7 @@ public class CameraAngleEditorMenuScreen extends Screen {
                     (rowY, template) -> addEntityRow(
                             rowX,
                             rowY,
-                            Component.literal(template.sourceType() + " " + shortId(template.refId())),
+                            Component.literal(template.sourceType() + " " + templateName(template)),
                             () -> {
                                 Services.PACKET.sendToServer(new C2SCameraAngleTeleportToTemplate(template.refId()));
                                 minecraft.gui.setScreen(null);
@@ -179,9 +181,14 @@ public class CameraAngleEditorMenuScreen extends Screen {
         addRenderableWidget(closeButton);
     }
 
-    private static String shortId(java.util.UUID id) {
-        String s = id.toString();
-        return s.substring(0, Math.min(8, s.length()));
+    private static String templateName(TemplateReference template) {
+        String displayName = template.displayName();
+        return displayName == null || displayName.isBlank() ? shortId(template.refId()) : displayName;
+    }
+
+    private static String shortId(UUID id) {
+        String value = id.toString();
+        return value.substring(0, Math.min(8, value.length()));
     }
 
     private void addCameraRow(int x, int y, CameraView cameraView) {

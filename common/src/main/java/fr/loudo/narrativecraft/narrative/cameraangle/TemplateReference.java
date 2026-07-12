@@ -25,9 +25,9 @@ package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import java.util.UUID;
 
-public record TemplateReference(UUID id, TemplateSourceType sourceType, UUID refId) {
+public record TemplateReference(UUID id, TemplateSourceType sourceType, UUID refId, String displayName) {
 
-    public TemplateReference(TemplateSourceType sourceType, UUID refId) {
-        this(UUID.randomUUID(), sourceType, refId);
+    public TemplateReference(TemplateSourceType sourceType, UUID refId, String displayName) {
+        this(UUID.randomUUID(), sourceType, refId, displayName);
     }
 }

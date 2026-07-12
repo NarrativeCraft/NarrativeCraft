@@ -163,6 +163,7 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
         json.addProperty("id", reference.id().toString());
         json.addProperty("sourceType", reference.sourceType().name());
         json.addProperty("characterId", reference.refId().toString());
+        json.addProperty("displayName", reference.displayName());
         return json;
     }
 }

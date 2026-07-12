@@ -297,7 +297,8 @@ public class ServerPacketHandler {
             return;
         }
 
-        TemplateReference reference = new TemplateReference(packet.templateReferenceId(), sourceType, packet.refId());
+        TemplateReference reference =
+                new TemplateReference(packet.templateReferenceId(), sourceType, packet.refId(), packet.displayName());
         editor.getTemplateReferences().add(reference);
         editor.spawnTemplateReference(reference);
     }
