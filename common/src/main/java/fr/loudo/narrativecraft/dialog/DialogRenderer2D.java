@@ -23,9 +23,12 @@
 
 package fr.loudo.narrativecraft.dialog;
 
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
+import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.ARGB;
 
@@ -66,17 +69,18 @@ public class DialogRenderer2D extends DialogRenderer {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-    }
-
-    @Override
     public void update(String newText) {
         super.update(newText);
         data.setWidth(BOX_WIDTH - 50f);
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+        Gui gui = Minecraft.getInstance().gui;
+        if (!(gui.screen() instanceof UnRemovableScreen)
+                && !ClientNarrativeCraftMod.getInstance().getPlayerSession().inCamera()) {
+            gui.setScreen(new UnRemovableScreen());
+        }
+
         if (animator.isStopped()) return;
 
         float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);

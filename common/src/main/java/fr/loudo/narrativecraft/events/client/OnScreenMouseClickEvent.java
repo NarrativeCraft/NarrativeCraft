@@ -29,7 +29,10 @@ import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditor
 import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
+import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
+import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.MouseButtonEvent;
 
 public class OnScreenMouseClickEvent {
@@ -47,6 +50,10 @@ public class OnScreenMouseClickEvent {
             globalDialogEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
         } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
             characterDialogEditor.mouseClicked(mouseButtonEvent, isDoubleClick);
+        }
+
+        if (Minecraft.getInstance().gui.screen() instanceof UnRemovableScreen) {
+            DialogRenderer.advanceNextDialog();
         }
     }
 

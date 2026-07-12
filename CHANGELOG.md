@@ -15,3 +15,8 @@
 - Text from text tag not centered correctly on screen
 - Fake player/entity playback delta, ground detection and step sounds not correctly working
 - Scene with only tags not detected as a new scene #20
+
+### Misc
+
+- Easing is now taken from the 2nd keyframe not the first one
+- Player can't move if a 2d dialog is rendered on screen if in gameplay mode

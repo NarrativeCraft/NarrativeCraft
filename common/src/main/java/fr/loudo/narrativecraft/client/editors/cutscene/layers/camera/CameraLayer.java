@@ -108,7 +108,7 @@ public class CameraLayer extends CutsceneLayer {
             return sorted.get(sorted.size() - 1).getPosition();
 
         KeyframeSegment<CameraKeyframe> seg = findSegment(sorted, tick);
-        if (seg.from().getEasing() == EasingType.SMOOTH) {
+        if (seg.to().getEasing() == EasingType.SMOOTH) {
             return interpolateCatmullRom(
                     seg.p0().getPosition(),
                     seg.from().getPosition(),

@@ -28,7 +28,11 @@ import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMaker
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
+import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
+import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.keys.ModKeys;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 
@@ -59,6 +63,11 @@ public class OnScreenKeyEvent {
             globalDialogEditor.keyPressed(event);
         } else if (editorMaker instanceof ClientCharacterDialogEditorMaker characterDialogEditor) {
             characterDialogEditor.keyPressed(event);
+        }
+
+        if (ModKeys.DIALOG_ADVANCE.matches(event)
+                && Minecraft.getInstance().gui.screen() instanceof UnRemovableScreen) {
+            DialogRenderer.advanceNextDialog();
         }
     }
 }
