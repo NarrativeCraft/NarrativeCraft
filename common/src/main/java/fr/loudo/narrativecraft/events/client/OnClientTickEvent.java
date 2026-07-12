@@ -33,7 +33,6 @@ import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.keys.PressKeyListener;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
-import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -57,17 +56,8 @@ public class OnClientTickEvent {
 
         tickClientInkActions(session);
 
-        DialogRenderer dialogRenderer = session.getMainDialog();
-        if (dialogRenderer != null) {
-            if (ModKeys.DIALOG_ADVANCE.consumeClick()) {
-                if (dialogRenderer.isAnimating()) return;
-                if (!dialogRenderer.isTextFinished()) {
-                    dialogRenderer.forceFinishText();
-                    return;
-                }
-
-                Services.PACKET.sendToServer(new C2SDialogueFinished());
-            }
+        if (ModKeys.DIALOG_ADVANCE.consumeClick()) {
+            DialogRenderer.advanceNextDialog();
         }
     }
 

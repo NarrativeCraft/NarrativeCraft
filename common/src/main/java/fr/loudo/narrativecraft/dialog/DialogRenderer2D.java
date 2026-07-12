@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.dialog;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -69,17 +71,18 @@ public class DialogRenderer2D extends DialogRenderer {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-    }
-
-    @Override
     public void update(String newText) {
         super.update(newText);
         data.setWidth(BOX_WIDTH - 50f);
     }
 
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!(minecraft.screen instanceof UnRemovableScreen)
+                && !ClientNarrativeCraftMod.getInstance().getPlayerSession().inCamera()) {
+            minecraft.setScreen(new UnRemovableScreen());
+        }
+
         if (animator.isStopped()) return;
 
         float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
