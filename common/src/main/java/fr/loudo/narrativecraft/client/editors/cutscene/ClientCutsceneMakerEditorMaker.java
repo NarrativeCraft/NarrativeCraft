@@ -200,7 +200,6 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     public void stop() {
         playback.pause();
         playerSession.getCutsceneDataSession().reset();
-        playerSession.stopAllClientInkActions();
     }
 
     public void tick() {
