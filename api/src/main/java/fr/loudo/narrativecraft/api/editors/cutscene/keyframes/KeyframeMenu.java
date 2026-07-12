@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -109,16 +110,33 @@ public abstract class KeyframeMenu<T extends Keyframe> {
         return true;
     }
 
-    protected void onContentMouseClicked(
-            MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {}
+    protected boolean onContentMouseClicked(
+            MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
+        return false;
+    }
 
-    public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {}
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        return false;
+    }
 
-    public void mouseScrolled(double amount) {}
+    public boolean mouseScrolled(double amount) {
+        return false;
+    }
 
-    public void charTyped(CharacterEvent event) {}
+    public boolean charTyped(CharacterEvent event) {
+        return false;
+    }
 
-    public void keyPressed(KeyEvent event) {}
+    public boolean keyPressed(KeyEvent event) {
+        return false;
+    }
+
+    protected boolean isHovered(MouseButtonEvent event, AbstractWidget widget) {
+        return event.x() >= widget.getX()
+                && event.x() < widget.getX() + widget.getWidth()
+                && event.y() >= widget.getY()
+                && event.y() < widget.getY() + widget.getHeight();
+    }
 
     private boolean isOnMenu(double mouseX, double mouseY, int x, int y, int totalHeight) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + totalHeight;

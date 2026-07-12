@@ -104,57 +104,58 @@ public class CameraKeyframeMenu extends KeyframeMenu<CameraKeyframe> {
     }
 
     @Override
-    protected void onContentMouseClicked(
+    protected boolean onContentMouseClicked(
             MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
         if (easingDropdown.mouseClicked(event)) {
             for (EditBox field : fields) field.setFocused(false);
-            return;
+            return true;
         }
         easingDropdown.close();
+        boolean handled = false;
         for (EditBox field : fields) {
-            boolean hovered = event.x() >= field.getX()
-                    && event.x() < field.getX() + field.getWidth()
-                    && event.y() >= field.getY()
-                    && event.y() < field.getY() + field.getHeight();
+            boolean hovered = isHovered(event, field);
             field.setFocused(hovered);
             if (hovered) {
                 field.mouseClicked(event, isDoubleClick);
+                handled = true;
             }
         }
+        return handled;
     }
 
     @Override
-    public void mouseScrolled(double amount) {
-        easingDropdown.mouseScrolled(amount);
-    }
-
-    public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
-        for (EditBox field : fields) {
-            if (field.isFocused()) {
-                field.mouseDragged(event, dragX, dragY);
-                return;
-            }
-        }
+    public boolean mouseScrolled(double amount) {
+        return easingDropdown.mouseScrolled(amount);
     }
 
     @Override
-    public void charTyped(CharacterEvent event) {
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
         for (EditBox field : fields) {
             if (field.isFocused()) {
-                field.charTyped(event);
-                return;
+                return field.mouseDragged(event, dragX, dragY);
             }
         }
+        return false;
     }
 
     @Override
-    public void keyPressed(KeyEvent event) {
+    public boolean charTyped(CharacterEvent event) {
         for (EditBox field : fields) {
             if (field.isFocused()) {
-                field.keyPressed(event);
-                return;
+                return field.charTyped(event);
             }
         }
+        return false;
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        for (EditBox field : fields) {
+            if (field.isFocused()) {
+                return field.keyPressed(event);
+            }
+        }
+        return false;
     }
 
     @Override

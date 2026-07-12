@@ -72,35 +72,36 @@ public class TextKeyframeMenu extends KeyframeMenu<TextKeyframe> {
     }
 
     @Override
-    protected void onContentMouseClicked(
+    protected boolean onContentMouseClicked(
             MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
-        boolean hovered = event.x() >= tagsBox.getX()
-                && event.x() < tagsBox.getX() + tagsBox.getWidth()
-                && event.y() >= tagsBox.getY()
-                && event.y() < tagsBox.getY() + tagsBox.getHeight();
+        boolean hovered = isHovered(event, tagsBox);
         tagsBox.setFocused(hovered);
         if (hovered) tagsBox.mouseClicked(event, isDoubleClick);
+        return hovered;
     }
 
     @Override
-    public void mouseScrolled(double amount) {
+    public boolean mouseScrolled(double amount) {
         int[] mousePosition = UtilsClient.getScaledMousePos();
-        tagsBox.mouseScrolled(mousePosition[0], mousePosition[1], 0, amount);
+        return tagsBox.mouseScrolled(mousePosition[0], mousePosition[1], 0, amount);
     }
 
     @Override
-    public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
-        if (tagsBox.isFocused()) tagsBox.mouseDragged(event, dragX, dragY);
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        if (tagsBox.isFocused()) return tagsBox.mouseDragged(event, dragX, dragY);
+        return false;
     }
 
     @Override
-    public void charTyped(CharacterEvent event) {
-        if (tagsBox.isFocused()) tagsBox.charTyped(event);
+    public boolean charTyped(CharacterEvent event) {
+        if (tagsBox.isFocused()) return tagsBox.charTyped(event);
+        return false;
     }
 
     @Override
-    public void keyPressed(KeyEvent event) {
-        if (tagsBox.isFocused()) tagsBox.keyPressed(event);
+    public boolean keyPressed(KeyEvent event) {
+        if (tagsBox.isFocused()) return tagsBox.keyPressed(event);
+        return false;
     }
 
     @Override

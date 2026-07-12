@@ -8,7 +8,7 @@
 - Text layer : render text on screen during a cutscene #22
 - Sound layer : play a sound during a cutscene #21
 - Locale support (multiple languages of your story in one world)
-- Added 3 in text tag : shadow, mute and text align
+- Added 3 actions in text tag : shadow, mute and text align
 
 ### Fixes
 
@@ -16,6 +16,7 @@
 - Text from text tag not centered correctly on screen
 - Fake player/entity playback delta, ground detection and step sounds not correctly working
 - Scene with only tags not detected as a new scene #20
+- Shortcuts in keyframe menus and cutscene layers conflicting
 
 ### Misc
 

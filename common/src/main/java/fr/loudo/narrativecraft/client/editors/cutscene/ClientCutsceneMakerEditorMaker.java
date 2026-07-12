@@ -520,11 +520,8 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
     public void keyPressed(KeyEvent event) {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
-        // Shortcuts are handled first; they consume the event if matched
-        if (shortcuts.handleKeyPressed(event)) return;
-        if (openMenu != null && openMenu.isVisible()) {
-            openMenu.keyPressed(event);
-        }
+        if (openMenu != null && openMenu.isVisible() && openMenu.keyPressed(event)) return;
+        shortcuts.handleKeyPressed(event);
     }
 
     public void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {

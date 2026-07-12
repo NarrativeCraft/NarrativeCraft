@@ -77,39 +77,40 @@ public class FovKeyframeMenu extends KeyframeMenu<FovKeyframe> {
     }
 
     @Override
-    protected void onContentMouseClicked(
+    protected boolean onContentMouseClicked(
             MouseButtonEvent event, boolean isDoubleClick, int contentX, int contentY, int contentWidth) {
         if (easingDropdown.mouseClicked(event)) {
             fieldFov.setFocused(false);
-            return;
+            return true;
         }
         easingDropdown.close();
-        boolean hovered = event.x() >= fieldFov.getX()
-                && event.x() < fieldFov.getX() + fieldFov.getWidth()
-                && event.y() >= fieldFov.getY()
-                && event.y() < fieldFov.getY() + fieldFov.getHeight();
+        boolean hovered = isHovered(event, fieldFov);
         fieldFov.setFocused(hovered);
         if (hovered) fieldFov.mouseClicked(event, isDoubleClick);
+        return hovered;
     }
 
     @Override
-    public void mouseScrolled(double amount) {
-        easingDropdown.mouseScrolled(amount);
+    public boolean mouseScrolled(double amount) {
+        return easingDropdown.mouseScrolled(amount);
     }
 
     @Override
-    public void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
-        if (fieldFov.isFocused()) fieldFov.mouseDragged(event, dragX, dragY);
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        if (fieldFov.isFocused()) return fieldFov.mouseDragged(event, dragX, dragY);
+        return false;
     }
 
     @Override
-    public void charTyped(CharacterEvent event) {
-        if (fieldFov.isFocused()) fieldFov.charTyped(event);
+    public boolean charTyped(CharacterEvent event) {
+        if (fieldFov.isFocused()) return fieldFov.charTyped(event);
+        return false;
     }
 
     @Override
-    public void keyPressed(KeyEvent event) {
-        if (fieldFov.isFocused()) fieldFov.keyPressed(event);
+    public boolean keyPressed(KeyEvent event) {
+        if (fieldFov.isFocused()) return fieldFov.keyPressed(event);
+        return false;
     }
 
     @Override
