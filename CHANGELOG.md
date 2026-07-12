@@ -8,6 +8,7 @@
 - Text layer : render text on screen during a cutscene #22
 - Sound layer : play a sound during a cutscene #21
 - Locale support (multiple languages of your story in one world)
+- Added 3 in text tag : shadow, mute and text align
 
 ### Fixes
 
