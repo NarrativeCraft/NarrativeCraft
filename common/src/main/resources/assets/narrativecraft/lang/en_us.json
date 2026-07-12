@@ -6,6 +6,8 @@
   "narrativecraft.key.toogle_dialog_mode_camera_angle": "Toggle Dialog Mode Camera Angle",
   "narrativecraft.key.toggle_camera_roll": "Toggle Camera Roll",
   "narrativecraft.key.dialog_advance": "Advance Dialog",
+  "narrativecraft.key.start_recording": "Start recording",
+  "narrativecraft.key.stop_recording": "Stop recording",
 
   "narrativecraft.chapter": "Chapter",
   "narrativecraft.chapter_index": "Chapter Index",
@@ -64,8 +66,6 @@
 
   "narrativecraft.screen.camera_angle_editor.add_camera": "Add camera",
   "narrativecraft.screen.camera_angle_editor.add_character": "Add character / NPC",
-  "narrativecraft.screen.camera_angle_editor.filter.characters": "Characters",
-  "narrativecraft.screen.camera_angle_editor.filter.npc": "NPC",
   "narrativecraft.screen.camera_angle_editor.add_template": "Add template",
   "narrativecraft.screen.camera_angle_editor.open_menu": "Open menu",
   "narrativecraft.screen.camera_angle_editor.camera_name_prompt": "Camera name",

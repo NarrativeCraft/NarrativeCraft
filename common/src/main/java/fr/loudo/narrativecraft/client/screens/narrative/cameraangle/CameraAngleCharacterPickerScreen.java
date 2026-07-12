@@ -80,14 +80,9 @@ public class CameraAngleCharacterPickerScreen
     @Override
     protected int addHeaderWidgets(int x, int y) {
         int filterButtonWidth = (buttonWidth - FILTER_BUTTON_GAP) / 2;
+        addFilterButton(Translation.message("character"), CharacterType.NORMAL, x, y, filterButtonWidth);
         addFilterButton(
-                Translation.message("screen.camera_angle_editor.filter.characters"),
-                CharacterType.NORMAL,
-                x,
-                y,
-                filterButtonWidth);
-        addFilterButton(
-                Translation.message("screen.camera_angle_editor.filter.npc"),
+                Translation.message("npc"),
                 CharacterType.NPC,
                 x + filterButtonWidth + FILTER_BUTTON_GAP,
                 y,
