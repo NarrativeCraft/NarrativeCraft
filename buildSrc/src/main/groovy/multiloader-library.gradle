@@ -12,7 +12,6 @@ dependencies {
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
-            artifactId base.archivesName.get()
             version "${version}+mc${minecraft_version}"
             from components.java
         }
@@ -29,5 +28,11 @@ publishing {
                 basic(BasicAuthentication)
             }
         }
+    }
+}
+
+afterEvaluate {
+    publishing.publications.named('mavenJava', MavenPublication) {
+        artifactId = base.archivesName.get()
     }
 }

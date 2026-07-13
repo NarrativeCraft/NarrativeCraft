@@ -49,8 +49,8 @@ jobs:
       - name: Build jars
         run: ./gradlew :fabric:build :${{ matrix.loader }}:build -Pversion=${{ env.MOD_VERSION }}
 
-      - name: Publish API and Common to Maven
-        run: ./gradlew :api:publish :common:publish -Pversion=${{ env.MOD_VERSION }}
+      - name: Publish API to Maven
+        run: ./gradlew :api:publish -Pversion=${{ env.MOD_VERSION }}
         env:
           ORG_GRADLE_PROJECT_reposiliteUser: ${{ secrets.REPOSILITE_USER }}
           ORG_GRADLE_PROJECT_reposilitePassword: ${{ secrets.REPOSILITE_PASSWORD }}
