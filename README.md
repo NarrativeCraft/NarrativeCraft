@@ -37,6 +37,7 @@ Compatibility with other mods requires installing addons.
 - Interactions with trigger zones and clickable points
 - Characters and NPCs
 - Full management of your story
+- Multiple locale in one world
 - Choices
 - Saves
 - Main screen (new game, continue...)
