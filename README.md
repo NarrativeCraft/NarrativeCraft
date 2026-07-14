@@ -21,6 +21,9 @@
 
 NarrativeCraft works thanks to the amazing open source project [Ink](https://www.inklestudios.com/ink/), a narrative scripting language to write dialogs and create branching patterns. Text first, logic later.
 
+## Showcase
+<a href="https://www.youtube.com/watch?v=RMUcXt4Lsf4"><img width="1920" height="1080" alt="cave" src="https://github.com/user-attachments/assets/9aa07623-e218-4dc1-993d-4ce237759a0b" /></a>
+
 ## Features
 
 NarrativeCraft is an all-in-one system, meaning that you have everything by default. 
