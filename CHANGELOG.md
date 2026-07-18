@@ -7,6 +7,7 @@
 - Improved story manager UI
 - Improved cutscene maker editor UI
 - Added a dialog button in camera angle preview to switch to dialog mode
+- Scrolling behavior if too many characters in camera angle in dialog mode
 
 ### Fixes
 - Some crash case while trying to show a character skin

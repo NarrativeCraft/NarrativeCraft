@@ -24,16 +24,16 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 
 public class OnScreenMouseScrollEvent {
 
     public static void onCutsceneLayerMouseScroll(double deltaX, double deltaY) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (!(playerSession.getEditor() instanceof ClientCutsceneMakerEditorMaker cutsceneEditor)) return;
-
-        cutsceneEditor.mouseScrolled(deltaX, deltaY);
+        EditorMaker editor = playerSession.getEditor();
+        if (editor == null) return;
+        editor.mouseScrolled(deltaX, deltaY);
     }
 }

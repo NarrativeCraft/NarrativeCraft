@@ -50,4 +50,8 @@ public interface EditorMaker {
     default void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {}
 
     default void mouseReleased(double mouseX, double mouseY, int button) {}
+
+    default void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {}
+
+    default void mouseScrolled(double deltaX, double deltaY) {}
 }
