@@ -205,6 +205,7 @@ public class Playback implements IPlaybackSession {
 
     public void moveTo(int toTick) {
         int fromTick = this.tick;
+        if (toTick <= fromTick) return;
         this.tick = toTick;
         for (int t = fromTick + 1; t <= toTick; t++) {
             for (PlaybackContext context : contexts) {
