@@ -52,7 +52,10 @@ public class OnPlayerLeaveEvent {
         RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
         Recording recording =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
-        recordingManager.remove(recording);
+        if (recording != null) {
+            recording.stop();
+            recordingManager.remove(recording);
+        }
     }
 
     public static void onClientLeave() {
