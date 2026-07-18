@@ -47,6 +47,7 @@ import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
+import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import net.minecraft.nbt.CompoundTag;
@@ -182,6 +183,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         entity.setXRot((float) characterPlacement.getRotation().x);
         entity.setYRot((float) characterPlacement.getRotation().y);
         entity.setYHeadRot((float) characterPlacement.getRotation().y);
+        entity.setOnGround(Utils.isOnGround(entity));
 
         addEntityToWorld(entity, player, level, characterStory);
 
