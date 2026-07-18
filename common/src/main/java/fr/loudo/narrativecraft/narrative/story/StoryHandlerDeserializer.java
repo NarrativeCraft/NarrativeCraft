@@ -97,7 +97,13 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
         }
 
         ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+        if (chapterManager.getList().isEmpty()) {
+            throw new JsonParseException("No compiled chapter available to load the save");
+        }
         Chapter firstChapter = chapterManager.getList().get(0);
+        if (firstChapter.getSceneManager().getList().isEmpty()) {
+            throw new JsonParseException("No compiled scene available to load the save");
+        }
         UUID chapterId =
                 obj.has("chapterId") ? UUID.fromString(obj.get("chapterId").getAsString()) : firstChapter.getId();
         UUID sceneId = obj.has("sceneId")
