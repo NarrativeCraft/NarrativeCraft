@@ -501,12 +501,17 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         stop();
     }
 
-    private static String[] parseSpeaker(String text) {
+    private String[] parseSpeaker(String text) {
         Matcher matcher = SPEAKER_PATTERN.matcher(text.trim());
-        if (matcher.matches()) {
+        if (matcher.matches() && isKnownSpeaker(matcher.group(1).trim())) {
             return new String[] {matcher.group(1), matcher.group(2).trim()};
         }
         return new String[] {TAG_2D, text};
+    }
+
+    private boolean isKnownSpeaker(String name) {
+        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        return characterManager.resolveCharacter(name, playerSession.getScene()) != null;
     }
 
     public boolean willTagsBlock(List<String> tags) {

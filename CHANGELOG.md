@@ -10,3 +10,4 @@
 - Loading a save with no compiled chapter/scene now fails cleanly
 - Disconnecting while recording now cleans up subscene playbacks
 - Spawn-tick-0 actions are no longer executed twice
+- Narration lines with a colon are no longer mistaken for a speaker
