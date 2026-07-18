@@ -702,6 +702,14 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         fovWidget.mouseDragged(event.y());
     }
 
+    public void mouseScrolled(double deltaX, double deltaY) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
+        if (!renderingHud || !clearScreenOpened()) return;
+        if (previewCameraView == null || editingCameraViewPosition || previewMode != PreviewMode.DIALOG) return;
+        int[] mousePos = UtilsClient.getScaledMousePos();
+        dialogPreviewPanel.mouseScrolled(deltaY, mousePos[0], mousePos[1]);
+    }
+
     private boolean clearScreenOpened() {
         return minecraft.gui.screen() != null && minecraft.gui.screen() instanceof ClearScreen;
     }

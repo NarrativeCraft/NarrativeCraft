@@ -53,4 +53,8 @@ public interface EditorMaker {
     default void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {}
 
     default void mouseReleased(MouseButtonEvent event) {}
+
+    default void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {}
+
+    default void mouseScrolled(double deltaX, double deltaY) {}
 }
