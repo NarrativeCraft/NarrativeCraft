@@ -105,6 +105,7 @@ public class UtilsServer {
     }
 
     public static void sendCharacterSkin(ServerPlayer player, ICharacterStory characterStory) {
+        if (characterStory == null) return;
         PlayerSessionManager sessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
         try {
             File skinFile = characterStory.getSkinFile();
