@@ -230,7 +230,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 currentLine = null;
                 advance();
             }
-            default -> advance();
+            default -> {}
         }
     }
 
