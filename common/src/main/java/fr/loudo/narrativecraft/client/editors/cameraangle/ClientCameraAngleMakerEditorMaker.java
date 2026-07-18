@@ -448,6 +448,8 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private void startDialogEntry(DialogPreviewEntry entry) {
         DialogRenderer3D renderer = entry.getRenderer();
+        stoppingRenderers.remove(renderer);
+        playerSession.removeDialog3D(renderer);
         String text = entry.getPreviewText().isEmpty() ? DEFAULT_DIALOG_TEXT : entry.getPreviewText();
         renderer.start(text);
         activeDialogRenderer = renderer;
@@ -462,6 +464,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     private void onDialogSelectionChanged(DialogPreviewEntry newEntry) {
+        if (newEntry.getRenderer() == activeDialogRenderer) return;
         stopActiveDialogRenderer();
         startDialogEntry(newEntry);
     }
@@ -566,6 +569,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void renderAnchorPoint(PoseStack poseStack) {
+        if (previewCameraView == null || previewMode != PreviewMode.DIALOG) return;
         dialogPreviewPanel.renderAnchorPoint(poseStack);
     }
 
