@@ -153,6 +153,12 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void stop() {
+        reset();
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
+    }
+
+    @Override
+    public void reset() {
         if (environment == NarrativeEnvironment.PRODUCTION) {
             for (Playback playback : playbacks) {
                 playback.stop();
@@ -163,7 +169,6 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
             }
             playerSession.changeGameMode(playerSession.getLastGameType());
         }
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
     }
 
     public void moveTo(int tick) {

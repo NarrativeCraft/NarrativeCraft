@@ -119,6 +119,9 @@ public class InteractionMakerEditorMaker implements EditorMaker {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
     }
 
+    @Override
+    public void reset() {}
+
     public Interaction getInteraction() {
         return interaction;
     }

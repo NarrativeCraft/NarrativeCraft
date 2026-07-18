@@ -34,9 +34,9 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class AbstractPlayerSession implements IPlayerSession {
 
-    private Chapter chapter;
-    private Scene scene;
-    private EditorMaker editorMaker;
+    protected Chapter chapter;
+    protected Scene scene;
+    protected EditorMaker editorMaker;
 
     public AbstractPlayerSession(Chapter chapter, Scene scene) {
         this.chapter = chapter;

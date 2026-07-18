@@ -32,6 +32,8 @@ public interface EditorMaker {
 
     void stop();
 
+    default void reset() {}
+
     void tick();
 
     void teleportToEditorOrigin();
