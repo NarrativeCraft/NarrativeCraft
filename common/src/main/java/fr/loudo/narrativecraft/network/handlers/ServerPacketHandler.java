@@ -215,10 +215,12 @@ public class ServerPacketHandler {
         session.setEditor(editor);
         editor.init();
 
-        UtilsServer.sendCharacterSkin((ServerPlayer) player, character);
-        Services.PACKET.sendToPlayer(
-                (ServerPlayer) player,
-                new S2CCharacterStoryAction(character.getId(), S2CCharacterStoryAction.Action.ADD));
+        if (character != null) {
+            UtilsServer.sendCharacterSkin((ServerPlayer) player, character);
+            Services.PACKET.sendToPlayer(
+                    (ServerPlayer) player,
+                    new S2CCharacterStoryAction(character.getId(), S2CCharacterStoryAction.Action.ADD));
+        }
     }
 
     private static Npc findNpcById(UUID id) {
