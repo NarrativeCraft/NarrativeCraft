@@ -30,11 +30,13 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -64,22 +66,26 @@ public class AnimationCharacterPickerScreen extends PaginationsItemsScreen<IChar
         super.init();
 
         if (npcMode) {
-            Button characterButton = Button.builder(Component.literal("C"), b -> {
+            Button characterButton = Button.builder(Component.literal(CustomFont.CHARACTER), b -> {
                         npcMode = false;
                         clearWidgets();
                         init();
                     })
                     .bounds(10, 10, 20, 20)
                     .build();
+            characterButton.setTooltip(
+                    Tooltip.create(Translation.message("npc").append(" -> ").append(Translation.message("character"))));
             addRenderableWidget(characterButton);
         } else {
-            Button npcButton = Button.builder(Component.literal("N"), b -> {
+            Button npcButton = Button.builder(Component.literal(CustomFont.CHARACTER), b -> {
                         npcMode = true;
                         clearWidgets();
                         init();
                     })
                     .bounds(10, 10, 20, 20)
                     .build();
+            npcButton.setTooltip(Tooltip.create(
+                    Translation.message("character").append(" -> ").append(Translation.message("npc"))));
             addRenderableWidget(npcButton);
         }
     }

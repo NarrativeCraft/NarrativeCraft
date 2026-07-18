@@ -80,6 +80,24 @@
       "chars": [
         "\uE208"
       ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/dialog.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE209"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/book.png",
+      "ascent": 9,
+      "height": 12,
+      "chars": [
+        "\uE210"
+      ]
     }
   ]
 }

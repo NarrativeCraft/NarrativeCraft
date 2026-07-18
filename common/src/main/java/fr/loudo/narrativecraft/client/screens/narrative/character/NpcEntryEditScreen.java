@@ -33,8 +33,10 @@ import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.NarrativeEntryAction;
 import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -114,7 +116,7 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
         super.init();
         if (entry != null) {
             Npc target = entry;
-            Button dialogEditorButton = Button.builder(Component.literal("D"), b -> {
+            Button dialogEditorButton = Button.builder(Component.literal(CustomFont.DIALOG), b -> {
                         ClientCharacterDialogEditorMaker editor = new ClientCharacterDialogEditorMaker(
                                 target,
                                 () -> Services.PACKET.sendToServer(new BiSyncNarrativeEntryPacket(
@@ -127,6 +129,7 @@ public class NpcEntryEditScreen extends AbstractNarrativeEntryEditScreen<Npc> {
                     })
                     .bounds(sendButton.getX() + sendButton.getWidth() + 5, sendButton.getY(), 20, 20)
                     .build();
+            dialogEditorButton.setTooltip(Tooltip.create(Translation.message("tooltip.dialog_editor")));
             addRenderableWidget(dialogEditorButton);
         }
     }

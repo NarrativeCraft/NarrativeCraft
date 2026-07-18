@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.utils.Translation;
 import java.io.File;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -101,12 +102,13 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
         }
 
         if (entryClass == CharacterStory.class) {
-            Button storiesButton = Button.builder(Component.literal("S"), b -> onClose())
+            Button storiesButton = Button.builder(Component.literal(CustomFont.BOOK), b -> onClose())
                     .bounds(10, 10, 20, 20)
                     .build();
+            storiesButton.setTooltip(Tooltip.create(Translation.message("tooltip.story")));
             this.addRenderableWidget(storiesButton);
         } else {
-            Button charactersButton = Button.builder(Component.literal("C"), b -> {
+            Button charactersButton = Button.builder(Component.literal(CustomFont.CHARACTER), b -> {
                         minecraft.gui.setScreen(new CharacterEntryListScreen(
                                 ClientNarrativeCraftMod.getInstance()
                                         .getCharacterManager()
@@ -116,6 +118,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                     })
                     .bounds(10, 10, 20, 20)
                     .build();
+            charactersButton.setTooltip(Tooltip.create(Translation.message("tooltip.characters")));
             this.addRenderableWidget(charactersButton);
         }
         Button settingsButton = Button.builder(Component.literal(CustomFont.SETTINGS), b -> {
@@ -123,9 +126,10 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                 })
                 .bounds(10, 35, 20, 20)
                 .build();
+        settingsButton.setTooltip(Tooltip.create(Translation.message("tooltip.settings")));
         this.addRenderableWidget(settingsButton);
 
-        Button globalDialogButton = Button.builder(Component.literal("D"), b -> {
+        Button globalDialogButton = Button.builder(Component.literal(CustomFont.DIALOG), b -> {
                     ClientGlobalDialogEditorMaker editor = new ClientGlobalDialogEditorMaker();
                     editor.init();
                     ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(editor);
@@ -134,6 +138,7 @@ public class NarrativeEntryListScreen<E extends NarrativeEntry<?>> extends Pagin
                 })
                 .bounds(10, 60, 20, 20)
                 .build();
+        globalDialogButton.setTooltip(Tooltip.create(Translation.message("tooltip.global_dialog")));
         this.addRenderableWidget(globalDialogButton);
 
         if (!breadCrumb.isEmpty()) {
