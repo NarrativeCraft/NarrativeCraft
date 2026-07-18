@@ -8,6 +8,7 @@
 - Prevent saving an animation while still recording
 - Cutscene scrubbing no longer freezes the server on a bad tick
 - Loading a save with no compiled chapter/scene now fails cleanly
+- Disconnecting while recording now cleans up subscene playbacks
 
 ## [2.1.0]
 
