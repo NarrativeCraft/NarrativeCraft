@@ -12,6 +12,7 @@
 - Spawn-tick-0 actions are no longer executed twice
 - Narration lines with a colon are no longer mistaken for a speaker
 - Spamming "continue dialogue" no longer skips lines
+- Removed fake players no longer linger in command name auto-complete #25
 
 ## [2.1.0]
 
