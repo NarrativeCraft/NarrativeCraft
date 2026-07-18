@@ -167,6 +167,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void moveTo(int tick) {
+        tick = Math.max(0, Math.min(tick, totalTick));
         for (Playback playback : playbacks) {
             if (tick < currentTick) {
                 playback.rewindTo(tick);
