@@ -154,6 +154,16 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                 .bounds(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
 
+        buttons.add(Button.builder(Component.literal(CustomFont.DIALOG), button -> {
+                    if (previewMode == PreviewMode.CAMERA) {
+                        enterDialogMode();
+                    } else {
+                        exitDialogMode();
+                    }
+                })
+                .bounds(0, 0, 20, 20)
+                .build());
+
         // Make template character button not active if on main screen editor
         buttons.get(2).active = cameraAngle.getScene() != null;
         if (cameraAngle.getScene() == null) {
@@ -613,6 +623,11 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             if (previewMode == PreviewMode.DIALOG) {
                 dialogPreviewPanel.render(graphics, screenWidth, screenHeight, mousePos[0], mousePos[1]);
             }
+
+            buttons.get(10).setPosition(screenWidth - 25, 5);
+            buttons.get(10).setWidth(20);
+            buttons.get(10)
+                    .extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
         } else {
             acceptPositionButton.setPosition(5, 5);
             acceptPositionButton.render(
@@ -662,6 +677,8 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             buttons.get(8).mouseClicked(mouseX, mouseY, button);
             buttons.get(9).mouseClicked(mouseX, mouseY, button);
         }
+
+        buttons.get(10).mouseClicked(event, isDoubleClick);
     }
 
     @Override
