@@ -14,6 +14,7 @@
 - Spamming "continue dialogue" no longer skips lines
 - Removed fake players no longer linger in command name auto-complete #25
 - Characters spawned from camera angle "on ground" always false
+- Switching editor giving conflicts
 
 ### Misc
 - Improved story manager UI

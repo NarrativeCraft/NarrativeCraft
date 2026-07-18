@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.session;
 
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
@@ -77,6 +78,14 @@ public class PlayerSession extends AbstractPlayerSession {
     public void changeGameMode(GameType gameType) {
         lastGameType = player.gameMode.getGameModeForPlayer();
         player.setGameMode(gameType);
+    }
+
+    @Override
+    public void setEditor(EditorMaker editorMaker) {
+        if (this.editorMaker != null) {
+            this.editorMaker.reset();
+        }
+        super.setEditor(editorMaker);
     }
 
     public ServerPlayer getPlayer() {
