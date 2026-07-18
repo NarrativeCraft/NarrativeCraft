@@ -39,6 +39,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
@@ -60,6 +61,9 @@ public abstract class PlayerInfoMixin {
 
     @Inject(method = "getSkinLocation", at = @At("RETURN"), cancellable = true)
     private void narrativecraft$getCharacterSkin(CallbackInfoReturnable<ResourceLocation> cir) {
+        LocalPlayer localPlayer = Minecraft.getInstance().player;
+        if (localPlayer == null) return;
+
         GameProfile profile = getProfile();
 
         UUID characterId = narrativecraft$resolveCharacterId(profile);
@@ -69,14 +73,14 @@ public abstract class PlayerInfoMixin {
             if (!characterId.equals(characterStory.getId())) continue;
 
             if (narrativecraft$isMainCharacterWithPlayerSkin(characterStory)) {
-                cir.setReturnValue(Minecraft.getInstance().player.getSkinTextureLocation());
+                cir.setReturnValue(localPlayer.getSkinTextureLocation());
                 continue;
             }
 
             narrativecraft$buildCharacterSkin(characterStory).ifPresent(cir::setReturnValue);
         }
 
-        if (profile.getId().equals(Minecraft.getInstance().player.getUUID())) {
+        if (profile.getId().equals(localPlayer.getUUID())) {
             narrativecraft$resolveLocalPlayerSkin().ifPresent(cir::setReturnValue);
         }
     }
