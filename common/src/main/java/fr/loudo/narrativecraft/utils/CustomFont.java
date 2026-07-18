@@ -36,4 +36,6 @@ public class CustomFont {
     public static final String SETTINGS = "⚙";
     public static final String SEARCH = "\uE207";
     public static final String FOLDER = "\uE208";
+    public static final String DIALOG = "\uE209";
+    public static final String BOOK = "\uE210";
 }
