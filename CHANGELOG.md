@@ -2,6 +2,11 @@
 
 ## [2.1.1]
 
+## Features
+
+- Improved story manager UI
+- Improved cutscene maker editor UI
+
 ### Fixes
 - Some crash case while trying to show a character skin
 - Crash when opening the global dialog editor with no target character
@@ -15,7 +20,3 @@
 - Removed fake players no longer linger in command name auto-complete #25
 - Characters spawned from camera angle "on ground" always false
 - Switching editor giving conflicts
-
-## Misc
-
-- Improved story manager UI
