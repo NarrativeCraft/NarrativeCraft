@@ -34,6 +34,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 
 public class Utils {
 
@@ -71,5 +72,10 @@ public class Utils {
         } catch (IllegalArgumentException e) {
             return SkinModel.values()[0];
         }
+    }
+
+    public static boolean isOnGround(Entity entity) {
+        AABB box = entity.getBoundingBox().deflate(0.001).move(0, -0.05, 0);
+        return !entity.level().noCollision(entity, box);
     }
 }

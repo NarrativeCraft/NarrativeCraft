@@ -27,12 +27,12 @@ import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.playback.IPlaybackSession;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.io.IOException;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class MovementAction extends AbstractAction {
@@ -73,7 +73,7 @@ public class MovementAction extends AbstractAction {
         entity.setXRot(pitch);
         entity.setYRot(yaw);
         entity.setYHeadRot(headYaw);
-        entity.setOnGround(isOnGround(entity));
+        entity.setOnGround(Utils.isOnGround(entity));
         for (ServerPlayer player : session.getTargetedPlayers()) {
             player.connection.send(new ClientboundRotateHeadPacket(entity, (byte) (headYaw * 256 / 360)));
         }
@@ -117,10 +117,5 @@ public class MovementAction extends AbstractAction {
     @Override
     public boolean shouldExecuteOnRewind() {
         return true;
-    }
-
-    private boolean isOnGround(Entity entity) {
-        AABB box = entity.getBoundingBox().deflate(0.001).move(0, -0.05, 0);
-        return !entity.level().noCollision(entity, box);
     }
 }

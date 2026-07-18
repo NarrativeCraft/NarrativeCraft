@@ -17,6 +17,7 @@
 - Narration lines with a colon are no longer mistaken for a speaker
 - Spamming "continue dialogue" no longer skips lines
 - Removed fake players no longer linger in command name auto-complete #25
+- Characters spawned from camera angle "on ground" always false
 
 ## [2.1.0]
 
