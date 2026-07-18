@@ -120,7 +120,7 @@ public class RecordingReader implements Action.Reader {
     }
 
     public Map<Byte, String> readLocalActionsId() throws IOException {
-        byte actionsCount = input.readByte();
+        int actionsCount = input.readUnsignedByte();
         for (int i = 0; i < actionsCount; i++) {
             byte id = input.readByte();
             String actionId = input.readUTF();
