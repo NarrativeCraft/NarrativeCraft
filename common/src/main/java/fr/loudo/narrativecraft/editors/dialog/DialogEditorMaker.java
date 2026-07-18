@@ -90,6 +90,12 @@ public class DialogEditorMaker implements EditorMaker {
 
     @Override
     public void stop() {
+        reset();
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
+    }
+
+    @Override
+    public void reset() {
         if (fakePlayer != null) {
             playerSession
                     .getPlayer()
@@ -99,7 +105,6 @@ public class DialogEditorMaker implements EditorMaker {
             fakePlayer = null;
         }
         playerSession.changeGameMode(playerSession.getLastGameType());
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
     }
 
     @Override
