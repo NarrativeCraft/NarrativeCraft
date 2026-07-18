@@ -247,6 +247,7 @@ public class RecordCommand {
 
         if (recording.isRecording()) {
             context.getSource().sendFailure(Translation.message("record.recording"));
+            return 0;
         }
 
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
