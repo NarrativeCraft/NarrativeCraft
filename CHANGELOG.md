@@ -2,7 +2,7 @@
 
 ## [2.1.1]
 
-## Features
+### Features
 
 - Improved story manager UI
 - Improved cutscene maker editor UI
