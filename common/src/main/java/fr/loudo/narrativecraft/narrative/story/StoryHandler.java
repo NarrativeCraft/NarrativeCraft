@@ -375,7 +375,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     private boolean needClose(Line line) {
-        return dialogVisible && ((line.hasText() && speakerChanged(line.speaker())) || willTagsBlock(line.tags()));
+        return dialogVisible && ((line.hasText() && speakerChanged(line.speaker())) || willTagsBlock(line.tags()))
+                || !story.getCurrentChoices().isEmpty();
     }
 
     private boolean speakerChanged(String speaker) {
