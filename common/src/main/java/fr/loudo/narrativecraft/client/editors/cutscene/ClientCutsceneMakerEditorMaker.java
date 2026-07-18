@@ -71,6 +71,9 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     private static final int MIN_VISIBLE_TICKS_AT_MAX_ZOOM = 2 * TICKS_PER_SECOND;
     private static final int SCROLLBAR_HEIGHT = 4;
     private static final int ADD_NEW_LAYER_BUTTON_OFFSET = 13;
+    private static final int MIN_MAJOR_LABEL_SPACING = 45;
+    private static final int MIN_MINOR_TICK_SPACING = 6;
+    private static final int[] NICE_STEP_SECONDS = {1, 2, 5, 10, 15, 30, 60, 120, 300, 600};
 
     private final Minecraft mc = Minecraft.getInstance();
     private final List<CutsceneMakerEditorLayer> editorLayers = new ArrayList<>();
@@ -319,44 +322,60 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         int rulerEndY = rulerY + RULER_HEIGHT;
         float pixelsPerTick = timelineWidth / visibleTicks;
 
-        // Global tick / time display in the left panel
         int currentTick = (int) playback.getCurrentTick();
         String tickDisplay = currentTick + " / " + formatTimeTicks(currentTick);
-        graphics.drawString(mc.font, Component.literal(tickDisplay), 2, rulerY + 1, 0xFFFFFFFF);
+        graphics.drawString(
+                mc.font,
+                Component.literal(tickDisplay),
+                LAYER_GAP / 2 - Minecraft.getInstance().font.width(tickDisplay) / 2,
+                rulerY + 3,
+                0xFFFFFFFF);
 
-        int firstSecond = (int) (viewStartTick / TICKS_PER_SECOND);
-        int lastSecond = (int) Math.ceil((viewStartTick + visibleTicks) / TICKS_PER_SECOND);
+        int majorStep = getNiceMajorStep(pixelsPerTick);
+        int minorStep = getNiceMinorStep(majorStep, pixelsPerTick);
 
-        for (int s = firstSecond; s <= lastSecond; s++) {
-            int tickAtSecond = s * TICKS_PER_SECOND;
-            if (tickAtSecond < 0 || tickAtSecond > totalTick) continue;
-            float x = LAYER_GAP + (tickAtSecond - viewStartTick) * pixelsPerTick;
+        int rangeEnd = Math.min(totalTick, (int) Math.ceil(viewStartTick + visibleTicks));
+        int firstMinor = Math.max(0, (int) viewStartTick / minorStep * minorStep);
+
+        for (int tickMark = firstMinor; tickMark <= rangeEnd; tickMark += minorStep) {
+            if (tickMark < 0 || tickMark > totalTick) continue;
+            float x = LAYER_GAP + (tickMark - viewStartTick) * pixelsPerTick;
             if (x < LAYER_GAP || x > LAYER_GAP + timelineWidth) continue;
             int xi = (int) x;
 
-            // Faint vertical line through all layers
-            graphics.fill(xi, rulerEndY, xi + 1, screenHeight, 0x30FFFFFF);
+            if (tickMark % majorStep == 0) {
+                graphics.fill(xi, rulerEndY, xi + 1, screenHeight, 0xFFA0A0A0);
 
-            // Big tick mark at ruler bottom
-            graphics.fill(xi, rulerEndY - 5, xi + 1, rulerEndY, 0xFFFFFFFF);
-
-            // mm:ss label
-            String label = formatTimeTicks(tickAtSecond);
-            int labelWidth = mc.font.width(label);
-            int labelX = MathUtils.clamp(xi - labelWidth / 2, LAYER_GAP, LAYER_GAP + timelineWidth - labelWidth);
-            graphics.drawString(mc.font, Component.literal(label), labelX, rulerY + 1, 0xFFFFFFFF);
-
-            // 3 small subdivision lines between this second and the next
-            for (int sub = 1; sub <= 3; sub++) {
-                int subTick = tickAtSecond + sub * (TICKS_PER_SECOND / 4);
-                if (subTick > totalTick) break;
-                float subXf = LAYER_GAP + (subTick - viewStartTick) * pixelsPerTick;
-                if (subXf < LAYER_GAP || subXf > LAYER_GAP + timelineWidth) continue;
-                int subX = (int) subXf;
-                graphics.fill(subX, rulerEndY - 2, subX + 1, rulerEndY, 0x80FFFFFF);
-                graphics.fill(subX, rulerEndY, subX + 1, screenHeight, 0x18FFFFFF);
+                String label = formatTimeTicks(tickMark);
+                int labelWidth = mc.font.width(label);
+                int labelX = MathUtils.clamp(xi - labelWidth / 2, LAYER_GAP, LAYER_GAP + timelineWidth - labelWidth);
+                graphics.drawString(mc.font, Component.literal(label), labelX, rulerY + 1, 0xFFFFFFFF);
+            } else {
+                graphics.fill(xi, rulerEndY, xi + 1, screenHeight, 0x18AAAAAA);
             }
         }
+    }
+
+    private int getNiceMajorStep(float pixelsPerTick) {
+        for (int seconds : NICE_STEP_SECONDS) {
+            int stepTicks = seconds * TICKS_PER_SECOND;
+            if (stepTicks * pixelsPerTick >= MIN_MAJOR_LABEL_SPACING) {
+                return stepTicks;
+            }
+        }
+        return NICE_STEP_SECONDS[NICE_STEP_SECONDS.length - 1] * TICKS_PER_SECOND;
+    }
+
+    private int getNiceMinorStep(int majorStep, float pixelsPerTick) {
+        int[] divisions = {4, 2};
+        for (int division : divisions) {
+            if (majorStep % division != 0) continue;
+            int step = majorStep / division;
+            if (step * pixelsPerTick >= MIN_MINOR_TICK_SPACING) {
+                return step;
+            }
+        }
+        return majorStep;
     }
 
     private void renderScrollbar(GuiGraphics graphics, int screenHeight, int timelineWidth) {

@@ -5,6 +5,7 @@
 ### Features
 
 - Improved story manager UI
+- Improved cutscene maker editor UI
 
 ### Fixes
 - Some crash case while trying to show a character skin
