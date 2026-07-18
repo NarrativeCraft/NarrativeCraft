@@ -631,7 +631,11 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             buttons.get(10).setPosition(screenWidth - 25, 5);
             buttons.get(10).setWidth(20);
             buttons.get(10)
-                    .extractRenderState(graphics, mousePos[0], mousePos[1], deltaTracker.getGameTimeDeltaTicks());
+                    .render(
+                            graphics,
+                            mousePos[0],
+                            mousePos[1],
+                            Minecraft.getInstance().getDeltaFrameTime());
         } else {
             acceptPositionButton.setPosition(5, 5);
             acceptPositionButton.render(
@@ -682,7 +686,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             buttons.get(9).mouseClicked(mouseX, mouseY, button);
         }
 
-        buttons.get(10).mouseClicked(event, isDoubleClick);
+        buttons.get(10).mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -702,6 +706,14 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         }
         if (rollWidget.mouseDragged((mouseY))) return;
         fovWidget.mouseDragged((mouseY));
+    }
+
+    public void mouseScrolled(double deltaX, double deltaY) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
+        if (!renderingHud || !clearScreenOpened()) return;
+        if (previewCameraView == null || editingCameraViewPosition || previewMode != PreviewMode.DIALOG) return;
+        int[] mousePos = UtilsClient.getScaledMousePos();
+        dialogPreviewPanel.mouseScrolled(deltaY, mousePos[0], mousePos[1]);
     }
 
     private boolean clearScreenOpened() {

@@ -28,6 +28,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.utils.MathUtils;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,8 @@ public class DialogPreviewPanel {
     private static final int PADDING_RIGHT = 10;
     private static final int EDITBOX_HEIGHT = 10;
     private static final int FIELD_GAP = 3;
+    private static final int MAX_VISIBLE_ROWS = 5;
+    private static final int SCROLLBAR_WIDTH = 2;
 
     private final Consumer<DialogData> onToggleAdvanced;
     private final String defaultDialogText;
@@ -59,6 +62,7 @@ public class DialogPreviewPanel {
     private DialogFieldSet fieldSet = DialogFieldSet.ALL;
     private List<DialogPreviewEntry> entries = new ArrayList<>();
     private int selectedIndex = 0;
+    private int listScrollOffset = 0;
 
     private EditBox previewTextBox;
     private EditBox offsetXBox;
@@ -131,6 +135,7 @@ public class DialogPreviewPanel {
     public void setEntries(List<DialogPreviewEntry> entries) {
         this.entries = entries != null ? entries : new ArrayList<>();
         this.selectedIndex = 0;
+        this.listScrollOffset = 0;
         rebuildEditBoxes();
     }
 
@@ -297,7 +302,13 @@ public class DialogPreviewPanel {
                 0xFFFFFFFF);
         y += ROW_HEIGHT + 2;
 
-        for (int i = 0; i < entries.size(); i++) {
+        int visibleRows = Math.min(entries.size(), MAX_VISIBLE_ROWS);
+        int maxScroll = Math.max(0, entries.size() - MAX_VISIBLE_ROWS);
+        listScrollOffset = MathUtils.clamp(listScrollOffset, 0, maxScroll);
+        int listStartY = y;
+
+        for (int row = 0; row < visibleRows; row++) {
+            int i = listScrollOffset + row;
             DialogPreviewEntry entry = entries.get(i);
             boolean selected = i == selectedIndex;
             int rowColor = selected
@@ -309,6 +320,15 @@ public class DialogPreviewPanel {
             graphics.drawString(
                     mc.font, entry.getLabel(), panelX + PADDING + 2, y + 2, selected ? 0xFFFFFFFF : 0xFFAAAAAA);
             y += ROW_HEIGHT;
+        }
+
+        if (maxScroll > 0) {
+            int listHeight = visibleRows * ROW_HEIGHT;
+            int barX = panelX + PANEL_WIDTH - PADDING + 2;
+            int thumbHeight = Math.max(6, listHeight * visibleRows / entries.size());
+            int thumbY = listStartY + Math.round((float) listScrollOffset / maxScroll * (listHeight - thumbHeight));
+            graphics.fill(barX, listStartY, barX + SCROLLBAR_WIDTH, listStartY + listHeight, 0x40FFFFFF);
+            graphics.fill(barX, thumbY, barX + SCROLLBAR_WIDTH, thumbY + thumbHeight, 0xFFCCCCCC);
         }
 
         y += 4;
@@ -437,7 +457,9 @@ public class DialogPreviewPanel {
         int imy = (int) mouseY;
 
         int y = 35 + PADDING + ROW_HEIGHT + 2;
-        for (int i = 0; i < entries.size(); i++) {
+        int visibleRows = Math.min(entries.size(), MAX_VISIBLE_ROWS);
+        for (int row = 0; row < visibleRows; row++) {
+            int i = listScrollOffset + row;
             if (isOver(imx, imy, panelX + PADDING, y, PANEL_WIDTH - PADDING * 2, ROW_HEIGHT - 2)) {
                 if (selectedIndex != i) {
                     selectedIndex = i;
@@ -509,6 +531,17 @@ public class DialogPreviewPanel {
         return false;
     }
 
+    public boolean mouseScrolled(double deltaY, int mouseX, int mouseY) {
+        int maxScroll = entries.size() - MAX_VISIBLE_ROWS;
+        if (maxScroll <= 0) return false;
+        int panelX = getPanelX(Minecraft.getInstance().getWindow().getGuiScaledWidth());
+        int listY = 35 + PADDING + ROW_HEIGHT + 2;
+        int listHeight = MAX_VISIBLE_ROWS * ROW_HEIGHT;
+        if (!isOver(mouseX, mouseY, panelX, listY, PANEL_WIDTH, listHeight)) return false;
+        listScrollOffset = (int) MathUtils.clamp(listScrollOffset - (int) Math.signum(deltaY), 0, maxScroll);
+        return true;
+    }
+
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         forwardKeyToAll(keyCode, scanCode, modifiers);
     }
@@ -572,7 +605,7 @@ public class DialogPreviewPanel {
             height += ROW_HEIGHT + PADDING;
             return height;
         }
-        height += entryCount * ROW_HEIGHT;
+        height += Math.min(entryCount, MAX_VISIBLE_ROWS) * ROW_HEIGHT;
         height += 4;
         int fieldCount;
         boolean hasAdvancedButton;
