@@ -55,6 +55,7 @@ public class PlaybackContext implements IPlaybackContext {
     private final NavigableMap<Integer, List<AbstractAction>> rewindLog = new TreeMap<>();
     private boolean isPlaying = false;
     private boolean spawned = false;
+    private int lastExecutedActionTick = -1;
 
     public PlaybackContext(Playback playback, RecordingData recordingData, ServerLevel level) {
         this.playback = playback;
@@ -79,6 +80,7 @@ public class PlaybackContext implements IPlaybackContext {
         for (AbstractAction action : actions) {
             action.execute(this, playback);
         }
+        lastExecutedActionTick = recordingData.getSpawnTick();
     }
 
     private void createEntity() {
@@ -207,7 +209,10 @@ public class PlaybackContext implements IPlaybackContext {
 
         if (!spawned) return;
 
-        executeActionsFromTick(currentTick);
+        if (currentTick != lastExecutedActionTick) {
+            executeActionsFromTick(currentTick);
+            lastExecutedActionTick = currentTick;
+        }
     }
 
     public void moveTo(int fromTick, int toTick) {
