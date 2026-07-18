@@ -14,6 +14,9 @@
 - Spamming "continue dialogue" no longer skips lines
 - Removed fake players no longer linger in command name auto-complete #25
 
+### Misc
+- Improved story manager UI
+
 ## [2.1.0]
 
 ### Features

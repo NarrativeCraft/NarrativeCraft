@@ -84,6 +84,12 @@
   "narrativecraft.screen.entity_type_picker": "Select Entity Type",
   "narrativecraft.screen.animation_character_picker": "Select Character",
 
+  "narrativecraft.tooltip.story": "Story",
+  "narrativecraft.tooltip.characters": "Characters",
+  "narrativecraft.tooltip.settings": "Settings",
+  "narrativecraft.tooltip.global_dialog": "Global dialogs",
+  "narrativecraft.tooltip.dialog_editor": "Dialogs",
+
   "narrativecraft.screen.settings.main_screen_maker_editor": "Main Screen Editor",
   "narrativecraft.screen.settings.world_settings": "World Settings",
 
