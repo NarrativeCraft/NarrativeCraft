@@ -79,6 +79,7 @@ public class Recording implements IRecording {
 
         for (RecordingEntityData data : recordingEntityDataList) {
             Entity entity = data.getEntity();
+            recordRideState(data);
             data.addAction(new MovementAction(
                     tick, entity.position(), entity.getXRot(), entity.getYRot(), entity.getYHeadRot()));
             data.addAction(new PoseAction(tick, entity.getPose()));
@@ -117,6 +118,25 @@ public class Recording implements IRecording {
                 seedActions(recordingEntityData);
             }
         }
+    }
+
+    private void recordRideState(RecordingEntityData data) {
+        Entity entity = data.getEntity();
+        Entity currentVehicle = entity.getVehicle();
+        Entity previousVehicle = data.getVehicle();
+        if (currentVehicle == previousVehicle) return;
+
+        if (currentVehicle != null) {
+            // action managed in EntityMixin
+            markEntityAsTracked(currentVehicle);
+        } else if (!previousVehicle.isRemoved()) {
+            RecordingEntityData previousVehicleData = getRecordingEntityData(previousVehicle);
+            if (previousVehicleData != null) {
+                data.addAction(new StopRideEntityAction(tick, previousVehicleData.getRecordingId()));
+            }
+        }
+
+        data.setVehicle(currentVehicle);
     }
 
     public void addAction(AbstractAction action, Entity entity) {

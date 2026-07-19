@@ -1,25 +1,5 @@
 # Changelog
 
-## [2.1.1]
+## [2.1.2]
 
-### Features
-
-- Improved story manager UI
-- Improved cutscene maker editor UI
-- Added a dialog button in camera angle preview to switch to dialog mode
-- Scrolling behavior if too many characters in camera angle in dialog mode
-
-### Fixes
-- Some crash case while trying to show a character skin
-- Crash when opening the global dialog editor with no target character
-- Prevent saving an animation while still recording
-- Cutscene scrubbing no longer freezes the server on a bad tick
-- Loading a save with no compiled chapter/scene now fails cleanly
-- Disconnecting while recording now cleans up subscene playbacks
-- Spawn-tick-0 actions are no longer executed twice
-- Narration lines with a colon are no longer mistaken for a speaker
-- Spamming "continue dialogue" no longer skips lines
-- Removed fake players no longer linger in command name auto-complete #25
-- Characters spawned from camera angle "on ground" always false
-- Switching editor giving conflicts
-- Spamming characters button in dialog mode rendering multiple dialogs at the same time
+- Ride action not working correctly on some furniture mod

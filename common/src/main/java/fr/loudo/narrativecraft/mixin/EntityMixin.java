@@ -25,16 +25,13 @@ package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.Recording;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.RideEntityAction;
-import fr.loudo.narrativecraft.recording.actions.StopRideEntityAction;
+import javax.annotation.Nullable;
 import net.minecraft.world.entity.Entity;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
@@ -43,31 +40,14 @@ public class EntityMixin {
     @Shadow
     private @Nullable Entity vehicle;
 
-    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z", at = @At("HEAD"))
-    private void narrativecraft$startRiding(
-            Entity vehicle, boolean force, boolean sendGameEvent, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"))
+    private void narrativecraft$startRiding(Entity toRide, CallbackInfoReturnable<Boolean> cir) {
 
         Entity entity = (Entity) (Object) this;
         Recording recording =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
         if (recording == null) return;
 
-        recording.addAction(new RideEntityAction(recording.getTick(), recording.markEntityAsTracked(vehicle)), entity);
-    }
-
-    @Inject(method = "stopRiding", at = @At("HEAD"))
-    private void narrativecraft$stopRiding(CallbackInfo ci) {
-
-        if (vehicle == null || vehicle.isRemoved()) return;
-
-        Entity entity = (Entity) (Object) this;
-        Recording recording =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecording(entity);
-        if (recording == null) return;
-        RecordingEntityData recordingEntityData = recording.getRecordingEntityData(vehicle);
-        if (recordingEntityData == null) return;
-
-        recording.addAction(
-                new StopRideEntityAction(recording.getTick(), recordingEntityData.getRecordingId()), entity);
+        recording.addAction(new RideEntityAction(recording.getTick(), recording.markEntityAsTracked(toRide)), entity);
     }
 }

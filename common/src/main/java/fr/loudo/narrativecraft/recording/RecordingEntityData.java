@@ -40,6 +40,7 @@ public class RecordingEntityData implements IRecordingEntityData {
     private final Recording recording;
     private boolean isTracked;
     private BlockPos lastInteractedBlockPos;
+    private Entity vehicle;
 
     public RecordingEntityData(
             int recordingId, Entity entity, boolean isTracked, int firstSeenTick, Recording recording) {
@@ -105,5 +106,13 @@ public class RecordingEntityData implements IRecordingEntityData {
 
     public void setLastInteractedBlockPos(BlockPos lastInteractedBlockPos) {
         this.lastInteractedBlockPos = lastInteractedBlockPos;
+    }
+
+    public Entity getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Entity vehicle) {
+        this.vehicle = vehicle;
     }
 }
