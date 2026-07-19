@@ -86,9 +86,9 @@ public class PlaybackContext implements IPlaybackContext {
     private void createEntity() {
         ICharacterStory characterStory = playback.getAnimation().getCharacterStory();
         boolean hasCharacter = characterStory != null;
-        boolean isCharacterEntity = recordingData.getRecordingId() != 0;
+        boolean isCharacterEntity = recordingData.getRecordingId() == 0;
 
-        String entityId = (hasCharacter && !isCharacterEntity)
+        String entityId = (hasCharacter && isCharacterEntity)
                 ? Utils.getEntityTypeString(characterStory.getEntityType())
                 : recordingData.getEntityId();
 
@@ -130,6 +130,8 @@ public class PlaybackContext implements IPlaybackContext {
                 entity.setCustomName(Component.literal(name));
                 entity.setCustomNameVisible(true);
             }
+        } else {
+            entity.setCustomNameVisible(false);
         }
 
         if (entity instanceof Mob mob) {
