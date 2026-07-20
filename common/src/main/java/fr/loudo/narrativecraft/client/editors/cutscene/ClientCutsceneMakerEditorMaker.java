@@ -222,6 +222,8 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         if (cutscene.getEditorLayers() != null) {
             editorLayers.addAll(cutscene.getEditorLayers());
         }
+        totalTick = cutscene.getMaxTick();
+        playback.setTotalTick(totalTick);
     }
 
     public void addLayer(ICutsceneLayer layer) {
