@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.editors.cutscene;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
 import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
@@ -114,7 +113,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
                     playerSession.getPlayer(),
                     new S2CCutsceneEditorData(cutscene.getId(), layersJson, cutscene.getManualMaxTick()));
         }
-        lastKeyframeTick = getLastTick();
+        lastKeyframeTick = cutscene.getMaxTick();
     }
 
     public void teleportToEditorOrigin() {
@@ -231,19 +230,5 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
 
     public void setCurrentTick(int currentTick) {
         this.currentTick = currentTick;
-    }
-
-    public int getLastTick() {
-        int maxTick = 0;
-        if (cutscene.getEditorLayers() != null) {
-            for (CutsceneMakerEditorLayer editorLayer : cutscene.getEditorLayers()) {
-                for (Keyframe keyframe : editorLayer.getLayer().getKeyframes()) {
-                    if (keyframe.getTick() > maxTick) {
-                        maxTick = keyframe.getTick();
-                    }
-                }
-            }
-        }
-        return maxTick;
     }
 }
