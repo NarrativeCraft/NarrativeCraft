@@ -79,8 +79,7 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutsce
         for (Animation animation : animations) {
             maxTick = Math.max(maxTick, animation.getTotalTick());
         }
-        int lastTick = getLastTick();
-        return Math.max(lastTick, maxTick);
+        return maxTick;
     }
 
     public int getLastTick() {

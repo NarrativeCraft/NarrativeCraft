@@ -230,7 +230,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 currentLine = null;
                 advance();
             }
-            default -> {}
+            default -> advance();
         }
     }
 
@@ -375,8 +375,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     private boolean needClose(Line line) {
-        return dialogVisible && ((line.hasText() && speakerChanged(line.speaker())) || willTagsBlock(line.tags()))
-                || !story.getCurrentChoices().isEmpty();
+        return dialogVisible && ((line.hasText() && speakerChanged(line.speaker())) || willTagsBlock(line.tags()));
     }
 
     private boolean speakerChanged(String speaker) {

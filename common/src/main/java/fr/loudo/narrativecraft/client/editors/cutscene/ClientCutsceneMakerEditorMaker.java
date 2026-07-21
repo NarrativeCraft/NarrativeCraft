@@ -109,7 +109,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     public ClientCutsceneMakerEditorMaker(Cutscene cutscene, NarrativeEnvironment environment) {
         this.cutscene = cutscene;
         this.control = new CutsceneMakerEditorControl(15, 15);
-        this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getMaxTick());
+        this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getLastTick());
         control.setPlaybackCallbacks(() -> playback.play(tick), () -> {
             playback.pause();
             setPreviewRoll(0.0f);

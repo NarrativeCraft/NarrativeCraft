@@ -113,7 +113,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
                     playerSession.getPlayer(),
                     new S2CCutsceneEditorData(cutscene.getId(), layersJson, cutscene.getManualMaxTick()));
         }
-        lastKeyframeTick = cutscene.getMaxTick();
+        lastKeyframeTick = cutscene.getLastTick();
     }
 
     public void teleportToEditorOrigin() {
