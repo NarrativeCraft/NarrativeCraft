@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
+import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -306,6 +307,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         entity.setXRot((float) placement.getRotation().x);
         entity.setYRot((float) placement.getRotation().y);
         entity.setYHeadRot((float) placement.getRotation().y);
+        entity.setOnGround(Utils.isOnGround(entity));
 
         if (mainData != null) {
             IPlaybackContext context = new SingleEntityContext(entity);
@@ -353,7 +355,9 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                 mob.setNoAi(true);
             }
             entity.setCustomName(Component.literal(characterStory.getName()));
-            entity.setCustomNameVisible(true);
+            if (characterStory.getCharacterType() == CharacterType.NORMAL) {
+                entity.setCustomNameVisible(true);
+            }
             level.addFreshEntity(entity);
         }
     }
