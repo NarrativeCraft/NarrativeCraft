@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -34,6 +35,8 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.utils.FakePlayer;
+import java.util.UUID;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
@@ -69,6 +72,8 @@ public class MinecraftCommandInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
         ServerPlayer player = playerSession.getPlayer();
+        FakePlayer fakePlayer = new FakePlayer(
+                playerSession.getPlayer().level(), new GameProfile(UUID.randomUUID(), "CommandExec"), true);
         String resolved = commandValue.replace("@p", player.getName().getString());
         CommandSourceStack source = new CommandSourceStack(
                 CommandSource.NULL,
@@ -81,7 +86,7 @@ public class MinecraftCommandInkAction extends InkAction {
                 player.level().getServer(),
                 player);
         try {
-            player.level().getServer().getCommands().getDispatcher().execute(resolved, source);
+            fakePlayer.level().getServer().getCommands().getDispatcher().execute(resolved, source);
         } catch (CommandSyntaxException e) {
             return InkActionResult.error("Command execution failed: " + e.getMessage());
         }
