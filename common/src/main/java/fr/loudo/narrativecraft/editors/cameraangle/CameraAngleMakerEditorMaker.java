@@ -48,7 +48,6 @@ import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
-import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import net.minecraft.nbt.CompoundTag;
@@ -189,7 +188,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         entity.setXRot((float) characterPlacement.getRotation().x);
         entity.setYRot((float) characterPlacement.getRotation().y);
         entity.setYHeadRot((float) characterPlacement.getRotation().y);
-        entity.setOnGround(Utils.isOnGround(entity));
+        entity.setOnGround(characterPlacement.isOnGround());
 
         addEntityToWorld(entity, player, level, characterStory);
 
@@ -271,7 +270,14 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         Vec3 rotation = new Vec3(lastMovement.getPitch(), lastMovement.getYaw(), 0.0);
 
         return new CharacterPlacement(
-                UUID.randomUUID(), characterStory, position, rotation, new ArrayList<>(), true, templateReferenceId);
+                UUID.randomUUID(),
+                characterStory,
+                position,
+                rotation,
+                new ArrayList<>(),
+                true,
+                true,
+                templateReferenceId);
     }
 
     private void spawnTemplateEntity(CharacterPlacement placement, Animation animation) {
@@ -306,7 +312,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         entity.setXRot((float) placement.getRotation().x);
         entity.setYRot((float) placement.getRotation().y);
         entity.setYHeadRot((float) placement.getRotation().y);
-        entity.setOnGround(Utils.isOnGround(entity));
+        entity.setOnGround(placement.isOnGround());
 
         if (mainData != null) {
             IPlaybackContext context = new SingleEntityContext(entity);

@@ -37,6 +37,7 @@ public class CharacterPlacement {
     private Vec3 position;
     private Vec3 rotation;
     private final List<ItemStack> items;
+    private final boolean onGround;
     private final boolean isTemplate;
     private final UUID templateReferenceId;
     private Pose pose = Pose.STANDING;
@@ -47,6 +48,7 @@ public class CharacterPlacement {
             Vec3 position,
             Vec3 rotation,
             List<ItemStack> items,
+            boolean onGround,
             boolean isTemplate,
             UUID templateReferenceId) {
         this.id = id;
@@ -54,17 +56,24 @@ public class CharacterPlacement {
         this.position = position;
         this.rotation = rotation;
         this.items = items;
+        this.onGround = onGround;
         this.isTemplate = isTemplate;
         this.templateReferenceId = templateReferenceId;
     }
 
     public CharacterPlacement(
-            UUID id, ICharacterStory characterStory, Vec3 position, Vec3 rotation, List<ItemStack> items) {
-        this(id, characterStory, position, rotation, items, false, null);
+            UUID id,
+            ICharacterStory characterStory,
+            Vec3 position,
+            Vec3 rotation,
+            List<ItemStack> items,
+            boolean onGround) {
+        this(id, characterStory, position, rotation, items, onGround, false, null);
     }
 
-    public CharacterPlacement(ICharacterStory characterStory, Vec3 position, Vec3 rotation, List<ItemStack> items) {
-        this(UUID.randomUUID(), characterStory, position, rotation, items, false, null);
+    public CharacterPlacement(
+            ICharacterStory characterStory, Vec3 position, Vec3 rotation, List<ItemStack> items, boolean onGround) {
+        this(UUID.randomUUID(), characterStory, position, rotation, items, onGround, false, null);
     }
 
     public UUID getId() {
@@ -93,6 +102,10 @@ public class CharacterPlacement {
 
     public List<ItemStack> getItems() {
         return items;
+    }
+
+    public boolean isOnGround() {
+        return onGround;
     }
 
     public boolean isTemplate() {
