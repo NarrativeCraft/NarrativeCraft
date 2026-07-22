@@ -173,6 +173,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
         }
 
         boolean isTemplate = json.has("isTemplate") && json.get("isTemplate").getAsBoolean();
+        boolean onGround = !json.has("onGround") || json.get("onGround").getAsBoolean();
         UUID templateReferenceId = json.has("templateReferenceId")
                 ? UUID.fromString(json.get("templateReferenceId").getAsString())
                 : null;
@@ -183,6 +184,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
                 new Vec3(x, y, z),
                 new Vec3(xRot, yRot, roll),
                 items,
+                onGround,
                 isTemplate,
                 templateReferenceId);
 
