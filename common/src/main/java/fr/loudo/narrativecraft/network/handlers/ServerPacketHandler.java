@@ -475,7 +475,8 @@ public class ServerPacketHandler {
                 NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(characterId, scene);
         if (characterStory == null) return;
 
-        CharacterPlacement placement = new CharacterPlacement(characterStory, position, rotation, items);
+        CharacterPlacement placement =
+                new CharacterPlacement(characterStory, position, rotation, items, player.onGround());
         String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
         Services.PACKET.sendToPlayer(
                 (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placementJson));
@@ -511,7 +512,8 @@ public class ServerPacketHandler {
             if (!stack.isEmpty()) items.add(stack.copy());
         }
 
-        CharacterPlacement placement = new CharacterPlacement(characterStory, position, rotation, items);
+        CharacterPlacement placement =
+                new CharacterPlacement(characterStory, position, rotation, items, player.onGround());
         String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
         Services.PACKET.sendToPlayer(
                 (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(mainScreenAngle.getId(), placementJson));
