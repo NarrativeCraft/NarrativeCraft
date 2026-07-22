@@ -31,6 +31,7 @@ public class OnEntityRightClickFabric implements IFabricEventRegister {
     @Override
     public void register() {
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
+            if (!level.isClientSide()) return InteractionResult.PASS;
             OnEntityRightClick.entityRightClick(entity);
             return InteractionResult.PASS;
         });
