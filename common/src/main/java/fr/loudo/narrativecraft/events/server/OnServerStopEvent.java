@@ -21,33 +21,16 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.register;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.events.IFabricEventRegister;
-import fr.loudo.narrativecraft.events.server.*;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.playback.Playback;
+import net.minecraft.server.MinecraftServer;
 
-public class FabricEventList {
+public class OnServerStopEvent {
 
-    private final List<IFabricEventRegister> events = new ArrayList<>();
-
-    public FabricEventList() {
-        events.add(new OnServerStartEventFabric());
-        events.add(new OnServerStopEventFabric());
-        events.add(new OnPlayerJoinEventFabric());
-        events.add(new OnPlayerLeaveEventFabric());
-        events.add(new OnServerTickEventFabric());
-        events.add(new OnCommandRegisterEventFabric());
-        events.add(new OnRightClickBlockEventFabric());
-        events.add(new OnDeathEventFabric());
-        events.add(new OnHurtEventFabric());
-        events.add(new OnUseItemEventFabric());
-    }
-
-    public void register() {
-        for (IFabricEventRegister event : events) {
-            event.register();
-        }
+    public static void serverStop(MinecraftServer server) {
+        NarrativeCraftMod.getInstance().getPlaybackManager().getList().forEach(Playback::stopAndKill);
+        NarrativeCraftMod.getInstance().getPlaybackManager().getList().clear();
     }
 }
