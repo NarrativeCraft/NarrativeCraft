@@ -28,6 +28,7 @@ import com.mojang.authlib.properties.Property;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import io.netty.channel.embedded.EmbeddedChannel;
+import java.util.List;
 import java.util.UUID;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
@@ -62,6 +63,17 @@ public class FakePlayer extends ServerPlayer {
         getEntityData().set(PlayerAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
 
         this.invulnerableTime = 0;
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        super.remove(reason);
+        try {
+            for (ServerPlayer player : serverLevel().players()) {
+                player.connection.send(new ClientboundPlayerInfoRemovePacket(List.of(uuid)));
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

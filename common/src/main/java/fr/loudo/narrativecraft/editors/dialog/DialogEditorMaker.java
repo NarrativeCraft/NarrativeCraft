@@ -35,7 +35,6 @@ import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.List;
 import java.util.UUID;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
@@ -100,10 +99,6 @@ public class DialogEditorMaker implements EditorMaker {
     @Override
     public void reset() {
         if (fakePlayer != null) {
-            playerSession
-                    .getPlayer()
-                    .connection
-                    .send(new ClientboundPlayerInfoRemovePacket(List.of(fakePlayer.getUUID())));
             fakePlayer.remove(Entity.RemovalReason.DISCARDED);
             fakePlayer = null;
         }
