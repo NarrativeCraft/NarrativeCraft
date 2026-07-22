@@ -35,7 +35,6 @@ import fr.loudo.narrativecraft.utils.Utils;
 import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -172,20 +171,9 @@ public class PlaybackContext implements IPlaybackContext {
 
     public void stop() {
         if (entity == null) return;
-        if (entity instanceof FakePlayer fakePlayer) {
-            removeFakePlayerFromTabList(fakePlayer);
-        }
         entity.remove(Entity.RemovalReason.KILLED);
         entity = null;
         pause();
-    }
-
-    private void removeFakePlayerFromTabList(FakePlayer fakePlayer) {
-        Collection<ServerPlayer> players =
-                playback.forSpecificPlayers() ? playback.getTargetedPlayers() : level.players();
-        for (ServerPlayer player : players) {
-            player.connection.send(new ClientboundPlayerInfoRemovePacket(List.of(fakePlayer.getUUID())));
-        }
     }
 
     public void play() {
@@ -254,15 +242,7 @@ public class PlaybackContext implements IPlaybackContext {
 
     private void killEntity() {
         if (entity == null) return;
-        if (entity instanceof FakePlayer fakePlayer) {
-            removeFakePlayerFromTabList(fakePlayer);
-        }
         entity.remove(Entity.RemovalReason.KILLED);
-        if (entity instanceof FakePlayer player) {
-            for (ServerPlayer serverPlayer : playback.getLevel().players()) {
-                serverPlayer.connection.send(new ClientboundPlayerInfoRemovePacket(List.of(player.getUUID())));
-            }
-        }
         entity = null;
         spawned = false;
     }
