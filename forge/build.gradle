@@ -62,8 +62,14 @@ dependencies {
             prefer "${blade_ink_version}"
         }
     }
+    jarJar(implementation("org.yaml:snakeyaml")) {
+        version {
+            prefer "${snakeyaml_version}"
+        }
+    }
     additionalRuntimeClasspath "com.bladecoder.ink:blade-ink:${blade_ink_version}"
     additionalRuntimeClasspath "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}"
+    additionalRuntimeClasspath "org.yaml:snakeyaml:${snakeyaml_version}"
     implementation project(':api')
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 }

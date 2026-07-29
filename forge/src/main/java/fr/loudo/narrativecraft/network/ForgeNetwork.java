@@ -176,6 +176,10 @@ public final class ForgeNetwork {
                 ClientPacketHandler::notifyClientPlayStory);
         clientRun(S2CSessionClear.TYPE, S2CSessionClear::read, ClientPacketHandler::sessionClear);
         client(S2CStoryLocales.TYPE, S2CStoryLocales::read, ClientPacketHandler::storyLocales);
+        client(S2CEnsureLocalExists.TYPE, S2CEnsureLocalExists::read, ClientPacketHandler::ensureLocalExists);
+        client(S2CSetStoryLocale.TYPE, S2CSetStoryLocale::read, ClientPacketHandler::applyStoryLocale);
+        client(S2CStoryTranslations.TYPE, S2CStoryTranslations::read, ClientPacketHandler::storyTranslations);
+        client(S2CStoryVariables.TYPE, S2CStoryVariables::read, ClientPacketHandler::storyVariables);
     }
 
     private static void registerServer() {
