@@ -152,7 +152,7 @@ public final class InkTagHandler {
 
             DispatchResult dispatchResult;
             try {
-                dispatchResult = dispatcher.dispatch(rawTag, playerSession.getScene());
+                dispatchResult = dispatcher.dispatch(rawTag, playerSession.getScene(), playerSession::localize);
             } catch (InkTagHandlerException exception) {
                 lifecycle.onError(exception);
                 return;
@@ -183,7 +183,7 @@ public final class InkTagHandler {
         for (String tag : tags) {
             DispatchResult dispatchResult;
             try {
-                dispatchResult = dispatcher.dispatch(tag, playerSession.getScene());
+                dispatchResult = dispatcher.dispatch(tag, playerSession.getScene(), playerSession::localize);
             } catch (InkTagHandlerException exception) {
                 lifecycle.onError(exception);
                 return false;

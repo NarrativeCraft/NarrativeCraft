@@ -40,10 +40,13 @@ import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.network.story.S2CDialogStop;
 import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
+import fr.loudo.narrativecraft.network.story.S2CSetStoryLocale;
 import fr.loudo.narrativecraft.network.story.S2CShowChoices;
 import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
 import fr.loudo.narrativecraft.network.story.S2CStopStory;
 import fr.loudo.narrativecraft.network.story.S2CStoryLocales;
+import fr.loudo.narrativecraft.network.story.S2CStoryTranslations;
+import fr.loudo.narrativecraft.network.story.S2CStoryVariables;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
@@ -144,6 +147,18 @@ public class ClientPacketHandlerNeoForge {
 
     public static void storyLocales(S2CStoryLocales packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.storyLocales(packet));
+    }
+
+    public static void applyStoryLocale(S2CSetStoryLocale packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.applyStoryLocale(packet));
+    }
+
+    public static void storyTranslations(S2CStoryTranslations packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.storyTranslations(packet));
+    }
+
+    public static void storyVariables(S2CStoryVariables packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.storyVariables(packet));
     }
 
     public static void dialogStop(S2CDialogStop packet, IPayloadContext context) {

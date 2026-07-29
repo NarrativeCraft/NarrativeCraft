@@ -42,6 +42,7 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
+import fr.loudo.narrativecraft.network.story.S2CStoryVariables;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -91,9 +92,13 @@ public class CutsceneInkAction extends InkAction {
         editorMaker =
                 new CutsceneMakerEditorMaker(cutscene, (PlayerSession) playerSession, NarrativeEnvironment.PRODUCTION);
         ((PlayerSession) playerSession).setEditor(editorMaker);
+        StoryHandler storyHandler = ((PlayerSession) playerSession).getStoryHandler();
+        if (storyHandler != null) {
+            Services.PACKET.sendToPlayer(
+                    playerSession.getPlayer(), new S2CStoryVariables(storyHandler.variablesSnapshot()));
+        }
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(), new BiCutsceneEnter(cutscene, NarrativeEnvironment.PRODUCTION));
-        StoryHandler storyHandler = ((PlayerSession) playerSession).getStoryHandler();
         editorMaker.init();
 
         // Re-use entity of a character if spawn animation point is close to current entity
