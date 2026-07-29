@@ -66,7 +66,7 @@ maven {
 }
 ```
 ```
-compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.1.3+mc{minecraft_version}'
+compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.2.0+mc{minecraft_version}'
 ```
 
 ### Maven
@@ -80,7 +80,7 @@ compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.1.3+mc{minecraft_versi
 <dependency>
     <groupId>fr.loudo.narrativecraft</groupId>
     <artifactId>narrativecraft-api</artifactId>
-    <version>2.1.3+mc{minecraft_version}</version>
+    <version>2.2.0+mc{minecraft_version}</version>
 </dependency>
 ```
 
