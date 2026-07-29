@@ -131,6 +131,7 @@ public class MainScreen extends Screen {
                             close();
                             Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false, true));
                         } else {
+                            activeMainMusic = false;
                             minecraft.gui.setScreen(new ConfirmScreen(
                                     t -> {
                                         if (t) {
