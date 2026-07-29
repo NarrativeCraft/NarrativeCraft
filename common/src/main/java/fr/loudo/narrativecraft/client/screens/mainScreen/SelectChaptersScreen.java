@@ -61,4 +61,9 @@ public class SelectChaptersScreen extends PaginationsItemsScreen<Chapter> {
     public void onClose() {
         minecraft.setScreen(lastScreen);
     }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
 }
