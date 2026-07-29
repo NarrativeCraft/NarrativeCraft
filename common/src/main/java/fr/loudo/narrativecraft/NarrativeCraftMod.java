@@ -43,7 +43,6 @@ import fr.loudo.narrativecraft.narrative.inkTag.InkActionRegister;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.narrative.save.SaveFileManager;
 import fr.loudo.narrativecraft.narrative.story.StoryHandlerManager;
-import fr.loudo.narrativecraft.narrative.story.StoryLibrary;
 import fr.loudo.narrativecraft.playback.PlaybackManager;
 import fr.loudo.narrativecraft.recording.actions.ActionRegister;
 import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
@@ -77,7 +76,7 @@ public class NarrativeCraftMod {
     private final SaveFileManager saveFileManager = new SaveFileManager();
     private CameraAngle mainScreenData;
 
-    private StoryLibrary storyLibrary;
+    private String compiledStoryJson;
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
 
@@ -164,16 +163,16 @@ public class NarrativeCraftMod {
         return inkTagDispatcher;
     }
 
-    public StoryLibrary getStoryLibrary() {
-        return storyLibrary;
+    public String getCompiledStoryJson() {
+        return compiledStoryJson;
     }
 
-    public void setStoryLibrary(StoryLibrary storyLibrary) {
-        this.storyLibrary = storyLibrary;
+    public void setCompiledStoryJson(String compiledStoryJson) {
+        this.compiledStoryJson = compiledStoryJson;
     }
 
     public boolean hasCompiledStory() {
-        return storyLibrary != null && !storyLibrary.isEmpty();
+        return compiledStoryJson != null;
     }
 
     public void setServer(MinecraftServer server) {

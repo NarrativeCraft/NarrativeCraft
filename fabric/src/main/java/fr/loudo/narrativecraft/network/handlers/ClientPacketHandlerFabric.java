@@ -37,13 +37,7 @@ import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
-import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
-import fr.loudo.narrativecraft.network.story.S2CDialogStop;
-import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
-import fr.loudo.narrativecraft.network.story.S2CShowChoices;
-import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
-import fr.loudo.narrativecraft.network.story.S2CStopStory;
-import fr.loudo.narrativecraft.network.story.S2CStoryLocales;
+import fr.loudo.narrativecraft.network.story.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
@@ -264,6 +258,32 @@ public class ClientPacketHandlerFabric {
             S2CStoryLocales packet = S2CStoryLocales.read(buf);
             client.execute(() -> {
                 ClientPacketHandler.storyLocales(packet);
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CSetStoryLocale.TYPE, (client, handler, buf, responseSender) -> {
+            S2CSetStoryLocale packet = S2CSetStoryLocale.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.applyStoryLocale(packet);
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CEnsureLocalExists.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CEnsureLocalExists packet = S2CEnsureLocalExists.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.ensureLocalExists(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CStoryTranslations.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CStoryTranslations packet = S2CStoryTranslations.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.storyTranslations(packet);
+                    });
+                });
+        ClientPlayNetworking.registerGlobalReceiver(S2CStoryVariables.TYPE, (client, handler, buf, responseSender) -> {
+            S2CStoryVariables packet = S2CStoryVariables.read(buf);
+            client.execute(() -> {
+                ClientPacketHandler.storyVariables(packet);
             });
         });
     }

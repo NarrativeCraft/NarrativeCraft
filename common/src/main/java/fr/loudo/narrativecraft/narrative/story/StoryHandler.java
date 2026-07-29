@@ -67,7 +67,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     private static final String TAG_2D = "[2D]";
 
     private final PlayerSession playerSession;
-    private final CompiledStory compiledStory;
     private final Story story;
     private final InkTagHandler inkTagHandler;
     private final Map<String, Entity> characterEntities = new HashMap<>();
@@ -77,18 +76,18 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     private Step step = Step.READY;
     private Line currentLine;
     private boolean dialogVisible;
+    private boolean choicesVisible;
     private boolean ended = false;
     private boolean finishedStory;
     private boolean loadedFromSave = false;
 
     public StoryHandler(PlayerSession playerSession) throws Exception {
-        this(playerSession, resolveStory(playerSession));
-    }
-
-    private StoryHandler(PlayerSession playerSession, CompiledStory compiledStory) throws Exception {
+        String compiledStoryJson = NarrativeCraftMod.getInstance().getCompiledStoryJson();
+        if (compiledStoryJson == null) {
+            throw new Exception("The story is not compiled!");
+        }
         this.playerSession = playerSession;
-        this.compiledStory = compiledStory;
-        this.story = new Story(compiledStory.json());
+        this.story = new Story(compiledStoryJson);
         this.inkTagHandler = new InkTagHandler(playerSession, this, story);
         story.onError = (message, type) -> {
             onError(new InkTagHandlerException(type.name() + ": " + message));
@@ -97,7 +96,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     StoryHandler(
             PlayerSession playerSession,
-            CompiledStory compiledStory,
             String storyState,
             Map<String, DialogData> characterDialogData,
             Set<UUID> interactionIds,
@@ -106,7 +104,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             boolean ended,
             boolean finishedStory)
             throws Exception {
-        this(playerSession, compiledStory);
+        this(playerSession);
         this.story.getState().loadJson(storyState);
         this.characterDialogData.putAll(characterDialogData);
         this.interactionIds.addAll(interactionIds);
@@ -115,16 +113,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         this.ended = ended;
         this.finishedStory = finishedStory;
         this.loadedFromSave = true;
-    }
-
-    private static CompiledStory resolveStory(PlayerSession playerSession) throws Exception {
-        StoryLibrary storyLibrary = NarrativeCraftMod.getInstance().getStoryLibrary();
-        CompiledStory compiledStory =
-                storyLibrary == null ? null : storyLibrary.resolve(playerSession.getStoryLocale());
-        if (compiledStory == null) {
-            throw new Exception("The story is not compiled!");
-        }
-        return compiledStory;
     }
 
     public void start() throws Exception {
@@ -182,6 +170,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         step = Step.READY;
         currentLine = null;
         dialogVisible = false;
+        choicesVisible = false;
         inkTagHandler.stopAll();
         characterEntities.forEach((s, entity) -> {
             entity.remove(Entity.RemovalReason.DISCARDED);
@@ -197,8 +186,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         if (ended) return;
         try {
             List<Choice> choices = story.getCurrentChoices();
-            List<String> choiceTexts = choices.stream().map(Choice::getText).toList();
-            NarrativeCraftMod.EVENT_BUS.post(new DialogChoiceEvent(playerSession, choiceTexts, index));
+            NarrativeCraftMod.EVENT_BUS.post(
+                    new DialogChoiceEvent(playerSession, localizedChoiceTexts(choices), index));
             story.chooseChoiceIndex(index);
             advance();
         } catch (Exception exception) {
@@ -270,14 +259,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         return story;
     }
 
-    public String getStoryLocale() {
-        return compiledStory.locale();
-    }
-
-    public String getStoryStructureHash() {
-        return compiledStory.structureHash();
-    }
-
     public InkTagHandler getInkTagHandler() {
         return inkTagHandler;
     }
@@ -292,6 +273,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     private void advance() {
         if (ended) return;
+        choicesVisible = false;
         try {
             while (story.canContinue()) {
                 Line line = readNextLine();
@@ -383,10 +365,15 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     private void sendDialogue(Line line) {
-        String speaker = line.speaker();
-        String dialogueText = line.dialogueText();
+        NarrativeCraftMod.EVENT_BUS.post(
+                new DialogStartEvent(playerSession, line.speaker(), playerSession.localize(line.dialogueText())));
+        pushDialogue(line);
+    }
 
-        NarrativeCraftMod.EVENT_BUS.post(new DialogStartEvent(playerSession, speaker, dialogueText));
+    private void pushDialogue(Line line) {
+        String speaker = line.speaker();
+        String dialogueText = playerSession.localize(line.dialogueText());
+
         int entityId = S2CShowDialogue.NO_ENTITY;
         Entity entity = characterEntities.get(speaker.toLowerCase());
         if (entity != null) {
@@ -461,8 +448,35 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     private void sendChoices(List<Choice> choices) {
-        List<String> texts = choices.stream().map(Choice::getText).toList();
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CShowChoices(texts));
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CShowChoices(localizedChoiceTexts(choices)));
+        choicesVisible = true;
+    }
+
+    private List<String> localizedChoiceTexts(List<Choice> choices) {
+        return choices.stream()
+                .map(Choice::getText)
+                .map(playerSession::localize)
+                .toList();
+    }
+
+    public Map<String, String> variablesSnapshot() {
+        Map<String, String> snapshot = new HashMap<>();
+        for (String name : story.getVariablesState()) {
+            Object value = story.getVariablesState().get(name);
+            if (value != null) snapshot.put(name, String.valueOf(value));
+        }
+        return snapshot;
+    }
+
+    public void refreshLocalizedContent() {
+        if (ended) return;
+        if (step == Step.AWAIT_DIALOG && currentLine != null) {
+            pushDialogue(currentLine);
+            return;
+        }
+        if (choicesVisible) {
+            sendChoices(story.getCurrentChoices());
+        }
     }
 
     public void triggerChangeScene() {
@@ -475,6 +489,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             playerSession.getEditor().stop();
         }
         dialogVisible = false;
+        choicesVisible = false;
     }
 
     public void finish() {

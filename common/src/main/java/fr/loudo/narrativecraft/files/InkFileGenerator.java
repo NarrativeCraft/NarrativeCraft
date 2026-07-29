@@ -100,14 +100,6 @@ public class InkFileGenerator {
         }
     }
 
-    public static void regenerateMainInk() {
-        writeMainInk(getMainDirectory());
-    }
-
-    public static void regenerateLocaleMainInk(String locale) {
-        writeMainInk(NarrativeCraftMod.getInstance().getFile().getInit().getLocaleDirectory(locale));
-    }
-
     public static List<File> collectStoryInkFiles() {
         File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
         List<File> inkFiles = new ArrayList<>();
@@ -146,7 +138,7 @@ public class InkFileGenerator {
         return inkFiles;
     }
 
-    private static void writeMainInk(File inkRoot) {
+    public static void regenerateMainInk() {
         File mainDirectory = getMainDirectory();
 
         StringBuilder builder = new StringBuilder();
@@ -161,9 +153,8 @@ public class InkFileGenerator {
         }
         builder.append("\n-> chapter_1\n");
 
-        File mainInkFile = new File(inkRoot, NarrativeCraftFileInit.MAIN_INK_NAME);
+        File mainInkFile = new File(mainDirectory, NarrativeCraftFileInit.MAIN_INK_NAME);
         try {
-            Files.createDirectories(inkRoot.toPath());
             Files.writeString(mainInkFile.toPath(), builder.toString());
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to regenerate {}", mainInkFile, e);

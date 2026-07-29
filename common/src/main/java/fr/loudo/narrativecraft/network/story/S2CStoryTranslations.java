@@ -21,6 +21,39 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story;
+package fr.loudo.narrativecraft.network.story;
 
-public record CompiledStory(String locale, String json, String structureHash) {}
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.network.NarrativePacket;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+
+public record S2CStoryTranslations(Map<String, String> entries) implements NarrativePacket {
+
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "story_translations");
+
+    public static S2CStoryTranslations read(FriendlyByteBuf buf) {
+        int size = buf.readInt();
+        Map<String, String> entries = new HashMap<>();
+        for (int i = 0; i < size; i++) {
+            entries.put(buf.readUtf(), buf.readUtf());
+        }
+        return new S2CStoryTranslations(entries);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        buf.writeInt(entries.size());
+        entries.forEach((key, value) -> {
+            buf.writeUtf(key);
+            buf.writeUtf(value);
+        });
+    }
+
+    @Override
+    public ResourceLocation type() {
+        return TYPE;
+    }
+}

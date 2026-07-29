@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
+import fr.loudo.narrativecraft.narrative.story.locale.StoryTranslations;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CNarrativeDataClear;
@@ -71,6 +72,7 @@ public class NarrativeEntryInit {
         interactions();
 
         NarrativeServerSettings.init(file.getInit().getDataDirectory().toPath());
+        StoryTranslations.reload();
 
         NarrativeCraftMod.getInstance().setMainScreenData(file.getMainScreenData());
         NarrativeCraftMod.getInstance().setGlobalDialogData(file.getGlobalDialogData());
@@ -79,29 +81,17 @@ public class NarrativeEntryInit {
     }
 
     private static void compileStories() {
-        StoryCompilerHandler.LibraryResult result = StoryCompilerHandler.compileLibrary();
-
-        if (result.getDefaultError() != null) {
-            NarrativeCraftMod.LOGGER.error("Failed to compile story (init process): {}", result.getDefaultError());
+        try {
+            NarrativeCraftMod.getInstance().setCompiledStoryJson(StoryCompilerHandler.compileToJson());
+        } catch (Exception exception) {
+            NarrativeCraftMod.LOGGER.error("Failed to compile story (init process)", exception);
+            return;
         }
-        for (StoryCompilerHandler.TagError tagError : result.getDefaultTagErrors()) {
+
+        for (StoryCompilerHandler.TagError tagError : StoryCompilerHandler.validateTags()) {
             NarrativeCraftMod.LOGGER.error(
                     "Invalid ink tag: {}", tagError.toMessage().getString());
         }
-        result.getLocaleErrors()
-                .forEach((locale, error) ->
-                        NarrativeCraftMod.LOGGER.error("Failed to compile locale '{}': {}", locale, error));
-        result.getLocaleTagErrors()
-                .forEach((locale, tagErrors) -> NarrativeCraftMod.LOGGER.error(
-                        "Locale '{}' has {} invalid ink tag(s) and was skipped", locale, tagErrors.size()));
-        for (String locale : result.getStructureMismatches()) {
-            NarrativeCraftMod.LOGGER.warn(
-                    "Locale '{}' has a different structure than the default story: saves are not portable between them",
-                    locale);
-        }
-
-        if (!result.isDefaultCompiled()) return;
-        NarrativeCraftMod.getInstance().setStoryLibrary(result.getLibrary());
     }
 
     private static void chapters() {
