@@ -12,6 +12,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     include(implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}")
     include(implementation "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}")
+    include(implementation "org.yaml:snakeyaml:${snakeyaml_version}")
     implementation project(':api')
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }

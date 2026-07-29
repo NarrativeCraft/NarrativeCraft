@@ -21,6 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story;
+package fr.loudo.narrativecraft.network.story;
 
-public record CompiledStory(String locale, String json, String structureHash) {}
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import java.util.List;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+
+public record S2CEnsureLocalExists(List<String> locales, String defaultLocale) implements CustomPacketPayload {
+
+    public static final Type<S2CEnsureLocalExists> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "ensure_local_exists"));
+
+    public static final StreamCodec<ByteBuf, S2CEnsureLocalExists> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()),
+            S2CEnsureLocalExists::locales,
+            ByteBufCodecs.STRING_UTF8,
+            S2CEnsureLocalExists::defaultLocale,
+            S2CEnsureLocalExists::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+}

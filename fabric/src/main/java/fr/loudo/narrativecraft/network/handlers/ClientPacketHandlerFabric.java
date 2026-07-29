@@ -37,13 +37,7 @@ import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
-import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
-import fr.loudo.narrativecraft.network.story.S2CDialogStop;
-import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
-import fr.loudo.narrativecraft.network.story.S2CShowChoices;
-import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
-import fr.loudo.narrativecraft.network.story.S2CStopStory;
-import fr.loudo.narrativecraft.network.story.S2CStoryLocales;
+import fr.loudo.narrativecraft.network.story.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientPacketHandlerFabric {
@@ -111,6 +105,18 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CStoryLocales.TYPE, (packet, context) -> {
             ClientPacketHandler.storyLocales(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CSetStoryLocale.TYPE, (packet, context) -> {
+            ClientPacketHandler.applyStoryLocale(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CEnsureLocalExists.TYPE, (packet, context) -> {
+            ClientPacketHandler.ensureLocalExists(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CStoryTranslations.TYPE, (packet, context) -> {
+            ClientPacketHandler.storyTranslations(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CStoryVariables.TYPE, (packet, context) -> {
+            ClientPacketHandler.storyVariables(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CDialogStop.TYPE, (packet, context) -> {
             ClientPacketHandler.dialogStop();

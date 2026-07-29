@@ -109,6 +109,18 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playToClient(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC, ClientPacketHandlerNeoForge::stopStory);
         registrar.playToClient(
                 S2CStoryLocales.TYPE, S2CStoryLocales.STREAM_CODEC, ClientPacketHandlerNeoForge::storyLocales);
+        registrar.playToClient(
+                S2CEnsureLocalExists.TYPE,
+                S2CEnsureLocalExists.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::ensureLocaleExists);
+        registrar.playToClient(
+                S2CSetStoryLocale.TYPE, S2CSetStoryLocale.STREAM_CODEC, ClientPacketHandlerNeoForge::applyStoryLocale);
+        registrar.playToClient(
+                S2CStoryTranslations.TYPE,
+                S2CStoryTranslations.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::storyTranslations);
+        registrar.playToClient(
+                S2CStoryVariables.TYPE, S2CStoryVariables.STREAM_CODEC, ClientPacketHandlerNeoForge::storyVariables);
         registrar.playToClient(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC, ClientPacketHandlerNeoForge::dialogStop);
         registrar.playToClient(
                 S2CCharacterStoryAction.TYPE,

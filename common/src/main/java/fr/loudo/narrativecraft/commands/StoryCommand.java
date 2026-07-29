@@ -34,7 +34,10 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryCompilerHandler;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.StoryLibrary;
+import fr.loudo.narrativecraft.narrative.story.locale.StoryLocaleManager;
+import fr.loudo.narrativecraft.narrative.story.locale.StoryTranslations;
+import fr.loudo.narrativecraft.network.story.S2CSetStoryLocale;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.List;
@@ -91,7 +94,7 @@ public class StoryCommand {
                                         })))
                         .then(Commands.literal("locale")
                                 .then(Commands.argument("locale", StringArgumentType.word())
-                                        .suggests(CommandSuggestions::suggestStoryLocales)
+                                        .suggests(CommandSuggestions::suggestLocales)
                                         .executes(ctx -> {
                                             ServerPlayer player =
                                                     ctx.getSource().getPlayerOrException();
@@ -108,8 +111,7 @@ public class StoryCommand {
     }
 
     private static int setLocaleFor(CommandContext<CommandSourceStack> context, ServerPlayer target, String locale) {
-        StoryLibrary storyLibrary = NarrativeCraftMod.getInstance().getStoryLibrary();
-        if (storyLibrary == null || !storyLibrary.getLocales().contains(locale)) {
+        if (!StoryLocaleManager.listAvailableLocales().contains(locale)) {
             context.getSource()
                     .sendFailure(Translation.message("locale.not_exists", Component.literal(locale))
                             .withStyle(ChatFormatting.RED));
@@ -121,6 +123,8 @@ public class StoryCommand {
         if (session == null) return 0;
 
         session.setStoryLocale(locale);
+        Services.PACKET.sendToPlayer(target, new S2CSetStoryLocale(locale));
+        LocaleCommand.sendTranslations(target);
         context.getSource()
                 .sendSuccess(
                         () -> Translation.message(
@@ -131,10 +135,8 @@ public class StoryCommand {
                         false);
 
         StoryHandler storyHandler = session.getStoryHandler();
-        if (storyHandler != null && !locale.equals(storyHandler.getStoryLocale())) {
-            context.getSource()
-                    .sendSystemMessage(
-                            Translation.message("locale.applies_next_load").withStyle(ChatFormatting.YELLOW));
+        if (storyHandler != null) {
+            storyHandler.refreshLocalizedContent();
         }
 
         return Command.SINGLE_SUCCESS;
@@ -144,17 +146,19 @@ public class StoryCommand {
         context.getSource()
                 .sendSystemMessage(Translation.message("story.compiling").withStyle(ChatFormatting.YELLOW));
 
-        StoryCompilerHandler.LibraryResult result = StoryCompilerHandler.compileLibrary();
-
-        if (result.getDefaultError() != null) {
+        String compiledStoryJson;
+        try {
+            compiledStoryJson = StoryCompilerHandler.compileToJson();
+        } catch (Exception exception) {
             context.getSource().sendSystemMessage(Component.empty());
-            NarrativeCraftMod.LOGGER.error("Failed to compile story: {}", result.getDefaultError());
+            NarrativeCraftMod.LOGGER.error("Failed to compile story", exception);
             context.getSource()
-                    .sendFailure(Component.literal(result.getDefaultError()).withStyle(ChatFormatting.RED));
+                    .sendFailure(Component.literal(String.valueOf(exception.getMessage()))
+                            .withStyle(ChatFormatting.RED));
             return 0;
         }
 
-        List<StoryCompilerHandler.TagError> tagErrors = result.getDefaultTagErrors();
+        List<StoryCompilerHandler.TagError> tagErrors = StoryCompilerHandler.validateTags();
         if (!tagErrors.isEmpty()) {
             for (StoryCompilerHandler.TagError tagError : tagErrors) {
                 context.getSource().sendFailure(tagError.toMessage());
@@ -168,40 +172,14 @@ public class StoryCommand {
             return 0;
         }
 
-        NarrativeCraftMod.getInstance().setStoryLibrary(result.getLibrary());
-        reportLocaleIssues(context, result);
+        NarrativeCraftMod.getInstance().setCompiledStoryJson(compiledStoryJson);
+        StoryTranslations.reload();
         LocaleCommand.broadcastLocales();
 
         context.getSource()
                 .sendSuccess(() -> Translation.message("story.compiled").withStyle(ChatFormatting.GREEN), false);
 
         return Command.SINGLE_SUCCESS;
-    }
-
-    private static void reportLocaleIssues(
-            CommandContext<CommandSourceStack> context, StoryCompilerHandler.LibraryResult result) {
-        result.getLocaleErrors().forEach((locale, error) -> context.getSource()
-                .sendFailure(Translation.message(
-                                "locale.compile_failed", Component.literal(locale), Component.literal(error))
-                        .withStyle(ChatFormatting.RED)));
-
-        result.getLocaleTagErrors().forEach((locale, tagErrors) -> {
-            for (StoryCompilerHandler.TagError tagError : tagErrors) {
-                context.getSource().sendFailure(tagError.toMessage());
-            }
-            context.getSource()
-                    .sendFailure(Translation.message(
-                                    "locale.tag_errors",
-                                    Component.literal(locale),
-                                    Component.literal(String.valueOf(tagErrors.size())))
-                            .withStyle(ChatFormatting.RED));
-        });
-
-        for (String locale : result.getStructureMismatches()) {
-            context.getSource()
-                    .sendSystemMessage(Translation.message("locale.structure_mismatch", Component.literal(locale))
-                            .withStyle(ChatFormatting.GOLD));
-        }
     }
 
     private static int playFor(CommandContext<CommandSourceStack> context, ServerPlayer target, String knotPath) {
