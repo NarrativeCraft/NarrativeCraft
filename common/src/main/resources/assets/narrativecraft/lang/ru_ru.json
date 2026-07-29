@@ -73,6 +73,12 @@
   "narrativecraft.screen.entity_type_picker": "Выбор типа сущности",
   "narrativecraft.screen.animation_character_picker": "Выбор персонажа",
 
+  "narrativecraft.tooltip.story": "История",
+  "narrativecraft.tooltip.characters": "Персонажи",
+  "narrativecraft.tooltip.settings": "Настройки",
+  "narrativecraft.tooltip.global_dialog": "Глобальные диалоги",
+  "narrativecraft.tooltip.dialog_editor": "Диалоги",
+  
   "narrativecraft.screen.settings.main_screen_maker_editor": "Редактор главного экрана",
   "narrativecraft.screen.settings.world_settings": "Настройки мира",
 
