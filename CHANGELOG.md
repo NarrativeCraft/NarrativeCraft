@@ -2,6 +2,10 @@
 
 ## [2.1.3]
 
+### Features
+
+- Confirm screen when clicking on "new game" if a save is detected
+
 ### Fixes
 
 - World locked if leaving the world while a playback is playing
