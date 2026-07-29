@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -126,8 +127,23 @@ public class MainScreen extends Screen {
 
         if (!isPause) {
             addRenderableWidget(Button.builder(Translation.message("screen.main.new_game"), button -> {
-                        close();
-                        Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false, true));
+                        if (!canContinue) {
+                            close();
+                            Services.PACKET.sendToServer(new C2SPlayStory(Optional.empty(), false, true));
+                        } else {
+                            minecraft.gui.setScreen(new ConfirmScreen(
+                                    t -> {
+                                        if (t) {
+                                            close();
+                                            Services.PACKET.sendToServer(
+                                                    new C2SPlayStory(Optional.empty(), false, true));
+                                        } else {
+                                            minecraft.gui.setScreen(this);
+                                        }
+                                    },
+                                    Translation.message("story.new_game.title"),
+                                    Translation.message("story.new_game.message")));
+                        }
                     })
                     .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                     .build());
