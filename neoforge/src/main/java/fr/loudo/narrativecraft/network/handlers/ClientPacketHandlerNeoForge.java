@@ -37,16 +37,7 @@ import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
-import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
-import fr.loudo.narrativecraft.network.story.S2CDialogStop;
-import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
-import fr.loudo.narrativecraft.network.story.S2CSetStoryLocale;
-import fr.loudo.narrativecraft.network.story.S2CShowChoices;
-import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
-import fr.loudo.narrativecraft.network.story.S2CStopStory;
-import fr.loudo.narrativecraft.network.story.S2CStoryLocales;
-import fr.loudo.narrativecraft.network.story.S2CStoryTranslations;
-import fr.loudo.narrativecraft.network.story.S2CStoryVariables;
+import fr.loudo.narrativecraft.network.story.*;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
@@ -147,6 +138,10 @@ public class ClientPacketHandlerNeoForge {
 
     public static void storyLocales(S2CStoryLocales packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.storyLocales(packet));
+    }
+
+    public static void ensureLocaleExists(S2CEnsureLocalExists packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.ensureLocalExists(packet));
     }
 
     public static void applyStoryLocale(S2CSetStoryLocale packet, IPayloadContext context) {

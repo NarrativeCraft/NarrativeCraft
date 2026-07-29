@@ -27,6 +27,9 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
+import fr.loudo.narrativecraft.narrative.story.locale.StoryTranslations;
+import fr.loudo.narrativecraft.network.story.S2CEnsureLocalExists;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -38,6 +41,9 @@ public class OnPlayerJoinEvent {
 
     public static void onPlayerJoin(ServerPlayer player) {
         NarrativeEntryInit.sendDataToPlayer(player);
+        Services.PACKET.sendToPlayer(
+                player,
+                new S2CEnsureLocalExists(StoryTranslations.listLoadedLocales(), NarrativeServerSettings.defaultLocale));
         for (DeserializationResult<?> deserializationResult :
                 NarrativeCraftMod.getInstance().getCorruptedDeserialization()) {
             Utils.sendError(Translation.message("error.corrupted_entry", deserializationResult.folderName()), player);

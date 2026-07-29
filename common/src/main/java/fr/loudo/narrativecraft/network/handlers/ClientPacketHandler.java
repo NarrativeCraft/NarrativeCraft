@@ -282,6 +282,17 @@ public class ClientPacketHandler {
         }
     }
 
+    public static void ensureLocalExists(S2CEnsureLocalExists packet) {
+        if (!packet.locales().contains(NarrativeClientSettings.storyLocale)) {
+            NarrativeClientSettings.storyLocale = packet.defaultLocale();
+            try {
+                NarrativeClientSettings.save();
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Failed to save user settings!", e);
+            }
+        }
+    }
+
     public static void stopAllInkActions() {
         ClientNarrativeCraftMod.getInstance().getPlayerSession().stopAllClientInkActions();
     }

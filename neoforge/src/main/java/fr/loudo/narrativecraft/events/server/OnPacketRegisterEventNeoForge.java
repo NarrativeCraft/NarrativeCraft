@@ -113,6 +113,10 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playToClient(
                 S2CStoryLocales.TYPE, S2CStoryLocales.STREAM_CODEC, ClientPacketHandlerNeoForge::storyLocales);
         registrar.playToClient(
+                S2CEnsureLocalExists.TYPE,
+                S2CEnsureLocalExists.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::ensureLocaleExists);
+        registrar.playToClient(
                 S2CSetStoryLocale.TYPE, S2CSetStoryLocale.STREAM_CODEC, ClientPacketHandlerNeoForge::applyStoryLocale);
         registrar.playToClient(
                 S2CStoryTranslations.TYPE,
