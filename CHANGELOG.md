@@ -1,14 +1,9 @@
 # Changelog
 
-## [2.1.3]
+## [2.2.0]
+
+### Feature
+- Refactored the way to translate a story: no cloned stories, everything is handled with translation key with yaml files.
 
 ### Fixes
-
-- Ride action not working correctly on some furniture mod
-- Entity custom name visible if not character in playback
-- Cutscene max tick conflict if removing an animation/subscene
-- Revert fix on story (break choices appear)
-- World locked if leaving the world while a playback is playing
-- Character placement on ground in camera angle not accurate
-- Log in chat of executed command with command tag
-- Crash if right-clicking an entity in camera angle editor in fabric
+- Main music in main screen stopping when going in options - 26.2

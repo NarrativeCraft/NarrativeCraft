@@ -81,6 +81,7 @@ public class MainScreen extends Screen {
     private boolean canContinue;
     private boolean finishedStory;
     private boolean isPause;
+    private boolean activeMainMusic = false;
 
     private int ctrlPressCount = 0;
     private Button leaveScreenButton;
@@ -155,9 +156,10 @@ public class MainScreen extends Screen {
             currentY += BUTTON_HEIGHT + BUTTON_GAP;
         }
 
-        addRenderableWidget(Button.builder(
-                        Translation.message("screen.main.options"),
-                        button -> minecraft.gui.setScreen(new OptionsScreen(this)))
+        addRenderableWidget(Button.builder(Translation.message("screen.main.options"), button -> {
+                    activeMainMusic = false;
+                    minecraft.gui.setScreen(new OptionsScreen(this));
+                })
                 .bounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
         currentY += BUTTON_HEIGHT + BUTTON_GAP;
@@ -184,8 +186,10 @@ public class MainScreen extends Screen {
             addRenderableWidget(leaveScreenButton);
         }
 
-        if (!minecraft.getSoundManager().isActive(MAIN_MUSIC_INSTANCE) && !isPause) {
+        if (!activeMainMusic && !isPause) {
+            minecraft.getSoundManager().stop(MAIN_MUSIC_INSTANCE);
             minecraft.getSoundManager().play(MAIN_MUSIC_INSTANCE);
+            activeMainMusic = true;
         }
     }
 
