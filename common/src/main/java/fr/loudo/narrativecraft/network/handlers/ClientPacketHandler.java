@@ -42,6 +42,8 @@ import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.client.settings.ClientStoryLocales;
+import fr.loudo.narrativecraft.client.settings.ClientStoryTranslations;
+import fr.loudo.narrativecraft.client.settings.ClientStoryVariables;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import fr.loudo.narrativecraft.dialog.*;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -263,6 +265,34 @@ public class ClientPacketHandler {
                 new C2SSetStoryLocale(ClientStoryLocales.resolve(NarrativeClientSettings.storyLocale)));
     }
 
+    public static void storyTranslations(S2CStoryTranslations packet) {
+        ClientStoryTranslations.set(packet.entries());
+    }
+
+    public static void storyVariables(S2CStoryVariables packet) {
+        ClientStoryVariables.set(packet.variables());
+    }
+
+    public static void applyStoryLocale(S2CSetStoryLocale packet) {
+        NarrativeClientSettings.storyLocale = packet.locale();
+        try {
+            NarrativeClientSettings.save();
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Failed to save user settings!", e);
+        }
+    }
+
+    public static void ensureLocalExists(S2CEnsureLocalExists packet) {
+        if (!packet.locales().contains(NarrativeClientSettings.storyLocale)) {
+            NarrativeClientSettings.storyLocale = packet.defaultLocale();
+            try {
+                NarrativeClientSettings.save();
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Failed to save user settings!", e);
+            }
+        }
+    }
+
     public static void stopAllInkActions() {
         ClientNarrativeCraftMod.getInstance().getPlayerSession().stopAllClientInkActions();
     }
@@ -271,6 +301,7 @@ public class ClientPacketHandler {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         session.clear();
         ClientNarrativeCraftMod.getInstance().getPlayerSession().setInStory(false);
+        ClientStoryVariables.clear();
     }
 
     public static void dialogStop() {

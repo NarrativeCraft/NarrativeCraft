@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.client.screens.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.settings.ClientStoryLocales;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
@@ -36,7 +35,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -94,13 +92,6 @@ public class OptionsScreen extends Screen {
                             buildLocaleLabel(), button -> minecraft.gui.setScreen(new SelectLocaleScreen(this)))
                     .bounds(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT)
                     .build();
-            addRenderableWidget(localeBtn);
-            boolean inStory =
-                    ClientNarrativeCraftMod.getInstance().getPlayerSession().isInStory();
-            localeBtn.active = !inStory;
-            if (inStory) {
-                localeBtn.setTooltip(Tooltip.create(Translation.message("screen.main.options.language_disabled")));
-            }
             addRenderableWidget(localeBtn);
             currentY += ELEMENT_HEIGHT + ELEMENT_GAP;
         }

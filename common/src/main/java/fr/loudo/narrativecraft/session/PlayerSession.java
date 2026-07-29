@@ -27,6 +27,8 @@ import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.narrative.story.locale.StoryTranslations;
+import fr.loudo.narrativecraft.narrative.story.locale.TranslationResolver;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CSessionClear;
@@ -39,6 +41,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 
 public class PlayerSession extends AbstractPlayerSession {
+
+    private static final String USER_PLACEHOLDER = "%user%";
 
     private final ServerPlayer player;
     private GameType lastGameType;
@@ -128,5 +132,10 @@ public class PlayerSession extends AbstractPlayerSession {
 
     public void setStoryLocale(@Nullable String storyLocale) {
         this.storyLocale = storyLocale;
+    }
+
+    public String localize(String text) {
+        return TranslationResolver.resolve(text, key -> StoryTranslations.find(storyLocale, key))
+                .replace(USER_PLACEHOLDER, player.getName().getString());
     }
 }

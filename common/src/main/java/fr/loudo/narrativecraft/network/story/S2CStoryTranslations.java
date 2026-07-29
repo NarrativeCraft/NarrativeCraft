@@ -21,6 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story;
+package fr.loudo.narrativecraft.network.story;
 
-public record CompiledStory(String locale, String json, String structureHash) {}
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+
+public record S2CStoryTranslations(Map<String, String> entries) implements CustomPacketPayload {
+
+    public static final Type<S2CStoryTranslations> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "story_translations"));
+
+    public static final StreamCodec<ByteBuf, S2CStoryTranslations> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.STRING_UTF8),
+            S2CStoryTranslations::entries,
+            S2CStoryTranslations::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+}

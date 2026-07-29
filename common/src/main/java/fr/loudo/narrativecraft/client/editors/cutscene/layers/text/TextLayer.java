@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.settings.ClientStoryTranslations;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.TextKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
@@ -104,7 +105,7 @@ public class TextLayer extends CutsceneLayer {
 
             DispatchResult dispatchResult;
             try {
-                dispatchResult = dispatcher.dispatch(tag, playerSession.getScene());
+                dispatchResult = dispatcher.dispatch(tag, playerSession.getScene(), ClientStoryTranslations::localize);
             } catch (InkTagHandlerException exception) {
                 NarrativeCraftMod.LOGGER.warn("Invalid text keyframe tag '{}': {}", tag, exception.getMessage());
                 continue;

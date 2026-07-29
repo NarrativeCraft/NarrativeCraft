@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.commands.LocaleCommand;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
@@ -46,7 +47,7 @@ import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.StoryLibrary;
+import fr.loudo.narrativecraft.narrative.story.locale.StoryLocaleManager;
 import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
@@ -69,7 +70,6 @@ import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -578,7 +578,6 @@ public class ServerPacketHandler {
                 storyHandler = new StoryHandler(playerSession);
             }
             playerSession.setStoryHandler(storyHandler);
-            warnIfSaveKeepsItsLocale(playerSession, storyHandler);
             if (packet.stitchName().isEmpty()) {
                 storyHandler.start();
             } else {
@@ -595,34 +594,14 @@ public class ServerPacketHandler {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         if (playerSession == null) return;
 
-        StoryLibrary storyLibrary = NarrativeCraftMod.getInstance().getStoryLibrary();
         String locale = packet.locale();
-        boolean known = storyLibrary != null && storyLibrary.getLocales().contains(locale);
-        playerSession.setStoryLocale(known ? locale : null);
+        playerSession.setStoryLocale(StoryLocaleManager.exists(locale) ? locale : null);
+        LocaleCommand.sendTranslations(playerSession.getPlayer());
 
         StoryHandler storyHandler = playerSession.getStoryHandler();
-        if (storyHandler == null || !localeDiffers(playerSession, storyHandler)) return;
-
-        sendLocaleToast(playerSession, Translation.message("locale.applies_next_load"));
-    }
-
-    private static void warnIfSaveKeepsItsLocale(PlayerSession playerSession, StoryHandler storyHandler) {
-        if (!localeDiffers(playerSession, storyHandler)) return;
-
-        sendLocaleToast(
-                playerSession,
-                Translation.message(
-                        "locale.save_incompatible", playerSession.getStoryLocale(), storyHandler.getStoryLocale()));
-    }
-
-    private static boolean localeDiffers(PlayerSession playerSession, StoryHandler storyHandler) {
-        String requestedLocale = playerSession.getStoryLocale();
-        return requestedLocale != null && !requestedLocale.equals(storyHandler.getStoryLocale());
-    }
-
-    private static void sendLocaleToast(PlayerSession playerSession, Component message) {
-        Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(), new S2CToastMessage(Translation.message("locale"), message));
+        if (storyHandler != null) {
+            storyHandler.refreshLocalizedContent();
+        }
     }
 
     public static void enterMainScreen(BiMainScreenEnter packet, Player player) {

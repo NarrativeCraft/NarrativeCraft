@@ -36,13 +36,7 @@ import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
-import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
-import fr.loudo.narrativecraft.network.story.S2CDialogStop;
-import fr.loudo.narrativecraft.network.story.S2CNotifyClientPlayStory;
-import fr.loudo.narrativecraft.network.story.S2CShowChoices;
-import fr.loudo.narrativecraft.network.story.S2CShowDialogue;
-import fr.loudo.narrativecraft.network.story.S2CStopStory;
-import fr.loudo.narrativecraft.network.story.S2CStoryLocales;
+import fr.loudo.narrativecraft.network.story.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class ClientPacketRegisterFabric {
@@ -73,6 +67,10 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay().register(S2CShowChoices.TYPE, S2CShowChoices.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CStopStory.TYPE, S2CStopStory.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CStoryLocales.TYPE, S2CStoryLocales.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CSetStoryLocale.TYPE, S2CSetStoryLocale.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CEnsureLocalExists.TYPE, S2CEnsureLocalExists.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CStoryTranslations.TYPE, S2CStoryTranslations.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CStoryVariables.TYPE, S2CStoryVariables.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BiStopEditorMaker.TYPE, BiStopEditorMaker.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);

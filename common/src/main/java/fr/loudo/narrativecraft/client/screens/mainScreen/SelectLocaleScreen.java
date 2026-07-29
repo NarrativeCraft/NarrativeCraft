@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.client.screens.mainScreen;
 import fr.loudo.narrativecraft.client.screens.PaginationsItemsScreen;
 import fr.loudo.narrativecraft.client.settings.ClientStoryLocales;
 import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
+import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -53,6 +55,7 @@ public class SelectLocaleScreen extends PaginationsItemsScreen<String> {
     @Override
     protected void onItemClicked(String locale) {
         NarrativeClientSettings.storyLocale = locale;
+        Services.PACKET.sendToServer(new C2SSetStoryLocale(locale));
         minecraft.gui.setScreen(lastScreen);
     }
 

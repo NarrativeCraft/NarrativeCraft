@@ -36,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -95,7 +96,13 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
      */
     @Nullable
     public DispatchResult dispatch(String rawTag, IScene scene) throws InkTagHandlerException {
-        List<String> tokens = tokenize(rawTag);
+        return dispatch(rawTag, scene, UnaryOperator.identity());
+    }
+
+    @Nullable
+    public DispatchResult dispatch(String rawTag, IScene scene, UnaryOperator<String> tokenLocalizer)
+            throws InkTagHandlerException {
+        List<String> tokens = tokenize(rawTag).stream().map(tokenLocalizer).toList();
         if (tokens.isEmpty()) return null;
 
         String keyword = tokens.get(0);
