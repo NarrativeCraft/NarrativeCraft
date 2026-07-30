@@ -27,12 +27,12 @@ import com.google.gson.JsonObject;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import net.minecraft.world.phys.Vec3;
 
-public class CameraLayerType extends CutsceneLayerType {
+public class CameraLayerType implements ICutsceneLayerType {
 
     public static final String ID = "camera";
 

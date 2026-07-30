@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.story;
 
+import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
 import fr.loudo.narrativecraft.api.narrative.IStoryHandlerManager;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -30,22 +31,30 @@ import fr.loudo.narrativecraft.session.PlayerSession;
 public class StoryHandlerManager implements IStoryHandlerManager {
     @Override
     public void start(IPlayerSession playerSession) throws Exception {
-        StoryHandler storyHandler = new StoryHandler((PlayerSession) playerSession);
+        PlayerSession session = requireOwnedSession(playerSession);
+        StoryHandler storyHandler = new StoryHandler(session);
         storyHandler.start();
-        ((PlayerSession) playerSession).setStoryHandler(storyHandler);
+        session.setStoryHandler(storyHandler);
     }
 
     @Override
     public void start(String path, IPlayerSession playerSession) throws Exception {
-        StoryHandler storyHandler = new StoryHandler((PlayerSession) playerSession);
+        PlayerSession session = requireOwnedSession(playerSession);
+        StoryHandler storyHandler = new StoryHandler(session);
         storyHandler.start(path);
-        ((PlayerSession) playerSession).setStoryHandler(storyHandler);
+        session.setStoryHandler(storyHandler);
     }
 
     @Override
     public void stop(IPlayerSession playerSession) {
-        StoryHandler storyHandler = (StoryHandler) playerSession.getStoryHandler();
+        IStoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return;
         storyHandler.stop();
+    }
+
+    private static PlayerSession requireOwnedSession(IPlayerSession playerSession) {
+        if (playerSession instanceof PlayerSession session) return session;
+        throw new IllegalArgumentException("Expected a player session obtained from IPlayerSessionManager, got "
+                + (playerSession == null ? "null" : playerSession.getClass().getName()));
     }
 }

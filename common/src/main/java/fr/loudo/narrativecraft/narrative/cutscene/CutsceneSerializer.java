@@ -31,8 +31,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import java.lang.reflect.Type;
@@ -89,11 +89,10 @@ public class CutsceneSerializer implements JsonSerializer<Cutscene> {
         json.addProperty("sortIndex", layer.getSortIndex());
 
         JsonArray keyframes = new JsonArray();
-        if (layer.getType() instanceof CutsceneLayerType layerType) {
-            for (Keyframe keyframe : layer.getKeyframes()) {
-                JsonObject keyframeJson = layerType.serializeKeyframe(keyframe);
-                if (keyframeJson != null) keyframes.add(keyframeJson);
-            }
+        ICutsceneLayerType layerType = layer.getType();
+        for (Keyframe keyframe : layer.getKeyframes()) {
+            JsonObject keyframeJson = layerType.serializeKeyframe(keyframe);
+            if (keyframeJson != null) keyframes.add(keyframeJson);
         }
         json.add("keyframes", keyframes);
         return json;

@@ -54,6 +54,11 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
     }
 
     @Override
+    public final String getTypeId() {
+        return layerType.getId();
+    }
+
+    @Override
     public ICutsceneLayerType getType() {
         return layerType;
     }

@@ -27,22 +27,17 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeSegment;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 
 public class FovLayer extends CutsceneLayer {
 
-    public FovLayer(CutsceneLayerType layerType) {
+    public FovLayer(ICutsceneLayerType layerType) {
         super(layerType);
-    }
-
-    @Override
-    public String getTypeId() {
-        return FovLayerType.ID;
     }
 
     @Override

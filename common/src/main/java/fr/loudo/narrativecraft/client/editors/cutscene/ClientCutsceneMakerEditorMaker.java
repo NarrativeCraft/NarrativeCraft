@@ -227,11 +227,9 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         playback.setTotalTick(totalTick);
     }
 
-    public void addLayer(ICutsceneLayer layer) {
-        if (layer instanceof CutsceneLayer cutsceneLayer) {
-            editorLayers.add(new CutsceneMakerEditorLayer(cutsceneLayer, LAYER_GAP));
-            rebuildSortIndices();
-        }
+    public void addLayer(CutsceneLayer layer) {
+        editorLayers.add(new CutsceneMakerEditorLayer(layer, LAYER_GAP));
+        rebuildSortIndices();
     }
 
     public void toggleHud() {

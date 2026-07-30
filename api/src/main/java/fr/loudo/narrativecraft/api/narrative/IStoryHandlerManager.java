@@ -25,6 +25,13 @@ package fr.loudo.narrativecraft.api.narrative;
 
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 
+/**
+ * Starts and stops story playback for a player session.
+ *
+ * <p>The sessions passed to {@link #start} must be owned by NarrativeCraft, i.e. obtained from
+ * {@link fr.loudo.narrativecraft.api.managers.IPlayerSessionManager#getByPlayer}. Custom
+ * implementations of {@link IPlayerSession} are rejected with an {@link IllegalArgumentException}.</p>
+ */
 public interface IStoryHandlerManager {
 
     void start(IPlayerSession playerSession) throws Exception;

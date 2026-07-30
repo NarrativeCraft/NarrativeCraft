@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.api.recording;
 
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import java.util.List;
 import java.util.UUID;
 import net.minecraft.world.entity.Entity;
 
@@ -48,6 +49,8 @@ public interface IRecording {
     IRecordingEntityData getRecordingEntityData(Entity entity);
 
     IRecordingEntityData getRecordingEntityData(UUID entityId);
+
+    List<IRecordingEntityData> getRecordingEntities();
 
     int getTick();
 
