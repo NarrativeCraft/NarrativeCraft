@@ -36,7 +36,7 @@ import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
 
 public class NarrativeCraftAPI {
 
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     private static volatile NarrativeCraftAPI INSTANCE;
 

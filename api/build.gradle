@@ -12,10 +12,6 @@ neoForge {
     neoFormVersion = neo_form_version
 }
 
-dependencies {
-    implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}"
-}
-
 configurations {
     apiJava {
         canBeResolved = false

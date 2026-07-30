@@ -25,12 +25,12 @@ package fr.loudo.narrativecraft.client.editors.cutscene.layers.text;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.client.settings.ClientStoryTranslations;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.TextKeyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl.DispatchResult;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
@@ -44,13 +44,8 @@ public class TextLayer extends CutsceneLayer {
 
     private final HashMap<Integer, List<TextInkAction>> executedText = new HashMap<>();
 
-    public TextLayer(CutsceneLayerType layerType) {
+    public TextLayer(ICutsceneLayerType layerType) {
         super(layerType);
-    }
-
-    @Override
-    public String getTypeId() {
-        return TextLayerType.ID;
     }
 
     @Override

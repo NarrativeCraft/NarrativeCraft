@@ -27,11 +27,11 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeSegment;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -43,13 +43,8 @@ public class CameraLayer extends CutsceneLayer {
     private int lastSentChunkX = Integer.MIN_VALUE;
     private int lastSentChunkZ = Integer.MIN_VALUE;
 
-    public CameraLayer(CutsceneLayerType layerType) {
+    public CameraLayer(ICutsceneLayerType layerType) {
         super(layerType);
-    }
-
-    @Override
-    public String getTypeId() {
-        return CameraLayerType.ID;
     }
 
     @Override

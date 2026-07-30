@@ -27,10 +27,10 @@ import com.google.gson.JsonObject;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.FovKeyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 
-public class FovLayerType extends CutsceneLayerType {
+public class FovLayerType implements ICutsceneLayerType {
 
     public static final String ID = "fov";
 

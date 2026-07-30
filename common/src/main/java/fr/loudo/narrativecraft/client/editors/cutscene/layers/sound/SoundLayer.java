@@ -24,8 +24,8 @@
 package fr.loudo.narrativecraft.client.editors.cutscene.layers.sound;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.SoundKeyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,13 +38,8 @@ import net.minecraft.sounds.SoundSource;
 public class SoundLayer extends CutsceneLayer {
     private final Map<Integer, SimpleSoundInstance> playedSounds = new HashMap<>();
 
-    public SoundLayer(CutsceneLayerType layerType) {
+    public SoundLayer(ICutsceneLayerType layerType) {
         super(layerType);
-    }
-
-    @Override
-    public String getTypeId() {
-        return SoundLayerType.ID;
     }
 
     @Override
