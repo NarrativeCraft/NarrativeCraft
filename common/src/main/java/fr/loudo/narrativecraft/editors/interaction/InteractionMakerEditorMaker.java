@@ -23,6 +23,9 @@
 
 package fr.loudo.narrativecraft.editors.interaction;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.events.interaction.InteractionZoneEnterEvent;
+import fr.loudo.narrativecraft.api.events.interaction.InteractionZoneLeaveEvent;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
@@ -74,9 +77,9 @@ public class InteractionMakerEditorMaker implements EditorMaker {
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return;
 
+        ServerPlayer player = playerSession.getPlayer();
         for (InteractionZone zone : interaction.getZones()) {
-            boolean isInside = new AABB(zone.getCorner1(), zone.getCorner2())
-                    .contains(playerSession.getPlayer().position());
+            boolean isInside = new AABB(zone.getCorner1(), zone.getCorner2()).contains(player.position());
             boolean wasInside = insideZoneIds.contains(zone.getId());
 
             if (isInside && !wasInside) {
@@ -86,8 +89,10 @@ public class InteractionMakerEditorMaker implements EditorMaker {
                     if (zone.isOneTime()) storyHandler.addInteractionId(zone.getId());
                 }
                 insideZoneIds.add(zone.getId());
-            } else if (!isInside) {
+                NarrativeCraftMod.EVENT_BUS.post(new InteractionZoneEnterEvent(player, zone));
+            } else if (!isInside && wasInside) {
                 insideZoneIds.remove(zone.getId());
+                NarrativeCraftMod.EVENT_BUS.post(new InteractionZoneLeaveEvent(player, zone));
             }
         }
     }

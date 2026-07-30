@@ -28,9 +28,9 @@ import java.util.function.Supplier;
 /**
  * Registry for {@link InkAction} implementations.
  *
- * <p>Call {@link #register} once at startup (before any Ink story runs) to make a custom action
- * available to the Ink tag system. Obtain the instance via
- * {@link fr.loudo.narrativecraft.api.NarrativeCraftAPI#getInkTagDispatcher()}.
+ * <p>This registry is owned by NarrativeCraft and is not exposed directly. Register custom actions
+ * once at startup (before any Ink story runs) through
+ * {@link fr.loudo.narrativecraft.api.AddonContext#registerInkAction(Class, java.util.function.Supplier)}.
  */
 public interface InkTagDispatcher {
 

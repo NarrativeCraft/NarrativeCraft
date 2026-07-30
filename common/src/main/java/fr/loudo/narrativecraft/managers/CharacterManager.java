@@ -24,11 +24,11 @@
 package fr.loudo.narrativecraft.managers;
 
 import fr.loudo.narrativecraft.api.managers.ICharacterManager;
+import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -45,20 +45,22 @@ public class CharacterManager extends NarrativeManager<CharacterStory> implement
 
     public ICharacterStory resolveCharacter(UUID characterId, @Nullable IScene scene) {
         ICharacterStory characterStory = getById(characterId);
-        Scene concreteScene = (Scene) scene;
         if (characterStory == null && scene != null) {
-            return concreteScene.getNpcManager().getById(characterId);
+            return asCharacterStory(scene.getNpcManager().getById(characterId));
         }
         return characterStory;
     }
 
     public ICharacterStory resolveCharacter(String characterName, @Nullable IScene scene) {
         ICharacterStory characterStory = getByName(characterName);
-        Scene concreteScene = (Scene) scene;
         if (characterStory == null && scene != null) {
-            return concreteScene.getNpcManager().getByName(characterName);
+            return asCharacterStory(scene.getNpcManager().getByName(characterName));
         }
         return characterStory;
+    }
+
+    private static ICharacterStory asCharacterStory(ICharacter character) {
+        return character instanceof ICharacterStory characterStory ? characterStory : null;
     }
 
     public CharacterStory getMainCharacter() {

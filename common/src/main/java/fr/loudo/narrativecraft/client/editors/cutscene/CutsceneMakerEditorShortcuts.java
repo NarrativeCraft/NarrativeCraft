@@ -28,7 +28,6 @@ import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.platform.Services;
@@ -148,8 +147,7 @@ public class CutsceneMakerEditorShortcuts {
         clipboard.clear();
 
         for (Keyframe keyframe : selected) {
-            ICutsceneLayerType rawType = keyframe.getLayer().getType();
-            if (!(rawType instanceof CutsceneLayerType layerType)) continue;
+            ICutsceneLayerType layerType = keyframe.getLayer().getType();
             JsonObject data = layerType.serializeKeyframe(keyframe);
             if (data == null) continue;
             int tickOffset = keyframe.getTick() - earliestTick;
@@ -163,8 +161,7 @@ public class CutsceneMakerEditorShortcuts {
         List<Keyframe> pastedKeyframes = new ArrayList<>();
 
         for (KeyframeCopy copy : clipboard) {
-            ICutsceneLayerType rawType = copy.layer().getType();
-            if (!(rawType instanceof CutsceneLayerType layerType)) continue;
+            ICutsceneLayerType layerType = copy.layer().getType();
 
             JsonObject json = JsonParser.parseString(copy.data().toString()).getAsJsonObject();
             json.addProperty("tick", playheadTick + copy.tickOffset());

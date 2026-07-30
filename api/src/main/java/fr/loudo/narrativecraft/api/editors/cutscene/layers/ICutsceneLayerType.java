@@ -23,9 +23,13 @@
 
 package fr.loudo.narrativecraft.api.editors.cutscene.layers;
 
+import com.google.gson.JsonObject;
+import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
+
 /**
  * Describes a layer type that can be added to a cutscene timeline.
- * Acts as a factory for creating layer instances.
+ * Acts as a factory for creating layer instances and as the serialization contract
+ * for the keyframes they hold.
  */
 public interface ICutsceneLayerType {
 
@@ -40,9 +44,26 @@ public interface ICutsceneLayerType {
     String getName();
 
     /**
-     * Creates a new instance of the layer. Called each time the user adds this layer to the timeline.
+     * Creates a new instance of the layer. Called each time the user adds this layer to the timeline,
+     * and each time a saved layer of this type is loaded.
      *
      * @return a fresh layer instance
      */
-    ICutsceneLayer createLayer();
+    CutsceneLayer createLayer();
+
+    /**
+     * Serializes a keyframe of this layer type to JSON. The {@code tick} must be stored under that
+     * exact property name, since it is rewritten when keyframes are pasted at a new playhead position.
+     *
+     * @return the JSON object, or {@code null} if the keyframe type is not supported
+     */
+    JsonObject serializeKeyframe(Keyframe keyframe);
+
+    /**
+     * Deserializes a keyframe of this layer type from JSON. The keyframe must be created against the
+     * given layer without being added to it: the caller adds the returned keyframe itself.
+     *
+     * @return the created keyframe, or {@code null} if the JSON is invalid
+     */
+    Keyframe deserializeKeyframe(CutsceneLayer layer, JsonObject json);
 }

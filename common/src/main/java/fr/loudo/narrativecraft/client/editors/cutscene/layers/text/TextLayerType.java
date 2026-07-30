@@ -28,12 +28,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.TextKeyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextLayerType extends CutsceneLayerType {
+public class TextLayerType implements ICutsceneLayerType {
 
     public static final String ID = "text";
 

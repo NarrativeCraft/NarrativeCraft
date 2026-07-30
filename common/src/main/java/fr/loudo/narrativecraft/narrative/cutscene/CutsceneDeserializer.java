@@ -34,7 +34,6 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -102,12 +101,12 @@ public class CutsceneDeserializer extends NarrativeDeserializer<Cutscene> {
                         ? layerObject.get("sortIndex").getAsInt()
                         : 0;
 
-                ICutsceneLayerType rawLayerType = NarrativeCraftMod.getInstance()
+                ICutsceneLayerType layerType = NarrativeCraftMod.getInstance()
                         .getCutsceneLayerRegistry()
                         .getType(typeId);
-                if (!(rawLayerType instanceof CutsceneLayerType layerType)) continue;
+                if (layerType == null) continue;
 
-                CutsceneLayer layer = (CutsceneLayer) layerType.createLayer();
+                CutsceneLayer layer = layerType.createLayer();
                 layer.setSortIndex(sortIndex);
 
                 if (layerObject.has("keyframes")) {
@@ -139,11 +138,11 @@ public class CutsceneDeserializer extends NarrativeDeserializer<Cutscene> {
             int sortIndex =
                     layerObject.has("sortIndex") ? layerObject.get("sortIndex").getAsInt() : 0;
 
-            ICutsceneLayerType rawLayerType =
+            ICutsceneLayerType layerType =
                     NarrativeCraftMod.getInstance().getCutsceneLayerRegistry().getType(typeId);
-            if (!(rawLayerType instanceof CutsceneLayerType layerType)) continue;
+            if (layerType == null) continue;
 
-            CutsceneLayer layer = (CutsceneLayer) layerType.createLayer();
+            CutsceneLayer layer = layerType.createLayer();
             layer.setSortIndex(sortIndex);
 
             if (layerObject.has("keyframes")) {

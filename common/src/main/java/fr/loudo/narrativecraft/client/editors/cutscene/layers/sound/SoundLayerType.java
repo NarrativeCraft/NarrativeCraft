@@ -26,10 +26,10 @@ package fr.loudo.narrativecraft.client.editors.cutscene.layers.sound;
 import com.google.gson.JsonObject;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.editors.cutscene.keyframes.SoundKeyframe;
-import fr.loudo.narrativecraft.editors.cutscene.layers.CutsceneLayerType;
 
-public class SoundLayerType extends CutsceneLayerType {
+public class SoundLayerType implements ICutsceneLayerType {
 
     public static final String ID = "sound";
 

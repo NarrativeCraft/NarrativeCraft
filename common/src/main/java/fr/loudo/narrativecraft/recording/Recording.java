@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.events.recording.RecordingSaveEvent;
 import fr.loudo.narrativecraft.api.events.recording.RecordingStartEvent;
 import fr.loudo.narrativecraft.api.events.recording.RecordingStopEvent;
 import fr.loudo.narrativecraft.api.recording.IRecording;
+import fr.loudo.narrativecraft.api.recording.IRecordingEntityData;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
@@ -287,6 +288,10 @@ public class Recording implements IRecording {
 
     public List<RecordingEntityData> getRecordingEntityDataList() {
         return recordingEntityDataList;
+    }
+
+    public List<IRecordingEntityData> getRecordingEntities() {
+        return new ArrayList<>(recordingEntityDataList);
     }
 
     public String getPendingOverwriteName() {
