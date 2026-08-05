@@ -27,16 +27,19 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 public class OnRenderNameTagEvent {
     public static boolean shouldRenderTag(Entity entity) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (!playerSession.isInStory()) return true;
+        if (!(entity instanceof Player player)) return true;
 
         for (ICharacterStory characterStory : playerSession.getCharactersInWorld()) {
-            if (characterStory.getId().equals(entity.getUUID())
+            if (characterStory.getId().equals(Utils.resolveCharacterId(player.getGameProfile()))
                     && characterStory.getCharacterType() == CharacterType.NPC) {
                 return false;
             }
