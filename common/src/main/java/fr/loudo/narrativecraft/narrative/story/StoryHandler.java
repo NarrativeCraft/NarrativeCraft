@@ -44,6 +44,7 @@ import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.save.SaveFileManager;
@@ -53,6 +54,7 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -117,6 +119,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void start() throws Exception {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CNotifyClientPlayStory());
+        sendMainCharacterSkin();
         NarrativeCraftMod.EVENT_BUS.post(new StoryStartEvent(playerSession));
         if (!loadedFromSave) {
             if (NarrativeCraftMod.getInstance().getChapterManager().getList().isEmpty()) {
@@ -140,6 +143,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void start(String knotPath) throws Exception {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CNotifyClientPlayStory());
+        sendMainCharacterSkin();
         NarrativeCraftMod.EVENT_BUS.post(new StoryStartEvent(playerSession));
         story.choosePathString(knotPath, true);
         Chapter chapter = getChapterFromKnotName(knotPath);
@@ -155,6 +159,15 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         playerSession.apply(chapter, scene);
         NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneStartEvent(playerSession, chapter, scene));
         advance();
+    }
+
+    private void sendMainCharacterSkin() {
+        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        CharacterStory mainCharacter = characterManager.getMainCharacter();
+        if (mainCharacter == null) return;
+        if (mainCharacter.getMainCharacterAttribute().getSkin()
+                != MainCharacterAttribute.SkinMode.CLIENT_HAS_CHARACTER_SKIN) return;
+        UtilsServer.sendCharacterSkin(playerSession.getPlayer(), mainCharacter);
     }
 
     public void tick() {
