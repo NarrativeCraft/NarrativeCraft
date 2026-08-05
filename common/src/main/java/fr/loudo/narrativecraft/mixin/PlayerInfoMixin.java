@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.mixin;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.mixin.accessor.TextureManagerAccessor;
@@ -32,7 +31,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
 import fr.loudo.narrativecraft.narrative.character.PlayerModelType;
-import fr.loudo.narrativecraft.utils.FakePlayer;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,7 +62,7 @@ public abstract class PlayerInfoMixin {
 
         GameProfile profile = getProfile();
 
-        UUID characterId = narrativecraft$resolveCharacterId(profile);
+        UUID characterId = Utils.resolveCharacterId(profile);
         List<ICharacterStory> charactersInWorld =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
         for (ICharacterStory characterStory : charactersInWorld) {
@@ -89,7 +88,7 @@ public abstract class PlayerInfoMixin {
         if (mainCharacter == null) return;
 
         GameProfile gameProfile = cir.getReturnValue();
-        UUID characterId = narrativecraft$resolveCharacterId(gameProfile);
+        UUID characterId = Utils.resolveCharacterId(gameProfile);
 
         List<ICharacterStory> charactersInWorld =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
@@ -134,16 +133,6 @@ public abstract class PlayerInfoMixin {
         if (attr.getSkin() != MainCharacterAttribute.SkinMode.CLIENT_HAS_CHARACTER_SKIN) return Optional.empty();
 
         return narrativecraft$buildCharacterSkin(mainCharacter);
-    }
-
-    private UUID narrativecraft$resolveCharacterId(GameProfile profile) {
-        for (Property property : profile.getProperties().get(FakePlayer.CHARACTER_ID_PROPERTY)) {
-            try {
-                return UUID.fromString(property.value());
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
-        return profile.getId();
     }
 
     private ResourceLocation narrativecraft$getSkinIdentifier(UUID characterId) {
