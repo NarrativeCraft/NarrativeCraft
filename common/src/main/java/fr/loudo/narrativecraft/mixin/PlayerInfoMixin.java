@@ -31,9 +31,6 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
 import fr.loudo.narrativecraft.utils.FakePlayer;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
@@ -48,7 +45,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PlayerInfo.class)
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Mixin(value = PlayerInfo.class, priority = 500)
 public abstract class PlayerInfoMixin {
 
     @Shadow

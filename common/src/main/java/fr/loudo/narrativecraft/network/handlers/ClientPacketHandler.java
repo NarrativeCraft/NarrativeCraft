@@ -498,8 +498,9 @@ public class ClientPacketHandler {
         TextureManager textureManager = minecraft.getTextureManager();
         for (UUID characterId : session.getLoadedCharactersSkin()) {
             textureManager.release(
-                    Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character" + characterId));
+                    Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "character/" + characterId));
         }
+        session.getLoadedCharactersSkin().clear();
     }
 
     public static void renderSaveIcon(S2CRenderSaveIcon packet) {

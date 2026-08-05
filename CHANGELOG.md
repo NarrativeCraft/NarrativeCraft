@@ -1,9 +1,6 @@
 # Changelog
 
-## [2.2.1]
-
-### Feature
-- Minor improvements to API
+## [2.2.2]
 
 ### Fix
-- Cutscene layer registry API
+- Capes mod overriding main character skin to local player
