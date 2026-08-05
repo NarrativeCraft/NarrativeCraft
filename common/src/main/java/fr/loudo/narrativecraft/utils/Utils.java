@@ -23,8 +23,11 @@
 
 package fr.loudo.narrativecraft.utils;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -73,5 +76,15 @@ public class Utils {
     public static boolean isOnGround(Entity entity) {
         AABB box = entity.getBoundingBox().deflate(0.001).move(0, -0.05, 0);
         return !entity.level().noCollision(entity, box);
+    }
+
+    public static UUID resolveCharacterId(GameProfile profile) {
+        for (Property property : profile.properties().get(FakePlayer.CHARACTER_ID_PROPERTY)) {
+            try {
+                return UUID.fromString(property.value());
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return profile.id();
     }
 }

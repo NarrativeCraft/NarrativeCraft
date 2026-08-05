@@ -24,13 +24,15 @@
 package fr.loudo.narrativecraft.mixin;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
-import fr.loudo.narrativecraft.utils.FakePlayer;
+import fr.loudo.narrativecraft.utils.Utils;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
@@ -45,10 +47,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 @Mixin(value = PlayerInfo.class, priority = 500)
 public abstract class PlayerInfoMixin {
 
@@ -62,7 +60,7 @@ public abstract class PlayerInfoMixin {
 
         GameProfile profile = getProfile();
 
-        UUID characterId = narrativecraft$resolveCharacterId(profile);
+        UUID characterId = Utils.resolveCharacterId(profile);
         List<ICharacterStory> charactersInWorld =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
         for (ICharacterStory characterStory : charactersInWorld) {
@@ -88,7 +86,7 @@ public abstract class PlayerInfoMixin {
         if (mainCharacter == null) return;
 
         GameProfile gameProfile = cir.getReturnValue();
-        UUID characterId = narrativecraft$resolveCharacterId(gameProfile);
+        UUID characterId = Utils.resolveCharacterId(gameProfile);
 
         List<ICharacterStory> charactersInWorld =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
@@ -130,16 +128,6 @@ public abstract class PlayerInfoMixin {
         if (attr.getSkin() != MainCharacterAttribute.SkinMode.CLIENT_HAS_CHARACTER_SKIN) return Optional.empty();
 
         return narrativecraft$buildCharacterSkin(mainCharacter);
-    }
-
-    private UUID narrativecraft$resolveCharacterId(GameProfile profile) {
-        for (Property property : profile.properties().get(FakePlayer.CHARACTER_ID_PROPERTY)) {
-            try {
-                return UUID.fromString(property.value());
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
-        return profile.id();
     }
 
     private Identifier narrativecraft$getSkinIdentifier(UUID characterId) {
