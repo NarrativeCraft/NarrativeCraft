@@ -187,12 +187,11 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         addEntityToWorld(entity, player, level, characterStory);
 
         if (entity instanceof LivingEntity livingEntity) {
-            for (int i = 0; i < characterPlacement.getItems().size(); i++) {
-                EquipmentSlot slot = EquipmentSlot.values()[i];
-                ItemStack itemStack = characterPlacement.getItems().get(i);
-                livingEntity.setItemSlot(slot, itemStack);
-                ((LivingEntityAccessor) livingEntity).callDetectEquipmentUpdates();
+            for (Map.Entry<EquipmentSlot, ItemStack> entry :
+                    characterPlacement.getItemsBySlot().entrySet()) {
+                livingEntity.setItemSlot(entry.getKey(), entry.getValue());
             }
+            ((LivingEntityAccessor) livingEntity).callDetectEquipmentUpdates();
         }
 
         entity.getTags().add(ENTITY_TAG);
@@ -268,7 +267,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                 characterStory,
                 position,
                 rotation,
-                new ArrayList<>(),
+                new EnumMap<>(EquipmentSlot.class),
                 true,
                 true,
                 templateReferenceId);
