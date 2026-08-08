@@ -24,8 +24,10 @@
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.UUID;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -36,7 +38,7 @@ public class CharacterPlacement {
     private final ICharacterStory characterStory;
     private Vec3 position;
     private Vec3 rotation;
-    private final List<ItemStack> items;
+    private final Map<EquipmentSlot, ItemStack> itemsBySlot = new EnumMap<>(EquipmentSlot.class);
     private final boolean onGround;
     private final boolean isTemplate;
     private final UUID templateReferenceId;
@@ -47,7 +49,7 @@ public class CharacterPlacement {
             ICharacterStory characterStory,
             Vec3 position,
             Vec3 rotation,
-            List<ItemStack> items,
+            Map<EquipmentSlot, ItemStack> itemsBySlot,
             boolean onGround,
             boolean isTemplate,
             UUID templateReferenceId) {
@@ -55,10 +57,14 @@ public class CharacterPlacement {
         this.characterStory = characterStory;
         this.position = position;
         this.rotation = rotation;
-        this.items = items;
         this.onGround = onGround;
         this.isTemplate = isTemplate;
         this.templateReferenceId = templateReferenceId;
+        if (itemsBySlot != null) {
+            for (Map.Entry<EquipmentSlot, ItemStack> entry : itemsBySlot.entrySet()) {
+                setItem(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     public CharacterPlacement(
@@ -66,14 +72,18 @@ public class CharacterPlacement {
             ICharacterStory characterStory,
             Vec3 position,
             Vec3 rotation,
-            List<ItemStack> items,
+            Map<EquipmentSlot, ItemStack> itemsBySlot,
             boolean onGround) {
-        this(id, characterStory, position, rotation, items, onGround, false, null);
+        this(id, characterStory, position, rotation, itemsBySlot, onGround, false, null);
     }
 
     public CharacterPlacement(
-            ICharacterStory characterStory, Vec3 position, Vec3 rotation, List<ItemStack> items, boolean onGround) {
-        this(UUID.randomUUID(), characterStory, position, rotation, items, onGround, false, null);
+            ICharacterStory characterStory,
+            Vec3 position,
+            Vec3 rotation,
+            Map<EquipmentSlot, ItemStack> itemsBySlot,
+            boolean onGround) {
+        this(UUID.randomUUID(), characterStory, position, rotation, itemsBySlot, onGround, false, null);
     }
 
     public UUID getId() {
@@ -100,8 +110,21 @@ public class CharacterPlacement {
         this.rotation = rotation;
     }
 
-    public List<ItemStack> getItems() {
-        return items;
+    public Map<EquipmentSlot, ItemStack> getItemsBySlot() {
+        return itemsBySlot;
+    }
+
+    public ItemStack getItem(EquipmentSlot slot) {
+        return itemsBySlot.getOrDefault(slot, ItemStack.EMPTY);
+    }
+
+    public void setItem(EquipmentSlot slot, ItemStack itemStack) {
+        if (slot == null) return;
+        if (itemStack == null || itemStack.isEmpty()) {
+            itemsBySlot.remove(slot);
+            return;
+        }
+        itemsBySlot.put(slot, itemStack);
     }
 
     public boolean isOnGround() {
