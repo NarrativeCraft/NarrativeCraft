@@ -34,13 +34,16 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.UUID;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.phys.Vec3;
 
 public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> {
@@ -158,13 +161,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
         double yRot = json.get("yRot").getAsDouble();
         double roll = json.has("roll") ? json.get("roll").getAsDouble() : 0.0;
 
-        List<ItemStack> items = new ArrayList<>();
-        if (json.has("items")) {
-            for (JsonElement element : json.getAsJsonArray("items")) {
-                ItemStack stack = deserializeItemStack(element.getAsString());
-                if (stack != null && !stack.isEmpty()) items.add(stack);
-            }
-        }
+        Map<EquipmentSlot, ItemStack> itemsBySlot = deserializeItems(json);
 
         ICharacterStory characterStory =
                 NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(characterId, scene);
@@ -183,7 +180,7 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
                 characterStory,
                 new Vec3(x, y, z),
                 new Vec3(xRot, yRot, roll),
-                items,
+                itemsBySlot,
                 onGround,
                 isTemplate,
                 templateReferenceId);
@@ -196,6 +193,41 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
         }
 
         return placement;
+    }
+
+    private static Map<EquipmentSlot, ItemStack> deserializeItems(JsonObject json) {
+        Map<EquipmentSlot, ItemStack> itemsBySlot = new EnumMap<>(EquipmentSlot.class);
+        if (!json.has("items")) return itemsBySlot;
+
+        JsonElement itemsElement = json.get("items");
+        if (itemsElement.isJsonObject()) {
+            for (Map.Entry<String, JsonElement> entry :
+                    itemsElement.getAsJsonObject().entrySet()) {
+                EquipmentSlot slot = EquipmentSlot.CODEC.byName(entry.getKey());
+                if (slot == null) continue;
+                ItemStack stack = deserializeItemStack(entry.getValue().getAsString());
+                if (stack != null && !stack.isEmpty()) itemsBySlot.put(slot, stack);
+            }
+            return itemsBySlot;
+        }
+
+        if (itemsElement.isJsonArray()) {
+            for (JsonElement element : itemsElement.getAsJsonArray()) {
+                ItemStack stack = deserializeItemStack(element.getAsString());
+                if (stack == null || stack.isEmpty()) continue;
+                EquipmentSlot slot = resolveLegacySlot(stack, itemsBySlot);
+                if (slot != null) itemsBySlot.put(slot, stack);
+            }
+        }
+        return itemsBySlot;
+    }
+
+    private static EquipmentSlot resolveLegacySlot(ItemStack stack, Map<EquipmentSlot, ItemStack> alreadyResolved) {
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        if (equippable != null && !alreadyResolved.containsKey(equippable.slot())) return equippable.slot();
+        if (!alreadyResolved.containsKey(EquipmentSlot.MAINHAND)) return EquipmentSlot.MAINHAND;
+        if (!alreadyResolved.containsKey(EquipmentSlot.OFFHAND)) return EquipmentSlot.OFFHAND;
+        return null;
     }
 
     private static ItemStack deserializeItemStack(String nbtString) {

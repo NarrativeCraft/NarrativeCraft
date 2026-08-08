@@ -2,6 +2,7 @@
 
 ## [2.2.2]
 
-### Fix
+### Fixes
 - Capes mod overriding main character skin to local player
 - NPC name tag shown in a story
+- Character from camera angle items not correctly applied

@@ -67,8 +67,8 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
@@ -466,17 +466,13 @@ public class ServerPacketHandler {
         Vec3 position = player.position();
         Vec3 rotation = new Vec3(player.getXRot(), player.getYRot(), 0.0);
 
-        List<ItemStack> items = new ArrayList<>();
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemStack stack = player.getItemBySlot(slot);
-            if (!stack.isEmpty()) items.add(stack.copy());
-        }
+        Map<EquipmentSlot, ItemStack> itemsBySlot = captureEquipment(player);
         ICharacterStory characterStory =
                 NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(characterId, scene);
         if (characterStory == null) return;
 
         CharacterPlacement placement =
-                new CharacterPlacement(characterStory, position, rotation, items, player.onGround());
+                new CharacterPlacement(characterStory, position, rotation, itemsBySlot, player.onGround());
         String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
         Services.PACKET.sendToPlayer(
                 (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placementJson));
@@ -506,19 +502,24 @@ public class ServerPacketHandler {
         Vec3 position = player.position();
         Vec3 rotation = new Vec3(player.getXRot(), player.getYRot(), 0.0);
 
-        List<ItemStack> items = new ArrayList<>();
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemStack stack = player.getItemBySlot(slot);
-            if (!stack.isEmpty()) items.add(stack.copy());
-        }
+        Map<EquipmentSlot, ItemStack> itemsBySlot = captureEquipment(player);
 
         CharacterPlacement placement =
-                new CharacterPlacement(characterStory, position, rotation, items, player.onGround());
+                new CharacterPlacement(characterStory, position, rotation, itemsBySlot, player.onGround());
         String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
         Services.PACKET.sendToPlayer(
                 (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(mainScreenAngle.getId(), placementJson));
 
         editor.spawnEntity(placement);
+    }
+
+    private static Map<EquipmentSlot, ItemStack> captureEquipment(Player player) {
+        Map<EquipmentSlot, ItemStack> itemsBySlot = new EnumMap<>(EquipmentSlot.class);
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            ItemStack stack = player.getItemBySlot(slot);
+            if (!stack.isEmpty()) itemsBySlot.put(slot, stack.copy());
+        }
+        return itemsBySlot;
     }
 
     public static void mainScreenRemovePlacement(C2SMainScreenRemovePlacement packet, Player player) {

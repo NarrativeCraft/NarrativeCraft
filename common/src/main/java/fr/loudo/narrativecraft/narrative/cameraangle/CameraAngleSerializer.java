@@ -29,9 +29,11 @@ import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import java.lang.reflect.Type;
+import java.util.Map;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
 public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
@@ -142,10 +144,11 @@ public class CameraAngleSerializer implements JsonSerializer<CameraAngle> {
                         placement.getTemplateReferenceId().toString());
         }
 
-        JsonArray items = new JsonArray();
-        for (ItemStack stack : placement.getItems()) {
-            JsonElement serialized = serializeItemStack(stack);
-            if (serialized != null) items.add(serialized);
+        JsonObject items = new JsonObject();
+        for (Map.Entry<EquipmentSlot, ItemStack> entry :
+                placement.getItemsBySlot().entrySet()) {
+            JsonElement serialized = serializeItemStack(entry.getValue());
+            if (serialized != null) items.add(entry.getKey().getSerializedName(), serialized);
         }
         json.add("items", items);
         return json;
