@@ -26,13 +26,12 @@ package fr.loudo.narrativecraft.mixin;
 import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.mixin.accessor.TextureManagerAccessor;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
 import fr.loudo.narrativecraft.narrative.character.PlayerModelType;
-import fr.loudo.narrativecraft.utils.Utils;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,18 +61,15 @@ public abstract class PlayerInfoMixin {
 
         GameProfile profile = getProfile();
 
-        UUID characterId = Utils.resolveCharacterId(profile);
-        List<ICharacterStory> charactersInWorld =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
-        for (ICharacterStory characterStory : charactersInWorld) {
-            if (!characterId.equals(characterStory.getId())) continue;
-
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        ICharacterStory characterStory = playerSession.getCharacterByProfileId(profile.getId());
+        if (characterStory != null) {
             if (narrativecraft$isMainCharacterWithPlayerSkin(characterStory)) {
                 cir.setReturnValue(localPlayer.getSkin());
-                continue;
+            } else {
+                narrativecraft$buildCharacterSkin(characterStory).ifPresent(cir::setReturnValue);
             }
-
-            narrativecraft$buildCharacterSkin(characterStory).ifPresent(cir::setReturnValue);
         }
 
         if (profile.getId().equals(localPlayer.getUUID())) {
@@ -88,21 +84,18 @@ public abstract class PlayerInfoMixin {
         if (mainCharacter == null) return;
 
         GameProfile gameProfile = cir.getReturnValue();
-        UUID characterId = Utils.resolveCharacterId(gameProfile);
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
-        List<ICharacterStory> charactersInWorld =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getCharactersInWorld();
-        for (ICharacterStory characterStory : charactersInWorld) {
-            if (!characterId.equals(mainCharacter.getId())) continue;
-            if (!gameProfile.getName().equalsIgnoreCase(CharacterStory.USERNAME_VARIABLE)) continue;
+        ICharacterStory characterStory = playerSession.getCharacterByProfileId(gameProfile.getId());
+        if (characterStory == null) return;
+        if (!characterStory.getId().equals(mainCharacter.getId())) return;
+        if (!gameProfile.getName().equalsIgnoreCase(CharacterStory.USERNAME_VARIABLE)) return;
 
-            GameProfile replaced = new GameProfile(
-                    gameProfile.getId(),
-                    Minecraft.getInstance().player.getName().getString());
-            replaced.getProperties().putAll(gameProfile.getProperties());
-            cir.setReturnValue(replaced);
-            return;
-        }
+        GameProfile replaced = new GameProfile(
+                gameProfile.getId(), Minecraft.getInstance().player.getName().getString());
+        replaced.getProperties().putAll(gameProfile.getProperties());
+        cir.setReturnValue(replaced);
     }
 
     private boolean narrativecraft$isMainCharacterWithPlayerSkin(ICharacterStory characterStory) {

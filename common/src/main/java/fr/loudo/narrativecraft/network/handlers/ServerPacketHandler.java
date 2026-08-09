@@ -67,6 +67,7 @@ import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.EnumMap;
 import java.util.Map;
@@ -219,7 +220,10 @@ public class ServerPacketHandler {
             UtilsServer.sendCharacterSkin((ServerPlayer) player, character);
             Services.PACKET.sendToPlayer(
                     (ServerPlayer) player,
-                    new S2CCharacterStoryAction(character.getId(), S2CCharacterStoryAction.Action.ADD));
+                    new S2CCharacterStoryAction(
+                            character.getId(),
+                            Utils.resolveProfileId(editor.getFakePlayer()),
+                            S2CCharacterStoryAction.Action.ADD));
         }
     }
 
@@ -455,10 +459,6 @@ public class ServerPacketHandler {
         EditorMaker editorMaker = playerSession.getEditor();
         if (!(editorMaker instanceof CameraAngleMakerEditorMaker cameraAngleMakerEditor)) return;
 
-        Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(),
-                new S2CCharacterStoryAction(packet.characterId(), S2CCharacterStoryAction.Action.ADD));
-
         UUID characterId = packet.characterId();
         Vec3 position = player.position();
         Vec3 rotation = new Vec3(player.getXRot(), player.getYRot(), 0.0);
@@ -487,10 +487,6 @@ public class ServerPacketHandler {
         if (playerSession == null) return;
         EditorMaker editorMaker = playerSession.getEditor();
         if (!(editorMaker instanceof MainScreenMakerEditor editor)) return;
-
-        Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(),
-                new S2CCharacterStoryAction(packet.characterId(), S2CCharacterStoryAction.Action.ADD));
 
         ICharacterStory characterStory =
                 NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(packet.characterId(), null);
