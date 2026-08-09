@@ -75,16 +75,17 @@ public class MinecraftCommandInkAction extends InkAction {
         String resolved = commandValue.replace("@p", player.getName().getString());
         CommandSourceStack source = new CommandSourceStack(
                 CommandSource.NULL,
-                player.position(),
-                player.getRotationVector(),
-                player.serverLevel(),
+                fakePlayer.position(),
+                fakePlayer.getRotationVector(),
+                fakePlayer.serverLevel(),
                 4,
-                player.getName().getString(),
-                player.getDisplayName(),
-                player.level().getServer(),
-                player);
+                fakePlayer.getName().getString(),
+                fakePlayer.getDisplayName(),
+                fakePlayer.level().getServer(),
+                fakePlayer);
         try {
             fakePlayer.level().getServer().getCommands().getDispatcher().execute(resolved, source);
+            NarrativeCraftMod.LOGGER.info("CommandExec executed command {} from command tag", resolved);
         } catch (CommandSyntaxException e) {
             return InkActionResult.error("Command execution failed: " + e.getMessage());
         }
