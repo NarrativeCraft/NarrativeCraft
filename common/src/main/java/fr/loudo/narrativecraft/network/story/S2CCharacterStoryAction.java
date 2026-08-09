@@ -25,14 +25,17 @@ package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
+import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CCharacterStoryAction(UUID characterId, Action action) implements CustomPacketPayload {
+public record S2CCharacterStoryAction(
+        UUID characterId, @Nullable UUID profileId, Action action) implements CustomPacketPayload {
 
     public enum Action {
         ADD,
@@ -46,9 +49,16 @@ public record S2CCharacterStoryAction(UUID characterId, Action action) implement
     public static final StreamCodec<ByteBuf, S2CCharacterStoryAction> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
             S2CCharacterStoryAction::characterId,
+            ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC),
+            packet -> Optional.ofNullable(packet.profileId()),
             ByteBufCodecs.idMapper(i -> Action.values()[i], Action::ordinal),
             S2CCharacterStoryAction::action,
-            S2CCharacterStoryAction::new);
+            (characterId, profileId, action) ->
+                    new S2CCharacterStoryAction(characterId, profileId.orElse(null), action));
+
+    public S2CCharacterStoryAction(UUID characterId, Action action) {
+        this(characterId, null, action);
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

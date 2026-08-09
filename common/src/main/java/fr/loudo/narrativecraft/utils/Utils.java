@@ -23,8 +23,6 @@
 
 package fr.loudo.narrativecraft.utils;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import java.util.UUID;
@@ -78,13 +76,9 @@ public class Utils {
         return !entity.level().noCollision(entity, box);
     }
 
-    public static UUID resolveCharacterId(GameProfile profile) {
-        for (Property property : profile.properties().get(FakePlayer.CHARACTER_ID_PROPERTY)) {
-            try {
-                return UUID.fromString(property.value());
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
-        return profile.id();
+    public static UUID resolveProfileId(Entity entity) {
+        if (entity instanceof FakePlayer fakePlayer)
+            return fakePlayer.getGameProfile().id();
+        return entity == null ? null : entity.getUUID();
     }
 }

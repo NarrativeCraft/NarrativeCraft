@@ -76,7 +76,7 @@ import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -406,17 +406,24 @@ public class ClientPacketHandler {
 
         CharacterManager characterManager =
                 ClientNarrativeCraftMod.getInstance().getCharacterManager();
-        ICharacterStory characterStory = characterManager.resolveCharacter(packet.characterId(), session.getScene());
-        List<ICharacterStory> charactersInWorld = session.getCharactersInWorld();
-        if (packet.action() == S2CCharacterStoryAction.Action.ADD) {
-            if (characterStory == null) return;
-            for (ICharacterStory characterStory1 : charactersInWorld) {
-                if (characterStory1.getId().equals(packet.characterId())) return;
-            }
-        }
+        Map<UUID, ICharacterStory> charactersInWorld = session.getCharactersInWorld();
         switch (packet.action()) {
-            case ADD -> charactersInWorld.add(characterStory);
-            case REMOVE -> charactersInWorld.remove(characterStory);
+            case ADD -> {
+                if (packet.profileId() == null) return;
+                ICharacterStory characterStory =
+                        characterManager.resolveCharacter(packet.characterId(), session.getScene());
+                if (characterStory == null) return;
+                charactersInWorld.put(packet.profileId(), characterStory);
+            }
+            case REMOVE -> {
+                if (packet.profileId() == null) {
+                    charactersInWorld
+                            .values()
+                            .removeIf(character -> character.getId().equals(packet.characterId()));
+                    return;
+                }
+                charactersInWorld.remove(packet.profileId());
+            }
             case CLEAR -> charactersInWorld.clear();
         }
     }
