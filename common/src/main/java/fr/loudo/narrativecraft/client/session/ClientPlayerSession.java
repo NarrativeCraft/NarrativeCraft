@@ -36,13 +36,14 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.AbstractPlayerSession;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 
 public class ClientPlayerSession extends AbstractPlayerSession {
 
     private final CutsceneDataSession cutsceneDataSession = new CutsceneDataSession();
     private final StorySaveIconRenderer saveIconRenderer = new StorySaveIconRenderer();
-    private final List<ICharacterStory> charactersInWorld = new ArrayList<>();
+    private final Map<UUID, ICharacterStory> charactersInWorld = new ConcurrentHashMap<>();
     private final List<UUID> loadedCharactersSkin = new ArrayList<>();
     private final List<DialogRenderer2D> activeDialog2DRenderers = new ArrayList<>();
     private final List<DialogRenderer3D> activeDialog3DRenderers = new ArrayList<>();
@@ -66,8 +67,12 @@ public class ClientPlayerSession extends AbstractPlayerSession {
         return cutsceneDataSession;
     }
 
-    public List<ICharacterStory> getCharactersInWorld() {
+    public Map<UUID, ICharacterStory> getCharactersInWorld() {
         return charactersInWorld;
+    }
+
+    public ICharacterStory getCharacterByProfileId(UUID profileId) {
+        return charactersInWorld.get(profileId);
     }
 
     public List<DialogRenderer2D> getActiveDialog2DRenderers() {

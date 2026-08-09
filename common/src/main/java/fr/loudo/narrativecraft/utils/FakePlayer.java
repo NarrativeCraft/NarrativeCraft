@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.utils;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -46,14 +45,10 @@ import net.minecraft.world.damagesource.DamageSource;
 
 // FakePlayer class from Forge
 public class FakePlayer extends ServerPlayer {
-    public static final String CHARACTER_ID_PROPERTY = "nc_character_id";
     private final boolean isInvulnerable;
 
     public static GameProfile createCharacterProfile(ICharacterStory characterStory, String name) {
-        UUID profileId = characterStory.getId();
-        GameProfile profile = new GameProfile(profileId, name);
-        profile.getProperties().put(CHARACTER_ID_PROPERTY, new Property(CHARACTER_ID_PROPERTY, profileId.toString()));
-        return profile;
+        return new GameProfile(UUID.randomUUID(), name);
     }
 
     public FakePlayer(ServerLevel level, GameProfile profile, boolean isInvulnerable) {

@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
+import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import net.minecraft.core.BlockPos;
@@ -85,11 +86,12 @@ public class Playback implements IPlaybackSession {
             hideEntitiesToOtherPlayers();
         }
         Collection<ServerPlayer> recipients = packetRecipients();
+        UUID profileId = Utils.resolveProfileId(getMasterEntity());
         for (ServerPlayer player : recipients) {
             Services.PACKET.sendToPlayer(
                     player,
                     new S2CCharacterStoryAction(
-                            animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
+                            animation.getCharacterStory().getId(), profileId, S2CCharacterStoryAction.Action.ADD));
         }
         UtilsServer.broadcastCharacterSkin(recipients, animation.getCharacterStory());
         NarrativeCraftMod.EVENT_BUS.post(new PlaybackStartEvent(this));
@@ -131,11 +133,14 @@ public class Playback implements IPlaybackSession {
         isPlaying = false;
         if (killOnEnd) {
             resetActions();
+            UUID profileId = Utils.resolveProfileId(getMasterEntity());
             for (ServerPlayer player : packetRecipients()) {
                 Services.PACKET.sendToPlayer(
                         player,
                         new S2CCharacterStoryAction(
-                                animation.getCharacterStory().getId(), S2CCharacterStoryAction.Action.REMOVE));
+                                animation.getCharacterStory().getId(),
+                                profileId,
+                                S2CCharacterStoryAction.Action.REMOVE));
             }
         }
         for (PlaybackContext context : contexts) {

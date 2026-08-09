@@ -48,6 +48,7 @@ import fr.loudo.narrativecraft.recording.actions.EntityByteAction;
 import fr.loudo.narrativecraft.recording.actions.MovementAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.FakePlayer;
+import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import net.minecraft.nbt.CompoundTag;
@@ -94,10 +95,6 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         }
         playerSession.changeGameMode(GameType.SPECTATOR);
         for (CharacterPlacement characterPlacement : cameraAngle.getCharacterPlacements()) {
-            Services.PACKET.sendToPlayer(
-                    playerSession.getPlayer(),
-                    new S2CCharacterStoryAction(
-                            characterPlacement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
             UtilsServer.sendCharacterSkin(playerSession.getPlayer(), characterPlacement.getCharacterStory());
             spawnEntity(characterPlacement);
             if (characterPlacement.isTemplate() && characterPlacement.getTemplateReferenceId() != null) {
@@ -164,10 +161,6 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
     public void spawnEntity(CharacterPlacement characterPlacement) {
         if (characterPlacement.isTemplate() && environment != NarrativeEnvironment.DEVELOPMENT) return;
         UtilsServer.sendCharacterSkin(playerSession.getPlayer(), characterPlacement.getCharacterStory());
-        Services.PACKET.sendToPlayer(
-                playerSession.getPlayer(),
-                new S2CCharacterStoryAction(
-                        characterPlacement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
         ICharacterStory characterStory = characterPlacement.getCharacterStory();
         ServerPlayer player = playerSession.getPlayer();
         ServerLevel level = player.serverLevel();
@@ -183,6 +176,11 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         entity.setYRot((float) characterPlacement.getRotation().y);
         entity.setYHeadRot((float) characterPlacement.getRotation().y);
         entity.setOnGround(characterPlacement.isOnGround());
+
+        Services.PACKET.sendToPlayer(
+                player,
+                new S2CCharacterStoryAction(
+                        characterStory.getId(), Utils.resolveProfileId(entity), S2CCharacterStoryAction.Action.ADD));
 
         addEntityToWorld(entity, player, level, characterStory);
 
@@ -217,7 +215,9 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             Services.PACKET.sendToPlayer(
                     player,
                     new S2CCharacterStoryAction(
-                            placement.getCharacterStory().getId(), S2CCharacterStoryAction.Action.ADD));
+                            placement.getCharacterStory().getId(),
+                            Utils.resolveProfileId(characterEntities.get(placement.getId())),
+                            S2CCharacterStoryAction.Action.ADD));
         }
         placementsByTemplateReference.put(reference.id(), createdIds);
     }

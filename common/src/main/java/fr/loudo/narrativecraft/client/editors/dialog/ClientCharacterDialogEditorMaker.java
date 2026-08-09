@@ -112,7 +112,7 @@ public class ClientCharacterDialogEditorMaker implements EditorMaker {
         }
         minecraft.setScreen(null);
         Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
-        playerSession.getCharactersInWorld().remove(character);
+        playerSession.getCharactersInWorld().values().remove(character);
     }
 
     @Override

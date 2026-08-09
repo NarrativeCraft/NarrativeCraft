@@ -26,10 +26,12 @@ package fr.loudo.narrativecraft.network.story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.NarrativePacket;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record S2CCharacterStoryAction(UUID characterId, Action action) implements NarrativePacket {
+public record S2CCharacterStoryAction(
+        UUID characterId, @Nullable UUID profileId, Action action) implements NarrativePacket {
 
     public enum Action {
         ADD,
@@ -40,13 +42,19 @@ public record S2CCharacterStoryAction(UUID characterId, Action action) implement
     public static final ResourceLocation TYPE =
             new ResourceLocation(NarrativeCraftMod.MOD_ID, "character_story_action");
 
+    public S2CCharacterStoryAction(UUID characterId, Action action) {
+        this(characterId, null, action);
+    }
+
     public static S2CCharacterStoryAction read(FriendlyByteBuf buf) {
-        return new S2CCharacterStoryAction(buf.readUUID(), buf.readEnum(Action.class));
+        return new S2CCharacterStoryAction(
+                buf.readUUID(), buf.readNullable(FriendlyByteBuf::readUUID), buf.readEnum(Action.class));
     }
 
     @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeUUID(characterId);
+        buf.writeNullable(profileId, FriendlyByteBuf::writeUUID);
         buf.writeEnum(action);
     }
 

@@ -90,6 +90,10 @@ public class DialogEditorMaker implements EditorMaker {
         Services.PACKET.sendToPlayer(player, new S2CDialogEditorEntitySpawned(entity.getId()));
     }
 
+    public Entity getFakePlayer() {
+        return fakePlayer;
+    }
+
     @Override
     public void stop() {
         reset();
