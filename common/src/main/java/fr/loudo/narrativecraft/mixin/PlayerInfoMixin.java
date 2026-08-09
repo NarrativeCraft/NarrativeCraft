@@ -101,6 +101,21 @@ public abstract class PlayerInfoMixin {
         cir.setReturnValue(replaced);
     }
 
+    @Inject(method = "getModelName", at = @At("RETURN"), cancellable = true)
+    private void narrativecraft$getModelType(CallbackInfoReturnable<String> cir) {
+        GameProfile profile = getProfile();
+        ClientPlayerSession playerSession =
+                ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        ICharacterStory characterStory = playerSession.getCharacterByProfileId(profile.getId());
+        if (characterStory == null) return;
+
+        String modelName = characterStory.getModelType().name().toLowerCase();
+        if (modelName.equals("wide")) {
+            modelName = "default";
+        }
+        cir.setReturnValue(modelName);
+    }
+
     private boolean narrativecraft$isMainCharacterWithPlayerSkin(ICharacterStory characterStory) {
         if (!(characterStory instanceof CharacterStory concreteCharacter)) return false;
 
