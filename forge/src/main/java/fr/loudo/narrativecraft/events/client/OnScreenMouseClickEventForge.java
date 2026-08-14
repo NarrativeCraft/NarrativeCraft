@@ -24,6 +24,8 @@
 package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -34,7 +36,12 @@ public class OnScreenMouseClickEventForge {
 
     @SubscribeEvent
     public static void onMouseClick(ScreenEvent.MouseButtonPressed.Pre event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        Screen screenBeforeClick = minecraft.screen;
         OnScreenMouseClickEvent.cutsceneHudClick(event.getMouseX(), event.getMouseY(), event.getButton(), false);
+        if (minecraft.screen != screenBeforeClick) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent
