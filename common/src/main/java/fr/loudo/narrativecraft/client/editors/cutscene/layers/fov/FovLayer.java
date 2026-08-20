@@ -78,7 +78,7 @@ public class FovLayer extends CutsceneLayer {
             return sorted.get(sorted.size() - 1).getFov();
 
         KeyframeSegment<FovKeyframe> seg = findSegment(sorted, tick);
-        if (seg.from().getEasing() == EasingType.SMOOTH) {
+        if (seg.to().getEasing() == EasingType.SMOOTH) {
             return (float) Interpolation.catmullRom(
                     seg.p0().getFov(),
                     seg.from().getFov(),
