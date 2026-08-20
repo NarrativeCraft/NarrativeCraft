@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import fr.loudo.narrativecraft.network.story.C2SSetStoryLocale;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.MathUtils;
+import fr.loudo.narrativecraft.utils.ModifiedOptionsScreen;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.io.IOException;
 import java.util.Locale;
@@ -91,8 +92,7 @@ public class OptionsScreen extends Screen {
 
         addRenderableWidget(Button.builder(
                         Translation.message("screen.main.options.minecraft_options"),
-                        button -> minecraft.setScreen(
-                                new net.minecraft.client.gui.screens.OptionsScreen(this, minecraft.options)))
+                        button -> minecraft.setScreen(new ModifiedOptionsScreen(this, minecraft.options)))
                 .bounds(middleX, currentY, ELEMENT_WIDTH, ELEMENT_HEIGHT)
                 .build());
 
