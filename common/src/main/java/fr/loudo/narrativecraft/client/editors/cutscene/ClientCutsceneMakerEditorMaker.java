@@ -98,7 +98,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     private float draggingStartMouseX;
 
     private Button addLayerButton;
-    private int tick, totalTick;
+    private int totalTick;
     private int scrollOffset = 0;
     private float zoomFactor = 1f;
     private float viewStartTick = 0f;
@@ -111,7 +111,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         this.cutscene = cutscene;
         this.control = new CutsceneMakerEditorControl(15, 15);
         this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getLastTick());
-        control.setPlaybackCallbacks(() -> playback.play(tick), () -> {
+        control.setPlaybackCallbacks(this::startPlayback, () -> {
             playback.pause();
             setPreviewRoll(0.0f);
         });
@@ -425,6 +425,24 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         return (float) totalTick / MIN_VISIBLE_TICKS_AT_MAX_ZOOM;
     }
 
+    private void startPlayback() {
+        if (playback.getCurrentTick() >= totalTick) {
+            playHead.setRatio(0f);
+            viewStartTick = 0f;
+            updateTick();
+        }
+        playback.play(playback.getCurrentTick());
+    }
+
+    private void followPlayHead() {
+        float visibleTicks = getVisibleTicks();
+        if (visibleTicks >= totalTick) return;
+        float currentTick = playback.getCurrentTick();
+        if (currentTick >= viewStartTick && currentTick <= viewStartTick + visibleTicks) return;
+        viewStartTick = currentTick;
+        clampViewStart();
+    }
+
     private void clampViewStart() {
         float maxStart = totalTick - getVisibleTicks();
         viewStartTick = (float) Math.clamp(viewStartTick, 0f, Math.max(0f, maxStart));
@@ -493,7 +511,15 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         playback.tick(deltaTracker);
 
-        if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
+        if (control.isPlaying() && !playback.isPlaying()) {
+            control.pause();
+        }
+        if (playback.isPlaying()) {
+            followPlayHead();
+        }
+
+        if (!renderingHud) return;
 
         int[] mousePos = UtilsClient.getScaledMousePos();
         int addLayerY = getStartLayerY() - ADD_NEW_LAYER_BUTTON_OFFSET;
@@ -617,8 +643,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
         if (playHead.isHovered()) {
             playHead.setDragging(true);
-        } else {
-            playHead.onClick(mouseButtonEvent, LAYER_GAP, getTimelineWidth(), getStartLayerY());
+        } else if (playHead.onClick(mouseButtonEvent, LAYER_GAP, getTimelineWidth(), getStartLayerY())) {
             updateTick();
         }
     }
@@ -706,7 +731,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     private void updateTick() {
-        tick = getPlayHeadTick();
+        int tick = getPlayHeadTick();
         playback.seekTo(tick);
         Services.PACKET.sendToServer(new BiCutscenePlayHeadPacket(tick));
     }
