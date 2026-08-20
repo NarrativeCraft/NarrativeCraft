@@ -508,6 +508,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         NarrativeCraftMod.LOGGER.info(
                 "Story finished for player {}.",
                 playerSession.getPlayer().getName().getString());
+        playerSession
+                .getPlayer()
+                .sendSystemMessage(Translation.message("story.finished").withStyle(ChatFormatting.GREEN));
         finishedStory = true;
         save(false);
         stop();
