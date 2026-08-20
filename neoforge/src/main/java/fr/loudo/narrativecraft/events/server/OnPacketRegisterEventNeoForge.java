@@ -254,10 +254,12 @@ public class OnPacketRegisterEventNeoForge {
                 new DirectionalPayloadHandler<>(
                         ClientPacketHandlerNeoForge::interactionEnter, ServerPacketHandlerNeoForge::interactionEnter));
         registrar.playBidirectional(
-                BiStopEditorMaker.TYPE,
-                BiStopEditorMaker.STREAM_CODEC,
+                BiEditorClose.TYPE,
+                BiEditorClose.STREAM_CODEC,
                 new DirectionalPayloadHandler<>(
-                        ClientPacketHandlerNeoForge::stopEditorMaker, ServerPacketHandlerNeoForge::stopEditorMaker));
+                        ClientPacketHandlerNeoForge::editorClose, ServerPacketHandlerNeoForge::editorCloseRequest));
+        registrar.playToClient(
+                S2CEditorOpened.TYPE, S2CEditorOpened.STREAM_CODEC, ClientPacketHandlerNeoForge::editorOpened);
         registrar.playToServer(C2SPlayStory.TYPE, C2SPlayStory.STREAM_CODEC, ServerPacketHandlerNeoForge::playStory);
     }
 }

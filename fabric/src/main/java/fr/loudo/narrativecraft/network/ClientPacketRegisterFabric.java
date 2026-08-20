@@ -69,7 +69,8 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.playS2C().register(S2CStoryTranslations.TYPE, S2CStoryTranslations.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CStoryVariables.TYPE, S2CStoryVariables.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CDialogStop.TYPE, S2CDialogStop.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(BiStopEditorMaker.TYPE, BiStopEditorMaker.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(BiEditorClose.TYPE, BiEditorClose.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CEditorOpened.TYPE, S2CEditorOpened.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(BiInteractionEnter.TYPE, BiInteractionEnter.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CCharacterSkin.TYPE, S2CCharacterSkin.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CCharacterStoryAction.TYPE, S2CCharacterStoryAction.STREAM_CODEC);

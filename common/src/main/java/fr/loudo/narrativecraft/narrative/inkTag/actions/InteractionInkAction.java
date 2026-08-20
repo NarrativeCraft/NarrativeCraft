@@ -74,21 +74,16 @@ public class InteractionInkAction extends InkAction {
         PlayerSession session = (PlayerSession) playerSession;
         EditorMaker lastEditorMaker = session.getEditor();
         if (action.equals("start")) {
-            if (lastEditorMaker != null) {
-                lastEditorMaker.stop();
-            }
             NarrativeCraftMod.EVENT_BUS.post(new InteractionTriggerEvent(playerSession, interaction));
             InteractionMakerEditorMaker editorMaker =
                     new InteractionMakerEditorMaker(interaction, session, NarrativeEnvironment.PRODUCTION);
-            session.setEditor(editorMaker);
-            editorMaker.init();
+            session.openEditor(editorMaker);
             String dataJson = InteractionSerializer.serializeData(interaction);
             Services.PACKET.sendToPlayer(
                     session.getPlayer(), new S2CInteractionEditorData(interaction.getId(), dataJson));
         } else if (action.equals("remove")) {
             if (lastEditorMaker instanceof InteractionMakerEditorMaker) {
-                lastEditorMaker.stop();
-                ((PlayerSession) playerSession).setEditor(null);
+                session.closeEditor();
             }
         }
 

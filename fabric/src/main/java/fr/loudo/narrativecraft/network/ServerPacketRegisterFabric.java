@@ -51,7 +51,7 @@ public class ServerPacketRegisterFabric {
         PayloadTypeRegistry.playC2S().register(C2SCutsceneSave.TYPE, C2SCutsceneSave.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(BiCameraAngleEnter.TYPE, BiCameraAngleEnter.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S().register(BiStopEditorMaker.TYPE, BiStopEditorMaker.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiEditorClose.TYPE, BiEditorClose.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(C2SCameraAngleSave.TYPE, C2SCameraAngleSave.STREAM_CODEC);
         PayloadTypeRegistry.playC2S()
                 .register(C2SCameraAngleCaptureCharacter.TYPE, C2SCameraAngleCaptureCharacter.STREAM_CODEC);

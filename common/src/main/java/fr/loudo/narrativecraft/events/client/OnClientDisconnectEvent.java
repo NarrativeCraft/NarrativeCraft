@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
+import fr.loudo.narrativecraft.network.BiEditorClose;
 import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.client.player.LocalPlayer;
 
@@ -37,7 +37,7 @@ public class OnClientDisconnectEvent {
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return;
 
-        Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
+        Services.PACKET.sendToServer(new BiEditorClose(BiEditorClose.UNIDENTIFIED_SESSION));
         playerSession.clear();
     }
 }

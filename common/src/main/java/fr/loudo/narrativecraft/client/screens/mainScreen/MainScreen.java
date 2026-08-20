@@ -29,8 +29,6 @@ import com.mojang.realmsclient.RealmsMainScreen;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.editors.EditorMaker;
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.story.C2SPlayStory;
 import fr.loudo.narrativecraft.network.story.C2SStopStory;
 import fr.loudo.narrativecraft.platform.Services;
@@ -197,7 +195,7 @@ public class MainScreen extends Screen {
         if (!isPause) {
             leaveScreenButton = Button.builder(Translation.message("screen.main.leave_screen"), button -> {
                         minecraft.getSoundManager().stop(MAIN_MUSIC_INSTANCE);
-                        Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
+                        ClientNarrativeCraftMod.getInstance().getPlayerSession().requestEditorClose();
                     })
                     .bounds(width - BUTTON_WIDTH - 10, 10, BUTTON_WIDTH, BUTTON_HEIGHT)
                     .build();
@@ -249,13 +247,7 @@ public class MainScreen extends Screen {
     public void close() {
         minecraft.setScreen(null);
         minecraft.getSoundManager().stop(MAIN_MUSIC_INSTANCE);
-        EditorMaker editor =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editor != null) {
-            editor.stop();
-        }
-        ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditor(null);
-        Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().requestEditorClose();
     }
 
     @Override

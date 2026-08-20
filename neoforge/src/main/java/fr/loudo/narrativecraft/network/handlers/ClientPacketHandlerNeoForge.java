@@ -24,6 +24,8 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.*;
+import fr.loudo.narrativecraft.network.BiEditorClose;
+import fr.loudo.narrativecraft.network.S2CEditorOpened;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
@@ -168,8 +170,12 @@ public class ClientPacketHandlerNeoForge {
         context.enqueueWork(() -> ClientPacketHandler.cameraAngleEnter(packet));
     }
 
-    public static void stopEditorMaker(BiStopEditorMaker packet, IPayloadContext context) {
-        context.enqueueWork(() -> ClientPacketHandler.stopEditorMaker(packet));
+    public static void editorClose(BiEditorClose packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.editorClose(packet));
+    }
+
+    public static void editorOpened(S2CEditorOpened packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.editorOpened(packet));
     }
 
     public static void interactionEnter(BiInteractionEnter packet, IPayloadContext context) {

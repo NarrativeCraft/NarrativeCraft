@@ -21,35 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.editors;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
-public interface EditorMaker {
+public record S2CEditorOpened(int editorSessionId) implements CustomPacketPayload {
 
-    void init();
+    public static final Type<S2CEditorOpened> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "editor_opened"));
 
-    void close();
+    public static final StreamCodec<ByteBuf, S2CEditorOpened> STREAM_CODEC =
+            ByteBufCodecs.VAR_INT.map(S2CEditorOpened::new, S2CEditorOpened::editorSessionId);
 
-    void tick();
-
-    void teleportToEditorOrigin();
-
-    NarrativeEnvironment getEnvironment();
-
-    default void render(GuiGraphics graphics, DeltaTracker deltaTracker) {}
-
-    default void charTyped(char codePoint, int modifiers) {}
-
-    default void keyPressed(int keyCode, int scanCode, int modifiers) {}
-
-    default void mouseClicked(double mouseX, double mouseY, int button, boolean isDoubleClick) {}
-
-    default void mouseReleased(double mouseX, double mouseY, int button) {}
-
-    default void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {}
-
-    default void mouseScrolled(double deltaX, double deltaY) {}
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

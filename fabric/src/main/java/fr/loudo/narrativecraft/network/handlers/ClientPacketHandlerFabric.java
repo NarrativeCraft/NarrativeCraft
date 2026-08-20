@@ -24,6 +24,8 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.*;
+import fr.loudo.narrativecraft.network.BiEditorClose;
+import fr.loudo.narrativecraft.network.S2CEditorOpened;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
@@ -124,8 +126,11 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(BiCameraAngleEnter.TYPE, (packet, context) -> {
             ClientPacketHandler.cameraAngleEnter(packet);
         });
-        ClientPlayNetworking.registerGlobalReceiver(BiStopEditorMaker.TYPE, (packet, context) -> {
-            ClientPacketHandler.stopEditorMaker(packet);
+        ClientPlayNetworking.registerGlobalReceiver(BiEditorClose.TYPE, (packet, context) -> {
+            ClientPacketHandler.editorClose(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CEditorOpened.TYPE, (packet, context) -> {
+            ClientPacketHandler.editorOpened(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(BiInteractionEnter.TYPE, (packet, context) -> {
             ClientPacketHandler.interactionEnter(packet);

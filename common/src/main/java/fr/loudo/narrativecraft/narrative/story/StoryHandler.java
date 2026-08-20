@@ -498,9 +498,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         }
         characterEntities.clear();
         inkTagHandler.stopAll();
-        if (playerSession.getEditor() != null) {
-            playerSession.getEditor().stop();
-        }
+        playerSession.closeEditor();
         dialogVisible = false;
         choicesVisible = false;
     }

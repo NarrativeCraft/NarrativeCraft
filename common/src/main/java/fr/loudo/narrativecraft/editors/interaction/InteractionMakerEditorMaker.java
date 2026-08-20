@@ -32,7 +32,6 @@ import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionZone;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -120,12 +119,8 @@ public class InteractionMakerEditorMaker implements EditorMaker {
         return null;
     }
 
-    public void stop() {
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
-    }
-
     @Override
-    public void reset() {}
+    public void close() {}
 
     public Interaction getInteraction() {
         return interaction;

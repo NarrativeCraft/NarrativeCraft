@@ -126,7 +126,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                                     Services.PACKET.sendToServer(new C2SCutsceneSave(cutscene, layersJson));
                                 }
                                 Services.PACKET.sendToServer(new C2SCutsceneControl(C2SCutsceneControl.State.QUIT));
-                                reset();
+                                playerSession.closeEditor();
                             },
                             Translation.message("screen.confirm.title"),
                             Translation.message("screen.confirm.save"));
@@ -195,20 +195,16 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         clampViewStart();
     }
 
-    public void reset() {
+    @Override
+    public void close() {
+        playback.pause();
         playerSession.getCutsceneDataSession().reset();
-        playerSession.setEditor(null);
-        mc.setScreen(null);
-        playerSession.stopAllClientInkActions();
         for (CutsceneMakerEditorLayer layer : editorLayers) {
             layer.getLayer().stop();
         }
-    }
-
-    @Override
-    public void stop() {
-        playback.pause();
-        playerSession.getCutsceneDataSession().reset();
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
+        mc.setScreen(null);
+        playerSession.stopAllClientInkActions();
     }
 
     public void tick() {
