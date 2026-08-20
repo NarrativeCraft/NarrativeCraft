@@ -54,15 +54,16 @@ public class CutsceneMakerEditorPlayHead {
         ratio = (float) Math.clamp((mouseX - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
     }
 
-    public void onClick(
+    public boolean onClick(
             double mouseX, double mouseY, int button, int timelineStartX, int timelineWidth, int timelineY) {
-        if (timelineWidth <= 0) return;
-        if (timelineY >= (mouseY) + 5) return;
+        if (timelineWidth <= 0) return false;
+        if (timelineY >= (mouseY) + 5) return false;
         if ((mouseX) <= timelineStartX) {
-            return;
+            return false;
         }
         isDragging = true;
         ratio = (float) Math.clamp(((mouseX) - timelineStartX) / (double) timelineWidth, 0.0, 1.0);
+        return true;
     }
 
     public void setY(int y) {

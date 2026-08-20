@@ -59,10 +59,10 @@ public class CutsceneMakerEditorControl {
     private void toggle() {
         playing = !playing;
         button.setMessage(playing ? PAUSE_LABEL : PLAY_LABEL);
-        Services.PACKET.sendToServer(
-                new C2SCutsceneControl(playing ? C2SCutsceneControl.State.PLAY : C2SCutsceneControl.State.PAUSE));
         if (playing && onPlay != null) onPlay.run();
         else if (!playing && onPause != null) onPause.run();
+        Services.PACKET.sendToServer(
+                new C2SCutsceneControl(playing ? C2SCutsceneControl.State.PLAY : C2SCutsceneControl.State.PAUSE));
     }
 
     public void play() {
