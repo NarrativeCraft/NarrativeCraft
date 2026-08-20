@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
 public final class Interpolation {
 
+    private static final double FLAT_SEGMENT_EPSILON = 1.0e-6;
+
     private Interpolation() {}
 
     public static double applyEasing(EasingType type, double t) {
@@ -46,6 +48,7 @@ public final class Interpolation {
     }
 
     public static double catmullRom(double p0, double p1, double p2, double p3, double t) {
+        if (Math.abs(p2 - p1) <= FLAT_SEGMENT_EPSILON) return p1;
         double t2 = t * t;
         double t3 = t2 * t;
         return 0.5
