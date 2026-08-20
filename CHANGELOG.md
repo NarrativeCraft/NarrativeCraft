@@ -15,6 +15,7 @@
 - Starting recording when riding an entity make it de-spawn
 - 1.20.1 - Closing options screen with "esc" while in main screen completely close it
 - OS conflict with ink import using "/" or "\\" for path
+- Non character entities with name tag shown in playback
 
 ## Misc
 - Shows a sentence in chat when a story has finished

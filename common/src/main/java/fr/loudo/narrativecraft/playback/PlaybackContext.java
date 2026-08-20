@@ -32,7 +32,6 @@ import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
-import java.util.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -44,6 +43,8 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.storage.TagValueInput;
+
+import java.util.*;
 
 public class PlaybackContext implements IPlaybackContext {
 
@@ -89,15 +90,14 @@ public class PlaybackContext implements IPlaybackContext {
 
     private void createEntity() {
         ICharacterStory characterStory = playback.getAnimation().getCharacterStory();
-        boolean hasCharacter = characterStory != null;
         boolean isCharacterEntity = recordingData.getRecordingId() == 0;
 
-        String entityId = (hasCharacter && isCharacterEntity)
+        String entityId = isCharacterEntity
                 ? Utils.getEntityTypeString(characterStory.getEntityType())
                 : recordingData.getEntityId();
 
         if (entityId.equals("minecraft:player")) {
-            String name = hasCharacter ? characterStory.getName() : "Somebody";
+            String name = characterStory != null ? characterStory.getName() : "Somebody";
             entity = new FakePlayer(
                     level,
                     FakePlayer.createCharacterProfile(playback.getAnimation().getCharacterStory(), name),
@@ -125,8 +125,7 @@ public class PlaybackContext implements IPlaybackContext {
             entity.setUUID(UUID.randomUUID());
         }
 
-        if (hasCharacter
-                && !isCharacterEntity
+        if (isCharacterEntity
                 && entity instanceof LivingEntity
                 && characterStory.getCharacterType() == CharacterType.NORMAL) {
             String name = characterStory.getName();
