@@ -8,3 +8,4 @@
 - Cutscene editor playhead staying still when pressing play
 - Slight drift between two keyframes sharing the same position and rotation
 - Fov layer reading the easing from the wrong keyframe of the segment
+- Camera spinning a full turn when the yaw or roll crosses 180/-180
