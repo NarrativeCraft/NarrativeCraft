@@ -12,3 +12,4 @@
 - Cutscene not starting at the first camera keyframe the first time it plays in production
 - Cutscene not stopping playbacks when finished in cutscene tag
 - Conflict client-server when exiting an editor (interaction, camera angle...)
+- Starting recording when riding an entity make it de-spawn
