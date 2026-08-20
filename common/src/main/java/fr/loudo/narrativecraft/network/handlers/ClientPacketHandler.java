@@ -32,7 +32,6 @@ import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorPlayHead;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
@@ -220,10 +219,7 @@ public class ClientPacketHandler {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (!(session.getEditor() instanceof ClientCutsceneMakerEditorMaker editor)) return;
 
-        CutsceneMakerEditorPlayHead playHead = editor.getPlayHead();
-        float ratio = (float) packet.tick() / editor.getTotalTick();
-        playHead.setRatio(ratio);
-        if (ratio == 1.0f) {
+        if (editor.getTotalTick() > 0 && packet.tick() >= editor.getTotalTick()) {
             editor.getControl().pause();
         }
     }
