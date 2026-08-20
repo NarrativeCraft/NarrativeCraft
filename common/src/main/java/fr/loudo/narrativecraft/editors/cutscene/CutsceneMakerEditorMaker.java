@@ -149,6 +149,12 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         for (Playback playback : playbacks) {
             playback.start(Collections.singletonList(playerSession.getPlayer()));
         }
+        if (environment == NarrativeEnvironment.PRODUCTION) {
+            int firstCameraTick = cutscene.getFirstCameraTick();
+            if (firstCameraTick > 0 && firstCameraTick < lastKeyframeTick) {
+                moveTo(firstCameraTick);
+            }
+        }
     }
 
     public void stop() {
