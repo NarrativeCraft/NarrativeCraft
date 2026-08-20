@@ -16,6 +16,7 @@
 - 1.20.1 - Closing options screen with "esc" while in main screen completely close it
 - OS conflict with ink import using "/" or "\\" for path
 - Non character entities with name tag shown in playback
+- HUD still hidden after a cutscene ended
 
 ## Misc
 - Shows a sentence in chat when a story has finished
