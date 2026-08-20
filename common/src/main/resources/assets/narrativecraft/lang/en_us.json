@@ -180,6 +180,7 @@
   "narrativecraft.story.started": "Story started for %s.",
   "narrativecraft.story.not_running": "No story is running for %s.",
   "narrativecraft.story.stopped": "Story stopped for %s.",
+  "narrativecraft.story.finished": "Story finished",
   "narrativecraft.story.new_game.title": "Are you sure you want to start a new game?",
   "narrativecraft.story.new_game.message": "Your current save will be reset!",
 
