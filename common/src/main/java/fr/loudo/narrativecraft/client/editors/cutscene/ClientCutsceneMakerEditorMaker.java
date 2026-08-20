@@ -176,8 +176,14 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
         if (environment == NarrativeEnvironment.PRODUCTION) {
             control.play();
-            playback.play(0);
+            startProductionPlayback();
         }
+    }
+
+    private void startProductionPlayback() {
+        if (environment != NarrativeEnvironment.PRODUCTION) return;
+        int firstCameraTick = cutscene.getFirstCameraTick();
+        playback.play(firstCameraTick < totalTick ? firstCameraTick : 0);
     }
 
     public void applyManualMaxTick(int value) {
@@ -224,6 +230,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
         totalTick = cutscene.getMaxTick();
         playback.setTotalTick(totalTick);
+        startProductionPlayback();
     }
 
     public void addLayer(CutsceneLayer layer) {
@@ -635,7 +642,6 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
         editorLayers.removeAll(toRemove);
 
-        // Deselect all keyframes when clicking on an empty area
         if (!selectedKeyframes.isEmpty()) {
             clearSelection();
         }
@@ -650,7 +656,6 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     private void handleKeyframeClick(
             Keyframe keyframe, double mouseX, double mouseY, int button, boolean isDoubleClick) {
         if (Screen.hasShiftDown()) {
-            // Shift+click: toggle this keyframe in/out of the selection
             if (selectedKeyframes.contains(keyframe)) {
                 keyframe.setSelected(false);
                 selectedKeyframes.remove(keyframe);
@@ -658,24 +663,20 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                 keyframe.setSelected(true);
                 selectedKeyframes.add(keyframe);
             }
-            // Refresh menu: show only for exactly one selected keyframe
             if (openMenu != null) openMenu.close();
             openMenu = selectedKeyframes.size() == 1 ? selectedKeyframes.get(0).createMenu() : null;
         } else {
-            // Regular click: if keyframe is not in the selection, switch to single selection
             if (!selectedKeyframes.contains(keyframe)) {
                 clearSelection();
                 keyframe.setSelected(true);
                 selectedKeyframes.add(keyframe);
             }
-            // Open menu for a single-keyframe selection
             if (selectedKeyframes.size() == 1) {
                 if (openMenu != null) openMenu.close();
                 openMenu = keyframe.createMenu();
             }
         }
 
-        // Start drag tracking for all currently selected keyframes
         draggingStartMouseX = (float) (mouseX);
         draggingOriginalTicks = new HashMap<>();
         for (Keyframe selected : selectedKeyframes) {
