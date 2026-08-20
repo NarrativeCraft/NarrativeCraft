@@ -30,10 +30,13 @@ import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.network.BiEditorClose;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.AbstractPlayerSession;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -86,6 +89,21 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     @Override
     public boolean isClientSide() {
         return true;
+    }
+
+    @Override
+    public void setEditor(EditorMaker editorMaker) {
+        EditorMaker previous = getEditor();
+        super.setEditor(editorMaker);
+        if (previous != null && previous != editorMaker) {
+            previous.close();
+        }
+        editorSessionId = BiEditorClose.UNIDENTIFIED_SESSION;
+    }
+
+    public void requestEditorClose() {
+        Services.PACKET.sendToServer(new BiEditorClose(editorSessionId));
+        closeEditor();
     }
 
     @Override

@@ -30,9 +30,7 @@ public interface EditorMaker {
 
     void init();
 
-    void stop();
-
-    default void reset() {}
+    void close();
 
     void tick();
 

@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
+import fr.loudo.narrativecraft.network.BiEditorClose;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.C2SChangeGamemodePacket;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
@@ -100,10 +100,10 @@ public class ServerPacketHandlerFabric {
                     });
                 });
         ServerPlayNetworking.registerGlobalReceiver(
-                BiStopEditorMaker.TYPE, (server, player, handler, buf, responseSender) -> {
-                    BiStopEditorMaker packet = BiStopEditorMaker.read(buf);
+                BiEditorClose.TYPE, (server, player, handler, buf, responseSender) -> {
+                    BiEditorClose packet = BiEditorClose.read(buf);
                     server.execute(() -> {
-                        ServerPacketHandler.stopEditorMaker(packet, player);
+                        ServerPacketHandler.editorCloseRequest(packet, player);
                     });
                 });
         ServerPlayNetworking.registerGlobalReceiver(

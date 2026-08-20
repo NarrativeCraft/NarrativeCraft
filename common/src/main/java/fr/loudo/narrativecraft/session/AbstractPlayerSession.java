@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.network.BiEditorClose;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -37,6 +38,7 @@ public class AbstractPlayerSession implements IPlayerSession {
     protected Chapter chapter;
     protected Scene scene;
     protected EditorMaker editorMaker;
+    protected int editorSessionId = BiEditorClose.UNIDENTIFIED_SESSION;
 
     public AbstractPlayerSession(Chapter chapter, Scene scene) {
         this.chapter = chapter;
@@ -52,6 +54,7 @@ public class AbstractPlayerSession implements IPlayerSession {
         chapter = null;
         scene = null;
         editorMaker = null;
+        editorSessionId = BiEditorClose.UNIDENTIFIED_SESSION;
     }
 
     public boolean sessionSet() {
@@ -80,6 +83,18 @@ public class AbstractPlayerSession implements IPlayerSession {
 
     public void setEditor(EditorMaker editorMaker) {
         this.editorMaker = editorMaker;
+    }
+
+    public void closeEditor() {
+        setEditor(null);
+    }
+
+    public int getEditorSessionId() {
+        return editorSessionId;
+    }
+
+    public void setEditorSessionId(int editorSessionId) {
+        this.editorSessionId = editorSessionId;
     }
 
     @Override

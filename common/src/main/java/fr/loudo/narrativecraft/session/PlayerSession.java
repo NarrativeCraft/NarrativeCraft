@@ -29,7 +29,8 @@ import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.locale.StoryTranslations;
 import fr.loudo.narrativecraft.narrative.story.locale.TranslationResolver;
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
+import fr.loudo.narrativecraft.network.BiEditorClose;
+import fr.loudo.narrativecraft.network.S2CEditorOpened;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CSessionClear;
 import fr.loudo.narrativecraft.platform.Services;
@@ -45,6 +46,7 @@ public class PlayerSession extends AbstractPlayerSession {
     private static final String USER_PLACEHOLDER = "%user%";
 
     private final ServerPlayer player;
+    private int nextEditorSessionId;
     private GameType lastGameType;
     private boolean gameplayMode;
     private final List<UUID> characterIdsSkinLoaded = new ArrayList<>();
@@ -68,9 +70,9 @@ public class PlayerSession extends AbstractPlayerSession {
 
     @Override
     public void clear() {
+        closeEditor();
         super.clear();
         characterIdsSkinLoaded.clear();
-        Services.PACKET.sendToPlayer(player, BiStopEditorMaker.INSTANCE);
         Services.PACKET.sendToPlayer(player, S2CSessionClear.INSTANCE);
     }
 
@@ -80,28 +82,37 @@ public class PlayerSession extends AbstractPlayerSession {
     }
 
     public void changeGameMode(GameType gameType) {
-        lastGameType = player.gameMode.getGameModeForPlayer();
+        if (lastGameType == null) {
+            lastGameType = player.gameMode.getGameModeForPlayer();
+        }
         player.setGameMode(gameType);
+    }
+
+    public void restoreGameMode() {
+        if (lastGameType == null) return;
+        player.setGameMode(lastGameType);
+        lastGameType = null;
     }
 
     @Override
     public void setEditor(EditorMaker editorMaker) {
-        if (this.editorMaker != null) {
-            this.editorMaker.reset();
-        }
+        EditorMaker previous = this.editorMaker;
         super.setEditor(editorMaker);
+        if (previous != null && previous != editorMaker) {
+            previous.close();
+            Services.PACKET.sendToPlayer(player, new BiEditorClose(editorSessionId));
+        }
+        editorSessionId = editorMaker == null ? BiEditorClose.UNIDENTIFIED_SESSION : nextEditorSessionId++;
+    }
+
+    public void openEditor(EditorMaker editorMaker) {
+        setEditor(editorMaker);
+        editorMaker.init();
+        Services.PACKET.sendToPlayer(player, new S2CEditorOpened(editorSessionId));
     }
 
     public ServerPlayer getPlayer() {
         return player;
-    }
-
-    public GameType getLastGameType() {
-        return lastGameType;
-    }
-
-    public void setLastGameType(GameType lastGameType) {
-        this.lastGameType = lastGameType;
     }
 
     @Nullable

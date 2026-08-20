@@ -33,14 +33,12 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
-import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.story.S2CStoryVariables;
 import fr.loudo.narrativecraft.platform.Services;
@@ -75,7 +73,7 @@ public class CutsceneInkAction extends InkAction {
     @Override
     public void tick() {
         if (editorMaker.isFinished()) {
-            editorMaker.stop();
+            editorMaker.getPlayerSession().closeEditor();
             isRunning = false;
             NarrativeCraftMod.EVENT_BUS.post(new CutsceneEndEvent(editorMaker.getPlayerSession(), cutscene));
         }
@@ -84,15 +82,8 @@ public class CutsceneInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
 
-        EditorMaker editor = ((PlayerSession) playerSession).getEditor();
-        if (editor != null) {
-            editor.stop();
-            Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
-        }
-
         editorMaker =
                 new CutsceneMakerEditorMaker(cutscene, (PlayerSession) playerSession, NarrativeEnvironment.PRODUCTION);
-        ((PlayerSession) playerSession).setEditor(editorMaker);
         StoryHandler storyHandler = ((PlayerSession) playerSession).getStoryHandler();
         if (storyHandler != null) {
             Services.PACKET.sendToPlayer(
@@ -100,7 +91,7 @@ public class CutsceneInkAction extends InkAction {
         }
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(), new BiCutsceneEnter(cutscene, NarrativeEnvironment.PRODUCTION));
-        editorMaker.init();
+        ((PlayerSession) playerSession).openEditor(editorMaker);
 
         // Re-use entity of a character if spawn animation point is close to current entity
         if (storyHandler != null) {

@@ -27,7 +27,6 @@ import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -95,18 +94,12 @@ public class DialogEditorMaker implements EditorMaker {
     }
 
     @Override
-    public void stop() {
-        reset();
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), BiStopEditorMaker.INSTANCE);
-    }
-
-    @Override
-    public void reset() {
+    public void close() {
         if (fakePlayer != null) {
             fakePlayer.remove(Entity.RemovalReason.DISCARDED);
             fakePlayer = null;
         }
-        playerSession.changeGameMode(playerSession.getLastGameType());
+        playerSession.restoreGameMode();
     }
 
     @Override

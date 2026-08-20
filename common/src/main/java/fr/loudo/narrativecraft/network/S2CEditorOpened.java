@@ -27,20 +27,18 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public class BiStopEditorMaker implements NarrativePacket {
+public record S2CEditorOpened(int editorSessionId) implements NarrativePacket {
 
-    public static final BiStopEditorMaker INSTANCE = new BiStopEditorMaker();
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "editor_opened");
 
-    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "stop_editor_maker");
-
-    private BiStopEditorMaker() {}
-
-    public static BiStopEditorMaker read(FriendlyByteBuf buf) {
-        return INSTANCE;
+    public static S2CEditorOpened read(FriendlyByteBuf buf) {
+        return new S2CEditorOpened(buf.readVarInt());
     }
 
     @Override
-    public void write(FriendlyByteBuf buf) {}
+    public void write(FriendlyByteBuf buf) {
+        buf.writeVarInt(editorSessionId);
+    }
 
     @Override
     public ResourceLocation type() {

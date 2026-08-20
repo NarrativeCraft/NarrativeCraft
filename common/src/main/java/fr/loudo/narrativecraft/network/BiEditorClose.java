@@ -21,23 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.client;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.network.BiEditorClose;
-import fr.loudo.narrativecraft.platform.Services;
-import net.minecraft.client.player.LocalPlayer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
-public class OnClientDisconnectEvent {
+public record BiEditorClose(int editorSessionId) implements NarrativePacket {
 
-    public static void clientDisconnect(LocalPlayer player) {
-        if (player == null) return;
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession == null) return;
+    public static final int UNIDENTIFIED_SESSION = -1;
 
-        Services.PACKET.sendToServer(new BiEditorClose(BiEditorClose.UNIDENTIFIED_SESSION));
-        playerSession.clear();
+    public static final ResourceLocation TYPE = new ResourceLocation(NarrativeCraftMod.MOD_ID, "editor_close");
+
+    public static BiEditorClose read(FriendlyByteBuf buf) {
+        return new BiEditorClose(buf.readVarInt());
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        buf.writeVarInt(editorSessionId);
+    }
+
+    @Override
+    public ResourceLocation type() {
+        return TYPE;
     }
 }

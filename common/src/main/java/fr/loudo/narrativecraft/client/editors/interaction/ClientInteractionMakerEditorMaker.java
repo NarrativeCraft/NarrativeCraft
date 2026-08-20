@@ -128,7 +128,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     }
 
     @Override
-    public void stop() {}
+    public void close() {}
 
     @Override
     public void tick() {}
@@ -335,7 +335,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     }
 
     public void quit() {
-        playerSession.setEditor(null);
+        playerSession.requestEditorClose();
         minecraft.setScreen(null);
     }
 

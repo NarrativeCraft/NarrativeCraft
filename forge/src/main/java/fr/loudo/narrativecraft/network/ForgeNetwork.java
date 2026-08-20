@@ -161,7 +161,8 @@ public final class ForgeNetwork {
         clientRun(S2CStopStory.TYPE, S2CStopStory::read, ClientPacketHandler::stopStory);
         clientRun(S2CDialogStop.TYPE, S2CDialogStop::read, ClientPacketHandler::dialogStop);
         client(BiCameraAngleEnter.TYPE, BiCameraAngleEnter::read, ClientPacketHandler::cameraAngleEnter);
-        client(BiStopEditorMaker.TYPE, BiStopEditorMaker::read, ClientPacketHandler::stopEditorMaker);
+        client(BiEditorClose.TYPE, BiEditorClose::read, ClientPacketHandler::editorClose);
+        client(S2CEditorOpened.TYPE, S2CEditorOpened::read, ClientPacketHandler::editorOpened);
         client(BiInteractionEnter.TYPE, BiInteractionEnter::read, ClientPacketHandler::interactionEnter);
         client(S2CCharacterSkin.TYPE, S2CCharacterSkin::read, ClientPacketHandler::characterSkin);
         client(S2CCharacterStoryAction.TYPE, S2CCharacterStoryAction::read, ClientPacketHandler::characterStoryAction);
@@ -189,7 +190,7 @@ public final class ForgeNetwork {
         server(C2SCutsceneSave.TYPE, C2SCutsceneSave::read, ServerPacketHandler::cutsceneSave);
         server(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket::read, ServerPacketHandler::playHeadUpdate);
         server(BiCameraAngleEnter.TYPE, BiCameraAngleEnter::read, ServerPacketHandler::cameraAngleEnter);
-        server(BiStopEditorMaker.TYPE, BiStopEditorMaker::read, ServerPacketHandler::stopEditorMaker);
+        server(BiEditorClose.TYPE, BiEditorClose::read, ServerPacketHandler::editorCloseRequest);
         server(C2SCameraAngleSave.TYPE, C2SCameraAngleSave::read, ServerPacketHandler::cameraAngleSave);
         server(
                 C2SCameraAngleCaptureCharacter.TYPE,
