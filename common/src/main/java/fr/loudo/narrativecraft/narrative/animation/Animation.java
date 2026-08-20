@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.RecordingData;
 import fr.loudo.narrativecraft.recording.RecordingReader;
@@ -106,6 +107,16 @@ public class Animation extends NarrativeEntry<AnimationPayload> implements IAnim
         }
 
         return true;
+    }
+
+    public List<Subscene> getLinkedSubscenes() {
+        List<Subscene> subscenes = new ArrayList<>();
+        for (Subscene subscene : scene.getSubsceneManager().getList()) {
+            if (subscene.getAnimations().contains(this)) {
+                subscenes.add(subscene);
+            }
+        }
+        return subscenes;
     }
 
     public int getTotalTick() {
