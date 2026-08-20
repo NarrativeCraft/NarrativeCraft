@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.playback.Playback;
@@ -229,6 +230,7 @@ public class Recording implements IRecording {
         Animation animation = new Animation(id, name, playerSession.getScene(), tick, characterStory);
 
         if (animationToOverwrite != null) {
+            List<Subscene> linkedSubscenes = animationToOverwrite.getLinkedSubscenes();
             if (NarrativeCraftFileRegistry.getInstance().delete(animationToOverwrite)
                     == NarrativeCraftFileEditor.OPERATION_FAILED) {
                 return false;
@@ -237,6 +239,9 @@ public class Recording implements IRecording {
             Services.PACKET.sendToPlayer(
                     getPlayer(),
                     BiSyncNarrativeEntryPacket.delete(animationToOverwrite.getId(), animationToOverwrite.toPayload()));
+            for (Subscene linkedSubscene : linkedSubscenes) {
+                linkedSubscene.getAnimations().add(animation);
+            }
         }
 
         if (NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_FAILED) {
