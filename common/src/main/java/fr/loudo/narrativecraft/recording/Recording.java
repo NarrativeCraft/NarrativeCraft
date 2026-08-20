@@ -164,6 +164,7 @@ public class Recording implements IRecording {
             data.getRecordingData().setSpawnTick(data.getFirstSeenTick());
             data.setTracked(true);
         }
+        seedActions(data);
         return data.getRecordingId();
     }
 

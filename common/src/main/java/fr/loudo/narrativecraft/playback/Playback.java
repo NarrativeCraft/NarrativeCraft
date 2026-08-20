@@ -80,6 +80,9 @@ public class Playback implements IPlaybackSession {
         maxTick = animation.getTotalTick();
         isPlaying = true;
         for (PlaybackContext context : contexts) {
+            context.init();
+        }
+        for (PlaybackContext context : contexts) {
             context.start();
         }
         if (forSpecificPlayers()) {
