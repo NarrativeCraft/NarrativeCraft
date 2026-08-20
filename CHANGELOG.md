@@ -14,6 +14,7 @@
 - Conflict client-server when exiting an editor (interaction, camera angle...)
 - Starting recording when riding an entity make it de-spawn
 - OS conflict with ink import using "/" or "\\" for path
+- Non character entities with name tag shown in playback
 
 ## Misc
 - Shows a sentence in chat when a story has finished

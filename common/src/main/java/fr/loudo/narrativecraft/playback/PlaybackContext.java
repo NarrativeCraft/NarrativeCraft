@@ -44,6 +44,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 
+import java.util.*;
+
 public class PlaybackContext implements IPlaybackContext {
 
     private final Playback playback;
@@ -88,15 +90,14 @@ public class PlaybackContext implements IPlaybackContext {
 
     private void createEntity() {
         ICharacterStory characterStory = playback.getAnimation().getCharacterStory();
-        boolean hasCharacter = characterStory != null;
         boolean isCharacterEntity = recordingData.getRecordingId() == 0;
 
-        String entityId = (hasCharacter && isCharacterEntity)
+        String entityId = isCharacterEntity
                 ? Utils.getEntityTypeString(characterStory.getEntityType())
                 : recordingData.getEntityId();
 
         if (entityId.equals("minecraft:player")) {
-            String name = hasCharacter ? characterStory.getName() : "Somebody";
+            String name = characterStory != null ? characterStory.getName() : "Somebody";
             entity = new FakePlayer(
                     level,
                     FakePlayer.createCharacterProfile(playback.getAnimation().getCharacterStory(), name),
@@ -124,8 +125,7 @@ public class PlaybackContext implements IPlaybackContext {
             entity.setUUID(UUID.randomUUID());
         }
 
-        if (hasCharacter
-                && isCharacterEntity
+        if (isCharacterEntity
                 && entity instanceof LivingEntity
                 && characterStory.getCharacterType() == CharacterType.NORMAL) {
             String name = characterStory.getName();
