@@ -199,6 +199,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     public void close() {
         playback.pause();
         playerSession.getCutsceneDataSession().reset();
+        Minecraft.getInstance().options.hideGui = false;
         for (CutsceneMakerEditorLayer layer : editorLayers) {
             layer.getLayer().stop();
         }
