@@ -75,6 +75,7 @@ public class CutsceneInkAction extends InkAction {
     @Override
     public void tick() {
         if (editorMaker.isFinished()) {
+            editorMaker.stop();
             isRunning = false;
             NarrativeCraftMod.EVENT_BUS.post(new CutsceneEndEvent(editorMaker.getPlayerSession(), cutscene));
         }
