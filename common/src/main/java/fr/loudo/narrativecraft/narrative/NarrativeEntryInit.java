@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.commands.LocaleCommand;
 import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.files.InkFileGenerator;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
@@ -81,6 +82,7 @@ public class NarrativeEntryInit {
     }
 
     private static void compileStories() {
+        InkFileGenerator.regenerateMainInk();
         try {
             NarrativeCraftMod.getInstance().setCompiledStoryJson(StoryCompilerHandler.compileToJson());
         } catch (Exception exception) {
