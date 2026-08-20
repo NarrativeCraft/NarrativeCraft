@@ -72,7 +72,7 @@ public class GameplayInkAction extends InkAction {
 
         EditorMaker editorMaker = currentSession.getEditor();
         if (!(editorMaker instanceof InteractionMakerEditorMaker) && editorMaker != null) {
-            editorMaker.stop();
+            currentSession.closeEditor();
         }
         currentSession.setGameplayMode(true);
         Entity mainCharacterEntity = storyHandler.getMainCharacterEntity();

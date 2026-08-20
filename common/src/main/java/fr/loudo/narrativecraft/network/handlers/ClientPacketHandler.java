@@ -57,6 +57,8 @@ import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.*;
+import fr.loudo.narrativecraft.network.BiEditorClose;
+import fr.loudo.narrativecraft.network.S2CEditorOpened;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
@@ -447,12 +449,15 @@ public class ClientPacketHandler {
         Minecraft.getInstance().gui.setScreen(null);
     }
 
-    public static void stopEditorMaker(BiStopEditorMaker packet) {
+    public static void editorClose(BiEditorClose packet) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        EditorMaker editor = session.getEditor();
-        if (editor == null) return;
-        editor.stop();
-        session.setEditor(null);
+        if (session.getEditor() == null) return;
+        if (packet.editorSessionId() != session.getEditorSessionId()) return;
+        session.closeEditor();
+    }
+
+    public static void editorOpened(S2CEditorOpened packet) {
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().setEditorSessionId(packet.editorSessionId());
     }
 
     public static void interactionEnter(BiInteractionEnter packet) {

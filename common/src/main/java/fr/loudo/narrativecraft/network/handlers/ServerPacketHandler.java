@@ -48,7 +48,7 @@ import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.locale.StoryLocaleManager;
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
+import fr.loudo.narrativecraft.network.BiEditorClose;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
@@ -106,8 +106,7 @@ public class ServerPacketHandler {
         if (cutscene == null) return;
 
         CutsceneMakerEditorMaker editor = new CutsceneMakerEditorMaker(cutscene, session, packet.getEnvironment());
-        session.setEditor(editor);
-        editor.init();
+        session.openEditor(editor);
         editor.start();
     }
 
@@ -121,10 +120,7 @@ public class ServerPacketHandler {
         switch (packet.state()) {
             case PLAY -> editor.play();
             case PAUSE -> editor.pause();
-            case QUIT -> {
-                editor.stop();
-                session.setEditor(null);
-            }
+            case QUIT -> session.closeEditor();
         }
     }
 
@@ -178,18 +174,16 @@ public class ServerPacketHandler {
         if (cameraAngle == null) return;
 
         CameraAngleMakerEditorMaker editor = new CameraAngleMakerEditorMaker(cameraAngle, session);
-        session.setEditor(editor);
-        editor.init();
+        session.openEditor(editor);
     }
 
-    public static void stopEditorMaker(BiStopEditorMaker packet, Player player) {
+    public static void editorCloseRequest(BiEditorClose packet, Player player) {
         PlayerSession session =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
-        if (session == null) return;
-        EditorMaker editor = session.getEditor();
-        if (editor == null) return;
-        editor.stop();
-        session.setEditor(null);
+        if (session == null || session.getEditor() == null) return;
+        if (packet.editorSessionId() != BiEditorClose.UNIDENTIFIED_SESSION
+                && packet.editorSessionId() != session.getEditorSessionId()) return;
+        session.closeEditor();
     }
 
     public static void enterDialogEditor(C2SEnterDialogEditor packet, Player player) {
@@ -215,8 +209,7 @@ public class ServerPacketHandler {
         }
 
         DialogEditorMaker editor = new DialogEditorMaker(session, character);
-        session.setEditor(editor);
-        editor.init();
+        session.openEditor(editor);
 
         if (character != null) {
             UtilsServer.sendCharacterSkin((ServerPlayer) player, character);
@@ -349,8 +342,7 @@ public class ServerPacketHandler {
         if (interaction == null) return;
 
         InteractionMakerEditorMaker editor = new InteractionMakerEditorMaker(interaction, session);
-        session.setEditor(editor);
-        editor.init();
+        session.openEditor(editor);
 
         String dataJson = InteractionSerializer.serializeData(interaction);
         Services.PACKET.sendToPlayer(
@@ -607,7 +599,6 @@ public class ServerPacketHandler {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         if (playerSession == null) return;
         MainScreenMakerEditor editor = new MainScreenMakerEditor(mainScreenAngle, playerSession, packet.environment());
-        playerSession.setEditor(editor);
-        editor.init();
+        playerSession.openEditor(editor);
     }
 }

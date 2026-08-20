@@ -11,3 +11,4 @@
 - Camera spinning a full turn when the yaw or roll crosses 180/-180
 - Cutscene not starting at the first camera keyframe the first time it plays in production
 - Cutscene not stopping playbacks when finished in cutscene tag
+- Conflict client-server when exiting an editor (interaction, camera angle...)

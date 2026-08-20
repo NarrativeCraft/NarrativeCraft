@@ -34,8 +34,6 @@ import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
-import fr.loudo.narrativecraft.network.BiStopEditorMaker;
-import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsClient;
@@ -94,7 +92,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
     private boolean stopping = false;
 
     @Override
-    public void stop() {
+    public void close() {
         if (stopping) return;
         stopping = true;
         if (renderer != null) {
@@ -102,7 +100,6 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
             renderer = null;
         }
         minecraft.gui.setScreen(null);
-        Services.PACKET.sendToServer(BiStopEditorMaker.INSTANCE);
     }
 
     @Override
@@ -131,8 +128,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 accepted -> {
                     if (accepted) save();
-                    stop();
-                    playerSession.setEditor(null);
+                    playerSession.requestEditorClose();
                 },
                 Translation.message("screen.confirm.title"),
                 Translation.message("screen.confirm.save"));

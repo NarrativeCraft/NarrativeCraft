@@ -25,20 +25,18 @@ package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public class BiStopEditorMaker implements CustomPacketPayload {
+public record S2CEditorOpened(int editorSessionId) implements CustomPacketPayload {
 
-    public static final BiStopEditorMaker INSTANCE = new BiStopEditorMaker();
+    public static final Type<S2CEditorOpened> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "editor_opened"));
 
-    private BiStopEditorMaker() {}
-
-    public static final Type<BiStopEditorMaker> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "stop_editor_maker"));
-
-    public static final StreamCodec<ByteBuf, BiStopEditorMaker> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, S2CEditorOpened> STREAM_CODEC =
+            ByteBufCodecs.VAR_INT.map(S2CEditorOpened::new, S2CEditorOpened::editorSessionId);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

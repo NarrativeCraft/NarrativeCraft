@@ -21,38 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.editors;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public interface EditorMaker {
+public record BiEditorClose(int editorSessionId) implements CustomPacketPayload {
 
-    void init();
+    public static final int UNIDENTIFIED_SESSION = -1;
 
-    void close();
+    public static final Type<BiEditorClose> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "editor_close"));
 
-    void tick();
+    public static final StreamCodec<ByteBuf, BiEditorClose> STREAM_CODEC =
+            ByteBufCodecs.VAR_INT.map(BiEditorClose::new, BiEditorClose::editorSessionId);
 
-    void teleportToEditorOrigin();
-
-    NarrativeEnvironment getEnvironment();
-
-    default void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {}
-
-    default void charTyped(CharacterEvent event) {}
-
-    default void keyPressed(KeyEvent event) {}
-
-    default void mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {}
-
-    default void mouseReleased(MouseButtonEvent event) {}
-
-    default void mouseDragged(MouseButtonEvent event, double dragX, double dragY) {}
-
-    default void mouseScrolled(double deltaX, double deltaY) {}
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

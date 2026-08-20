@@ -94,18 +94,14 @@ public class CameraAngleInkAction extends InkAction {
             enterEditorMaker =
                     !cameraAngleMakerEditorMaker.getCameraAngle().getId().equals(cameraAngle.getId());
         } else {
-            if (editorMaker != null) {
-                editorMaker.stop();
-                enterEditorMaker = true;
-            }
+            enterEditorMaker = true;
         }
         if (enterEditorMaker) {
             Services.PACKET.sendToPlayer(
                     playerSession.getPlayer(), new BiCameraAngleEnter(cameraAngle, NarrativeEnvironment.PRODUCTION));
             CameraAngleMakerEditorMaker editor =
                     new CameraAngleMakerEditorMaker(cameraAngle, session, NarrativeEnvironment.PRODUCTION);
-            session.setEditor(editor);
-            editor.init();
+            session.openEditor(editor);
             if (storyHandler != null) {
                 for (CharacterPlacement characterPlacement : editor.getCharacterPlacements()) {
                     if (characterPlacement.isTemplate()) continue;

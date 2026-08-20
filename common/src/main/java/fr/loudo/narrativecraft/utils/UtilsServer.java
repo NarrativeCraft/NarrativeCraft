@@ -126,8 +126,7 @@ public class UtilsServer {
         Services.PACKET.sendToPlayer(player, new BiMainScreenEnter(NarrativeEnvironment.PRODUCTION));
         MainScreenMakerEditor editor = new MainScreenMakerEditor(
                 NarrativeCraftMod.getInstance().getMainScreenData(), playerSession, NarrativeEnvironment.PRODUCTION);
-        editor.init();
-        playerSession.setEditor(editor);
+        playerSession.openEditor(editor);
         Services.PACKET.sendToPlayer(player, new S2COpenMainScreen(canContinue, finishedStory));
     }
 
