@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.cutscene;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.narrative.cutscene.ICutscene;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneMakerEditorLayer;
+import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -94,6 +95,19 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutsce
             }
         }
         return maxTick;
+    }
+
+    public int getFirstCameraTick() {
+        if (editorLayers == null) return 0;
+        int firstTick = Integer.MAX_VALUE;
+        for (CutsceneMakerEditorLayer editorLayer : editorLayers) {
+            for (Keyframe keyframe : editorLayer.getLayer().getKeyframes()) {
+                if (keyframe instanceof CameraKeyframe && keyframe.getTick() < firstTick) {
+                    firstTick = keyframe.getTick();
+                }
+            }
+        }
+        return firstTick == Integer.MAX_VALUE ? 0 : firstTick;
     }
 
     public int getManualMaxTick() {
