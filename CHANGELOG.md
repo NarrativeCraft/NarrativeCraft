@@ -17,6 +17,7 @@
 - OS conflict with ink import using "/" or "\\" for path
 - Non character entities with name tag shown in playback
 - HUD still hidden after a cutscene ended
+- Accidentally spectating a character when entering a camera angle and left-clicking the entity 
 
 ## Misc
 - Shows a sentence in chat when a story has finished
