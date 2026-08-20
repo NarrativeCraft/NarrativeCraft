@@ -126,8 +126,8 @@ public class CameraLayer extends CutsceneLayer {
                         Interpolation.lerp(a.getPosition().z, b.getPosition().z, t)),
                 new Vec3(
                         Interpolation.lerp(a.getRotation().x, b.getRotation().x, t),
-                        Interpolation.lerp(a.getRotation().y, b.getRotation().y, t),
-                        Interpolation.lerp(a.getRotation().z, b.getRotation().z, t)));
+                        Interpolation.lerpAngle(a.getRotation().y, b.getRotation().y, t),
+                        Interpolation.lerpAngle(a.getRotation().z, b.getRotation().z, t)));
     }
 
     private static KeyframePosition interpolateCatmullRom(
@@ -143,9 +143,9 @@ public class CameraLayer extends CutsceneLayer {
                 new Vec3(
                         Interpolation.catmullRom(
                                 p0.getRotation().x, p1.getRotation().x, p2.getRotation().x, p3.getRotation().x, t),
-                        Interpolation.catmullRom(
+                        Interpolation.catmullRomAngle(
                                 p0.getRotation().y, p1.getRotation().y, p2.getRotation().y, p3.getRotation().y, t),
-                        Interpolation.catmullRom(
+                        Interpolation.catmullRomAngle(
                                 p0.getRotation().z, p1.getRotation().z, p2.getRotation().z, p3.getRotation().z, t)));
     }
 }

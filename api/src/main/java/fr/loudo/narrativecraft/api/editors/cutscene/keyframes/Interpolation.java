@@ -42,9 +42,21 @@ public final class Interpolation {
         return a + (b - a) * t;
     }
 
+    public static double shortestAngleDelta(double fromDeg, double toDeg) {
+        double delta = (toDeg - fromDeg + 180.0) % 360.0;
+        if (delta < 0.0) delta += 360.0;
+        return delta - 180.0;
+    }
+
     public static double lerpAngle(double fromDeg, double toDeg, double t) {
-        double diff = ((toDeg - fromDeg + 540.0) % 360.0) - 180.0;
-        return fromDeg + diff * t;
+        return fromDeg + shortestAngleDelta(fromDeg, toDeg) * t;
+    }
+
+    public static double catmullRomAngle(double p0, double p1, double p2, double p3, double t) {
+        double unwrappedP0 = p1 + shortestAngleDelta(p1, p0);
+        double unwrappedP2 = p1 + shortestAngleDelta(p1, p2);
+        double unwrappedP3 = unwrappedP2 + shortestAngleDelta(unwrappedP2, p3);
+        return catmullRom(unwrappedP0, p1, unwrappedP2, unwrappedP3, t);
     }
 
     public static double catmullRom(double p0, double p1, double p2, double p3, double t) {
