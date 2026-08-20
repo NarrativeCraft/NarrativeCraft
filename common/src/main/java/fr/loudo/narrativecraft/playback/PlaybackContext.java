@@ -44,8 +44,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 
-import java.util.*;
-
 public class PlaybackContext implements IPlaybackContext {
 
     private final Playback playback;

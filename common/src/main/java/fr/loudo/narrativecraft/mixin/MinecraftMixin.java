@@ -73,7 +73,7 @@ public abstract class MinecraftMixin {
     private void narrativecraft$spectate(CallbackInfoReturnable<Boolean> cir) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession.isInStory() && playerSession.inCamera()) {
+        if (playerSession.inCamera()) {
             cir.cancel();
         }
     }

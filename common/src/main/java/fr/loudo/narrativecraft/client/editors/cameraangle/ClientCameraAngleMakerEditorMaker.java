@@ -191,6 +191,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
                     (float) previewCameraView.getRotation().x,
                     player.onGround()));
             Minecraft.getInstance().options.hideGui = true;
+            minecraft.setCameraEntity(minecraft.player);
         }
         advancedPanel.tick();
     }
@@ -391,6 +392,7 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     public void enterPreview(CameraView cameraView) {
         this.previewCameraView = cameraView;
         Services.PACKET.sendToServer(new C2SChangeGamemodePacket(GameType.SPECTATOR));
+        minecraft.setCameraEntity(minecraft.player);
         playerSession.setCameraView(cameraView);
         UtilsClient.teleportPlayerTo(cameraView.getPosition(), cameraView.getRotation());
         rollWidget.setValue(cameraView.getRoll());
