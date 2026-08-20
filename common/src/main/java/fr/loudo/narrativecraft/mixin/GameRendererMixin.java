@@ -40,20 +40,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
-    @Inject(method = "bobHurt", at = @At("RETURN"))
+    @Inject(method = "bobHurt", at = @At("RETURN"), cancellable = true)
     private void narrativecraft$shakeScreenInkAction(
             CameraRenderState cameraState, PoseStack poseStack, CallbackInfo ci) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         DeltaTracker deltaTracker = Minecraft.getInstance().getDeltaTracker();
+        boolean hasShakingActive = false;
         for (InkAction action : session.getActiveClientInkActions()) {
             if (!(action instanceof ClientShakeScreenInkAction clientShakeScreenInkAction)) continue;
             clientShakeScreenInkAction.shakeScreen(poseStack, deltaTracker.getGameTimeDeltaPartialTick(true));
+            hasShakingActive = true;
+        }
+        if (!hasShakingActive && session.inCamera()) {
+            ci.cancel();
         }
     }
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void narrativecraft$cancelBobCamera(CameraRenderState cameraState, PoseStack poseStack, CallbackInfo ci) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (session.inCamera()) ci.cancel();
+        if (session.inCamera()) {
+            ci.cancel();
+        }
     }
 }
