@@ -13,6 +13,7 @@
 - Cutscene not stopping playbacks when finished in cutscene tag
 - Conflict client-server when exiting an editor (interaction, camera angle...)
 - Starting recording when riding an entity make it de-spawn
+- OS conflict with ink import using "/" or "\\" for path
 
 ## Misc
 - Shows a sentence in chat when a story has finished
