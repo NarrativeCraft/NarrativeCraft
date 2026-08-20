@@ -45,6 +45,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.stats.Stat;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.portal.TeleportTransition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,6 +64,7 @@ public class FakePlayer extends ServerPlayer {
         this.connection = new FakePlayerNetHandler(level.getServer(), this, profile);
         this.isInvulnerable = isInvulnerable;
         getEntityData().set(AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
+        this.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
 
         this.invulnerableTime = 0;
     }

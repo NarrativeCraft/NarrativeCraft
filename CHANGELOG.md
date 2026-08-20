@@ -5,7 +5,7 @@
 ### Fixes
 - 1.20.1 - game crash when editing camera angle position
 - Overriding an animation with same name linked to a subscene being removed from it
-- Hurt bobbing when changing camera angle (I couldn't this bug, but I assume I fix it I hope)
+- Hurt bobbing when changing camera angle (I couldn't reproduce this bug, but I assume I fix it I hope)
 - Cutscene editor playhead staying still when pressing play
 - Slight drift between two keyframes sharing the same position and rotation
 - Fov layer reading the easing from the wrong keyframe of the segment
@@ -19,6 +19,7 @@
 - Non character entities with name tag shown in playback
 - HUD still hidden after a cutscene ended
 - Accidentally spectating a character when entering a camera angle and left-clicking the entity 
+- Fake player appearing transparent when adding it either in camera angle editor main screen editor
 
 ## Misc
 - Shows a sentence in chat when a story has finished
