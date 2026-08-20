@@ -85,7 +85,7 @@ public class Playback implements IPlaybackSession {
         if (forSpecificPlayers()) {
             hideEntitiesToOtherPlayers();
         }
-        Collection<ServerPlayer> recipients = packetRecipients();
+        Collection<ServerPlayer> recipients = getTargetedPlayers();
         UUID profileId = Utils.resolveProfileId(getMasterEntity());
         for (ServerPlayer player : recipients) {
             Services.PACKET.sendToPlayer(
@@ -134,7 +134,7 @@ public class Playback implements IPlaybackSession {
         if (killOnEnd) {
             resetActions();
             UUID profileId = Utils.resolveProfileId(getMasterEntity());
-            for (ServerPlayer player : packetRecipients()) {
+            for (ServerPlayer player : getTargetedPlayers()) {
                 Services.PACKET.sendToPlayer(
                         player,
                         new S2CCharacterStoryAction(
@@ -172,10 +172,6 @@ public class Playback implements IPlaybackSession {
         }
 
         tick++;
-    }
-
-    private Collection<ServerPlayer> packetRecipients() {
-        return forSpecificPlayers() ? targetedPlayers : requester.level().players();
     }
 
     public void hideEntitiesToOtherPlayers() {
@@ -278,7 +274,7 @@ public class Playback implements IPlaybackSession {
 
     @Override
     public Collection<ServerPlayer> getTargetedPlayers() {
-        return targetedPlayers;
+        return forSpecificPlayers() ? targetedPlayers : requester.level().players();
     }
 
     @Override
