@@ -36,6 +36,7 @@ jobs:
         run: |
           echo "MOD_VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
           echo "JAVA_VERSION=$(grep '^java_version=' gradle.properties | cut -d= -f2)" >> $GITHUB_ENV
+          echo "API_VERSION=$(grep '^api_version=' gradle.properties | cut -d= -f2)" >> $GITHUB_ENV
 
       - name: Setup Java ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -49,8 +50,34 @@ jobs:
       - name: Build jars
         run: ./gradlew :fabric:build :${{ matrix.loader }}:build -Pversion=${{ env.MOD_VERSION }}
 
+      - name: Check whether the API is already published
+        id: api_published
+        run: |
+          ARTIFACT="narrativecraft-api-${{ matrix.mc_version }}"
+          URL="https://maven.loudo.dev/fr/loudo/narrativecraft/${ARTIFACT}/${API_VERSION}/${ARTIFACT}-${API_VERSION}.jar"
+          STATUS=$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 --retry-delay 5 --max-time 30 "${URL}")
+          case "${STATUS}" in
+            200)
+              echo "skip=true" >> $GITHUB_OUTPUT
+              echo "::notice::${ARTIFACT}:${API_VERSION} is already published, skipping the Maven deployment"
+              ;;
+            404)
+              echo "skip=false" >> $GITHUB_OUTPUT
+              echo "::notice::${ARTIFACT}:${API_VERSION} is not published yet, it will be deployed"
+              ;;
+            *)
+              echo "::error::Unexpected HTTP ${STATUS} from ${URL}, refusing to guess whether the artifact exists"
+              exit 1
+              ;;
+          esac
+
+      - name: Stagger concurrent deployments
+        if: steps.api_published.outputs.skip == 'false'
+        run: sleep $(( ${{ strategy.job-index }} * 30 ))
+
       - name: Publish API to Maven
-        run: ./gradlew :api:publish -Pversion=${{ env.MOD_VERSION }}
+        if: steps.api_published.outputs.skip == 'false'
+        run: ./gradlew :api:publish
         env:
           ORG_GRADLE_PROJECT_reposiliteUser: ${{ secrets.REPOSILITE_USER }}
           ORG_GRADLE_PROJECT_reposilitePassword: ${{ secrets.REPOSILITE_PASSWORD }}

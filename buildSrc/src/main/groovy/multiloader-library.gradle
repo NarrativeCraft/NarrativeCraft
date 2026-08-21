@@ -12,7 +12,6 @@ dependencies {
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
-            version "${version}+mc${minecraft_version}"
             from components.java
         }
     }
@@ -34,5 +33,6 @@ publishing {
 afterEvaluate {
     publishing.publications.named('mavenJava', MavenPublication) {
         artifactId = base.archivesName.get()
+        version = project.findProperty('mavenPublishVersion') ?: "${project.version}+mc${minecraft_version}"
     }
 }
