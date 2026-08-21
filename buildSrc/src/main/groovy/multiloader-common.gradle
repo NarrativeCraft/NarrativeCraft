@@ -85,6 +85,7 @@ processResources {
             'credits'                      : credits,
             'java_version'                 : java_version,
             'blade_ink_version'            : blade_ink_version,
+            'api_version'                  : api_version,
     ]
 
     var jsonExpandProps = expandProps.collectEntries {

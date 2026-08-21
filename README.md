@@ -62,7 +62,7 @@ maven {
 }
 ```
 ```
-compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.2.0+mc{minecraft_version}'
+compileOnly 'fr.loudo.narrativecraft:narrativecraft-api-{minecraft_version}:3.0.0'
 ```
 
 ### Maven
@@ -75,12 +75,15 @@ compileOnly 'fr.loudo.narrativecraft:narrativecraft-api:2.2.0+mc{minecraft_versi
 ```
 <dependency>
     <groupId>fr.loudo.narrativecraft</groupId>
-    <artifactId>narrativecraft-api</artifactId>
-    <version>2.2.0+mc{minecraft_version}</version>
+    <artifactId>narrativecraft-api-{minecraft_version}</artifactId>
+    <version>3.0.0</version>
 </dependency>
 ```
 
 Current minecraft versions available: `26.2` and `1.21.1`
+
+The API is versioned independently of the mod: its major matches `NarrativeCraftAPI.VERSION` and only
+changes on a breaking change, so a new mod release does not imply a new API release.
 
 ## Contributing
 
