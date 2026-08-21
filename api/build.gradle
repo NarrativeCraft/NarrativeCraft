@@ -4,9 +4,8 @@ plugins {
     id 'multiloader-library'
 }
 
-base {
-    archivesName = 'narrativecraft-api'
-}
+version = api_version
+ext.mavenPublishVersion = api_version
 
 neoForge {
     neoFormVersion = neo_form_version
@@ -26,5 +25,35 @@ configurations {
 artifacts {
     apiJava sourceSets.main.java.sourceDirectories.singleFile
     apiResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+tasks.register('checkApiVersion') {
+    def apiVersionSourceFile = file('src/main/java/fr/loudo/narrativecraft/api/NarrativeCraftAPI.java')
+    def declaredApiVersion = api_version.toString()
+    def declaredMajor = declaredApiVersion.tokenize('.').first()
+
+    inputs.file(apiVersionSourceFile)
+    inputs.property('apiVersion', declaredApiVersion)
+
+    doLast {
+        def matcher = apiVersionSourceFile.text =~ /VERSION\s*=\s*(\d+)/
+        if (!matcher.find()) {
+            throw new GradleException("Could not read NarrativeCraftAPI.VERSION from ${apiVersionSourceFile}")
+        }
+        def sourceVersion = matcher.group(1)
+        if (sourceVersion != declaredMajor) {
+            throw new GradleException(
+                    "api_version=${declaredApiVersion} does not match NarrativeCraftAPI.VERSION=${sourceVersion}. " +
+                            "The major of api_version must equal NarrativeCraftAPI.VERSION.")
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn 'checkApiVersion'
+}
+
+tasks.withType(PublishToMavenRepository).configureEach {
+    dependsOn 'checkApiVersion'
 }
 
