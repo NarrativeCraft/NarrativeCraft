@@ -46,6 +46,9 @@ public class DialogRenderer2D extends DialogRenderer {
         BOTTOM_RIGHT
     }
 
+    private static final float REFERENCE_GUI_SCALE = 3f;
+    private static final float REFERENCE_WINDOW_WIDTH = 1920f;
+    private static final float REFERENCE_WINDOW_HEIGHT = 1080f;
     private static final float BOX_WIDTH = 430f;
     private static final float BOX_HEIGHT = 80f;
     private static final float SKIP_INDICATOR_SIZE = 6f;
@@ -65,7 +68,7 @@ public class DialogRenderer2D extends DialogRenderer {
     }
 
     public DialogRenderer2D(DialogData data) {
-        this(data, Anchor.BOTTOM_CENTER, 0, -40);
+        this(data, Anchor.BOTTOM_CENTER, 0, -20);
     }
 
     @Override
@@ -94,20 +97,28 @@ public class DialogRenderer2D extends DialogRenderer {
 
         layout.compute(data, scrollText, mc.font);
 
+        double guiScale = mc.getWindow().getGuiScale();
+        float windowWidth = (float) (screenWidth * guiScale);
+        float windowHeight = (float) (screenHeight * guiScale);
+        float windowScale = Math.min(windowWidth / REFERENCE_WINDOW_WIDTH, windowHeight / REFERENCE_WINDOW_HEIGHT);
+        float uiScale = (float) (REFERENCE_GUI_SCALE * windowScale / guiScale);
+
         float totalWidth = BOX_WIDTH * data.getScale();
         float totalHeight = BOX_HEIGHT * data.getScale();
+        float renderedWidth = totalWidth * uiScale;
+        float renderedHeight = totalHeight * uiScale;
 
-        float[] origin = computeAnchorOrigin(screenWidth, screenHeight, totalWidth, totalHeight);
-        float dialogX = origin[0] + anchorOffsetX;
-        float dialogY = origin[1] + anchorOffsetY;
+        float[] origin = computeAnchorOrigin(screenWidth, screenHeight, renderedWidth, renderedHeight);
+        float dialogX = origin[0] + anchorOffsetX * uiScale;
+        float dialogY = origin[1] + anchorOffsetY * uiScale;
 
-        float centerX = dialogX + totalWidth / 2f;
-        float centerY = dialogY + totalHeight / 2f;
+        float centerX = dialogX + renderedWidth / 2f;
+        float centerY = dialogY + renderedHeight / 2f;
 
         var pose = graphics.pose();
         pose.pushMatrix();
         pose.translate(centerX, centerY);
-        pose.scale(scale, scale);
+        pose.scale(scale * uiScale, scale * uiScale);
         pose.translate(-totalWidth / 2f, -totalHeight / 2f);
 
         renderBackground(graphics, totalWidth, totalHeight, opacity);

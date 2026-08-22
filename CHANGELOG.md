@@ -4,3 +4,6 @@
 
 ### Features
 - Timed choice
+
+### Fixes
+- Dialog 2D scale not fixed based on gui scale
