@@ -56,7 +56,7 @@ public class ClientShakeScreenInkAction extends ShakeScreenInkAction {
 
     @Override
     public void tick() {
-        if (!isRunning) return;
+        if (!isRunning()) return;
 
         noiseIndex += (1.0f / 20.0f) * noiseShakeSpeed;
 
@@ -69,8 +69,7 @@ public class ClientShakeScreenInkAction extends ShakeScreenInkAction {
         currentOffsetY = (float) noise.getValue(100, noiseIndex) * shakeStrength;
 
         if (Math.abs(shakeStrength) < 0.001f) {
-            isRunning = false;
-            currentOffsetX = currentOffsetY = lastOffsetX = lastOffsetY = 0.0f;
+            stop();
         }
     }
 
@@ -97,8 +96,7 @@ public class ClientShakeScreenInkAction extends ShakeScreenInkAction {
                     active.stop();
                 }
             }
-            isRunning = false;
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
         noise = new SimplexNoise(RandomSource.create());
         shakeStrength = noiseShakeStrength * PIXEL;

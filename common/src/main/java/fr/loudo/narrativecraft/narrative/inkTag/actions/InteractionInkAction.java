@@ -87,7 +87,6 @@ public class InteractionInkAction extends InkAction {
             }
         }
 
-        isRunning = false;
-        return InkActionResult.ignored();
+        return InkActionResult.singleOk();
     }
 }
