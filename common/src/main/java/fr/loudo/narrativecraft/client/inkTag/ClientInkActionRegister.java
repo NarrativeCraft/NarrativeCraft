@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientBorderInkAction;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientFadeInkAction;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
+import fr.loudo.narrativecraft.client.inkTag.actions.choiceTime.ClientChoiceTimeInkAction;
 import fr.loudo.narrativecraft.client.inkTag.actions.sound.ClientSoundInkAction;
 import fr.loudo.narrativecraft.client.inkTag.actions.text.ClientTextInkAction;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
@@ -50,5 +51,6 @@ public final class ClientInkActionRegister {
         dispatcher.register(ClientBorderInkAction.class, ClientBorderInkAction::new);
         dispatcher.register(ClientSoundInkAction.class, ClientSoundInkAction::new);
         dispatcher.register(ClientTextInkAction.class, ClientTextInkAction::new);
+        dispatcher.register(ClientChoiceTimeInkAction.class, ClientChoiceTimeInkAction::new);
     }
 }
