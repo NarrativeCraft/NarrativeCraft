@@ -103,13 +103,13 @@ public class ChangeDayTimeInkAction extends InkAction {
 
     @Override
     public void tick() {
-        if (!isRunning || level == null || totalTick == 0) return;
+        if (!isRunning() || level == null || totalTick == 0) return;
         tick++;
         double t = Mth.clamp((double) tick / totalTick, 0.0, 1.0);
         t = Interpolation.applyEasing(easingType, t);
         changeTime((long) Interpolation.lerp(fromTick, toTick, t));
         if (tick >= totalTick) {
-            isRunning = false;
+            stop();
         }
     }
 
@@ -119,13 +119,13 @@ public class ChangeDayTimeInkAction extends InkAction {
 
         if (action.equals("add")) {
             changeTime(getDayTime() + fromTick);
-            isRunning = false;
+            stop();
             return InkActionResult.ok();
         }
 
         if (totalTick == 0) {
             changeTime(fromTick);
-            isRunning = false;
+            stop();
             return InkActionResult.ok();
         }
 

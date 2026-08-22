@@ -112,9 +112,8 @@ public class CameraAngleInkAction extends InkAction {
             }
         }
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CEnterCameraView(cameraView.getId()));
-        isRunning = false;
         playerSession.setGameplayMode(false);
-        return InkActionResult.ok();
+        return InkActionResult.singleOk();
     }
 
     private void registerDialogData(StoryHandler storyHandler) {

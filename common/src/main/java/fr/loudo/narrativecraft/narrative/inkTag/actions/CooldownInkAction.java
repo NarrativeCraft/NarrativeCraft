@@ -41,9 +41,9 @@ public class CooldownInkAction extends InkAction {
 
     @Override
     public void tick() {
-        if (!isRunning) return;
+        if (!isBlocking()) return;
         tick++;
-        if (tick >= totalTick) isRunning = false;
+        if (tick >= totalTick) stop();
     }
 
     @Override

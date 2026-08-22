@@ -116,7 +116,7 @@ public class SubsceneInkAction extends InkAction {
                 }
             }
         } else {
-            isRunning = false;
+            stop();
         }
     }
 
@@ -127,13 +127,12 @@ public class SubsceneInkAction extends InkAction {
 
         if (action.equals("stop")) {
             stopRunningPlaybacks();
-            isRunning = false;
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
 
         for (Animation animation : subscene.getAnimations()) {
             if (!animation.initialize()) {
-                isRunning = false;
+                stop();
                 return InkActionResult.error("Failed to load animation data: " + animation.getName());
             }
 
@@ -158,7 +157,7 @@ public class SubsceneInkAction extends InkAction {
             return InkActionResult.block();
         }
         if (!loop) {
-            isRunning = false;
+            return InkActionResult.singleOk();
         }
         return InkActionResult.ok();
     }

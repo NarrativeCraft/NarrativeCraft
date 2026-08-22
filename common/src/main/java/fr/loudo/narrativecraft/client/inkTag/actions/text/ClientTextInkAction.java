@@ -50,11 +50,11 @@ public class ClientTextInkAction extends TextInkAction {
 
     @Override
     public void tick() {
-        if (!isRunning) return;
+        if (!isRunning()) return;
 
         if (monitoredInstance != null) {
             if (monitoredInstance.scrollText != null && monitoredInstance.scrollText.isFinished()) {
-                isRunning = false;
+                stop();
             }
             return;
         }
@@ -82,7 +82,7 @@ public class ClientTextInkAction extends TextInkAction {
                 case FADE_OUT -> {
                     fadeState = null;
                     if (!noRemove) {
-                        isRunning = false;
+                        stop();
                     }
                 }
             }
@@ -91,7 +91,7 @@ public class ClientTextInkAction extends TextInkAction {
 
     @Override
     public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {
-        if (!isRunning || scrollText == null || dialogData == null) return;
+        if (!isRunning() || scrollText == null || dialogData == null) return;
 
         float currentOpacity = computeOpacity(partialTick);
         int adjustedAlpha = (int) (ARGB.alpha(ARGB.color(255, color)) * currentOpacity);
@@ -116,7 +116,7 @@ public class ClientTextInkAction extends TextInkAction {
 
         if (action.equals("create")) {
             if (existing != null) {
-                isRunning = false;
+                stop();
                 return InkActionResult.error("Text id '" + textId + "' already exists");
             }
             dialogData = new DialogData();
@@ -131,53 +131,31 @@ public class ClientTextInkAction extends TextInkAction {
 
         if (existing == null) {
             if (action.equals("remove")) {
-                isRunning = false;
-                return InkActionResult.ok();
+                return InkActionResult.singleOk();
             }
-            isRunning = false;
+            stop();
             return InkActionResult.error("Text id '" + textId + "' not found");
         }
 
         switch (action) {
-            case "remove" -> {
-                existing.isRunning = false;
-                isRunning = false;
-            }
+            case "remove" -> existing.stop();
             case "edit" -> {
                 existing.text = text;
                 existing.scrollText.setText(text);
                 existing.scrollText.forceFinish();
-                isRunning = false;
             }
-            case "position", "pos" -> {
-                existing.position = position;
-                isRunning = false;
-            }
-            case "space" -> {
-                existing.space = space;
-                isRunning = false;
-            }
-            case "color" -> {
-                existing.color = color;
-                isRunning = false;
-            }
-            case "opacity" -> {
-                existing.opacity = opacity;
-                isRunning = false;
-            }
-            case "scale" -> {
-                existing.scale = scale;
-                isRunning = false;
-            }
+            case "position", "pos" -> existing.position = position;
+            case "space" -> existing.space = space;
+            case "color" -> existing.color = color;
+            case "opacity" -> existing.opacity = opacity;
+            case "scale" -> existing.scale = scale;
             case "width" -> {
                 existing.width = width;
                 existing.dialogData.setWidth(width);
-                isRunning = false;
             }
             case "text_alignment" -> {
                 existing.textAlignment = textAlignment;
                 existing.dialogData.setTextAlignment(textAlignment);
-                isRunning = false;
             }
             case "fade" -> {
                 existing.fadeState = fadeState;
@@ -186,7 +164,6 @@ public class ClientTextInkAction extends TextInkAction {
                 existing.fadeOutSeconds = fadeOutSeconds;
                 existing.totalTick = totalTick;
                 existing.tick = 0;
-                isRunning = false;
             }
             case "fadein" -> {
                 existing.fadeState = FadeState.FADE_IN;
@@ -194,39 +171,33 @@ public class ClientTextInkAction extends TextInkAction {
                 existing.staySeconds = -1;
                 existing.totalTick = (int) (fadeInSeconds * 20.0);
                 existing.tick = 0;
-                isRunning = false;
             }
             case "fadeout" -> {
                 existing.fadeState = FadeState.FADE_OUT;
                 existing.fadeOutSeconds = fadeOutSeconds;
                 existing.totalTick = (int) (fadeOutSeconds * 20.0);
                 existing.tick = 0;
-                isRunning = false;
             }
             case "type" -> {
                 existing.scrollSpeed = scrollSpeed;
                 existing.noTyping = false;
                 existing.scrollText.setText(existing.text);
-                if (!blocking) {
-                    isRunning = false;
-                } else {
+                if (blocking) {
                     monitoredInstance = existing;
                 }
             }
             case "shadow" -> {
                 existing.shadow = shadow;
                 existing.dialogData.setTextShadow(shadow);
-                isRunning = false;
             }
             case "mute" -> {
                 existing.mute = mute;
                 existing.dialogData.setSoundMuted(mute);
                 existing.scrollText.setMutedSound(mute);
-                isRunning = false;
             }
         }
 
-        return blocking ? InkActionResult.block() : InkActionResult.ok();
+        return blocking ? InkActionResult.block() : InkActionResult.singleOk();
     }
 
     private float computeOpacity(float partialTick) {

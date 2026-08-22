@@ -38,12 +38,12 @@ final class ClientActionStub extends InkAction {
 
     ClientActionStub(long instanceId) {
         this.instanceId = instanceId;
-        this.isRunning = true;
+        setRunning(true);
     }
 
     /** Called by the packet handler when the client confirms the action is done. */
     void finishRemotely() {
-        isRunning = false;
+        stop();
     }
 
     @Override

@@ -39,9 +39,9 @@ public class ClientBorderInkAction extends BorderInkAction {
 
     @Override
     public void tick() {
-        if (!isRunning) return;
+        if (!isRunning()) return;
         if (verb.equals("out") && tick >= totalTick) {
-            isRunning = false;
+            stop();
             return;
         }
         if (tick < totalTick) {
@@ -51,7 +51,7 @@ public class ClientBorderInkAction extends BorderInkAction {
 
     @Override
     public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {
-        if (!isRunning) return;
+        if (!isRunning()) return;
 
         float upRender = up;
         float rightRender = right;
@@ -102,13 +102,12 @@ public class ClientBorderInkAction extends BorderInkAction {
                     down = existing.downInterpolated;
                     left = existing.leftInterpolated;
                     color = existing.color;
-                    existing.isRunning = false;
+                    existing.stop();
                     break;
                 }
             }
             if (up == 0 && right == 0 && down == 0 && left == 0) {
-                isRunning = false;
-                return InkActionResult.ok();
+                return InkActionResult.singleOk();
             }
             return InkActionResult.ok();
         }
@@ -119,8 +118,7 @@ public class ClientBorderInkAction extends BorderInkAction {
                     active.stop();
                 }
             }
-            isRunning = false;
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
 
         if (totalTick == 0) {
