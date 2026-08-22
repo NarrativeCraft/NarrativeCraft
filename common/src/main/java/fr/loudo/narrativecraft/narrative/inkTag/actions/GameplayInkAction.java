@@ -95,7 +95,6 @@ public class GameplayInkAction extends InkAction {
         storyHandler.unregisterEntity(mainCharacter);
         mainCharacterEntity.remove(Entity.RemovalReason.KILLED);
 
-        isRunning = false;
-        return InkActionResult.ok();
+        return InkActionResult.singleOk();
     }
 }

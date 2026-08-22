@@ -38,7 +38,7 @@ public class ClientFadeInkAction extends FadeInkAction {
 
     @Override
     public void tick() {
-        if (!isRunning) return;
+        if (!isRunning()) return;
         tick++;
         if (tick >= totalTick) {
             tick = 0;
@@ -49,14 +49,14 @@ public class ClientFadeInkAction extends FadeInkAction {
                 currentFadeState = FadeState.FADE_OUT;
                 totalTick = (int) (fadeOutSeconds * 20.0);
             } else if (currentFadeState == FadeState.FADE_OUT) {
-                isRunning = false;
+                stop();
             }
         }
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, float partialTick) {
-        if (!isRunning) return;
+        if (!isRunning()) return;
         double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
         int opacity = 255;
         if (currentFadeState == FadeState.FADE_IN) {
@@ -82,12 +82,10 @@ public class ClientFadeInkAction extends FadeInkAction {
                     active.stop();
                 }
             }
-            isRunning = false;
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
         if (fadeInSeconds == 0 && staySeconds == 0 && fadeOutSeconds == 0) {
-            isRunning = false;
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
         currentFadeState = FadeState.FADE_IN;
         totalTick = (int) (fadeInSeconds * 20.0);

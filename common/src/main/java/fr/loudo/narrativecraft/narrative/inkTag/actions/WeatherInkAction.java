@@ -94,7 +94,6 @@ public class WeatherInkAction extends InkAction {
             }
         }
 
-        isRunning = false;
-        return InkActionResult.ok();
+        return InkActionResult.singleOk();
     }
 }

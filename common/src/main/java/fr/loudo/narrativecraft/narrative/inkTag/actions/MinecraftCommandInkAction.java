@@ -89,7 +89,6 @@ public class MinecraftCommandInkAction extends InkAction {
         } catch (CommandSyntaxException e) {
             return InkActionResult.error("Command execution failed: " + e.getMessage());
         }
-        isRunning = false;
-        return InkActionResult.ok();
+        return InkActionResult.singleOk();
     }
 }

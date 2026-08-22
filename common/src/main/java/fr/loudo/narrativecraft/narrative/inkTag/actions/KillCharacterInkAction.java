@@ -66,11 +66,9 @@ public class KillCharacterInkAction extends InkAction {
     protected InkActionResult doExecute(IPlayerSession playerSession) {
         StoryHandler storyHandler = ((PlayerSession) playerSession).getStoryHandler();
         if (storyHandler == null) {
-            isRunning = false;
             return InkActionResult.ignored();
         }
         if (!storyHandler.characterInStory(character)) {
-            isRunning = false;
             return InkActionResult.ignored();
         }
         Entity entity =
@@ -79,7 +77,6 @@ public class KillCharacterInkAction extends InkAction {
             storyHandler.unregisterEntity(character, entity);
             entity.remove(Entity.RemovalReason.KILLED);
         }
-        isRunning = false;
-        return InkActionResult.ok();
+        return InkActionResult.singleOk();
     }
 }

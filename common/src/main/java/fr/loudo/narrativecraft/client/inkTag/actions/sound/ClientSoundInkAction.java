@@ -44,24 +44,24 @@ public class ClientSoundInkAction extends SoundInkAction {
     @Override
     public void tick() {
         if (soundInstance == null || soundManager == null) {
-            isRunning = false;
+            stop();
             return;
         }
         if (!soundManager.isActive(soundInstance) && soundAction.equals("play")) {
-            isRunning = false;
+            stop();
             return;
         }
-        if (totalTick == 0 || !isRunning) return;
+        if (totalTick == 0 || !isRunning()) return;
         tick++;
         if (tick > totalTick && soundAction.equals("stop")) {
             soundManager.stop(soundInstance);
-            isRunning = false;
+            stop();
         }
     }
 
     @Override
     public void partialTick(float partialTick) {
-        if (soundInstance == null || soundManager == null || totalTick == 0 || !isRunning) return;
+        if (soundInstance == null || soundManager == null || totalTick == 0 || !isRunning()) return;
         double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
         soundInstance.setFading(t < 1.0);
         currentVolume =
@@ -79,7 +79,7 @@ public class ClientSoundInkAction extends SoundInkAction {
     @Override
     public void stop() {
         if (soundManager != null && soundInstance != null) soundManager.stop(soundInstance);
-        isRunning = false;
+        setRunning(false);
     }
 
     @Override
@@ -92,8 +92,7 @@ public class ClientSoundInkAction extends SoundInkAction {
                 if (!(inkAction instanceof ClientSoundInkAction clientSoundInkAction)) continue;
                 clientSoundInkAction.stop();
             }
-            isRunning = false;
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
 
         switch (soundAction) {
@@ -122,7 +121,7 @@ public class ClientSoundInkAction extends SoundInkAction {
             }
         }
         if (soundAction.equals("stop") && (soundName.equals("all") || totalTick == 0)) {
-            isRunning = false;
+            return InkActionResult.singleOk();
         }
 
         return InkActionResult.ok();

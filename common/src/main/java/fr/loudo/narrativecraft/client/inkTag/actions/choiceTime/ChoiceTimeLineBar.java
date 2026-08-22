@@ -25,10 +25,9 @@ package fr.loudo.narrativecraft.client.inkTag.actions.choiceTime;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
-import fr.loudo.narrativecraft.client.gui.GuiGraphicsExtractorExtension;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.util.ARGB;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.FastColor;
 
 public class ChoiceTimeLineBar {
 
@@ -98,7 +97,7 @@ public class ChoiceTimeLineBar {
         }
     }
 
-    public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {
+    public void render(GuiGraphics guiGraphics, float partialTick) {
         loadingBar.render(guiGraphics, this, getOpacity(partialTick), getProgress(partialTick));
     }
 
@@ -217,30 +216,41 @@ public class ChoiceTimeLineBar {
 
 record LoadingBar(int color, Outline outline) {
 
-    public void render(GuiGraphicsExtractor graphics, ChoiceTimeLineBar lineBar, float opacity, float progress) {
+    public void render(GuiGraphics graphics, ChoiceTimeLineBar lineBar, float opacity, float progress) {
         float rightX = (float) (graphics.guiWidth() / 2.0 + lineBar.getLineWidth() / 2);
         float leftX = (float) (rightX - lineBar.getLineWidth());
         float bottomY = (float) (graphics.guiHeight() - lineBar.getOffsetY());
         float topY = (float) (bottomY - lineBar.getLineHeight());
 
-        GuiGraphicsExtractorExtension guiGraphicsExtractorExtension = new GuiGraphicsExtractorExtension(graphics);
-        guiGraphicsExtractorExtension.fill(
-                rightX + outline.padding(),
-                bottomY + outline.padding(),
-                leftX - outline.padding(),
-                topY - outline.padding(),
-                ARGB.color(opacity, outline.color()));
+        graphics.fill(
+                Math.round(leftX - outline.padding()),
+                Math.round(topY - outline.padding()),
+                Math.round(rightX + outline.padding()),
+                Math.round(bottomY + outline.padding()),
+                applyOpacity(opacity, outline.color()));
 
         float loadingRightX = (float) Interpolation.lerp(leftX, rightX, progress);
-        guiGraphicsExtractorExtension.fill(loadingRightX, bottomY, leftX, topY, ARGB.color(opacity, color));
+        graphics.fill(
+                Math.round(leftX),
+                Math.round(topY),
+                Math.round(loadingRightX),
+                Math.round(bottomY),
+                applyOpacity(opacity, color));
 
         if (lineBar.isShowText()) {
             String secondsString = lineBar.getRemainingSeconds() + "s";
             int middleTextX =
                     graphics.guiWidth() / 2 - Minecraft.getInstance().font.width(secondsString) / 2;
             int textY = (int) bottomY + 5;
-            graphics.text(Minecraft.getInstance().font, secondsString, middleTextX, textY, ARGB.color(opacity, color));
+            graphics.drawString(
+                    Minecraft.getInstance().font, secondsString, middleTextX, textY, applyOpacity(opacity, color));
         }
+    }
+
+    private static int applyOpacity(float opacity, int color) {
+        int alpha = (int) (FastColor.ARGB32.alpha(color) * opacity);
+        return FastColor.ARGB32.color(
+                alpha, FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color));
     }
 }
 

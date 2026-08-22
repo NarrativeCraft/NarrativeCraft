@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.ChoiceTimeInkAction;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
@@ -42,10 +42,10 @@ public class ClientChoiceTimeInkAction extends ChoiceTimeInkAction {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor guiGraphics, float partialTick) {
+    public void render(GuiGraphics guiGraphics, float partialTick) {
         timeLineBar.render(guiGraphics, partialTick);
         if (timeLineBar.isFadeOutFinished()) {
-            isRunning = false;
+            stop();
         }
     }
 
@@ -71,7 +71,7 @@ public class ClientChoiceTimeInkAction extends ChoiceTimeInkAction {
     }
 
     private void onTimeout() {
-        if (!(Minecraft.getInstance().gui.screen() instanceof ChoiceScreen choiceScreen)) return;
+        if (!(Minecraft.getInstance().screen instanceof ChoiceScreen choiceScreen)) return;
 
         if (defaultAnswerIndex == -1) {
             defaultAnswerIndex = Mth.randomBetweenInclusive(
