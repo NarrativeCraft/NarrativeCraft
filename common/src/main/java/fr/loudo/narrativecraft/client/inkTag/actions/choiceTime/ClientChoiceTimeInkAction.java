@@ -45,7 +45,7 @@ public class ClientChoiceTimeInkAction extends ChoiceTimeInkAction {
     public void render(GuiGraphics guiGraphics, float partialTick) {
         timeLineBar.render(guiGraphics, partialTick);
         if (timeLineBar.isFadeOutFinished()) {
-            isRunning = false;
+            stop();
         }
     }
 

@@ -80,7 +80,6 @@ public class OnEnterInkAction extends InkAction {
         storyHandler.triggerChangeScene();
         Services.PACKET.sendToPlayer(session.getPlayer(), new S2CPlayerSession(chapter.getId(), scene.getId()));
         storyHandler.save(true);
-        isRunning = false;
-        return InkActionResult.ok();
+        return InkActionResult.singleOk();
     }
 }

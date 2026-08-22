@@ -114,7 +114,7 @@ public class AnimationInkAction extends InkAction {
                 }
             }
         } else {
-            isRunning = false;
+            stop();
         }
     }
 
@@ -125,12 +125,10 @@ public class AnimationInkAction extends InkAction {
 
         if (action.equals("stop")) {
             stopRunningPlayback();
-            isRunning = false;
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
 
         if (!animation.initialize()) {
-            isRunning = false;
             return InkActionResult.error("Failed to load animation data: " + animation.getName());
         }
 
@@ -153,7 +151,7 @@ public class AnimationInkAction extends InkAction {
             return InkActionResult.block();
         }
         if (!loop) {
-            isRunning = false;
+            return InkActionResult.singleOk();
         }
         return InkActionResult.ok();
     }

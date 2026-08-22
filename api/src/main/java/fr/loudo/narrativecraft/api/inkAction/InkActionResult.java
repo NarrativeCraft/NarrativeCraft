@@ -28,7 +28,8 @@ package fr.loudo.narrativecraft.api.inkAction;
  *
  * <p>Return one of the static factory methods from {@code doExecute()}:
  * <ul>
- *   <li>{@link #ok()}, action ran and finished immediately.</li>
+ *   <li>{@link #ok()}, action ran and running in background.</li>
+ *   <li>{@link #singleOk()}, action ran and finished immediately.</li>
  *   <li>{@link #block()}, action started and will complete asynchronously;
  *       the tag queue is paused until the action sets {@code isRunning = false}.</li>
  *   <li>{@link #ignored()}, action intentionally did nothing (e.g. condition not met).</li>
@@ -39,6 +40,7 @@ public record InkActionResult(Status status, String errorMessage) {
 
     public enum Status {
         OK,
+        SINGLE_OK,
         IGNORED,
         BLOCK,
         ERROR,
@@ -47,6 +49,10 @@ public record InkActionResult(Status status, String errorMessage) {
 
     public static InkActionResult ok() {
         return new InkActionResult(Status.OK, null);
+    }
+
+    public static InkActionResult singleOk() {
+        return new InkActionResult(Status.SINGLE_OK, null);
     }
 
     public static InkActionResult ignored() {
@@ -68,6 +74,10 @@ public record InkActionResult(Status status, String errorMessage) {
 
     public boolean isOk() {
         return status == Status.OK || status == Status.IGNORED;
+    }
+
+    public boolean isSingleOk() {
+        return status == Status.SINGLE_OK || status == Status.IGNORED;
     }
 
     public boolean isIgnore() {
