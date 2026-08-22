@@ -24,23 +24,7 @@
 package fr.loudo.narrativecraft.narrative.inkTag;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.AnimationInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.BorderInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.CameraAngleInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.ChangeDayTimeInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.CooldownInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.CutsceneInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.FadeInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.GameplayInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.InteractionInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.KillCharacterInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.MinecraftCommandInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.OnEnterInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.ShakeScreenInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.SoundInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.SubsceneInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.TextInkAction;
-import fr.loudo.narrativecraft.narrative.inkTag.actions.WeatherInkAction;
+import fr.loudo.narrativecraft.narrative.inkTag.actions.*;
 
 public final class InkActionRegister {
 
@@ -66,5 +50,6 @@ public final class InkActionRegister {
         dispatcher.register(OnEnterInkAction.class, OnEnterInkAction::new);
         dispatcher.register(ChangeDayTimeInkAction.class, ChangeDayTimeInkAction::new);
         dispatcher.register(TextInkAction.class, TextInkAction::new);
+        dispatcher.register(ChoiceTimeInkAction.class, ChoiceTimeInkAction::new);
     }
 }
