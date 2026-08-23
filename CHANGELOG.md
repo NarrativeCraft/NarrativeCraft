@@ -11,3 +11,4 @@
 - Dialog 2D scale not fixed based on gui scale
 - Entity played from a playback during subscene recording not ignored
 - Can't play, stop or change locale to more than one player using command
+- Player joining server can see entities of player in a story
