@@ -102,6 +102,7 @@ public class NpcEditor implements NarrativeEntryEditor<NpcPayload, Npc> {
         }
         oldNpc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         oldNpc.setDialogData(newNpc.getDialogData());
+        oldNpc.setCustomNbt(payload.getCustomNbt());
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }
@@ -137,6 +138,7 @@ public class NpcEditor implements NarrativeEntryEditor<NpcPayload, Npc> {
             } catch (Exception ignored) {
             }
         }
+        npc.setCustomNbt(payload.getCustomNbt());
         return npc;
     }
 

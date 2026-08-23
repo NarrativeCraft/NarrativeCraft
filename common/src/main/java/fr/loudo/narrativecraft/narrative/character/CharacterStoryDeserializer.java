@@ -59,6 +59,12 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
                     .getOptional(Identifier.parse(entityTypeId))
                     .orElse(EntityTypes.PLAYER));
         }
+
+        character.setCustomNbt("");
+        if (jsonObject.has("customNbt")) {
+            String customNbt = jsonObject.get("customNbt").getAsString();
+            character.setCustomNbt(customNbt);
+        }
     }
 
     @Override

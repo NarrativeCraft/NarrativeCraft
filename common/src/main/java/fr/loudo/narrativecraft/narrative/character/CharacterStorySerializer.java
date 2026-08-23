@@ -43,6 +43,7 @@ public class CharacterStorySerializer implements JsonSerializer<CharacterStory> 
         json.addProperty(
                 "entityTypeId",
                 BuiltInRegistries.ENTITY_TYPE.getKey(src.getEntityType()).toString());
+        json.addProperty("customNbt", src.getCustomNbt());
     }
 
     @Override

@@ -45,6 +45,8 @@ public class NpcPayload extends NarrativeEntryPayload {
             NpcPayload::getChapterId,
             ByteBufCodecs.STRING_UTF8,
             NpcPayload::getDialogDataJson,
+            ByteBufCodecs.STRING_UTF8,
+            NpcPayload::getCustomNbt,
             NpcPayload::new);
 
     private final String modelType;
@@ -52,15 +54,23 @@ public class NpcPayload extends NarrativeEntryPayload {
     private final UUID sceneId;
     private final UUID chapterId;
     private final String dialogDataJson;
+    private final String customNbt;
 
     public NpcPayload(
-            String name, String modelType, String entityTypeId, UUID sceneId, UUID chapterId, String dialogDataJson) {
+            String name,
+            String modelType,
+            String entityTypeId,
+            UUID sceneId,
+            UUID chapterId,
+            String dialogDataJson,
+            String customNbt) {
         super(name, "");
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
         this.sceneId = sceneId;
         this.chapterId = chapterId;
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
+        this.customNbt = customNbt;
     }
 
     public String getModelType() {
@@ -81,5 +91,9 @@ public class NpcPayload extends NarrativeEntryPayload {
 
     public String getDialogDataJson() {
         return dialogDataJson;
+    }
+
+    public String getCustomNbt() {
+        return customNbt;
     }
 }

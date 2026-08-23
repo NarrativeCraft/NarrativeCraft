@@ -79,6 +79,7 @@ public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, N
             } catch (Exception ignored) {
             }
         }
+        npc.setCustomNbt(payload.getCustomNbt());
 
         UtilsClient.reloadListScreen();
     }
@@ -116,6 +117,7 @@ public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, N
             npc.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
         }
         npc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        npc.setCustomNbt(payload.getDialogDataJson());
         String dialogDataJson = payload.getDialogDataJson();
         if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
             try {

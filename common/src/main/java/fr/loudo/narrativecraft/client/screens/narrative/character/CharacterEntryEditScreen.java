@@ -77,12 +77,13 @@ public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<C
     @Override
     protected void addCustomFields() {
         super.addCustomFields();
-        Button mainCharacterSettingsButton = Button.builder(
-                        Translation.message("screen.character.main_character_settings"),
-                        b -> minecraft.gui.setScreen(new MainCharacterAttributeScreen(this, mainCharacterAttribute)))
+        Button settingsButton = Button.builder(
+                        Translation.message("screen.character.settings"),
+                        b -> minecraft.gui.setScreen(new CharacterSettingsScreen(
+                                this, mainCharacterAttribute, customNbt, value -> customNbt = value)))
                 .size(GLOBAL_WIDTH, 20)
                 .build();
-        addElementToWidgetsList(mainCharacterSettingsButton);
+        addElementToWidgetsList(settingsButton);
     }
 
     @Override
@@ -114,6 +115,7 @@ public class CharacterEntryEditScreen extends AbstractCharacterEntryEditScreen<C
         character.setEntityType(selectedEntityType);
         character.setModelType(selectedModelType);
         character.setMainCharacterAttribute(mainCharacterAttribute);
+        character.setCustomNbt(customNbt);
         return character;
     }
 }

@@ -69,6 +69,7 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
         }
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         oldCharacter.setMainCharacterAttribute(payload.getMainCharacterAttribute());
+        oldCharacter.setCustomNbt(payload.getCustomNbt());
         String dialogDataJson = payload.getDialogDataJson();
         if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
             try {
@@ -94,6 +95,7 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
         }
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         character.setMainCharacterAttribute(payload.getMainCharacterAttribute());
+        character.setCustomNbt(payload.getCustomNbt());
         String dialogDataJson = payload.getDialogDataJson();
         if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
             try {
