@@ -24,9 +24,11 @@
 package fr.loudo.narrativecraft.api.inkAction.syntax;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,6 +67,8 @@ public final class SyntaxParser {
         Map<String, NamedArgDef> namedArgs = new LinkedHashMap<>();
         Map<String, FlagDef> flags = new LinkedHashMap<>();
 
+        Set<String> declaredNames = new HashSet<>();
+
         String[] tokens = syntax.trim().split("\\s+");
 
         for (int i = 1; i < tokens.length; i++) {
@@ -73,6 +77,7 @@ public final class SyntaxParser {
             Matcher requiredMatcher = REQUIRED_ARG.matcher(token);
             if (requiredMatcher.matches()) {
                 String name = requiredMatcher.group(1);
+                checkUniqueName(keyword, token, name, declaredNames);
                 ArgType type = parseType(token, requiredMatcher.group(2));
                 positionalArgs.add(new ArgDef(name, type));
                 continue;
@@ -81,6 +86,7 @@ public final class SyntaxParser {
             Matcher optionalPositionalMatcher = OPTIONAL_POSITIONAL_ARG.matcher(token);
             if (optionalPositionalMatcher.matches()) {
                 String name = optionalPositionalMatcher.group(1);
+                checkUniqueName(keyword, token, name, declaredNames);
                 ArgType type = parseType(token, optionalPositionalMatcher.group(2));
                 optionalPositionalArgs.add(new ArgDef(name, type));
                 continue;
@@ -89,6 +95,7 @@ public final class SyntaxParser {
             Matcher optionalMatcher = OPTIONAL_ARG.matcher(token);
             if (optionalMatcher.matches()) {
                 String name = optionalMatcher.group(1);
+                checkUniqueName(keyword, token, name, declaredNames);
                 ArgType type = parseType(token, optionalMatcher.group(2));
                 Object defaultValue = parseDefault(token, type, optionalMatcher.group(3));
                 namedArgs.put(name, new NamedArgDef(name, type, defaultValue));
@@ -107,6 +114,14 @@ public final class SyntaxParser {
         }
 
         return new CommandSpec(keyword, positionalArgs, optionalPositionalArgs, namedArgs, flags);
+    }
+
+    private static void checkUniqueName(String keyword, String fullToken, String name, Set<String> declaredNames) {
+        if (!declaredNames.add(name)) {
+            throw new IllegalArgumentException("Duplicate argument name '" + name + "' in token '" + fullToken
+                    + "' of syntax for '" + keyword + "'. Argument names must be unique, they are used to "
+                    + "resolve 'name:value' tokens.");
+        }
     }
 
     private static ArgType parseType(String fullToken, String typeToken) {
