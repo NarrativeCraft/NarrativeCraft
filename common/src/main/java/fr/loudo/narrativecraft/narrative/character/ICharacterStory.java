@@ -41,6 +41,12 @@ public interface ICharacterStory extends ICharacter {
 
     File getSkinFile();
 
+    String getCustomNbt();
+
+    void setCustomNbt(String customNbt);
+
+    boolean isMainCharacter();
+
     EntityType<?> getEntityType();
 
     PlayerModelType getModelType();

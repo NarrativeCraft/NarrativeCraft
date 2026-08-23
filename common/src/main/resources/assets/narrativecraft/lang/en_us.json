@@ -79,6 +79,8 @@
   "narrativecraft.screen.character.is_main_character": "Main Character: %s",
   "narrativecraft.screen.character.skin": "Skin: %s",
   "narrativecraft.screen.character.main_character_settings": "Main Character Settings",
+  "narrativecraft.screen.character.custom_nbt": "Custom NBT",
+  "narrativecraft.screen.character.settings": "Settings",
   "narrativecraft.screen.character.model_type": "Model Type: %s",
 
   "narrativecraft.screen.entity_type_picker": "Select Entity Type",

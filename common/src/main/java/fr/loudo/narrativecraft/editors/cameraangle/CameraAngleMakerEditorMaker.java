@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.editors.cameraangle;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -52,6 +53,7 @@ import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -291,6 +293,19 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             if (entity == null) return;
             if (mainData != null) {
                 CompoundTag initialNbt = mainData.getInitialNbt();
+                try {
+                    CompoundTag customNbt = Utils.nbtFromString(characterStory.getCustomNbt());
+                    if (initialNbt == null) {
+                        initialNbt = customNbt;
+                    } else {
+                        for (String key : customNbt.getAllKeys()) {
+                            Tag tag = customNbt.get(key);
+                            if (tag == null) continue;
+                            initialNbt.put(key, tag);
+                        }
+                    }
+                } catch (CommandSyntaxException ignored) {
+                }
                 if (initialNbt != null && !initialNbt.isEmpty()) {
                     entity.load(initialNbt);
                     entity.setUUID(UUID.randomUUID());

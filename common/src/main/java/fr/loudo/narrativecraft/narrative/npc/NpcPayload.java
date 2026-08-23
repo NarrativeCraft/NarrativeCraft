@@ -32,35 +32,47 @@ import net.minecraft.network.codec.StreamCodec;
 
 public class NpcPayload extends NarrativeEntryPayload {
 
-    public static final StreamCodec<ByteBuf, NpcPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getModelType,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getEntityTypeId,
-            UUIDUtil.STREAM_CODEC,
-            NpcPayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            NpcPayload::getChapterId,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getDialogDataJson,
-            NpcPayload::new);
+    public static final StreamCodec<ByteBuf, NpcPayload> STREAM_CODEC = StreamCodec.of(
+            (buffer, payload) -> {
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getName());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getModelType());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getEntityTypeId());
+                UUIDUtil.STREAM_CODEC.encode(buffer, payload.getSceneId());
+                UUIDUtil.STREAM_CODEC.encode(buffer, payload.getChapterId());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getDialogDataJson());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getCustomNbt());
+            },
+            buffer -> new NpcPayload(
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    UUIDUtil.STREAM_CODEC.decode(buffer),
+                    UUIDUtil.STREAM_CODEC.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer)));
 
     private final String modelType;
     private final String entityTypeId;
     private final UUID sceneId;
     private final UUID chapterId;
     private final String dialogDataJson;
+    private final String customNbt;
 
     public NpcPayload(
-            String name, String modelType, String entityTypeId, UUID sceneId, UUID chapterId, String dialogDataJson) {
+            String name,
+            String modelType,
+            String entityTypeId,
+            UUID sceneId,
+            UUID chapterId,
+            String dialogDataJson,
+            String customNbt) {
         super(name, "");
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
         this.sceneId = sceneId;
         this.chapterId = chapterId;
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
+        this.customNbt = customNbt;
     }
 
     public String getModelType() {
@@ -81,5 +93,9 @@ public class NpcPayload extends NarrativeEntryPayload {
 
     public String getDialogDataJson() {
         return dialogDataJson;
+    }
+
+    public String getCustomNbt() {
+        return customNbt;
     }
 }

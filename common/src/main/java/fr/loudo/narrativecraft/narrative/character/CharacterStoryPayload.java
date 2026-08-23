@@ -30,23 +30,28 @@ import net.minecraft.network.codec.StreamCodec;
 
 public class CharacterStoryPayload extends NarrativeEntryPayload {
 
-    public static final StreamCodec<ByteBuf, CharacterStoryPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getDescription,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getModelType,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getEntityTypeId,
-            MainCharacterAttribute.STREAM_CODEC,
-            CharacterStoryPayload::getMainCharacterAttribute,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getDialogDataJson,
-            CharacterStoryPayload::new);
+    public static final StreamCodec<ByteBuf, CharacterStoryPayload> STREAM_CODEC = StreamCodec.of(
+            (buffer, payload) -> {
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getName());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getDescription());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getModelType());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getEntityTypeId());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getCustomNbt());
+                MainCharacterAttribute.STREAM_CODEC.encode(buffer, payload.getMainCharacterAttribute());
+                ByteBufCodecs.STRING_UTF8.encode(buffer, payload.getDialogDataJson());
+            },
+            buffer -> new CharacterStoryPayload(
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    MainCharacterAttribute.STREAM_CODEC.decode(buffer),
+                    ByteBufCodecs.STRING_UTF8.decode(buffer)));
 
     private final String modelType;
     private final String entityTypeId;
+    private final String customNbt;
     private final MainCharacterAttribute mainCharacterAttribute;
     private final String dialogDataJson;
 
@@ -55,11 +60,13 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
             String description,
             String modelType,
             String entityTypeId,
+            String customNbt,
             MainCharacterAttribute mainCharacterAttribute,
             String dialogDataJson) {
         super(name, description);
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
+        this.customNbt = customNbt;
         this.mainCharacterAttribute =
                 mainCharacterAttribute != null ? mainCharacterAttribute : new MainCharacterAttribute();
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
@@ -79,5 +86,9 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
 
     public String getDialogDataJson() {
         return dialogDataJson;
+    }
+
+    public String getCustomNbt() {
+        return customNbt;
     }
 }

@@ -45,6 +45,7 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
     private final CharacterType characterType = CharacterType.NPC;
     private DialogData dialogData = new DialogData();
     private EntityType<?> entityType = EntityType.PLAYER;
+    private String customNbt;
     private PlayerModelType modelType;
 
     public Npc(UUID id, String name, Scene scene) {
@@ -68,6 +69,19 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
         if (!npcFolder.exists()) return null;
 
         return new File(npcFolder, NarrativeCraftFileDefault.SKIN_CHARACTER_FILE);
+    }
+
+    public String getCustomNbt() {
+        return customNbt;
+    }
+
+    public void setCustomNbt(String customNbt) {
+        this.customNbt = customNbt;
+    }
+
+    @Override
+    public boolean isMainCharacter() {
+        return false;
     }
 
     public DialogData getDialogData() {
@@ -114,7 +128,8 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
                 entityTypeIdStr,
                 scene.getId(),
                 scene.getChapter().getId(),
-                dialogDataJson);
+                dialogDataJson,
+                customNbt);
     }
 
     @Override
