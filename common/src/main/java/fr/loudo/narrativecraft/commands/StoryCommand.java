@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.network.story.S2CSetStoryLocale;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
+import java.util.Collection;
 import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -62,10 +63,13 @@ public class StoryCommand {
                                     ServerPlayer player = ctx.getSource().getPlayerOrException();
                                     return playFor(ctx, player, null);
                                 })
-                                .then(Commands.argument("target", EntityArgument.player())
+                                .then(Commands.argument("target", EntityArgument.players())
                                         .executes(ctx -> {
-                                            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
-                                            return playFor(ctx, target, null);
+                                            Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "target");
+                                            targets.forEach(player -> {
+                                                playFor(ctx, player, null);
+                                            });
+                                            return Command.SINGLE_SUCCESS;
                                         })
                                         .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
                                                 .suggests(CommandSuggestions::suggestChapters)
@@ -87,10 +91,13 @@ public class StoryCommand {
                                     ServerPlayer player = ctx.getSource().getPlayerOrException();
                                     return stopFor(ctx, player);
                                 })
-                                .then(Commands.argument("target", EntityArgument.player())
+                                .then(Commands.argument("target", EntityArgument.players())
                                         .executes(ctx -> {
-                                            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
-                                            return stopFor(ctx, target);
+                                            Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "target");
+                                            targets.forEach(player -> {
+                                                stopFor(ctx, player);
+                                            });
+                                            return Command.SINGLE_SUCCESS;
                                         })))
                         .then(Commands.literal("locale")
                                 .then(Commands.argument("locale", StringArgumentType.word())
@@ -101,12 +108,18 @@ public class StoryCommand {
                                             return setLocaleFor(
                                                     ctx, player, StringArgumentType.getString(ctx, "locale"));
                                         })
-                                        .then(Commands.argument("target", EntityArgument.player())
+                                        .then(Commands.argument("target", EntityArgument.players())
                                                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                                                 .executes(ctx -> {
-                                                    ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
-                                                    return setLocaleFor(
-                                                            ctx, target, StringArgumentType.getString(ctx, "locale"));
+                                                    Collection<ServerPlayer> targets =
+                                                            EntityArgument.getPlayers(ctx, "target");
+                                                    targets.forEach(player -> {
+                                                        setLocaleFor(
+                                                                ctx,
+                                                                player,
+                                                                StringArgumentType.getString(ctx, "locale"));
+                                                    });
+                                                    return Command.SINGLE_SUCCESS;
                                                 }))))));
     }
 
