@@ -60,6 +60,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
 public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandler {
@@ -172,6 +174,13 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void tick() {
         inkTagHandler.tick();
+        for (ServerPlayer player : playerSession.getPlayer().serverLevel().players()) {
+            if (!player.is(playerSession.getPlayer())) {
+                for (Entity entity : characterEntities.values()) {
+                    player.connection.send(new ClientboundRemoveEntitiesPacket(entity.getId()));
+                }
+            }
+        }
     }
 
     public void stop() {
