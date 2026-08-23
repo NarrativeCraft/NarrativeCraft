@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
@@ -164,6 +165,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         } else {
             entity = characterStory.getEntityType().create(level);
         }
+        if (entity == null) return;
         entity.setPos(characterPlacement.getPosition());
         entity.setXRot((float) characterPlacement.getRotation().x);
         entity.setYRot((float) characterPlacement.getRotation().y);
@@ -345,9 +347,13 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             if (entity instanceof Mob mob) {
                 mob.setNoAi(true);
             }
-            entity.setCustomName(Component.literal(characterStory.getName()));
             if (characterStory.getCharacterType() == CharacterType.NORMAL) {
+                String name = characterStory.getName();
+                if (name.equals(CharacterStory.USERNAME_VARIABLE)) {
+                    name = player.getName().getString();
+                }
                 entity.setCustomNameVisible(true);
+                entity.setCustomName(Component.literal(name));
             }
             level.addFreshEntity(entity);
         }
