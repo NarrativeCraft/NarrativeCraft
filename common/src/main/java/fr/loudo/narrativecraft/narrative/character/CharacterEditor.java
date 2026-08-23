@@ -100,6 +100,7 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
         oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         oldCharacter.setMainCharacterAttribute(newAttribute);
         oldCharacter.setDialogData(newCharacter.getDialogData());
+        oldCharacter.setCustomNbt(newCharacter.getCustomNbt());
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }
@@ -138,6 +139,7 @@ public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPaylo
         }
         character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
         character.setMainCharacterAttribute(new MainCharacterAttribute(payload.getMainCharacterAttribute()));
+        character.setCustomNbt(payload.getCustomNbt());
         String dialogDataJson = payload.getDialogDataJson();
         if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
             try {

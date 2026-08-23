@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.playback;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
@@ -35,6 +36,7 @@ import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.util.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -122,9 +124,20 @@ public class PlaybackContext implements IPlaybackContext {
         }
 
         CompoundTag nbt = recordingData.getInitialNbt();
-        if (nbt != null && !nbt.isEmpty()) {
-            entity.load(nbt);
-            entity.setUUID(UUID.randomUUID());
+        if (isCharacterEntity) {
+            try {
+                CompoundTag customNbt = Utils.nbtFromString(characterStory.getCustomNbt());
+                if (nbt == null) {
+                    nbt = customNbt;
+                } else {
+                    for (String key : customNbt.getAllKeys()) {
+                        Tag tag = customNbt.get(key);
+                        if (tag == null) continue;
+                        nbt.put(key, tag);
+                    }
+                }
+            } catch (CommandSyntaxException exception) {
+            }
         }
 
         if (isCharacterEntity
@@ -136,6 +149,11 @@ public class PlaybackContext implements IPlaybackContext {
             }
         } else {
             entity.setCustomNameVisible(false);
+        }
+
+        if (nbt != null && !nbt.isEmpty()) {
+            entity.load(nbt);
+            entity.setUUID(UUID.randomUUID());
         }
 
         if (entity instanceof Mob mob) {

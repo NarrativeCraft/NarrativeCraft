@@ -44,6 +44,7 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
     private DialogData dialogData = new DialogData();
     private EntityType<?> entityType = EntityType.PLAYER;
     private SkinModel modelType;
+    private String customNbt;
     private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
 
     public CharacterStory(String name, String description) {
@@ -99,8 +100,20 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
         return characterType;
     }
 
+    public String getCustomNbt() {
+        return customNbt;
+    }
+
+    public void setCustomNbt(String customNbt) {
+        this.customNbt = customNbt;
+    }
+
     public MainCharacterAttribute getMainCharacterAttribute() {
         return mainCharacterAttribute;
+    }
+
+    public boolean isMainCharacter() {
+        return mainCharacterAttribute.isMainCharacter();
     }
 
     public void setMainCharacterAttribute(MainCharacterAttribute mainCharacterAttribute) {
@@ -113,7 +126,7 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
         String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
         String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData, DialogFieldSet.CHARACTER));
         return new CharacterStoryPayload(
-                name, description, modelTypeName, entityTypeId, mainCharacterAttribute, dialogDataJson);
+                name, description, modelTypeName, entityTypeId, customNbt, mainCharacterAttribute, dialogDataJson);
     }
 
     @Override

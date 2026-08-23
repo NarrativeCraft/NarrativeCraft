@@ -30,6 +30,7 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
 
     private final String modelType;
     private final String entityTypeId;
+    private final String customNbt;
     private final MainCharacterAttribute mainCharacterAttribute;
     private final String dialogDataJson;
 
@@ -38,11 +39,13 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
             String description,
             String modelType,
             String entityTypeId,
+            String customNbt,
             MainCharacterAttribute mainCharacterAttribute,
             String dialogDataJson) {
         super(name, description);
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
+        this.customNbt = customNbt;
         this.mainCharacterAttribute =
                 mainCharacterAttribute != null ? mainCharacterAttribute : new MainCharacterAttribute();
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
@@ -50,6 +53,7 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
 
     public static CharacterStoryPayload read(FriendlyByteBuf buf) {
         return new CharacterStoryPayload(
+                buf.readUtf(),
                 buf.readUtf(),
                 buf.readUtf(),
                 buf.readUtf(),
@@ -64,6 +68,7 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
         buf.writeUtf(getDescription());
         buf.writeUtf(modelType);
         buf.writeUtf(entityTypeId);
+        buf.writeUtf(customNbt);
         mainCharacterAttribute.write(buf);
         buf.writeUtf(dialogDataJson);
     }
@@ -82,5 +87,9 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
 
     public String getDialogDataJson() {
         return dialogDataJson;
+    }
+
+    public String getCustomNbt() {
+        return customNbt;
     }
 }

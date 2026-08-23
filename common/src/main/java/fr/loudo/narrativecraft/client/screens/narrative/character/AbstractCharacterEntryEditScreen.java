@@ -38,17 +38,20 @@ public abstract class AbstractCharacterEntryEditScreen<T extends CharacterStory>
 
     protected EntityType<?> selectedEntityType;
     protected SkinModel selectedModelType;
+    protected String customNbt;
 
     public AbstractCharacterEntryEditScreen(Screen lastScreen) {
         super(lastScreen);
         this.selectedEntityType = EntityType.PLAYER;
         this.selectedModelType = SkinModel.WIDE;
+        this.customNbt = "";
     }
 
     public AbstractCharacterEntryEditScreen(T entry, Screen lastScreen) {
         super(entry, lastScreen);
         this.selectedEntityType = entry.getEntityType();
         this.selectedModelType = entry.getModelType();
+        this.customNbt = entry.getCustomNbt();
     }
 
     @Override
