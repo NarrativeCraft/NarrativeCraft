@@ -40,6 +40,7 @@ public final class CommandSpec {
     private final String keyword;
     private final List<ArgDef> positionalArgs;
     private final List<ArgDef> optionalPositionalArgs;
+    private final Map<String, ArgDef> positionalArgsByName;
     private final Map<String, NamedArgDef> namedArgs;
     private final Map<String, FlagDef> flags;
 
@@ -54,6 +55,15 @@ public final class CommandSpec {
         this.optionalPositionalArgs = optionalPositionalArgs;
         this.namedArgs = namedArgs;
         this.flags = flags;
+
+        Map<String, ArgDef> byName = new LinkedHashMap<>();
+        for (ArgDef def : positionalArgs) {
+            byName.put(def.name(), def);
+        }
+        for (ArgDef def : optionalPositionalArgs) {
+            byName.put(def.name(), def);
+        }
+        this.positionalArgsByName = byName;
     }
 
     /**
@@ -64,11 +74,13 @@ public final class CommandSpec {
     public ParsedCommand parse(List<String> tokens) {
         Map<String, Object> args = new HashMap<>();
         Set<String> activeFlags = new HashSet<>();
-
-        int positionalIndex = 0;
-        int optionalPositionalIndex = 0;
+        Set<String> assignedPositionals = new HashSet<>();
+        List<String> unnamedValues = new ArrayList<>();
 
         for (String token : tokens) {
+            int colonIndex = token.indexOf(':');
+            String prefix = colonIndex > 0 ? token.substring(0, colonIndex) : null;
+
             if (token.startsWith("--")) {
                 String flagName = token.substring(2);
                 if (!flags.containsKey(flagName)) {
@@ -77,31 +89,42 @@ public final class CommandSpec {
                 }
                 activeFlags.add(flagName);
 
-            } else if (token.contains(":") && namedArgs.containsKey(token.substring(0, token.indexOf(':')))) {
-                int colonIndex = token.indexOf(':');
-                String name = token.substring(0, colonIndex);
+            } else if (prefix != null && namedArgs.containsKey(prefix)) {
                 String rawValue = token.substring(colonIndex + 1);
-                args.put(name, namedArgs.get(name).type().parse(rawValue));
+                args.put(prefix, namedArgs.get(prefix).type().parse(rawValue));
+
+            } else if (prefix != null && positionalArgsByName.containsKey(prefix)) {
+                ArgDef def = positionalArgsByName.get(prefix);
+                if (!assignedPositionals.add(prefix)) {
+                    throw new IllegalArgumentException(
+                            "Argument '" + prefix + "' given more than once for tag '" + keyword + "'.");
+                }
+                args.put(prefix, def.type().parse(token.substring(colonIndex + 1)));
 
             } else {
-                if (positionalIndex < positionalArgs.size()) {
-                    ArgDef def = positionalArgs.get(positionalIndex++);
-                    args.put(def.name(), def.type().parse(token));
-                } else if (optionalPositionalIndex < optionalPositionalArgs.size()) {
-                    ArgDef def = optionalPositionalArgs.get(optionalPositionalIndex++);
-                    args.put(def.name(), def.type().parse(token));
-                } else {
-                    throw new IllegalArgumentException("Too many positional arguments for tag '" + keyword + "'. "
-                            + "Expected at most "
-                            + (positionalArgs.size() + optionalPositionalArgs.size()) + ".");
-                }
+                unnamedValues.add(token);
             }
         }
 
-        if (positionalIndex < positionalArgs.size()) {
-            ArgDef missing = positionalArgs.get(positionalIndex);
-            throw new IllegalArgumentException("Missing required argument '" + missing.name() + "' of type '"
-                    + missing.type().name().toLowerCase() + "' for tag '" + keyword + "'.");
+        int valueIndex = 0;
+        for (ArgDef def : positionalArgsByName.values()) {
+            if (valueIndex >= unnamedValues.size()) break;
+            if (assignedPositionals.contains(def.name())) continue;
+            assignedPositionals.add(def.name());
+            args.put(def.name(), def.type().parse(unnamedValues.get(valueIndex++)));
+        }
+
+        if (valueIndex < unnamedValues.size()) {
+            throw new IllegalArgumentException("Too many positional arguments for tag '" + keyword + "'. "
+                    + "Expected at most "
+                    + (positionalArgs.size() + optionalPositionalArgs.size()) + ".");
+        }
+
+        for (ArgDef required : positionalArgs) {
+            if (!assignedPositionals.contains(required.name())) {
+                throw new IllegalArgumentException("Missing required argument '" + required.name() + "' of type '"
+                        + required.type().name().toLowerCase() + "' for tag '" + keyword + "'.");
+            }
         }
 
         for (NamedArgDef def : namedArgs.values()) {
