@@ -24,6 +24,7 @@
 - Entity played from a playback during subscene recording not ignored
 - Can't play, stop or change locale to more than one player using command
 - Player joining server can see entities of player in a story
+- "user" variable name for a character not replaced by the player name playing the story
 
 ## Misc
 - Shows a sentence in chat when a story has finished
