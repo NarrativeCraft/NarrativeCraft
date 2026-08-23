@@ -35,13 +35,18 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.FakePlayer;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.PermissionSet;
+import net.minecraft.world.entity.Entity;
 
 @InkCommand(
         keyword = "command",
@@ -50,17 +55,24 @@ import net.minecraft.server.permissions.PermissionSet;
         side = Side.SERVER)
 public class MinecraftCommandInkAction extends InkAction {
 
+    private static final Pattern CHARACTER_REG = Pattern.compile("@char\\(([^()]*)\\)");
+
     private String commandValue;
 
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
         commandValue = cmd.getString("commandValue").replace("\\{", "{").replace("\\}", "}");
 
+        String tempCmd = commandValue;
+        Matcher charMatcher = parseCharSyntax(tempCmd);
+        if (charMatcher.find()) {
+            tempCmd = tempCmd.replace(charMatcher.group(0), "@s");
+        }
         MinecraftServer server = NarrativeCraftMod.getInstance().getServer();
         CommandSourceStack source =
                 new CommandSourceStack(null, null, null, null, PermissionSet.ALL_PERMISSIONS, null, null, server, null);
         ParseResults<CommandSourceStack> parse =
-                server.getCommands().getDispatcher().parse(new StringReader(commandValue), source);
+                server.getCommands().getDispatcher().parse(new StringReader(tempCmd), source);
 
         if (parse.getReader().canRead() && parse.getExceptions().size() == 1) {
             String error = parse.getExceptions().values().iterator().next().getMessage();
@@ -75,6 +87,20 @@ public class MinecraftCommandInkAction extends InkAction {
         FakePlayer fakePlayer = new FakePlayer(
                 playerSession.getPlayer().level(), new GameProfile(UUID.randomUUID(), "CommandExec"), true);
         String resolved = commandValue.replace("@p", player.getName().getString());
+        ICharacterStory characterStory = resolveCharacter(resolved, (Scene) playerSession.getScene());
+        Entity entityTargeted = null;
+        if (characterStory != null && playerSession.getStoryHandler() != null) {
+            entityTargeted =
+                    playerSession.getStoryHandler().getCharacterEntities().get(characterStory.getName());
+        }
+        if (entityTargeted == null) {
+            entityTargeted = fakePlayer;
+        }
+        Matcher charMatcher = parseCharSyntax(resolved);
+        if (charMatcher.find()) {
+            resolved = resolved.replace(charMatcher.group(0), "@s");
+        }
+
         CommandSourceStack source = new CommandSourceStack(
                 CommandSource.NULL,
                 fakePlayer.position(),
@@ -84,7 +110,7 @@ public class MinecraftCommandInkAction extends InkAction {
                 fakePlayer.getName().getString(),
                 fakePlayer.getDisplayName(),
                 fakePlayer.level().getServer(),
-                fakePlayer);
+                entityTargeted);
         try {
             fakePlayer.level().getServer().getCommands().getDispatcher().execute(resolved, source);
             NarrativeCraftMod.LOGGER.info("CommandExec executed command {} from command tag", resolved);
@@ -92,5 +118,18 @@ public class MinecraftCommandInkAction extends InkAction {
             return InkActionResult.error("Command execution failed: " + e.getMessage());
         }
         return InkActionResult.singleOk();
+    }
+
+    private ICharacterStory resolveCharacter(String rawCommand, Scene scene) {
+
+        Matcher matcher = parseCharSyntax(rawCommand);
+        if (!matcher.find()) return null;
+        String characterName = matcher.group(1);
+
+        return NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(characterName, scene);
+    }
+
+    private Matcher parseCharSyntax(String rawCommand) {
+        return CHARACTER_REG.matcher(rawCommand);
     }
 }

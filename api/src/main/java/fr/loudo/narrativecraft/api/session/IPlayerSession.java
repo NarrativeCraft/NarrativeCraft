@@ -25,10 +25,16 @@ package fr.loudo.narrativecraft.api.session;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
+import fr.loudo.narrativecraft.api.narrative.chapter.IChapter;
+import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 
 public interface IPlayerSession {
+
+    IScene getScene();
+
+    IChapter getChapter();
 
     ServerPlayer getPlayer();
 
