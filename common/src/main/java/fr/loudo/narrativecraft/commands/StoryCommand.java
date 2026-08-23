@@ -76,14 +76,18 @@ public class StoryCommand {
                                                 .then(Commands.argument("scene_name", StringArgumentType.string())
                                                         .suggests(CommandSuggestions::suggestSceneByChapter)
                                                         .executes(ctx -> {
-                                                            ServerPlayer target =
-                                                                    EntityArgument.getPlayer(ctx, "target");
-                                                            return playFor(
-                                                                    ctx,
-                                                                    target,
-                                                                    IntegerArgumentType.getInteger(
-                                                                            ctx, "chapter_index"),
-                                                                    StringArgumentType.getString(ctx, "scene_name"));
+                                                            Collection<ServerPlayer> targets =
+                                                                    EntityArgument.getPlayers(ctx, "target");
+                                                            targets.forEach(player -> {
+                                                                playFor(
+                                                                        ctx,
+                                                                        player,
+                                                                        IntegerArgumentType.getInteger(
+                                                                                ctx, "chapter_index"),
+                                                                        StringArgumentType.getString(
+                                                                                ctx, "scene_name"));
+                                                            });
+                                                            return Command.SINGLE_SUCCESS;
                                                         })))))
                         .then(Commands.literal("stop")
                                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
