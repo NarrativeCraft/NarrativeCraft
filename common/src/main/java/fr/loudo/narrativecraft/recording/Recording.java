@@ -112,6 +112,7 @@ public class Recording implements IRecording {
         AABB searchBox = player.getBoundingBox().inflate(SCAN_RADIUS);
         List<Entity> found = player.level().getEntities(player, searchBox, e -> !(e instanceof Player));
         for (Entity entity : found) {
+            if (entity.getTags().contains(Playback.ENTITY_TAG)) continue;
             if (getRecordingEntityData(entity) == null) {
                 RecordingEntityData recordingEntityData =
                         new RecordingEntityData(nextNearbyEntityLocalId++, entity, false, tick, this);
