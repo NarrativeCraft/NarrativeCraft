@@ -22,6 +22,7 @@
 - Fake player appearing transparent when adding it either in camera angle editor main screen editor
 - Dialog 2D scale not fixed based on gui scale
 - Entity played from a playback during subscene recording not ignored
+- Can't play, stop or change locale to more than one player using command
 
 ## Misc
 - Shows a sentence in chat when a story has finished
