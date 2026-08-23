@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.playback;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.api.recording.action.ActionResult;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.recording.RecordingData;
@@ -95,8 +96,11 @@ public class PlaybackContext implements IPlaybackContext {
                 ? Utils.getEntityTypeString(characterStory.getEntityType())
                 : recordingData.getEntityId();
 
+        String name = characterStory != null ? characterStory.getName() : "Somebody";
+        if (name.equals(CharacterStory.USERNAME_VARIABLE)) {
+            name = playback.getRequester().getName().getString();
+        }
         if (entityId.equals("minecraft:player")) {
-            String name = characterStory != null ? characterStory.getName() : "Somebody";
             entity = new FakePlayer(
                     level,
                     FakePlayer.createCharacterProfile(playback.getAnimation().getCharacterStory(), name),
@@ -127,8 +131,7 @@ public class PlaybackContext implements IPlaybackContext {
         if (isCharacterEntity
                 && entity instanceof LivingEntity
                 && characterStory.getCharacterType() == CharacterType.NORMAL) {
-            String name = characterStory.getName();
-            if (name != null && !name.isBlank()) {
+            if (!name.isBlank()) {
                 entity.setCustomName(Component.literal(name));
                 entity.setCustomNameVisible(true);
             }
