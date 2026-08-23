@@ -51,5 +51,6 @@ public final class InkActionRegister {
         dispatcher.register(ChangeDayTimeInkAction.class, ChangeDayTimeInkAction::new);
         dispatcher.register(TextInkAction.class, TextInkAction::new);
         dispatcher.register(ChoiceTimeInkAction.class, ChoiceTimeInkAction::new);
+        dispatcher.register(ImageInkAction.class, ImageInkAction::new);
     }
 }

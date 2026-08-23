@@ -23,21 +23,17 @@
 
 package fr.loudo.narrativecraft.client.inkTag.actions.text;
 
-import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.TextInkAction;
-import fr.loudo.narrativecraft.utils.FadeState;
-import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.FastColor;
-import net.minecraft.util.Mth;
 
 public class ClientTextInkAction extends TextInkAction {
 
@@ -52,6 +48,8 @@ public class ClientTextInkAction extends TextInkAction {
     public void tick() {
         if (!isRunning()) return;
 
+        if (tickMonitoredOverlay()) return;
+
         if (monitoredInstance != null) {
             if (monitoredInstance.scrollText != null && monitoredInstance.scrollText.isFinished()) {
                 stop();
@@ -63,30 +61,8 @@ public class ClientTextInkAction extends TextInkAction {
             scrollText.tick(noTyping ? scrollText.isFinished() ? 0 : Float.MAX_VALUE : scrollSpeed);
         }
 
-        tick++;
-        if (tick >= totalTick && fadeState != null) {
-            tick = 0;
-            switch (fadeState) {
-                case FADE_IN -> {
-                    if (staySeconds >= 0) {
-                        fadeState = FadeState.STAY;
-                        totalTick = (int) (staySeconds * 20.0);
-                    } else {
-                        fadeState = null;
-                    }
-                }
-                case STAY -> {
-                    fadeState = FadeState.FADE_OUT;
-                    totalTick = (int) (fadeOutSeconds * 20.0);
-                }
-                case FADE_OUT -> {
-                    fadeState = null;
-                    if (!noRemove) {
-                        stop();
-                    }
-                }
-            }
-        }
+        tickFade();
+        tickAnimation();
     }
 
     @Override
@@ -100,12 +76,20 @@ public class ClientTextInkAction extends TextInkAction {
         Font font = Minecraft.getInstance().font;
         cachedTextDimensions = scrollText.computeTextDimensions(width, font, dialogData);
 
-        Minecraft mc = Minecraft.getInstance();
-        float[] origin =
-                computeOrigin(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+        float[] origin = computeOrigin(
+                guiGraphics.guiWidth(), guiGraphics.guiHeight(), cachedTextDimensions[0], cachedTextDimensions[1]);
+        float[] animationOffset = computeAnimationOffset(
+                guiGraphics.guiWidth(),
+                guiGraphics.guiHeight(),
+                cachedTextDimensions[0],
+                cachedTextDimensions[1],
+                1f,
+                partialTick);
 
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(origin[0] + space.x, origin[1] + space.y, 0);
+        guiGraphics
+                .pose()
+                .translate(origin[0] + space.x + animationOffset[0], origin[1] + space.y + animationOffset[1], 0);
         guiGraphics.pose().scale(scale, scale, 1f);
         scrollText.render2D(guiGraphics, 0, 0, dialogData, partialTick);
         guiGraphics.pose().popPose();
@@ -114,12 +98,13 @@ public class ClientTextInkAction extends TextInkAction {
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
         ClientPlayerSession session = (ClientPlayerSession) playerSession;
-        ClientTextInkAction existing = findActiveById(textId, session.getActiveClientInkActions());
+        ClientTextInkAction existing =
+                findActiveById(ClientTextInkAction.class, overlayId, session.getActiveClientInkActions(), "create");
 
         if (action.equals("create")) {
             if (existing != null) {
                 stop();
-                return InkActionResult.error("Text id '" + textId + "' already exists");
+                return InkActionResult.error("Text id '" + overlayId + "' already exists");
             }
             dialogData = new DialogData();
             dialogData.setWidth(width);
@@ -136,113 +121,45 @@ public class ClientTextInkAction extends TextInkAction {
                 return InkActionResult.singleOk();
             }
             stop();
-            return InkActionResult.error("Text id '" + textId + "' not found");
+            return InkActionResult.error("Text id '" + overlayId + "' not found");
         }
 
-        switch (action) {
-            case "remove" -> existing.stop();
-            case "edit" -> {
-                existing.text = text;
-                existing.scrollText.setText(text);
-                existing.scrollText.forceFinish();
-            }
-            case "position", "pos" -> existing.position = position;
-            case "space" -> existing.space = space;
-            case "color" -> existing.color = color;
-            case "opacity" -> existing.opacity = opacity;
-            case "scale" -> existing.scale = scale;
-            case "width" -> {
-                existing.width = width;
-                existing.dialogData.setWidth(width);
-            }
-            case "text_alignment" -> {
-                existing.textAlignment = textAlignment;
-                existing.dialogData.setTextAlignment(textAlignment);
-            }
-            case "fade" -> {
-                existing.fadeState = fadeState;
-                existing.fadeInSeconds = fadeInSeconds;
-                existing.staySeconds = staySeconds;
-                existing.fadeOutSeconds = fadeOutSeconds;
-                existing.totalTick = totalTick;
-                existing.tick = 0;
-            }
-            case "fadein" -> {
-                existing.fadeState = FadeState.FADE_IN;
-                existing.fadeInSeconds = fadeInSeconds;
-                existing.staySeconds = -1;
-                existing.totalTick = (int) (fadeInSeconds * 20.0);
-                existing.tick = 0;
-            }
-            case "fadeout" -> {
-                existing.fadeState = FadeState.FADE_OUT;
-                existing.fadeOutSeconds = fadeOutSeconds;
-                existing.totalTick = (int) (fadeOutSeconds * 20.0);
-                existing.tick = 0;
-            }
-            case "type" -> {
-                existing.scrollSpeed = scrollSpeed;
-                existing.noTyping = false;
-                existing.scrollText.setText(existing.text);
-                if (blocking) {
-                    monitoredInstance = existing;
+        if (!applySharedProperty(existing)) {
+            switch (action) {
+                case "edit" -> {
+                    existing.text = text;
+                    existing.scrollText.setText(text);
+                    existing.scrollText.forceFinish();
                 }
-            }
-            case "shadow" -> {
-                existing.shadow = shadow;
-                existing.dialogData.setTextShadow(shadow);
-            }
-            case "mute" -> {
-                existing.mute = mute;
-                existing.dialogData.setSoundMuted(mute);
-                existing.scrollText.setMutedSound(mute);
+                case "color" -> existing.color = color;
+                case "width" -> {
+                    existing.width = width;
+                    existing.dialogData.setWidth(width);
+                }
+                case "text_alignment" -> {
+                    existing.textAlignment = textAlignment;
+                    existing.dialogData.setTextAlignment(textAlignment);
+                }
+                case "type" -> {
+                    existing.scrollSpeed = scrollSpeed;
+                    existing.noTyping = false;
+                    existing.scrollText.setText(existing.text);
+                    if (blocking) {
+                        monitoredInstance = existing;
+                    }
+                }
+                case "shadow" -> {
+                    existing.shadow = shadow;
+                    existing.dialogData.setTextShadow(shadow);
+                }
+                case "mute" -> {
+                    existing.mute = mute;
+                    existing.dialogData.setSoundMuted(mute);
+                    existing.scrollText.setMutedSound(mute);
+                }
             }
         }
 
         return blocking ? InkActionResult.block() : InkActionResult.singleOk();
-    }
-
-    private float computeOpacity(float partialTick) {
-        if (fadeState == null) return opacity;
-        double t = Mth.clamp((tick + partialTick) / (float) totalTick, 0.0, 1.0);
-        return switch (fadeState) {
-            case FADE_IN -> (float) Interpolation.lerp(0.05, opacity, t);
-            case STAY -> opacity;
-            case FADE_OUT -> (float) Interpolation.lerp(opacity, 0.05, t);
-        };
-    }
-
-    private float[] computeOrigin(int guiWidth, int guiHeight) {
-        float textWidth = cachedTextDimensions[0] * scale;
-        float textHeight = cachedTextDimensions[1] * scale;
-
-        float originX =
-                switch (position) {
-                    case TOP_LEFT, MIDDLE_LEFT, BOTTOM_LEFT -> 0;
-                    case TOP, MIDDLE, BOTTOM -> (guiWidth - textWidth) / 2f;
-                    case TOP_RIGHT, MIDDLE_RIGHT, BOTTOM_RIGHT -> guiWidth - textWidth;
-                };
-
-        float originY =
-                switch (position) {
-                    case TOP_LEFT, TOP, TOP_RIGHT -> 0;
-                    case MIDDLE_LEFT, MIDDLE, MIDDLE_RIGHT -> (guiHeight - textHeight) / 2f;
-                    case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> guiHeight - textHeight;
-                };
-
-        return new float[] {originX, originY};
-    }
-
-    @Nullable
-    private static ClientTextInkAction findActiveById(String id, List<?> actions) {
-        for (Object action : actions) {
-            if (action instanceof ClientTextInkAction textAction
-                    && textAction.textId != null
-                    && textAction.textId.equalsIgnoreCase(id)
-                    && textAction.action.equals("create")) {
-                return textAction;
-            }
-        }
-        return null;
     }
 }

@@ -34,6 +34,9 @@ import net.minecraft.world.phys.Vec3;
 
 public class UtilsClient {
 
+    public static final float REFERENCE_WINDOW_WIDTH = 1920f;
+    public static final float REFERENCE_WINDOW_HEIGHT = 1080f;
+
     private static final Minecraft minecraft = Minecraft.getInstance();
 
     public static void reloadListScreen() {
@@ -66,5 +69,14 @@ public class UtilsClient {
         player.setYHeadRot((float) rotation.y);
         player.connection.send(new ServerboundMovePlayerPacket.PosRot(
                 position.x, position.y, position.z, (float) rotation.y, (float) rotation.x, player.onGround()));
+    }
+
+    public static float computeUiScale(float referenceGuiScale) {
+        Window window = minecraft.getWindow();
+        double guiScale = window.getGuiScale();
+        float windowWidth = (float) (window.getGuiScaledWidth() * guiScale);
+        float windowHeight = (float) (window.getGuiScaledHeight() * guiScale);
+        float windowScale = Math.min(windowWidth / REFERENCE_WINDOW_WIDTH, windowHeight / REFERENCE_WINDOW_HEIGHT);
+        return (float) (referenceGuiScale * windowScale / guiScale);
     }
 }

@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
+import fr.loudo.narrativecraft.utils.UtilsClient;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -49,8 +50,6 @@ public class DialogRenderer2D extends DialogRenderer {
     }
 
     private static final float REFERENCE_GUI_SCALE = 3f;
-    private static final float REFERENCE_WINDOW_WIDTH = 1920f;
-    private static final float REFERENCE_WINDOW_HEIGHT = 1080f;
     private static final float BOX_WIDTH = 430f;
     private static final float BOX_HEIGHT = 80f;
     private static final float SKIP_INDICATOR_SIZE = 3f;
@@ -99,11 +98,7 @@ public class DialogRenderer2D extends DialogRenderer {
 
         layout.compute(data, scrollText, mc.font);
 
-        double guiScale = mc.getWindow().getGuiScale();
-        float windowWidth = (float) (screenWidth * guiScale);
-        float windowHeight = (float) (screenHeight * guiScale);
-        float windowScale = Math.min(windowWidth / REFERENCE_WINDOW_WIDTH, windowHeight / REFERENCE_WINDOW_HEIGHT);
-        float uiScale = (float) (REFERENCE_GUI_SCALE * windowScale / guiScale);
+        float uiScale = UtilsClient.computeUiScale(REFERENCE_GUI_SCALE);
 
         float totalWidth = BOX_WIDTH * data.getScale();
         float totalHeight = BOX_HEIGHT * data.getScale();
