@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
+import fr.loudo.narrativecraft.dialog.DialogEntityBobbing;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
@@ -74,9 +75,11 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     private final Story story;
     private final InkTagHandler inkTagHandler;
     private final Map<String, Entity> characterEntities = new HashMap<>();
+    private final Map<String, DialogEntityBobbing> dialogEntityBobbingMap = new HashMap<>();
     private final Map<String, DialogData> characterDialogData = new HashMap<>();
     private final Set<UUID> interactionIds = new HashSet<>();
     private String lastCharacterSpoke = "";
+    private String currentSpeaker = "";
     private Step step = Step.READY;
     private Line currentLine;
     private boolean dialogVisible;
@@ -181,6 +184,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 }
             }
         }
+        DialogEntityBobbing currentBobbing = dialogEntityBobbingMap.get(currentSpeaker.toLowerCase());
+        if (currentBobbing != null) {
+            currentBobbing.tick();
+        }
     }
 
     public void stop() {
@@ -194,6 +201,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         dialogVisible = false;
         choicesVisible = false;
         inkTagHandler.stopAll();
+        dialogEntityBobbingMap.clear();
         characterEntities.forEach((s, entity) -> {
             entity.remove(Entity.RemovalReason.DISCARDED);
         });
@@ -394,6 +402,13 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     private void pushDialogue(Line line) {
         String speaker = line.speaker();
+        currentSpeaker = line.speaker();
+        if (!lastCharacterSpoke.equals(speaker)) {
+            DialogEntityBobbing currentBobbing = dialogEntityBobbingMap.get(lastCharacterSpoke.toLowerCase());
+            if (currentBobbing != null) {
+                currentBobbing.reset();
+            }
+        }
         String dialogueText = playerSession.localize(line.dialogueText());
 
         int entityId = S2CShowDialogue.NO_ENTITY;
@@ -434,6 +449,13 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             existing.remove(Entity.RemovalReason.KILLED);
         }
         characterEntities.put(name, entity);
+        DialogData data = characterDialogData.get(name);
+        if (data == null) {
+            data = NarrativeCraftMod.getInstance().getGlobalDialogData();
+        }
+        dialogEntityBobbingMap.put(
+                name,
+                new DialogEntityBobbing(entity, data.getBobbingNoiseShakeSpeed(), data.getBobbingNoiseShakeStrength()));
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new CharacterSpawnEvent(characterStory, playerSession.getScene()));
         }
@@ -441,6 +463,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void unregisterEntity(ICharacterStory characterStory, Entity entity) {
         characterEntities.remove(characterStory.getName().toLowerCase(), entity);
+        dialogEntityBobbingMap.remove(characterStory.getName().toLowerCase());
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new CharacterDespawnEvent(characterStory, playerSession.getScene()));
         }
@@ -448,6 +471,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void unregisterEntity(ICharacterStory characterStory) {
         characterEntities.remove(characterStory.getName().toLowerCase());
+        dialogEntityBobbingMap.remove(characterStory.getName().toLowerCase());
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new CharacterDespawnEvent(characterStory, playerSession.getScene()));
         }

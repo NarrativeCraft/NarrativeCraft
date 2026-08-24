@@ -87,6 +87,7 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
         renderer.start(DEFAULT_TEXT);
         playerSession.addDialog3D(renderer);
         previewPanel.setEntries(List.of(new DialogPreviewEntry("Global", working, renderer)));
+        advancedPanel.setupEntityBobbing(entity);
     }
 
     private boolean stopping = false;

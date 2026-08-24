@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.client.editors.widgets;
 
 import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogEntityBobbing;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.util.Locale;
@@ -37,6 +38,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.world.entity.Entity;
 
 public class DialogSetupAdvancedPanel {
 
@@ -50,10 +52,11 @@ public class DialogSetupAdvancedPanel {
     private static final int ROW_GAP = 2;
     private static final int LABEL_WIDTH = 84;
 
+    private final DialogPreviewPanel previewPanel;
     private DialogData data;
     private DialogFieldSet fieldSet = DialogFieldSet.ALL;
     private boolean visible = false;
-    private DialogPreviewPanel previewPanel;
+    private DialogEntityBobbing dialogEntityBobbing;
 
     private EditBox widthBox;
     private EditBox paddingXBox;
@@ -63,6 +66,8 @@ public class DialogSetupAdvancedPanel {
     private EditBox skipSecondsBox;
     private EditBox backgroundImageBox;
     private EditBox letterSoundBox;
+    private EditBox noiseShakeSpeedBox;
+    private EditBox noiseShakeStrengthBox;
 
     private ToggleButton tailVisibleButton;
     private ToggleButton soundMutedButton;
@@ -170,6 +175,25 @@ public class DialogSetupAdvancedPanel {
             }
         });
 
+        noiseShakeSpeedBox =
+                makeBox(mc, 16, String.format(Locale.ROOT, "%.2f", data.getBobbingNoiseShakeSpeed()), text -> {
+                    try {
+                        data.setBobbingNoiseShakeSpeed(Float.parseFloat(text));
+                        if (dialogEntityBobbing != null) dialogEntityBobbing.setNoiseShakeSpeed(Float.parseFloat(text));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+
+        noiseShakeStrengthBox =
+                makeBox(mc, 16, String.format(Locale.ROOT, "%.2f", data.getBobbingNoiseShakeStrength()), text -> {
+                    try {
+                        data.setBobbingNoiseShakeStrength(Float.parseFloat(text));
+                        if (dialogEntityBobbing != null)
+                            dialogEntityBobbing.setNoiseShakeStrength(Float.parseFloat(text));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+
         int editBoxWidth = PANEL_WIDTH - PANEL_PADDING * 2 - LABEL_WIDTH - 2;
         tailVisibleButton =
                 new ToggleButton(0, 0, editBoxWidth, ROW_HEIGHT, data.isTailVisible(), data::setTailVisible);
@@ -195,6 +219,7 @@ public class DialogSetupAdvancedPanel {
                     : Identifier.parse(value);
             dialog.getScrollText().setSound(soundId);
         }
+        if (dialogEntityBobbing != null) dialogEntityBobbing.tick();
     }
 
     private EditBox makeBox(Minecraft mc, int maxLength, String value, Consumer<String> responder) {
@@ -311,16 +336,28 @@ public class DialogSetupAdvancedPanel {
                 backgroundImageBox,
                 mouseX,
                 mouseY);
-        y = renderFieldRow(
-                graphics,
-                mc,
-                trans("screen.dialog_editor.advanced.letter_sound"),
-                contentX,
-                editBoxX,
-                y,
-                letterSoundBox,
-                mouseX,
-                mouseY);
+        if (fieldSet == DialogFieldSet.ALL) {
+            y = renderFieldRow(
+                    graphics,
+                    mc,
+                    trans("screen.dialog_editor.advanced.bobbing_speed"),
+                    contentX,
+                    editBoxX,
+                    y,
+                    noiseShakeSpeedBox,
+                    mouseX,
+                    mouseY);
+            y = renderFieldRow(
+                    graphics,
+                    mc,
+                    trans("screen.dialog_editor.advanced.bobbing_strength"),
+                    contentX,
+                    editBoxX,
+                    y,
+                    noiseShakeStrengthBox,
+                    mouseX,
+                    mouseY);
+        }
 
         y += ROW_GAP * 2;
         closeRowY = y;
@@ -405,6 +442,8 @@ public class DialogSetupAdvancedPanel {
             if (tryFocus(letterSpacingBox, mouseX, mouseY, event)) return true;
             if (tryFocus(lineGapBox, mouseX, mouseY, event)) return true;
             if (tryFocus(skipSecondsBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(noiseShakeSpeedBox, mouseX, mouseY, event)) return true;
+            if (tryFocus(noiseShakeStrengthBox, mouseX, mouseY, event)) return true;
 
             if (soundMutedButton != null && soundMutedButton.mouseClicked(event, false)) return true;
             if (alignmentRowY >= 0) {
@@ -442,6 +481,8 @@ public class DialogSetupAdvancedPanel {
             forwardKeyToFocused(letterSpacingBox, event);
             forwardKeyToFocused(lineGapBox, event);
             forwardKeyToFocused(skipSecondsBox, event);
+            forwardKeyToFocused(noiseShakeSpeedBox, event);
+            forwardKeyToFocused(noiseShakeStrengthBox, event);
         }
         forwardKeyToFocused(backgroundImageBox, event);
         forwardKeyToFocused(letterSoundBox, event);
@@ -455,6 +496,8 @@ public class DialogSetupAdvancedPanel {
             forwardCharToFocused(letterSpacingBox, event);
             forwardCharToFocused(lineGapBox, event);
             forwardCharToFocused(skipSecondsBox, event);
+            forwardCharToFocused(noiseShakeSpeedBox, event);
+            forwardCharToFocused(noiseShakeStrengthBox, event);
         }
         forwardCharToFocused(backgroundImageBox, event);
         forwardCharToFocused(letterSoundBox, event);
@@ -467,7 +510,9 @@ public class DialogSetupAdvancedPanel {
                     || isFocused(paddingYBox)
                     || isFocused(letterSpacingBox)
                     || isFocused(lineGapBox)
-                    || isFocused(skipSecondsBox)) {
+                    || isFocused(skipSecondsBox)
+                    || isFocused(noiseShakeSpeedBox)
+                    || isFocused(noiseShakeStrengthBox)) {
                 return true;
             }
         }
@@ -482,6 +527,8 @@ public class DialogSetupAdvancedPanel {
             setFocus(letterSpacingBox, false);
             setFocus(lineGapBox, false);
             setFocus(skipSecondsBox, false);
+            setFocus(noiseShakeSpeedBox, false);
+            setFocus(noiseShakeStrengthBox, false);
         }
         setFocus(backgroundImageBox, false);
         setFocus(letterSoundBox, false);
@@ -532,5 +579,12 @@ public class DialogSetupAdvancedPanel {
 
     private String trans(String key) {
         return Translation.message(key).getString();
+    }
+
+    public void setupEntityBobbing(Entity entity) {
+        if (previewPanel.getSelectedEntry() == null) return;
+        DialogData data = previewPanel.getSelectedEntry().getData();
+        dialogEntityBobbing =
+                new DialogEntityBobbing(entity, data.getBobbingNoiseShakeSpeed(), data.getBobbingNoiseShakeStrength());
     }
 }

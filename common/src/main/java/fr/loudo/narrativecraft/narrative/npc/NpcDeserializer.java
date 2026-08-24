@@ -76,6 +76,11 @@ public class NpcDeserializer extends NarrativeDeserializer<Npc> {
             npc.setModelType(Utils.parsePlayerModelType(modelTypeName));
         }
 
+        npc.setCustomNbt("");
+        if (jsonObject.has("customNbt")) {
+            npc.setCustomNbt(jsonObject.get("customNbt").getAsString());
+        }
+
         String entityTypeId = jsonObject.get("entityTypeId").getAsString();
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE
                 .getOptional(Identifier.parse(entityTypeId))

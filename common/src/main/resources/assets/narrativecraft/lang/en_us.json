@@ -247,6 +247,8 @@
   "narrativecraft.screen.dialog_editor.advanced.alignment": "Alignment:",
   "narrativecraft.screen.dialog_editor.advanced.bg_image": "BG Image:",
   "narrativecraft.screen.dialog_editor.advanced.letter_sound": "Letter Sound:",
+  "narrativecraft.screen.dialog_editor.advanced.bobbing_speed": "Bob Speed:",
+  "narrativecraft.screen.dialog_editor.advanced.bobbing_strength": "Bob Strength:",
   "narrativecraft.screen.dialog_editor.advanced.close": "Close",
 
   "narrativecraft.widget.toggle.on": "On",

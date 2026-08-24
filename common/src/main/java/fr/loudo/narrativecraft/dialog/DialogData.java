@@ -40,12 +40,14 @@ public class DialogData {
     private float ancOffsetX = 0f;
     private float ancOffsetY = 0f;
 
-    private float width = 80f;
+    private float width = 120f;
     private float paddingX = 4f;
     private float paddingY = 4f;
     private float scale = 1f;
     private float letterSpacing = 0f;
     private float lineGap = 2f;
+    private float bobbingNoiseShakeSpeed = 2.9f;
+    private float bobbingNoiseShakeStrength = 2.15f;
 
     private int backgroundColor = 0xCC000000;
     private int textColor = 0xFFFFFFFF;
@@ -86,6 +88,8 @@ public class DialogData {
         this.autoSkipSeconds = source.autoSkipSeconds;
         this.textAlignment = source.textAlignment;
         this.textShadow = source.textShadow;
+        this.bobbingNoiseShakeSpeed = source.bobbingNoiseShakeSpeed;
+        this.bobbingNoiseShakeStrength = source.bobbingNoiseShakeStrength;
     }
 
     public void copyFrom(DialogData source) {
@@ -110,6 +114,8 @@ public class DialogData {
         this.autoSkipSeconds = source.autoSkipSeconds;
         this.textAlignment = source.textAlignment;
         this.textShadow = source.textShadow;
+        this.bobbingNoiseShakeSpeed = source.bobbingNoiseShakeSpeed;
+        this.bobbingNoiseShakeStrength = source.bobbingNoiseShakeStrength;
     }
 
     public static DialogData resolve(DialogData global, DialogData character, DialogData cameraView) {
@@ -158,6 +164,10 @@ public class DialogData {
         if (overrides.autoSkipSeconds != defaults.autoSkipSeconds) base.autoSkipSeconds = overrides.autoSkipSeconds;
         if (overrides.textAlignment != defaults.textAlignment) base.textAlignment = overrides.textAlignment;
         if (overrides.textShadow != defaults.textShadow) base.textShadow = overrides.textShadow;
+        if (overrides.bobbingNoiseShakeSpeed != defaults.bobbingNoiseShakeSpeed)
+            base.bobbingNoiseShakeSpeed = overrides.bobbingNoiseShakeSpeed;
+        if (overrides.bobbingNoiseShakeStrength != defaults.bobbingNoiseShakeStrength)
+            base.bobbingNoiseShakeStrength = overrides.bobbingNoiseShakeStrength;
         return base;
     }
 
@@ -327,5 +337,21 @@ public class DialogData {
 
     public void setTextShadow(boolean textShadow) {
         this.textShadow = textShadow;
+    }
+
+    public float getBobbingNoiseShakeSpeed() {
+        return bobbingNoiseShakeSpeed;
+    }
+
+    public void setBobbingNoiseShakeSpeed(float bobbingNoiseShakeSpeed) {
+        this.bobbingNoiseShakeSpeed = bobbingNoiseShakeSpeed;
+    }
+
+    public float getBobbingNoiseShakeStrength() {
+        return bobbingNoiseShakeStrength;
+    }
+
+    public void setBobbingNoiseShakeStrength(float bobbingNoiseShakeStrength) {
+        this.bobbingNoiseShakeStrength = bobbingNoiseShakeStrength;
     }
 }
