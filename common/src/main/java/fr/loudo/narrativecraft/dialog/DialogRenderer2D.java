@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
 import fr.loudo.narrativecraft.utils.UtilsClient;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.ARGB;
@@ -48,10 +49,13 @@ public class DialogRenderer2D extends DialogRenderer {
     }
 
     private static final float REFERENCE_GUI_SCALE = 3f;
-    private static final float BOX_WIDTH = 430f;
+    private static final float BOX_WIDTH_WITH_IMAGE = 360f;
+    private static final float BOX_WIDTH_WITHOUT_IMAGE = 430f;
     private static final float BOX_HEIGHT = 80f;
     private static final float SKIP_INDICATOR_SIZE = 6f;
     private static final float SKIP_SLIDE_OFFSET = -5f;
+    private static final float IMAGE_ZONE_PADDING = 6f;
+    private static final float TEXT_MARGIN = 50f;
 
     private final Anchor anchor;
     private final int anchorOffsetX;
@@ -63,17 +67,10 @@ public class DialogRenderer2D extends DialogRenderer {
         this.anchorOffsetX = anchorOffsetX;
         this.anchorOffsetY = anchorOffsetY;
         data.setTextAlignment(DialogData.TextAlignment.CENTER);
-        data.setWidth(BOX_WIDTH - 50f);
     }
 
     public DialogRenderer2D(DialogData data) {
         this(data, Anchor.BOTTOM_CENTER, 0, -20);
-    }
-
-    @Override
-    public void update(String newText) {
-        super.update(newText);
-        data.setWidth(BOX_WIDTH - 50f);
     }
 
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
@@ -94,14 +91,19 @@ public class DialogRenderer2D extends DialogRenderer {
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-        layout.compute(data, scrollText, mc.font);
+        float centerWidth = centerWidth();
+        data.setWidth(centerWidth - TEXT_MARGIN);
+        layout.compute(data, scrollText, mc.font, imageZoneHeight());
 
         float uiScale = UtilsClient.computeUiScale(REFERENCE_GUI_SCALE);
 
-        float totalWidth = BOX_WIDTH * data.getScale();
-        float totalHeight = BOX_HEIGHT * data.getScale();
-        float renderedWidth = totalWidth * uiScale;
-        float renderedHeight = totalHeight * uiScale;
+        float leftZoneWidth = imageZoneWidth(layout.getLeftGutterWidth());
+        float rightZoneWidth = imageZoneWidth(layout.getRightGutterWidth());
+        float boxWidth = centerWidth + leftZoneWidth + rightZoneWidth;
+
+        float boxScale = uiScale * data.getScale();
+        float renderedWidth = boxWidth * boxScale;
+        float renderedHeight = BOX_HEIGHT * boxScale;
 
         float[] origin = computeAnchorOrigin(screenWidth, screenHeight, renderedWidth, renderedHeight);
         float dialogX = origin[0] + anchorOffsetX * uiScale;
@@ -113,34 +115,53 @@ public class DialogRenderer2D extends DialogRenderer {
         var pose = graphics.pose();
         pose.pushMatrix();
         pose.translate(centerX, centerY);
-        pose.scale(scale * uiScale, scale * uiScale);
-        pose.translate(-totalWidth / 2f, -totalHeight / 2f);
+        pose.scale(scale * boxScale, scale * boxScale);
+        pose.translate(-boxWidth / 2f, -BOX_HEIGHT / 2f);
 
-        renderBackground(graphics, totalWidth, totalHeight, opacity);
-        renderText(graphics, totalWidth, partialTick);
-        renderSkipIndicator(graphics, totalWidth, totalHeight, opacity, partialTick);
+        renderBackground(graphics, boxWidth, BOX_HEIGHT, opacity);
+        renderText(graphics, boxWidth, centerWidth, leftZoneWidth, partialTick);
+        renderSkipIndicator(graphics, boxWidth - rightZoneWidth, BOX_HEIGHT, opacity, partialTick);
 
         pose.popMatrix();
     }
 
-    private void renderBackground(GuiGraphicsExtractor graphics, float totalWidth, float totalHeight, float opacity) {
+    private void renderBackground(GuiGraphicsExtractor graphics, float boxWidth, float boxHeight, float opacity) {
         int color = applyOpacity(data.getBackgroundColor(), opacity);
-        graphics.fill(0, 0, (int) totalWidth, (int) totalHeight, color);
+        graphics.fill(0, 0, (int) boxWidth, (int) boxHeight, color);
     }
 
-    private void renderText(GuiGraphicsExtractor graphics, float totalWidth, float partialTick) {
-        float textX = (totalWidth - layout.getWidth()) / 2f;
-        float textY = (BOX_HEIGHT - layout.getHeight()) / 2f;
-        scrollText.render2D(graphics, textX, textY, data, partialTick);
+    private void renderText(
+            GuiGraphicsExtractor graphics, float boxWidth, float centerWidth, float leftZoneWidth, float partialTick) {
+        Font font = Minecraft.getInstance().font;
+        float textX = leftZoneWidth + (centerWidth - layout.getTextWidth()) / 2f;
+        float textY = (BOX_HEIGHT - layout.getTextHeight()) / 2f;
+
+        DialogScrollText.LayoutResult result =
+                scrollText.computeLayout(textX, textY, data.getWidth(), imageZoneHeight(), font, data);
+        scrollText.renderInline2D(graphics, result, data, partialTick);
+        scrollText.renderSideImages2D(
+                graphics, result, IMAGE_ZONE_PADDING, boxWidth - IMAGE_ZONE_PADDING, BOX_HEIGHT / 2f);
+    }
+
+    private float centerWidth() {
+        return scrollText.hasSideImages() ? BOX_WIDTH_WITH_IMAGE : BOX_WIDTH_WITHOUT_IMAGE;
+    }
+
+    private float imageZoneHeight() {
+        return BOX_HEIGHT - IMAGE_ZONE_PADDING * 2f;
+    }
+
+    private float imageZoneWidth(float gutterWidth) {
+        return gutterWidth > 0f ? gutterWidth + IMAGE_ZONE_PADDING * 2f : 0f;
     }
 
     private void renderSkipIndicator(
-            GuiGraphicsExtractor graphics, float totalWidth, float totalHeight, float opacity, float partialTick) {
+            GuiGraphicsExtractor graphics, float skipAreaRight, float boxHeight, float opacity, float partialTick) {
         float skipT = getSkipProgress(partialTick);
         if (skipT <= 0f || animator.isStopping()) return;
 
-        float finalX = totalWidth - (4f * data.getScale()) - SKIP_INDICATOR_SIZE;
-        float iy = totalHeight - (4f * data.getScale()) - SKIP_INDICATOR_SIZE;
+        float finalX = skipAreaRight - 4f - SKIP_INDICATOR_SIZE;
+        float iy = boxHeight - 4f - SKIP_INDICATOR_SIZE;
         float x = finalX + SKIP_SLIDE_OFFSET * (1f - skipT);
         int color = applyOpacity(0xFFFFFFFF, skipT * 0.9f * opacity);
 

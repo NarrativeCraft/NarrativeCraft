@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.client.rendering.Dialog3DRendererHelper;
 import fr.loudo.narrativecraft.dialog.geometric.DialogTail;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.ARGB;
@@ -206,9 +207,20 @@ public class DialogRenderer3D extends DialogRenderer {
     }
 
     private void renderText(PoseStack poseStack, SubmitNodeCollector collector, float partialTick) {
-        float textX = data.getPaddingX();
-        float textY = data.getPaddingY();
-        scrollText.render3D(poseStack, collector, textX, textY, data, partialTick);
+        Font font = Minecraft.getInstance().font;
+        float contentX = data.getPaddingX();
+        float textY = data.getPaddingY() + (layout.getHeight() - layout.getTextHeight()) / 2f;
+
+        DialogScrollText.LayoutResult result = scrollText.computeLayout(
+                contentX + layout.getLeftGutterWidth(), textY, data.getWidth(), 0f, font, data);
+        scrollText.renderInline3D(poseStack, collector, result, data, partialTick);
+        scrollText.renderSideImages3D(
+                poseStack,
+                collector,
+                result,
+                contentX,
+                contentX + layout.getWidth(),
+                data.getPaddingY() + layout.getHeight() / 2f);
     }
 
     private void renderSkipIndicator(

@@ -29,18 +29,29 @@ public class DialogLayout {
 
     private float width;
     private float height;
+    private float textWidth;
+    private float textHeight;
+    private float leftGutterWidth;
+    private float rightGutterWidth;
     private float totalWidth;
     private float totalHeight;
 
     public void compute(DialogData data, DialogScrollText scrollText, Font font) {
-        float[] dims = scrollText.computeTextDimensions(data.getWidth(), font, data);
-        float contentWidth = dims[0];
-        float contentHeight = dims[1];
+        compute(data, scrollText, font, 0f);
+    }
 
-        width = contentWidth;
-        height = contentHeight;
-        totalWidth = contentWidth + data.getPaddingX() * 2f;
-        totalHeight = contentHeight + data.getPaddingY() * 2f;
+    public void compute(DialogData data, DialogScrollText scrollText, Font font, float sideImageHeight) {
+        DialogScrollText.LayoutResult result =
+                scrollText.computeLayout(0f, 0f, data.getWidth(), sideImageHeight, font, data);
+
+        width = result.contentWidth();
+        height = result.contentHeight();
+        textWidth = result.textWidth();
+        textHeight = result.textHeight();
+        leftGutterWidth = result.leftGutterWidth();
+        rightGutterWidth = result.rightGutterWidth();
+        totalWidth = width + data.getPaddingX() * 2f;
+        totalHeight = height + data.getPaddingY() * 2f;
     }
 
     public float getWidth() {
@@ -49,6 +60,22 @@ public class DialogLayout {
 
     public float getHeight() {
         return height;
+    }
+
+    public float getTextWidth() {
+        return textWidth;
+    }
+
+    public float getTextHeight() {
+        return textHeight;
+    }
+
+    public float getLeftGutterWidth() {
+        return leftGutterWidth;
+    }
+
+    public float getRightGutterWidth() {
+        return rightGutterWidth;
     }
 
     public float getTotalWidth() {
