@@ -30,10 +30,11 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.utils.FadeState;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public abstract class OverlayInkAction extends InkAction {
 
@@ -108,7 +109,7 @@ public abstract class OverlayInkAction extends InkAction {
             ParsedCommand cmd, String value1, String value2, String value3, String value4) {
         switch (action) {
             case "remove" -> {
-                return InkActionResult.ok();
+                return InkActionResult.singleOk();
             }
             case "position", "pos" -> {
                 if (value1 == null || value1.isEmpty()) {
