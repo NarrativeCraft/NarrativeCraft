@@ -57,8 +57,6 @@ import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.*;
-import fr.loudo.narrativecraft.network.BiEditorClose;
-import fr.loudo.narrativecraft.network.S2CEditorOpened;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
@@ -229,7 +227,8 @@ public class ClientPacketHandler {
     public static void runInkAction(S2CRunInkAction packet) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
-        InkAction action = NarrativeCraftMod.getInstance().getInkTagDispatcher().instantiate(packet.keyword());
+        InkAction action =
+                ClientNarrativeCraftMod.getInstance().getInkTagDispatcher().instantiate(packet.keyword());
         if (action == null) return;
 
         ParsedCommand cmd = ParsedCommand.fromJson(packet.parsedArgsJson());

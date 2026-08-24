@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.client.inkTag;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientBorderInkAction;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientFadeInkAction;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientImageInkAction;
@@ -46,7 +46,7 @@ public final class ClientInkActionRegister {
     private ClientInkActionRegister() {}
 
     public static void register() {
-        InkTagDispatcherImpl dispatcher = NarrativeCraftMod.getInstance().getInkTagDispatcher();
+        InkTagDispatcherImpl dispatcher = ClientNarrativeCraftMod.getInstance().getInkTagDispatcher();
         dispatcher.register(ClientFadeInkAction.class, ClientFadeInkAction::new);
         dispatcher.register(ClientShakeScreenInkAction.class, ClientShakeScreenInkAction::new);
         dispatcher.register(ClientBorderInkAction.class, ClientBorderInkAction::new);

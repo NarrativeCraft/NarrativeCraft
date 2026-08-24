@@ -55,6 +55,7 @@ public class ImageInkAction extends OverlayInkAction {
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
+
         return InkActionResult.ignored();
     }
 }
