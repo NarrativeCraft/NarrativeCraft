@@ -44,7 +44,9 @@ public class ImageInkAction extends OverlayInkAction {
     protected InkActionResult validateOwnProperty(
             ParsedCommand cmd, IScene scene, String value1, String value2, String value3) {
 
-        if (action.equals("render")) {
+        if (!action.equals("render")) {
+            return InkActionResult.error(String.format("Unknown image action '%s'", action));
+        } else {
             imagePath = value1;
         }
 
