@@ -52,5 +52,6 @@ public final class InkActionRegister {
         dispatcher.register(TextInkAction.class, TextInkAction::new);
         dispatcher.register(ChoiceTimeInkAction.class, ChoiceTimeInkAction::new);
         dispatcher.register(ImageInkAction.class, ImageInkAction::new);
+        dispatcher.register(ItemRequirementInkAction.class, ItemRequirementInkAction::new);
     }
 }
