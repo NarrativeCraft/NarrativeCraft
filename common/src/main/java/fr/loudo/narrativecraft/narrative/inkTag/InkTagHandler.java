@@ -211,8 +211,8 @@ public final class InkTagHandler {
         long instanceId = nextInstanceId.getAndIncrement();
         action.setInstanceId(instanceId);
 
+        InkActionResult result = action.execute(playerSession);
         if (action.getSide() == Side.SERVER) {
-            InkActionResult result = action.execute(playerSession);
             if (result.isSingleOk()) {
                 action.setRunning(false);
             }
