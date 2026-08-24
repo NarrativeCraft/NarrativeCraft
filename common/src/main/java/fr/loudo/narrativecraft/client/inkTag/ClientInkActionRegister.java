@@ -24,10 +24,7 @@
 package fr.loudo.narrativecraft.client.inkTag;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.inkTag.actions.ClientBorderInkAction;
-import fr.loudo.narrativecraft.client.inkTag.actions.ClientFadeInkAction;
-import fr.loudo.narrativecraft.client.inkTag.actions.ClientImageInkAction;
-import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
+import fr.loudo.narrativecraft.client.inkTag.actions.*;
 import fr.loudo.narrativecraft.client.inkTag.actions.choiceTime.ClientChoiceTimeInkAction;
 import fr.loudo.narrativecraft.client.inkTag.actions.sound.ClientSoundInkAction;
 import fr.loudo.narrativecraft.client.inkTag.actions.text.ClientTextInkAction;
@@ -54,5 +51,6 @@ public final class ClientInkActionRegister {
         dispatcher.register(ClientTextInkAction.class, ClientTextInkAction::new);
         dispatcher.register(ClientChoiceTimeInkAction.class, ClientChoiceTimeInkAction::new);
         dispatcher.register(ClientImageInkAction.class, ClientImageInkAction::new);
+        dispatcher.register(ClientLockChoiceInkAction.class, ClientLockChoiceInkAction::new);
     }
 }

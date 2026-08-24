@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.screens.components;
 
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogScrollText;
+import fr.loudo.narrativecraft.utils.CustomFont;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -47,6 +48,7 @@ public class ChoiceButtonWidget extends AbstractButton {
     private final Consumer<Integer> onPress;
     private final DialogScrollText scrollText;
     private final DialogData dialogData;
+    private final boolean locked;
 
     private int opacity = 255;
     private float renderOffsetX;
@@ -55,10 +57,11 @@ public class ChoiceButtonWidget extends AbstractButton {
     private float baseOffsetY;
     private boolean canPress = true;
 
-    public ChoiceButtonWidget(String text, int index, Consumer<Integer> onPress) {
+    public ChoiceButtonWidget(String text, int index, boolean locked, Consumer<Integer> onPress) {
         super(0, 0, 0, 0, Component.literal(text));
         this.index = index;
         this.onPress = onPress;
+        this.locked = locked;
 
         dialogData = new DialogData();
         dialogData.setWidth(9999f);
@@ -66,6 +69,9 @@ public class ChoiceButtonWidget extends AbstractButton {
 
         scrollText = new DialogScrollText(null, true);
         scrollText.setText(text);
+        if (locked) {
+            scrollText.setText(CustomFont.LOCK + " " + text);
+        }
         scrollText.forceFinish();
 
         var font = Minecraft.getInstance().font;
@@ -101,7 +107,7 @@ public class ChoiceButtonWidget extends AbstractButton {
 
     @Override
     public void onPress(InputWithModifiers inputWithModifiers) {
-        if (!canPress) return;
+        if (!canPress || locked) return;
         onPress.accept(index);
     }
 

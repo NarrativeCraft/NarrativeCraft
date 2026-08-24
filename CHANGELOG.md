@@ -9,6 +9,7 @@
 - Assign custom nbt to characters
 - Render image in dialog `Clara: [img clara/happy] I'm feeling good right now!`
 - Item requirement tag
+- Locked choice
 
 ### Fixes
 - Dialog 2D scale not fixed based on gui scale
