@@ -45,6 +45,7 @@ public class NpcSerializer implements JsonSerializer<Npc> {
         json.addProperty(
                 "entityTypeId",
                 BuiltInRegistries.ENTITY_TYPE.getKey(src.getEntityType()).toString());
+        json.addProperty("customNbt", src.getCustomNbt() != null ? src.getCustomNbt() : "");
         json.addProperty("sceneId", src.getScene().getId().toString());
         json.addProperty("chapterId", src.getScene().getChapter().getId().toString());
         return json;
