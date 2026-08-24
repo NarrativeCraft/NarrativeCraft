@@ -65,6 +65,8 @@ public final class DialogDataIO {
             json.addProperty("autoSkipEnabled", data.isAutoSkipEnabled());
             json.addProperty("autoSkipSeconds", data.getAutoSkipSeconds());
             json.addProperty("textAlignment", data.getTextAlignment().name());
+            json.addProperty("bobbingSpeed", data.getBobbingNoiseShakeSpeed());
+            json.addProperty("bobbingShake", data.getBobbingNoiseShakeStrength());
         }
         return json;
     }
@@ -122,6 +124,10 @@ public final class DialogDataIO {
                 } catch (IllegalArgumentException ignored) {
                 }
             }
+            if (json.has("bobbingSpeed"))
+                data.setBobbingNoiseShakeSpeed(json.get("bobbingSpeed").getAsFloat());
+            if (json.has("bobbingShake"))
+                data.setBobbingNoiseShakeStrength(json.get("bobbingShake").getAsFloat());
         }
         return data;
     }

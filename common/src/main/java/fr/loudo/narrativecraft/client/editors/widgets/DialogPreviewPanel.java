@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.dialog.DialogEntityBobbing;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.utils.MathUtils;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -61,6 +62,7 @@ public class DialogPreviewPanel {
 
     private DialogFieldSet fieldSet = DialogFieldSet.ALL;
     private List<DialogPreviewEntry> entries = new ArrayList<>();
+    private DialogEntityBobbing dialogEntityBobbing;
     private int selectedIndex = 0;
     private int listScrollOffset = 0;
 
@@ -79,6 +81,12 @@ public class DialogPreviewPanel {
     public DialogPreviewPanel(Consumer<DialogData> onToggleAdvanced, String defaultDialogText) {
         this.onToggleAdvanced = onToggleAdvanced;
         this.defaultDialogText = defaultDialogText;
+    }
+
+    public void tick() {
+        if (dialogEntityBobbing != null) {
+            dialogEntityBobbing.tick();
+        }
     }
 
     public void renderAnchorPoint(PoseStack poseStack) {
@@ -628,7 +636,7 @@ public class DialogPreviewPanel {
         return screenWidth - PANEL_WIDTH - PADDING_RIGHT;
     }
 
-    private DialogPreviewEntry getSelectedEntry() {
+    DialogPreviewEntry getSelectedEntry() {
         if (entries.isEmpty() || selectedIndex >= entries.size()) return null;
         return entries.get(selectedIndex);
     }

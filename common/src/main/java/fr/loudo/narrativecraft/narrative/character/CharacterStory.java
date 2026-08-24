@@ -44,7 +44,7 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
     private DialogData dialogData = new DialogData();
     private EntityType<?> entityType = EntityType.PLAYER;
     private SkinModel modelType;
-    private String customNbt;
+    private String customNbt = "";
     private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
 
     public CharacterStory(String name, String description) {

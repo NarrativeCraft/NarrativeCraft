@@ -50,7 +50,7 @@ public class NpcPayload extends NarrativeEntryPayload {
         this.sceneId = sceneId;
         this.chapterId = chapterId;
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
-        this.customNbt = customNbt;
+        this.customNbt = customNbt != null ? customNbt : "";
     }
 
     public static NpcPayload read(FriendlyByteBuf buf) {

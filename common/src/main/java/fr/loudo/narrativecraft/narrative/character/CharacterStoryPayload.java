@@ -45,7 +45,7 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
         super(name, description);
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
-        this.customNbt = customNbt;
+        this.customNbt = customNbt != null ? customNbt : "";
         this.mainCharacterAttribute =
                 mainCharacterAttribute != null ? mainCharacterAttribute : new MainCharacterAttribute();
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
