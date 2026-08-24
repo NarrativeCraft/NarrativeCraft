@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import java.util.regex.Pattern;
 import net.minecraft.client.gui.GuiGraphics;
 
 /**
@@ -42,6 +43,7 @@ import net.minecraft.client.gui.GuiGraphics;
  */
 public abstract class InkAction {
 
+    public static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{([^}]*)}");
     public static final String NOT_EXISTS_KEY = "story.validation_error.not_exists";
 
     /** Unique id assigned by the dispatcher before the action enters the queue. */

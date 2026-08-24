@@ -21,22 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.utils;
+package fr.loudo.narrativecraft.client.inkTag.actions;
 
-public class CustomFont {
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.narrative.inkTag.actions.LockChoiceInkAction;
 
-    public static final String SAVE = "\uE200";
-    public static final String UNDO = "\uE201";
-    public static final String CROSS = "✖";
-    public static final String CHECK = "\uE202";
-    public static final String CAMERA = "\uE203";
-    public static final String CHARACTER = "\uE204";
-    public static final String CHARACTER_TEMPLATE = "\uE205";
-    public static final String BURGER_MENU = "\uE206";
-    public static final String SETTINGS = "⚙";
-    public static final String SEARCH = "\uE207";
-    public static final String FOLDER = "\uE208";
-    public static final String DIALOG = "\uE209";
-    public static final String BOOK = "\uE210";
-    public static final String LOCK = "\uE211";
+public class ClientLockChoiceInkAction extends LockChoiceInkAction {
+
+    @Override
+    protected InkActionResult doExecute(IPlayerSession playerSession) {
+        ((ClientPlayerSession) playerSession).setChoiceLocked(choiceLocked);
+        return InkActionResult.singleOk();
+    }
 }

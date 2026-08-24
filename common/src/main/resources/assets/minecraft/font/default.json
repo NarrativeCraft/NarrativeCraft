@@ -98,6 +98,15 @@
       "chars": [
         "\uE210"
       ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/lock.png",
+      "ascent": 8,
+      "height": 8,
+      "chars": [
+        "\uE211"
+      ]
     }
   ]
 }

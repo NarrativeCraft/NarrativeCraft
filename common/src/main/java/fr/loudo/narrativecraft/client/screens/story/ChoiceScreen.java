@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.inkTag.actions.choiceTime.ClientChoiceTimeInkAction;
 import fr.loudo.narrativecraft.client.screens.components.ChoiceButtonWidget;
+import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
@@ -79,8 +80,10 @@ public class ChoiceScreen extends Screen {
         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(soundId), 1.0f));
 
         buttons.clear();
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         for (int i = 0; i < choices.size(); i++) {
-            ChoiceButtonWidget button = new ChoiceButtonWidget(choices.get(i), i, integer -> select(integer, false));
+            ChoiceButtonWidget button = new ChoiceButtonWidget(
+                    choices.get(i), i, session.getChoiceLocked().get(i), integer -> select(integer, false));
             button.setOpacity(5);
             button.setCanPress(false);
             buttons.add(button);
