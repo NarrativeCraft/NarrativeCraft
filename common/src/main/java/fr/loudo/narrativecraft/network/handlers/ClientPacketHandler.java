@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.client.editors.dialog.ClientGlobalDialogEditorMak
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.client.rendering.ImageTexture;
 import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
@@ -299,6 +300,7 @@ public class ClientPacketHandler {
         session.clear();
         ClientNarrativeCraftMod.getInstance().getPlayerSession().setInStory(false);
         ClientStoryVariables.clear();
+        ImageTexture.clearCache();
     }
 
     public static void dialogStop() {
