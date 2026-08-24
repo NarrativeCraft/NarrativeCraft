@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.api.inkAction.syntax;
 
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+
 public enum ArgType {
     STRING,
     INT,
@@ -44,6 +46,7 @@ public enum ArgType {
 
     /** Parses a raw string value into a typed Java value. */
     public Object parse(String raw) {
+        if (InkAction.VARIABLE_PATTERN.matcher(raw).find()) return raw;
         return switch (this) {
             case STRING -> raw;
             case INT -> parseIntSafe(raw);

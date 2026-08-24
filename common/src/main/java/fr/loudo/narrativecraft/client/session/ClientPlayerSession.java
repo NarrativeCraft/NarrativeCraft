@@ -57,6 +57,7 @@ public class ClientPlayerSession extends AbstractPlayerSession {
     private CameraView cameraView;
     private DialogRenderer mainDialog;
     private boolean stopNextDialog;
+    private HashMap<Integer, Boolean> choiceLocked = new HashMap<>() {};
 
     public ClientPlayerSession() {
         super(null, null);
@@ -210,5 +211,13 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public void setChoiceScreen(ChoiceScreen choiceScreen) {
         this.choiceScreen = choiceScreen;
+    }
+
+    public HashMap<Integer, Boolean> getChoiceLocked() {
+        return choiceLocked;
+    }
+
+    public void setChoiceLocked(HashMap<Integer, Boolean> choiceLocked) {
+        this.choiceLocked = choiceLocked;
     }
 }
