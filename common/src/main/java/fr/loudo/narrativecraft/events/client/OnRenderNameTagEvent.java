@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
@@ -40,6 +41,10 @@ public class OnRenderNameTagEvent {
         ICharacterStory characterStory =
                 playerSession.getCharacterByProfileId(player.getGameProfile().getId());
         if (characterStory == null) return true;
+
+        if (characterStory.getCharacterType() == CharacterType.NORMAL) {
+            return NarrativeServerSettings.showNametagGlobalCharacter;
+        }
 
         return characterStory.getCharacterType() != CharacterType.NPC;
     }
