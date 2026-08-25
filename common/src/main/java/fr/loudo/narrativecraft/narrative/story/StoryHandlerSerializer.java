@@ -23,11 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative.story;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
+import fr.loudo.narrativecraft.api.utils.UserPosition;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
@@ -36,6 +33,12 @@ import java.util.Map;
 import java.util.UUID;
 
 public class StoryHandlerSerializer implements JsonSerializer<StoryHandler> {
+
+    private final boolean includeLastPosition;
+
+    public StoryHandlerSerializer(boolean includeLastPosition) {
+        this.includeLastPosition = includeLastPosition;
+    }
 
     @Override
     public JsonElement serialize(StoryHandler src, Type typeOfSrc, JsonSerializationContext context) {
@@ -67,6 +70,10 @@ public class StoryHandlerSerializer implements JsonSerializer<StoryHandler> {
         json.addProperty(
                 "chapterId", src.getPlayerSession().getChapter().getId().toString());
         json.addProperty("sceneId", src.getPlayerSession().getScene().getId().toString());
+        if (includeLastPosition) {
+            UserPosition lastPosition = UserPosition.of(src.getPlayerSession().getPlayer());
+            json.add("lastPosition", lastPosition.serialize());
+        }
 
         return json;
     }

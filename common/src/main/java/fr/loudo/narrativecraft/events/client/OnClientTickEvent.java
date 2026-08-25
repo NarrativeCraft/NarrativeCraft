@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.keys.PressKeyListener;
+import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
@@ -44,6 +45,8 @@ public class OnClientTickEvent {
         if (Minecraft.getInstance().isPaused()) return;
 
         PressKeyListener.onKeyPressed(minecraft);
+
+        ClientPacketHandler.tickPendingDialogue();
 
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         new ArrayList<>(session.getActiveDialog2DRenderers()).forEach(DialogRenderer2D::tick);

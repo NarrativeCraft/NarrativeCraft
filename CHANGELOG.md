@@ -11,6 +11,7 @@
 - Item requirement tag
 - Locked choice
 - Character head bobbing when talking (it's back!)
+- Save tag (include last character position)
 
 ### Fixes
 - Dialog 2D scale not fixed based on gui scale

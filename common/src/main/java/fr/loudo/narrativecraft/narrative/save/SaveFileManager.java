@@ -37,13 +37,13 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class SaveFileManager {
 
-    public void writeSave(PlayerSession session) {
+    public void writeSave(PlayerSession session, boolean includeLastPosition) {
         StoryHandler storyHandler = session.getStoryHandler();
         if (storyHandler == null) return;
 
         File saveFile = getSaveFile(session);
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(StoryHandler.class, new StoryHandlerSerializer())
+                .registerTypeAdapter(StoryHandler.class, new StoryHandlerSerializer(includeLastPosition))
                 .create();
         try (Writer writer = new BufferedWriter(new FileWriter(saveFile))) {
             gson.toJson(storyHandler, writer);
