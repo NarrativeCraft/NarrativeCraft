@@ -37,8 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 /**
@@ -102,7 +100,12 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
     @Nullable
     public DispatchResult dispatch(String rawTag, IScene scene, UnaryOperator<String> tokenLocalizer)
             throws InkTagHandlerException {
-        List<String> tokens = tokenize(rawTag).stream().map(tokenLocalizer).toList();
+        List<String> tokens;
+        try {
+            tokens = tokenize(rawTag).stream().map(tokenLocalizer).toList();
+        } catch (IllegalArgumentException e) {
+            throw new InkTagHandlerException(e.getMessage(), e);
+        }
         if (tokens.isEmpty()) return null;
 
         String keyword = tokens.get(0);
@@ -145,45 +148,87 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
         return entry.factory().get();
     }
 
-    /**
-     * Matches three token forms, in priority order:
-     * <ol>
-     *   <li>{@code name:"quoted value"} → named arg whose value may contain spaces</li>
-     *   <li>{@code "quoted value"}      → standalone positional value with spaces</li>
-     *   <li>{@code \S+}                 → regular whitespace-delimited token</li>
-     * </ol>
-     */
-    private static final Pattern TOKEN_PATTERN = Pattern.compile("(\\w+):\"([^\"]*)\"|\"([^\"]*)\"|([\\S]+)");
-
-    /** Strips everything from the first {@code //} not inside a quoted string. */
-    private static String stripComment(String s) {
-        boolean inQuote = false;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '"') {
-                inQuote = !inQuote;
-            } else if (!inQuote && c == '/' && i + 1 < s.length() && s.charAt(i + 1) == '/') {
-                return s.substring(0, i).trim();
-            }
-        }
-        return s;
+    private static boolean isQuote(char character) {
+        return character == '"' || character == '\'';
     }
 
-    /** Splits a raw tag into tokens, treating double-quoted spans as single tokens. */
+    /** Strips everything from the first {@code //} not inside a quoted string. */
+    private static String stripComment(String rawTag) {
+        char openingQuote = 0;
+        for (int index = 0; index < rawTag.length(); index++) {
+            char character = rawTag.charAt(index);
+            if (character == '\\' && index + 1 < rawTag.length() && isQuote(rawTag.charAt(index + 1))) {
+                index++;
+            } else if (openingQuote != 0) {
+                if (character == openingQuote) {
+                    openingQuote = 0;
+                }
+            } else if (isQuote(character)) {
+                openingQuote = character;
+            } else if (character == '/' && index + 1 < rawTag.length() && rawTag.charAt(index + 1) == '/') {
+                return rawTag.substring(0, index).trim();
+            }
+        }
+        return rawTag;
+    }
+
+    /**
+     * Splits a raw tag into tokens, treating spans quoted with {@code "} or {@code '} as single
+     * tokens. Inside a span the other quote character is a plain character, and {@code \"} or
+     * {@code \'} yields the quote itself; any other backslash is kept as-is.
+     *
+     * @throws IllegalArgumentException if a quoted span is never closed
+     */
     private static List<String> tokenize(String rawTag) {
         String trimmed = stripComment(rawTag.trim());
         if (trimmed.isEmpty()) return List.of();
+
         List<String> tokens = new ArrayList<>();
-        Matcher matcher = TOKEN_PATTERN.matcher(trimmed);
-        while (matcher.find()) {
-            if (matcher.group(1) != null) {
-                tokens.add(matcher.group(1) + ":" + matcher.group(2));
-            } else if (matcher.group(3) != null) {
-                tokens.add(matcher.group(3));
+        StringBuilder currentToken = new StringBuilder();
+        boolean tokenStarted = false;
+        char openingQuote = 0;
+
+        for (int index = 0; index < trimmed.length(); index++) {
+            char character = trimmed.charAt(index);
+
+            if (character == '\\' && index + 1 < trimmed.length() && isQuote(trimmed.charAt(index + 1))) {
+                currentToken.append(trimmed.charAt(index + 1));
+                tokenStarted = true;
+                index++;
+
+            } else if (openingQuote != 0) {
+                if (character == openingQuote) {
+                    openingQuote = 0;
+                } else {
+                    currentToken.append(character);
+                }
+
+            } else if (isQuote(character)) {
+                openingQuote = character;
+                tokenStarted = true;
+
+            } else if (Character.isWhitespace(character)) {
+                if (tokenStarted) {
+                    tokens.add(currentToken.toString());
+                    currentToken.setLength(0);
+                    tokenStarted = false;
+                }
+
             } else {
-                tokens.add(matcher.group(4));
+                currentToken.append(character);
+                tokenStarted = true;
             }
         }
+
+        if (openingQuote != 0) {
+            throw new IllegalArgumentException("Unclosed " + openingQuote + " quote in tag '" + trimmed + "'. "
+                    + "Close it, or escape it as '\\" + openingQuote + "' to use it as a plain character.");
+        }
+
+        if (tokenStarted) {
+            tokens.add(currentToken.toString());
+        }
+
         return List.copyOf(tokens);
     }
 }
