@@ -45,7 +45,7 @@ import net.minecraft.world.phys.Vec3;
         keyword = "gameplay",
         description = "Enables or disables standard player gameplay controls (movement, inventory, …) during a scene.",
         syntax = "gameplay [gamemode:string=adventure]",
-        side = Side.SERVER)
+        side = Side.CLIENT_SERVER)
 public class GameplayInkAction extends InkAction {
 
     private GameType gameType = GameType.ADVENTURE;

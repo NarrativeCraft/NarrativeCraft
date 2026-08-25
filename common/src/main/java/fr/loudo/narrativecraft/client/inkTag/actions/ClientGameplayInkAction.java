@@ -21,10 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.inkAction;
+package fr.loudo.narrativecraft.client.inkTag.actions;
 
-public enum Side {
-    SERVER,
-    CLIENT,
-    CLIENT_SERVER
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.narrative.inkTag.actions.GameplayInkAction;
+import net.minecraft.client.Minecraft;
+
+public class ClientGameplayInkAction extends GameplayInkAction {
+
+    @Override
+    protected InkActionResult doExecute(IPlayerSession playerSession) {
+        Minecraft.getInstance().options.hideGui = false;
+        return InkActionResult.singleOk();
+    }
 }
