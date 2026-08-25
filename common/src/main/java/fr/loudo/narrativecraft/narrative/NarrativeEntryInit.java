@@ -79,6 +79,7 @@ public class NarrativeEntryInit {
         NarrativeCraftMod.getInstance().setGlobalDialogData(file.getGlobalDialogData());
 
         compileStories();
+        initPrecompiledStory();
     }
 
     private static void compileStories() {
@@ -93,6 +94,22 @@ public class NarrativeEntryInit {
         for (StoryCompilerHandler.TagError tagError : StoryCompilerHandler.validateTags()) {
             NarrativeCraftMod.LOGGER.error(
                     "Invalid ink tag: {}", tagError.toMessage().getString());
+        }
+    }
+
+    private static void initPrecompiledStory() {
+        try {
+            String preCompiledStory = NarrativeCraftMod.getInstance().getFile().getCompiledStoryContent();
+            if (preCompiledStory != null) {
+                NarrativeCraftMod.getInstance().setCompiledStoryJson(preCompiledStory);
+                NarrativeCraftMod.LOGGER.info("Pre-compiled story loaded.");
+            } else {
+                NarrativeCraftMod.LOGGER.info("No pre-compiled story not available, ignoring.");
+            }
+        } catch (Exception exception) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Failed to fetch pre-compiled story, trying to compile current story instead", exception);
+            compileStories();
         }
     }
 

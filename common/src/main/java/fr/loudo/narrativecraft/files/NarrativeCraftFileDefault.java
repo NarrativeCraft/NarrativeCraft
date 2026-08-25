@@ -40,6 +40,7 @@ public class NarrativeCraftFileDefault {
     public static final String CAMERA_ANGLES_FOLDER_NAME = "camera_angles";
     public static final String NPC_FOLDER_NAME = "npc";
     public static final String INTERACTIONS_FOLDER_NAME = "interactions";
+    public static final String COMPILED_STORY_FILE_NAME = "compiled_story" + EXTENSION_DATA_FILE;
 
     protected final GsonBuilder gsonBuilder = new GsonBuilder();
     protected final String DIRECTORY_NAME = NarrativeCraftMod.MOD_ID;
