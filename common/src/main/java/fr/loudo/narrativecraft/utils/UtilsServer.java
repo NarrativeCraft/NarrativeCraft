@@ -27,6 +27,7 @@ import com.google.common.io.Files;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
@@ -35,6 +36,7 @@ import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.io.File;
 import java.util.Collection;
@@ -131,6 +133,13 @@ public class UtilsServer {
     }
 
     public static void openMainScreenToPlayer(ServerPlayer player) {
+        CameraAngle mainScreen = NarrativeCraftMod.getInstance().getMainScreenData();
+        if (!NarrativeServerSettings.showMainScreenOnJoin
+                || mainScreen == null
+                || mainScreen.getCameras().isEmpty()
+                || !player.level().getServer().isSingleplayer()) {
+            return;
+        }
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
         if (playerSession == null) return;

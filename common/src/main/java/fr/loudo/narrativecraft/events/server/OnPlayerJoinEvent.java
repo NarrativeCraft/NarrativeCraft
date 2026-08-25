@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.story.locale.StoryTranslations;
 import fr.loudo.narrativecraft.network.story.S2CEnsureLocalExists;
 import fr.loudo.narrativecraft.platform.Services;
@@ -52,11 +51,6 @@ public class OnPlayerJoinEvent {
         PlayerSession playerSession = new PlayerSession(player);
         NarrativeCraftMod.getInstance().getPlayerSessionManager().add(playerSession);
 
-        CameraAngle mainScreen = NarrativeCraftMod.getInstance().getMainScreenData();
-        if (NarrativeServerSettings.showMainScreenOnJoin
-                && !mainScreen.getCameras().isEmpty()
-                && player.level().getServer().isSingleplayer()) {
-            UtilsServer.openMainScreenToPlayer(player);
-        }
+        UtilsServer.openMainScreenToPlayer(player);
     }
 }
