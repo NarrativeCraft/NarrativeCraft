@@ -61,10 +61,19 @@ public class ClientPlayerSession extends AbstractPlayerSession {
 
     public ClientPlayerSession() {
         super(null, null);
+        initChoiceLocked();
     }
 
     public ClientPlayerSession(Chapter chapter, Scene scene) {
         super(chapter, scene);
+        initChoiceLocked();
+    }
+
+    private void initChoiceLocked() {
+        choiceLocked.put(0, false);
+        choiceLocked.put(1, false);
+        choiceLocked.put(2, false);
+        choiceLocked.put(3, false);
     }
 
     public CutsceneDataSession getCutsceneDataSession() {
