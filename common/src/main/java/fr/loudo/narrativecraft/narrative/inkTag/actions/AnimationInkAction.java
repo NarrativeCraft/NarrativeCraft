@@ -136,13 +136,24 @@ public class AnimationInkAction extends InkAction {
         if (unique && !loop) {
             playback.setKillOnEnd(true);
         }
+        if (storyHandler != null) {
+            Entity entity = storyHandler
+                    .getCharacterEntities()
+                    .get(animation.getCharacterStory().getName().toLowerCase());
+            if (entity != null && entity.position().distanceTo(playback.getFirstPosition()) <= 1) {
+                playback.setMasterEntity(entity);
+            }
+        }
         playback.start(Collections.singleton(playerSession.getPlayer()));
         NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
 
         ICharacterStory characterStory = animation.getCharacterStory();
         if (storyHandler != null && characterStory != null) {
+            Entity initialEntity = storyHandler
+                    .getCharacterEntities()
+                    .get(animation.getCharacterStory().getName().toLowerCase());
             Entity masterEntity = playback.getMasterEntity();
-            if (masterEntity != null) {
+            if (masterEntity != null && initialEntity != null && !masterEntity.is(initialEntity)) {
                 storyHandler.registerEntity(characterStory, masterEntity);
             }
         }

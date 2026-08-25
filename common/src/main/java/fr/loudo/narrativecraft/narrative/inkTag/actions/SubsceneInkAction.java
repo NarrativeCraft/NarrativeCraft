@@ -140,13 +140,24 @@ public class SubsceneInkAction extends InkAction {
             if (unique && !loop) {
                 playback.setKillOnEnd(true);
             }
+
+            ICharacterStory characterStory = animation.getCharacterStory();
+            Entity initialEntity = null;
+            if (storyHandler != null && characterStory != null) {
+                initialEntity = storyHandler
+                        .getCharacterEntities()
+                        .get(characterStory.getName().toLowerCase());
+                if (initialEntity != null && initialEntity.position().distanceTo(playback.getFirstPosition()) <= 1) {
+                    playback.setMasterEntity(initialEntity);
+                }
+            }
+
             playback.start(Collections.singleton(playerSession.getPlayer()));
             NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
 
-            ICharacterStory characterStory = animation.getCharacterStory();
             if (storyHandler != null && characterStory != null) {
                 Entity masterEntity = playback.getMasterEntity();
-                if (masterEntity != null) {
+                if (masterEntity != null && initialEntity != null && !masterEntity.is(initialEntity)) {
                     storyHandler.registerEntity(characterStory, masterEntity);
                 }
             }

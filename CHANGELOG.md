@@ -12,6 +12,7 @@
 - Locked choice
 - Character head bobbing when talking (it's back!)
 - Save tag (include last character position)
+- Re-use entity already in world close to first position of animation in story
 
 ### Fixes
 - Dialog 2D scale not fixed based on gui scale
