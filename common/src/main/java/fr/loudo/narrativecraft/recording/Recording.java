@@ -155,7 +155,10 @@ public class Recording implements IRecording {
 
     public int markEntityAsTracked(Entity entity) {
         RecordingEntityData data = getRecordingEntityData(entity);
-        if (data == null) return -1;
+        if (data == null) {
+            data = new RecordingEntityData(nextNearbyEntityLocalId++, entity, false, tick, this);
+            recordingEntityDataList.add(data);
+        }
 
         if (!data.isTracked()) {
             CompoundTag nbt = new CompoundTag();

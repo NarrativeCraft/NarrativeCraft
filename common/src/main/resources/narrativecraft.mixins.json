@@ -9,14 +9,14 @@
     "ItemEntityMixin",
     "LivingEntityMixin",
     "ServerLevelMixin",
-    "accessor.BoatAccessor",
+    "ServerPlayerMixin",
     "accessor.AbstractHorseAccessor",
-    "accessor.PlayerAccessor",
+    "accessor.BoatAccessor",
     "accessor.EntityAccessor",
-    "accessor.LivingEntityAccessor"
+    "accessor.LivingEntityAccessor",
+    "accessor.PlayerAccessor"
   ],
   "client": [
-    "accessor.TextureManagerAccessor",
     "CameraMixin",
     "GameRendererMixin",
     "LocalPlayerMixin",
@@ -24,7 +24,8 @@
     "MouseHandlerMixin",
     "PlayerInfoMixin",
     "SoundEngineMixin",
-    "SoundManagerMixin"
+    "SoundManagerMixin",
+    "accessor.TextureManagerAccessor"
   ],
   "server": [],
   "injectors": {
