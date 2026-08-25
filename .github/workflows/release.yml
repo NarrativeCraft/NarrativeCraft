@@ -124,6 +124,7 @@ jobs:
         with:
           body: ${{ env.CHANGELOG }}
           files: artifacts/**/*.jar
+          prerelease: true
 
       - name: Publish to Modrinth
         env:
@@ -154,7 +155,7 @@ jobs:
                 changelog: $changelog,
                 dependencies: $deps,
                 game_versions: [$mc_version],
-                version_type: "release",
+                version_type: "beta",
                 environment: "client_and_server",
                 loaders: [$loader],
                 featured: true,
@@ -179,10 +180,7 @@ jobs:
           TIMESTAMP=$(date +%s)
           ROLE_ID="1515653721621794968"
 
-          case "${MOD_VERSION}" in
-            *-beta*) ACCENT_COLOR=13729047 ;;
-            *) ACCENT_COLOR=11479789 ;;
-          esac
+          ACCENT_COLOR=13729047
 
           PAYLOAD=$(jq -n \
             --arg version "${MOD_VERSION}" \
