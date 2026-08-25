@@ -28,7 +28,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 @Mod(NarrativeCraftMod.MOD_ID)
 public class OnUseItemEventNeoForge {
@@ -37,7 +37,8 @@ public class OnUseItemEventNeoForge {
         NeoForge.EVENT_BUS.addListener(OnUseItemEventNeoForge::onUseItem);
     }
 
-    private static void onUseItem(LivingEntityUseItemEvent event) {
+    private static void onUseItem(PlayerInteractEvent.RightClickItem event) {
+        if (event.getLevel().isClientSide()) return;
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         OnUseItemEvent.onUseItem(player, event.getHand());
     }
