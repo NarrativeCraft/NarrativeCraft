@@ -179,19 +179,25 @@ jobs:
           TIMESTAMP=$(date +%s)
           ROLE_ID="1515653721621794968"
 
+          case "${MOD_VERSION}" in
+            *-beta*) ACCENT_COLOR=13729047 ;;
+            *) ACCENT_COLOR=11479789 ;;
+          esac
+
           PAYLOAD=$(jq -n \
             --arg version "${MOD_VERSION}" \
             --arg icon "${ICON_URL}" \
             --arg changelog "${CHANGELOG}" \
             --arg ts "${TIMESTAMP}" \
             --arg role "${ROLE_ID}" \
+            --argjson accent "${ACCENT_COLOR}" \
             '{
               flags: 32768,
               allowed_mentions: { roles: [$role] },
               components: [
                 {
                   type: 17,
-                  accent_color: 11479789,
+                  accent_color: $accent,
                   components: [
                     {
                       type: 9,
