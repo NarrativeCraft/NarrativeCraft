@@ -87,7 +87,7 @@ public class ItemRequirementInkAction extends InkAction {
         }
 
         if (localAmount < amount) {
-            storyHandler.playStitch("on_" + redirect_fail_stitch + "_item_requierement_fail");
+            storyHandler.playStitch("on_" + redirect_fail_stitch + "_item_requireement_fail");
         }
 
         return InkActionResult.singleOk();
