@@ -23,8 +23,6 @@
 
 package fr.loudo.narrativecraft.narrative.inkTag.actions;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.events.story.ChapterSceneChangeEvent;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
@@ -32,54 +30,32 @@ import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.network.S2CPlayerSession;
-import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.session.PlayerSession;
-import javax.annotation.Nullable;
 
 @InkCommand(
-        keyword = "on_enter",
-        description = "Registers a one-shot callback that runs the next time the player enters this scene.",
-        syntax = "on_enter <knot:string>",
-        side = Side.SERVER)
-public class OnEnterInkAction extends InkAction {
+        keyword = "save",
+        description = "Save player progression",
+        side = Side.SERVER,
+        syntax = "save [--include_last_position] [--hide_icon]")
+public class SaveInkAction extends InkAction {
 
-    @Nullable
-    private String knot;
+    private boolean includeLastPosition;
+    private boolean hideIcon;
 
     @Override
     protected InkActionResult doValidate(ParsedCommand cmd, IScene scene) {
-        knot = cmd.getString("knot");
+        includeLastPosition = cmd.flag("include_last_position");
+        hideIcon = cmd.flag("hide_icon");
         return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(IPlayerSession playerSession) {
-        PlayerSession session = (PlayerSession) playerSession;
-        StoryHandler storyHandler = session.getStoryHandler();
+        StoryHandler storyHandler = (StoryHandler) playerSession.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
 
-        if (knot == null) return InkActionResult.error("Missing knot name");
+        storyHandler.save(!hideIcon, includeLastPosition);
 
-        Chapter chapter = StoryHandler.getChapterFromKnotName(knot);
-        if (chapter == null) return InkActionResult.ignored();
-
-        Scene scene = StoryHandler.getSceneFromKnotName(chapter, knot);
-        if (scene == null) return InkActionResult.ignored();
-
-        if (chapter.getId().equals(session.getChapter().getId())
-                && scene.getId().equals(session.getScene().getId())) {
-            return InkActionResult.ignored();
-        }
-        session.apply(chapter, scene);
-        NarrativeCraftMod.EVENT_BUS.post(new ChapterSceneChangeEvent(playerSession, chapter, scene));
-
-        storyHandler.triggerChangeScene();
-        Services.PACKET.sendToPlayer(session.getPlayer(), new S2CPlayerSession(chapter.getId(), scene.getId()));
-        storyHandler.save(true, false);
         return InkActionResult.singleOk();
     }
 }

@@ -23,12 +23,9 @@
 
 package fr.loudo.narrativecraft.narrative.story;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.utils.UserPosition;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
@@ -37,11 +34,7 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> {
 
@@ -84,6 +77,11 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
         boolean finishedStory =
                 obj.has("finishedStory") && obj.get("finishedStory").getAsBoolean();
 
+        UserPosition lastPosition = null;
+        if (obj.has("lastPosition")) {
+            lastPosition = UserPosition.deserialize(obj.getAsJsonObject("lastPosition"));
+        }
+
         ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
         if (chapterManager.getList().isEmpty()) {
             throw new JsonParseException("No compiled chapter available to load the save");
@@ -107,7 +105,7 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
         playerSession.apply(chapter, scene);
 
         try {
-            return new StoryHandler(
+            StoryHandler storyHandler = new StoryHandler(
                     playerSession,
                     storyState,
                     characterDialogData,
@@ -116,6 +114,8 @@ public class StoryHandlerDeserializer implements JsonDeserializer<StoryHandler> 
                     dialogVisible,
                     ended,
                     finishedStory);
+            storyHandler.setLastPosition(lastPosition);
+            return storyHandler;
         } catch (Exception e) {
             throw new JsonParseException(e);
         }

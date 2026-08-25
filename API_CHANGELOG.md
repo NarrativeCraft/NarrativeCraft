@@ -8,3 +8,5 @@
 - Added `IChapter getChapter()` and `IScene getScene()` in `IPlayerSession`
 - Added in `ICharacterStory` `getCustomNbt()` `setCustomNbt(String nbt)` `isMainCharacter()`
 - Added `VARIABLE_PATTERN` in `InkAction` to detect variable in a tag value before it get replaced by the compiler
+- Added `UserPosition getLastPosition();` and `void setLastPosition(UserPosition lastPosition);` in `IStoryHandler`
+- Added `UserPosition` record in `fr.loudo.narrativecraft.api.utils` holding `x`, `y`, `z`, `xRot` and `yRot`

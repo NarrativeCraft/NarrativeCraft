@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.api.events.story.StoryEndEvent;
 import fr.loudo.narrativecraft.api.events.story.StoryStartEvent;
 import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
 import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
+import fr.loudo.narrativecraft.api.utils.UserPosition;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
@@ -78,6 +79,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     private final Map<String, DialogEntityBobbing> dialogEntityBobbingMap = new HashMap<>();
     private final Map<String, DialogData> characterDialogData = new HashMap<>();
     private final Set<UUID> interactionIds = new HashSet<>();
+    private UserPosition lastPosition;
     private String lastCharacterSpoke = "";
     private String currentSpeaker = "";
     private Step step = Step.READY;
@@ -144,6 +146,17 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             story.choosePathString(playerSession.getScene().knotName(), true);
         }
         advance();
+        if (lastPosition != null) {
+            ServerPlayer player = playerSession.getPlayer();
+            player.teleportTo(
+                    player.serverLevel(),
+                    lastPosition.x(),
+                    lastPosition.y(),
+                    lastPosition.z(),
+                    Set.of(),
+                    lastPosition.yRot(),
+                    lastPosition.xRot());
+        }
     }
 
     public void start(String knotPath) throws Exception {
@@ -386,12 +399,12 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         return !lastCharacterSpoke.isEmpty() && !lastCharacterSpoke.equalsIgnoreCase(speaker);
     }
 
-    public void save(boolean showIcon) {
+    public void save(boolean showIcon, boolean includeLastPosition) {
         if (showIcon) {
             Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CRenderSaveIcon(0.9, 3, 0.9));
         }
         SaveFileManager saveFileManager = NarrativeCraftMod.getInstance().getSaveFileManager();
-        saveFileManager.writeSave(playerSession);
+        saveFileManager.writeSave(playerSession, includeLastPosition);
     }
 
     private void sendDialogue(Line line) {
@@ -545,7 +558,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 .getPlayer()
                 .sendSystemMessage(Translation.message("story.finished").withStyle(ChatFormatting.GREEN));
         finishedStory = true;
-        save(false);
+        save(false, false);
         stop();
     }
 
@@ -604,6 +617,14 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void setFinishedStory(boolean finishedStory) {
         this.finishedStory = finishedStory;
+    }
+
+    public UserPosition getLastPosition() {
+        return lastPosition;
+    }
+
+    public void setLastPosition(UserPosition lastPosition) {
+        this.lastPosition = lastPosition;
     }
 
     public static Chapter getChapterFromKnotName(String knotName) {

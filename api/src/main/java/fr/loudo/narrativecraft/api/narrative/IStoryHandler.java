@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.api.narrative;
 
 import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.api.utils.UserPosition;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -67,4 +68,8 @@ public interface IStoryHandler {
     Entity getEntityFromCharacter(ICharacter characterStory);
 
     boolean characterInStory(ICharacter characterStory);
+
+    UserPosition getLastPosition();
+
+    void setLastPosition(UserPosition lastPosition);
 }

@@ -89,6 +89,11 @@ public class ClientPacketHandler {
 
     public static final Minecraft MINECRAFT = Minecraft.getInstance();
 
+    private static final int PENDING_DIALOGUE_MAX_TICKS = 20;
+
+    private static S2CShowDialogue pendingDialogue;
+    private static int pendingDialogueTicks;
+
     public static void narrativeEntry(BiSyncNarrativeEntryPacket packet) {
         switch (packet.action()) {
             case ADD -> ClientNarrativeEntryEditorRegistry.getInstance().add(packet.entryId(), packet.entry());
@@ -297,6 +302,7 @@ public class ClientPacketHandler {
 
     public static void stopStory() {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        pendingDialogue = null;
         session.clear();
         ClientNarrativeCraftMod.getInstance().getPlayerSession().setInStory(false);
         ClientStoryVariables.clear();
@@ -306,6 +312,7 @@ public class ClientPacketHandler {
     public static void dialogStop() {
 
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        pendingDialogue = null;
         DialogRenderer dialogRenderer = session.getMainDialog();
         if (dialogRenderer == null) {
             Services.PACKET.sendToServer(new C2SDialogueFinished());
@@ -334,11 +341,45 @@ public class ClientPacketHandler {
     public static void showDialogue(S2CShowDialogue packet) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
+        pendingDialogue = null;
+        if (session.getMainDialog() == null
+                && packet.entityId() != S2CShowDialogue.NO_ENTITY
+                && !entityAvailable(packet.entityId())) {
+            pendingDialogue = packet;
+            pendingDialogueTicks = 0;
+            return;
+        }
+
+        displayDialogue(packet);
+    }
+
+    public static void tickPendingDialogue() {
+        if (pendingDialogue == null) return;
+
+        pendingDialogueTicks++;
+        if (!entityAvailable(pendingDialogue.entityId()) && pendingDialogueTicks < PENDING_DIALOGUE_MAX_TICKS) return;
+
+        S2CShowDialogue packet = pendingDialogue;
+        pendingDialogue = null;
+        displayDialogue(packet);
+    }
+
+    private static boolean entityAvailable(int entityId) {
+        return MINECRAFT.level != null && MINECRAFT.level.getEntity(entityId) != null;
+    }
+
+    private static void displayDialogue(S2CShowDialogue packet) {
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+
         DialogData resolvedData = resolveDialogData(packet.dialogDataJson());
 
         if (session.getMainDialog() != null) {
             DialogRenderer dialogRenderer = session.getMainDialog();
-            dialogRenderer.setData(resolvedData);
+            DialogData data = new DialogData();
+            if (packet.entityId() != S2CShowDialogue.NO_ENTITY && entityAvailable(packet.entityId())) {
+                data = resolvedData;
+            }
+            dialogRenderer.setData(data);
             dialogRenderer.update(packet.text());
             return;
         }
@@ -346,7 +387,7 @@ public class ClientPacketHandler {
         if (packet.entityId() != S2CShowDialogue.NO_ENTITY && MINECRAFT.level != null) {
             Entity entity = MINECRAFT.level.getEntity(packet.entityId());
             if (entity != null) {
-                DialogData data = resolvedData != null ? resolvedData : defaultDialogData3D();
+                DialogData data = resolvedData != null ? resolvedData : new DialogData();
                 DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
                 session.setMainDialog(renderer);
                 renderer.onStopped(() -> {
@@ -362,8 +403,7 @@ public class ClientPacketHandler {
             }
         }
 
-        DialogData data = resolvedData != null ? resolvedData : defaultDialogData2D();
-        DialogRenderer2D renderer = new DialogRenderer2D(data);
+        DialogRenderer2D renderer = new DialogRenderer2D(new DialogData());
         session.setMainDialog(renderer);
         renderer.onStopped(() -> {
             session.removeDialog2D(renderer);
@@ -384,20 +424,6 @@ public class ClientPacketHandler {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private static DialogData defaultDialogData3D() {
-        DialogData data = new DialogData();
-        data.setPaddingY(7);
-        data.setPaddingX(5);
-        return data;
-    }
-
-    private static DialogData defaultDialogData2D() {
-        DialogData data = new DialogData();
-        data.setScale(2f);
-        data.setWidth(200f);
-        return data;
     }
 
     public static void characterStoryAction(S2CCharacterStoryAction packet) {
