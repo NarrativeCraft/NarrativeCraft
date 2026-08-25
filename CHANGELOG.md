@@ -16,6 +16,7 @@
 - Pre-compile story `/nc story reload (as_file)` - will be loaded in priority when the server/world start
 - Launch multiple interaction instead of one in the story
 - Return player to main screen when finished story (if available)
+- Togglable settings to render names of global characters
 
 ### Fixes
 - Dialog 2D scale not fixed based on gui scale
