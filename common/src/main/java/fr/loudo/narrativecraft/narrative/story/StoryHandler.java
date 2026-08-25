@@ -310,11 +310,6 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 return;
             }
 
-            DialogEntityBobbing currentBobbing = dialogEntityBobbingMap.get(lastCharacterSpoke.toLowerCase());
-            if (currentBobbing != null) {
-                currentBobbing.reset();
-                dialogEntityBobbingMap.remove(lastCharacterSpoke.toLowerCase());
-            }
             List<Choice> choices = story.getCurrentChoices();
             if (!choices.isEmpty()) {
                 sendChoices(choices);

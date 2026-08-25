@@ -71,6 +71,7 @@ public class PlaybackContext implements IPlaybackContext {
 
     public void start() {
         isPlaying = true;
+        entity.setOnGround(true);
         executeFirstActions();
         if (entity != null && recordingData.getSpawnTick() == 0) {
             spawned = true;
