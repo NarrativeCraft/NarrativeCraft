@@ -40,6 +40,7 @@ public class NarrativeServerSettings {
     public static final String DEFAULT_LOCALE = "en_us";
 
     public static boolean showMainScreenOnJoin = false;
+    public static boolean showNametagGlobalCharacter = true;
     public static String defaultLocale = DEFAULT_LOCALE;
 
     public static void init(Path dataDir) {
@@ -76,11 +77,13 @@ public class NarrativeServerSettings {
 
     private static void loadFromProps() {
         showMainScreenOnJoin = Boolean.parseBoolean(PROPS.getProperty("showMainScreenOnJoin", "false"));
+        showNametagGlobalCharacter = Boolean.parseBoolean(PROPS.getProperty("showNametagGlobalCharacter", "true"));
         defaultLocale = PROPS.getProperty("defaultLocale", DEFAULT_LOCALE);
     }
 
     private static void setToProps() {
         PROPS.setProperty("showMainScreenOnJoin", String.valueOf(showMainScreenOnJoin));
+        PROPS.setProperty("showNametagGlobalCharacter", String.valueOf(showNametagGlobalCharacter));
         PROPS.setProperty("defaultLocale", defaultLocale);
     }
 }

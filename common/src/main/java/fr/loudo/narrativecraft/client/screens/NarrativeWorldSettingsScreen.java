@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import fr.loudo.narrativecraft.utils.Translation;
 import java.io.IOException;
+import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -54,13 +55,27 @@ public class NarrativeWorldSettingsScreen extends Screen {
                 "screen.world_settings.show_main_screen_on_join",
                 NarrativeServerSettings.showMainScreenOnJoin,
                 middleX,
-                currentY);
+                currentY,
+                aBoolean -> {
+                    NarrativeServerSettings.showMainScreenOnJoin = aBoolean;
+                });
         showMainScreenOnJoin.active = minecraft.hasSingleplayerServer();
         if (!minecraft.hasSingleplayerServer()) {
             showMainScreenOnJoin.setTooltip(
                     Tooltip.create(Translation.message("screen.world_settings.tooltip.main_screen")));
         }
         addRenderableWidget(showMainScreenOnJoin);
+
+        currentY = showMainScreenOnJoin.getY() + showMainScreenOnJoin.getHeight() + 5;
+        Button showNametagGlobalCharacter = buildToggleButton(
+                "screen.world_settings.show_name_global_characters",
+                NarrativeServerSettings.showNametagGlobalCharacter,
+                middleX,
+                currentY,
+                aBoolean -> {
+                    NarrativeServerSettings.showNametagGlobalCharacter = aBoolean;
+                });
+        addRenderableWidget(showNametagGlobalCharacter);
 
         addRenderableWidget(Button.builder(Translation.message("screen.world_settings.done"), button -> {
                     try {
@@ -76,11 +91,12 @@ public class NarrativeWorldSettingsScreen extends Screen {
                 .build());
     }
 
-    private Button buildToggleButton(String labelKey, boolean initialValue, int x, int y) {
+    private Button buildToggleButton(String labelKey, boolean initialValue, int x, int y, Consumer<Boolean> onChange) {
         boolean[] current = {initialValue};
+
         return Button.builder(buildToggleLabel(labelKey, current[0]), button -> {
                     current[0] = !current[0];
-                    NarrativeServerSettings.showMainScreenOnJoin = current[0];
+                    onChange.accept(current[0]);
                     button.setMessage(buildToggleLabel(labelKey, current[0]));
                 })
                 .bounds(x, y, BUTTON_WIDTH, BUTTON_HEIGHT)
