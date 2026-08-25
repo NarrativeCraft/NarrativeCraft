@@ -164,6 +164,7 @@ public final class ForgeNetwork {
         client(BiEditorClose.TYPE, BiEditorClose::read, ClientPacketHandler::editorClose);
         client(S2CEditorOpened.TYPE, S2CEditorOpened::read, ClientPacketHandler::editorOpened);
         client(BiInteractionEnter.TYPE, BiInteractionEnter::read, ClientPacketHandler::interactionEnter);
+        client(S2CInteractionLeave.TYPE, S2CInteractionLeave::read, ClientPacketHandler::interactionLeave);
         client(S2CCharacterSkin.TYPE, S2CCharacterSkin::read, ClientPacketHandler::characterSkin);
         client(S2CCharacterStoryAction.TYPE, S2CCharacterStoryAction::read, ClientPacketHandler::characterStoryAction);
         client(S2CClearLoadedSkins.TYPE, S2CClearLoadedSkins::read, ClientPacketHandler::clearLoadedSkins);

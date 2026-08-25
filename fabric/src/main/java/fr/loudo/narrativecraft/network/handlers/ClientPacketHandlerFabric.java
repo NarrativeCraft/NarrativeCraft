@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
@@ -205,6 +206,13 @@ public class ClientPacketHandlerFabric {
                 ClientPacketHandler.interactionEnter(packet);
             });
         });
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2CInteractionLeave.TYPE, (client, handler, buf, responseSender) -> {
+                    S2CInteractionLeave packet = S2CInteractionLeave.read(buf);
+                    client.execute(() -> {
+                        ClientPacketHandler.interactionLeave(packet);
+                    });
+                });
         ClientPlayNetworking.registerGlobalReceiver(S2CCharacterSkin.TYPE, (client, handler, buf, responseSender) -> {
             S2CCharacterSkin packet = S2CCharacterSkin.read(buf);
             client.execute(() -> {

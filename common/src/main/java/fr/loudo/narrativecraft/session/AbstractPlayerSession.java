@@ -30,7 +30,13 @@ import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.BiEditorClose;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 
 public class AbstractPlayerSession implements IPlayerSession {
@@ -39,6 +45,7 @@ public class AbstractPlayerSession implements IPlayerSession {
     protected Scene scene;
     protected EditorMaker editorMaker;
     protected int editorSessionId = BiEditorClose.UNIDENTIFIED_SESSION;
+    protected final Map<UUID, EditorMaker> interactionSessions = new LinkedHashMap<>();
 
     public AbstractPlayerSession(Chapter chapter, Scene scene) {
         this.chapter = chapter;
@@ -51,6 +58,7 @@ public class AbstractPlayerSession implements IPlayerSession {
     }
 
     public void clear() {
+        clearInteractionSession();
         chapter = null;
         scene = null;
         editorMaker = null;
@@ -87,6 +95,34 @@ public class AbstractPlayerSession implements IPlayerSession {
 
     public void closeEditor() {
         setEditor(null);
+    }
+
+    public void addInteractionSession(UUID interactionId, EditorMaker interactionSession) {
+        EditorMaker previousSession = interactionSessions.put(interactionId, interactionSession);
+        if (previousSession != null && previousSession != interactionSession) {
+            previousSession.close();
+        }
+        interactionSession.init();
+    }
+
+    public void removeInteractionSession(UUID interactionId) {
+        EditorMaker interactionSession = interactionSessions.remove(interactionId);
+        if (interactionSession == null) return;
+        interactionSession.close();
+    }
+
+    public void clearInteractionSession() {
+        for (UUID interactionId : new ArrayList<>(interactionSessions.keySet())) {
+            removeInteractionSession(interactionId);
+        }
+    }
+
+    public EditorMaker getInteractionSession(UUID interactionId) {
+        return interactionSessions.get(interactionId);
+    }
+
+    public Collection<EditorMaker> getInteractionSessions() {
+        return Collections.unmodifiableCollection(interactionSessions.values());
     }
 
     public int getEditorSessionId() {

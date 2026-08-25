@@ -63,6 +63,10 @@ public class OnServerTickEvent {
                 editorMaker.tick();
             }
 
+            for (EditorMaker interactionSession : new ArrayList<>(playerSession.getInteractionSessions())) {
+                interactionSession.tick();
+            }
+
             StoryHandler storyHandler = playerSession.getStoryHandler();
             if (storyHandler != null) {
                 storyHandler.tick();
