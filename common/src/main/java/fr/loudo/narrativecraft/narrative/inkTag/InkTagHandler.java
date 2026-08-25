@@ -214,7 +214,7 @@ public final class InkTagHandler {
         action.setInstanceId(instanceId);
 
         InkActionResult result = action.execute(playerSession);
-        if (action.getSide() == Side.SERVER) {
+        if (action.getSide() == Side.SERVER || action.getSide() == Side.CLIENT_SERVER) {
             if (result.isSingleOk()) {
                 action.setRunning(false);
             }
@@ -230,7 +230,7 @@ public final class InkTagHandler {
             } else {
                 action.setRunning(false);
             }
-            return result;
+            if (action.getSide() == Side.SERVER) return result;
         }
 
         boolean blocking = action.isBlocking();

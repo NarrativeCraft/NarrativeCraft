@@ -25,6 +25,7 @@
 - Can't play, stop or change locale to more than one player using command
 - Player joining server can see entities of player in a story
 - "user" variable name for a character not replaced by the player name playing the story
+- Gameplay tag not automatically show hud again
 
 ## Misc
 - Shows a sentence in chat when a story has finished
