@@ -27,6 +27,7 @@
 - "user" variable name for a character not replaced by the player name playing the story
 - Gameplay tag not automatically show hud again
 - Delta movement of dropped item in playback random and buggy
+- Interaction with item not recorded on neoforge (wrong event called)
 
 ## Misc
 - Shows a sentence in chat when a story has finished
