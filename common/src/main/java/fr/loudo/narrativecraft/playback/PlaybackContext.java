@@ -177,10 +177,13 @@ public class PlaybackContext implements IPlaybackContext {
                 return;
             }
             if (entity instanceof ItemEntity itemEntity) {
-                float f = level.getRandom().nextFloat() * 0.5F;
-                float angle = level.getRandom().nextFloat() * (float) (Math.PI * 2);
-                itemEntity.setDeltaMovement(-Math.sin(angle) * f, 0.2F, Math.cos(angle) * f);
-                level.addFreshEntity(entity);
+                Entity masterEntity = playback.getMasterEntity();
+                if (masterEntity instanceof ServerPlayer player) {
+                    entity = player.drop(itemEntity.getItem(), false, false);
+                    entity.setInvulnerable(true);
+                    entity.getTags().add(Playback.ENTITY_TAG);
+                    level.addFreshEntity(entity);
+                }
                 return;
             }
             level.addFreshEntity(entity);

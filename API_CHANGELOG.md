@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.1.0]
+## [3.1.0-beta]
 
 ### Features
 - `singleOK()` returned in `InkActionResult` to automatically stop any one shot ink action running in background
