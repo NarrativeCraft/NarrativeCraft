@@ -64,18 +64,17 @@ public class PlaybackContext implements IPlaybackContext {
     }
 
     public void init() {
+        if (entity != null) return;
         createEntity();
         spawned = false;
-        if (entity != null && recordingData.getSpawnTick() == 0) {
-            addEntityToWorld();
-            spawned = true;
-        }
     }
 
     public void start() {
         isPlaying = true;
+        executeFirstActions();
         if (entity != null && recordingData.getSpawnTick() == 0) {
-            executeFirstActions();
+            spawned = true;
+            addEntityToWorld();
         }
     }
 
