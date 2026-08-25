@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
@@ -116,6 +117,10 @@ public class ClientPacketHandlerNeoForge {
 
     public static void loadInteractionEditorData(S2CInteractionEditorData packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.loadInteractionEditorData(packet));
+    }
+
+    public static void interactionLeave(S2CInteractionLeave packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.interactionLeave(packet));
     }
 
     public static void runInkAction(S2CRunInkAction packet, IPayloadContext context) {

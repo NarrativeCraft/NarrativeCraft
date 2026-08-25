@@ -109,17 +109,19 @@ public class PressKeyListener {
 
     private static void handleInteractionPoints() {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (!(session.getEditor() instanceof ClientInteractionMakerEditorMaker interactionEditor)) return;
-        if (interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT) return;
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
-        for (InteractionPoint point : interactionEditor.getInteraction().getPoints()) {
-            if (point.isOneTimeClick() && session.hasClickedInteractionPoint(point.getId())) continue;
-            if (point.canSee(player) && point.canClick(player)) {
-                if (point.isOneTimeClick()) session.addClickedInteractionPoint(point.getId());
-                Services.PACKET.sendToServer(
-                        new C2SPlayStitchStory(point.getStitchName(), point.getId(), point.isOneTimeClick()));
-                return;
+        for (EditorMaker interactionSession : session.getInteractionSessions()) {
+            if (!(interactionSession instanceof ClientInteractionMakerEditorMaker interactionEditor)) continue;
+            if (interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT) continue;
+            for (InteractionPoint point : interactionEditor.getInteraction().getPoints()) {
+                if (point.isOneTimeClick() && session.hasClickedInteractionPoint(point.getId())) continue;
+                if (point.canSee(player) && point.canClick(player)) {
+                    if (point.isOneTimeClick()) session.addClickedInteractionPoint(point.getId());
+                    Services.PACKET.sendToServer(
+                            new C2SPlayStitchStory(point.getStitchName(), point.getId(), point.isOneTimeClick()));
+                    return;
+                }
             }
         }
     }

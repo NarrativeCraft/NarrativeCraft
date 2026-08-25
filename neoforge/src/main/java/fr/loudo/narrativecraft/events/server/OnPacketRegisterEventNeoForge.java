@@ -39,6 +39,7 @@ import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.*;
 import fr.loudo.narrativecraft.network.story.*;
 import net.neoforged.bus.api.IEventBus;
@@ -96,6 +97,10 @@ public class OnPacketRegisterEventNeoForge {
                 S2CInteractionEditorData.TYPE,
                 S2CInteractionEditorData.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::loadInteractionEditorData);
+        registrar.playToClient(
+                S2CInteractionLeave.TYPE,
+                S2CInteractionLeave.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::interactionLeave);
         registrar.playToClient(
                 S2CRunInkAction.TYPE, S2CRunInkAction.STREAM_CODEC, ClientPacketHandlerNeoForge::runInkAction);
         registrar.playToClient(
