@@ -9,6 +9,7 @@
     "ItemEntityMixin",
     "LivingEntityMixin",
     "ServerLevelMixin",
+    "ServerPlayerMixin",
     "accessor.AbstractBoatAccessor",
     "accessor.AbstractHorseAccessor",
     "accessor.AvatarAccessor",
