@@ -15,6 +15,7 @@
 - Re-use entity already in world close to first position of animation in story
 - Pre-compile story `/nc story reload (as_file)` - will be loaded in priority when the server/world start
 - Launch multiple interaction instead of one in the story
+- Return player to main screen when finished story (if available)
 
 ### Fixes
 - Dialog 2D scale not fixed based on gui scale
