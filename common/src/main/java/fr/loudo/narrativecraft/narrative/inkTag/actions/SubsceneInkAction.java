@@ -157,7 +157,7 @@ public class SubsceneInkAction extends InkAction {
 
             if (storyHandler != null && characterStory != null) {
                 Entity masterEntity = playback.getMasterEntity();
-                if (masterEntity != null && initialEntity != null && !masterEntity.is(initialEntity)) {
+                if (masterEntity != null && (initialEntity == null || !masterEntity.is(initialEntity))) {
                     storyHandler.registerEntity(characterStory, masterEntity);
                 }
             }
