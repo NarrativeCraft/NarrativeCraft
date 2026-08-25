@@ -77,6 +77,7 @@ public class NarrativeCraftMod {
     private CameraAngle mainScreenData;
 
     private String compiledStoryJson;
+    private String preCompiledStoryJson;
 
     private final NarrativeCraftFile file = new NarrativeCraftFile();
 
@@ -169,6 +170,14 @@ public class NarrativeCraftMod {
 
     public void setCompiledStoryJson(String compiledStoryJson) {
         this.compiledStoryJson = compiledStoryJson;
+    }
+
+    public String getPreCompiledStoryJson() {
+        return preCompiledStoryJson;
+    }
+
+    public void setPreCompiledStoryJson(String preCompiledStoryJson) {
+        this.preCompiledStoryJson = preCompiledStoryJson;
     }
 
     public boolean hasCompiledStory() {

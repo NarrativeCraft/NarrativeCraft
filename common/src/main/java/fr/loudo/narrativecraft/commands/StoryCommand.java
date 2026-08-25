@@ -56,7 +56,8 @@ public class StoryCommand {
                 .then(Commands.literal("story")
                         .then(Commands.literal("reload")
                                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
-                                .executes(StoryCommand::reload))
+                                .executes(context -> reload(context, false))
+                                .then(Commands.literal("as_file").executes(context -> reload(context, true))))
                         .then(Commands.literal("play")
                                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                                 .executes(ctx -> {
@@ -159,13 +160,16 @@ public class StoryCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int reload(CommandContext<CommandSourceStack> context) {
+    private static int reload(CommandContext<CommandSourceStack> context, boolean asFile) {
         context.getSource()
                 .sendSystemMessage(Translation.message("story.compiling").withStyle(ChatFormatting.YELLOW));
 
         String compiledStoryJson;
         try {
             compiledStoryJson = StoryCompilerHandler.compileToJson();
+            if (asFile) {
+                NarrativeCraftMod.getInstance().getFile().writeCompiledStory(compiledStoryJson);
+            }
         } catch (Exception exception) {
             context.getSource().sendSystemMessage(Component.empty());
             NarrativeCraftMod.LOGGER.error("Failed to compile story", exception);

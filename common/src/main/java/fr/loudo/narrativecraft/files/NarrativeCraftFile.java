@@ -34,10 +34,7 @@ import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 
 public class NarrativeCraftFile {
@@ -76,6 +73,22 @@ public class NarrativeCraftFile {
         }
     }
 
+    public void writeCompiledStory(String compiledStoryJson) throws IOException {
+        File compiledStory = getPrecompiledStoryFile();
+        if (!compiledStory.exists()) {
+            compiledStory.createNewFile();
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(compiledStory))) {
+            writer.write(compiledStoryJson);
+        }
+    }
+
+    public String getCompiledStoryContent() throws IOException {
+        File compiledStory = getPrecompiledStoryFile();
+        if (!compiledStory.exists()) return null;
+        return Files.readString(compiledStory.toPath());
+    }
+
     public DialogData getGlobalDialogData() {
         File dataFolder = init.getDataDirectory();
         File globalDialogFile = new File(dataFolder, NarrativeCraftFileInit.GLOBAL_DIALOG_DATA_NAME);
@@ -98,5 +111,9 @@ public class NarrativeCraftFile {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(globalDialogFile))) {
             new Gson().toJson(json, writer);
         }
+    }
+
+    public File getPrecompiledStoryFile() {
+        return new File(init.getMainDirectory(), NarrativeCraftFileDefault.COMPILED_STORY_FILE_NAME);
     }
 }
