@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.3.0]
+## [2.3.0-beta]
 
 ### Features
 - Timed choice
