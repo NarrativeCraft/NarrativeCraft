@@ -567,6 +567,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         finishedStory = true;
         save(false, false);
         stop();
+        UtilsServer.openMainScreenToPlayer(playerSession.getPlayer());
     }
 
     private String[] parseSpeaker(String text) {
