@@ -336,6 +336,16 @@ public class DialogSetupAdvancedPanel {
                 backgroundImageBox,
                 mouseX,
                 mouseY);
+        y = renderFieldRow(
+                graphics,
+                mc,
+                trans("screen.dialog_editor.advanced.letter_sound"),
+                contentX,
+                editBoxX,
+                y,
+                letterSoundBox,
+                mouseX,
+                mouseY);
         if (fieldSet == DialogFieldSet.ALL) {
             y = renderFieldRow(
                     graphics,
