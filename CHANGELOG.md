@@ -22,3 +22,4 @@
 - Can't play, stop story or change locale to more than one player using command
 - "user" variable name for a character not replaced by the player name playing the story
 - Default ground of entity to false
+- Gameplay tag not automatically show hud again

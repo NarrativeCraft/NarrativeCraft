@@ -52,5 +52,6 @@ public final class ClientInkActionRegister {
         dispatcher.register(ClientChoiceTimeInkAction.class, ClientChoiceTimeInkAction::new);
         dispatcher.register(ClientImageInkAction.class, ClientImageInkAction::new);
         dispatcher.register(ClientLockChoiceInkAction.class, ClientLockChoiceInkAction::new);
+        dispatcher.register(ClientGameplayInkAction.class, ClientGameplayInkAction::new);
     }
 }

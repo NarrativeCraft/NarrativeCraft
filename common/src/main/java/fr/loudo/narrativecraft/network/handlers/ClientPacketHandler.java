@@ -28,6 +28,7 @@ import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.NativeImage;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
@@ -249,8 +250,10 @@ public class ClientPacketHandler {
             return;
         }
 
-        action.execute(session);
-        session.addClientInkAction(action);
+        InkActionResult result = action.execute(session);
+        if (result.isOk()) {
+            session.addClientInkAction(action);
+        }
     }
 
     public static void storyLocales(S2CStoryLocales packet) {
