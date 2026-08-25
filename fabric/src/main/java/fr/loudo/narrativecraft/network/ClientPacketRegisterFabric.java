@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
@@ -61,6 +62,7 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay().register(S2CEnterCameraView.TYPE, S2CEnterCameraView.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CInteractionEditorData.TYPE, S2CInteractionEditorData.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CInteractionLeave.TYPE, S2CInteractionLeave.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CRunInkAction.TYPE, S2CRunInkAction.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CStopAllInkActions.TYPE, S2CStopAllInkActions.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CShowDialogue.TYPE, S2CShowDialogue.STREAM_CODEC);

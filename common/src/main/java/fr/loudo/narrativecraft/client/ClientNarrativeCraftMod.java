@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
+import java.util.UUID;
 
 public class ClientNarrativeCraftMod {
     private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
@@ -87,6 +88,16 @@ public class ClientNarrativeCraftMod {
         EditorMaker editorMaker = getPlayerSession().getEditor();
         if (!(editorMaker instanceof ClientInteractionMakerEditorMaker)) return null;
         return (ClientInteractionMakerEditorMaker) editorMaker;
+    }
+
+    public ClientInteractionMakerEditorMaker getInteractionMakerEditor(UUID interactionId) {
+        ClientInteractionMakerEditorMaker editorMaker = getInteractionMakerEditor();
+        if (editorMaker != null && editorMaker.getInteraction().getId().equals(interactionId)) {
+            return editorMaker;
+        }
+        EditorMaker interactionSession = getPlayerSession().getInteractionSession(interactionId);
+        if (!(interactionSession instanceof ClientInteractionMakerEditorMaker)) return null;
+        return (ClientInteractionMakerEditorMaker) interactionSession;
     }
 
     public InkTagDispatcherImpl getInkTagDispatcher() {

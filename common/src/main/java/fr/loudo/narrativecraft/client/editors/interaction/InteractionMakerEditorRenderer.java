@@ -62,10 +62,24 @@ public class InteractionMakerEditorRenderer {
     private static final Map<UUID, Float> pointAnimT = new HashMap<>();
 
     public static void render(SubmitNodeCollector collector, PoseStack poseStack, DeltaTracker deltaTracker) {
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editorMaker instanceof ClientInteractionMakerEditorMaker interactionEditor)) return;
+        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
+        if (session.getEditor() instanceof ClientInteractionMakerEditorMaker interactionEditor) {
+            renderInteraction(interactionEditor, collector, poseStack, deltaTracker);
+        }
+
+        for (EditorMaker interactionSession : session.getInteractionSessions()) {
+            if (interactionSession instanceof ClientInteractionMakerEditorMaker interactionEditor) {
+                renderInteraction(interactionEditor, collector, poseStack, deltaTracker);
+            }
+        }
+    }
+
+    private static void renderInteraction(
+            ClientInteractionMakerEditorMaker interactionEditor,
+            SubmitNodeCollector collector,
+            PoseStack poseStack,
+            DeltaTracker deltaTracker) {
         Minecraft minecraft = Minecraft.getInstance();
         Vec3 cameraPosition = minecraft.gameRenderer.mainCamera().position();
         Interaction interaction = interactionEditor.getInteraction();
@@ -90,7 +104,6 @@ public class InteractionMakerEditorRenderer {
 
         ClientPlayerSession clientSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
-
         for (InteractionPoint point : interaction.getPoints()) {
             Vec3 pointPosition = resolvePointPosition(point, interactionEditor);
             if (pointPosition == null) continue;

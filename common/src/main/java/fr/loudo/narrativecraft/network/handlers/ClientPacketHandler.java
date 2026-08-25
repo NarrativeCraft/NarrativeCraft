@@ -49,6 +49,7 @@ import fr.loudo.narrativecraft.dialog.*;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
@@ -67,6 +68,7 @@ import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
@@ -184,7 +186,7 @@ public class ClientPacketHandler {
 
     public static void loadInteractionEditorData(S2CInteractionEditorData packet) {
         ClientInteractionMakerEditorMaker editor =
-                ClientNarrativeCraftMod.getInstance().getInteractionMakerEditor();
+                ClientNarrativeCraftMod.getInstance().getInteractionMakerEditor(packet.getInteractionId());
         if (editor == null) return;
         editor.loadData(packet.getDataJson());
     }
@@ -499,9 +501,17 @@ public class ClientPacketHandler {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
         ClientInteractionMakerEditorMaker interactionEditor =
                 new ClientInteractionMakerEditorMaker(interaction, packet.getEnvironment());
+        if (packet.getEnvironment() == NarrativeEnvironment.PRODUCTION) {
+            session.addInteractionSession(interaction.getId(), interactionEditor);
+            return;
+        }
         interactionEditor.init();
         session.setEditor(interactionEditor);
         Minecraft.getInstance().gui.setScreen(null);
+    }
+
+    public static void interactionLeave(S2CInteractionLeave packet) {
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().removeInteractionSession(packet.getInteractionId());
     }
 
     public static void characterSkin(S2CCharacterSkin packet) {

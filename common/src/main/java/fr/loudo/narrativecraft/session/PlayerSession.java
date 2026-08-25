@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.network.BiEditorClose;
 import fr.loudo.narrativecraft.network.S2CEditorOpened;
 import fr.loudo.narrativecraft.network.S2CPlayerSession;
 import fr.loudo.narrativecraft.network.S2CSessionClear;
+import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +104,13 @@ public class PlayerSession extends AbstractPlayerSession {
             Services.PACKET.sendToPlayer(player, new BiEditorClose(editorSessionId));
         }
         editorSessionId = editorMaker == null ? BiEditorClose.UNIDENTIFIED_SESSION : nextEditorSessionId++;
+    }
+
+    @Override
+    public void removeInteractionSession(UUID interactionId) {
+        if (!interactionSessions.containsKey(interactionId)) return;
+        super.removeInteractionSession(interactionId);
+        Services.PACKET.sendToPlayer(player, new S2CInteractionLeave(interactionId));
     }
 
     public void openEditor(EditorMaker editorMaker) {
