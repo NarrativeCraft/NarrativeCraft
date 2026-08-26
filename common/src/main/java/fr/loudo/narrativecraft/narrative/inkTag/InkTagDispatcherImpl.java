@@ -31,7 +31,6 @@ import fr.loudo.narrativecraft.api.inkAction.syntax.CommandSpec;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.inkAction.syntax.SyntaxParser;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +101,7 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
             throws InkTagHandlerException {
         List<String> tokens;
         try {
-            tokens = tokenize(rawTag).stream().map(tokenLocalizer).toList();
+            tokens = TagTokenizer.tokenize(rawTag).stream().map(tokenLocalizer).toList();
         } catch (IllegalArgumentException e) {
             throw new InkTagHandlerException(e.getMessage(), e);
         }
@@ -146,89 +145,5 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
             return null;
         }
         return entry.factory().get();
-    }
-
-    private static boolean isQuote(char character) {
-        return character == '"' || character == '\'';
-    }
-
-    /** Strips everything from the first {@code //} not inside a quoted string. */
-    private static String stripComment(String rawTag) {
-        char openingQuote = 0;
-        for (int index = 0; index < rawTag.length(); index++) {
-            char character = rawTag.charAt(index);
-            if (character == '\\' && index + 1 < rawTag.length() && isQuote(rawTag.charAt(index + 1))) {
-                index++;
-            } else if (openingQuote != 0) {
-                if (character == openingQuote) {
-                    openingQuote = 0;
-                }
-            } else if (isQuote(character)) {
-                openingQuote = character;
-            } else if (character == '/' && index + 1 < rawTag.length() && rawTag.charAt(index + 1) == '/') {
-                return rawTag.substring(0, index).trim();
-            }
-        }
-        return rawTag;
-    }
-
-    /**
-     * Splits a raw tag into tokens, treating spans quoted with {@code "} or {@code '} as single
-     * tokens. Inside a span the other quote character is a plain character, and {@code \"} or
-     * {@code \'} yields the quote itself; any other backslash is kept as-is.
-     *
-     * @throws IllegalArgumentException if a quoted span is never closed
-     */
-    private static List<String> tokenize(String rawTag) {
-        String trimmed = stripComment(rawTag.trim());
-        if (trimmed.isEmpty()) return List.of();
-
-        List<String> tokens = new ArrayList<>();
-        StringBuilder currentToken = new StringBuilder();
-        boolean tokenStarted = false;
-        char openingQuote = 0;
-
-        for (int index = 0; index < trimmed.length(); index++) {
-            char character = trimmed.charAt(index);
-
-            if (character == '\\' && index + 1 < trimmed.length() && isQuote(trimmed.charAt(index + 1))) {
-                currentToken.append(trimmed.charAt(index + 1));
-                tokenStarted = true;
-                index++;
-
-            } else if (openingQuote != 0) {
-                if (character == openingQuote) {
-                    openingQuote = 0;
-                } else {
-                    currentToken.append(character);
-                }
-
-            } else if (isQuote(character)) {
-                openingQuote = character;
-                tokenStarted = true;
-
-            } else if (Character.isWhitespace(character)) {
-                if (tokenStarted) {
-                    tokens.add(currentToken.toString());
-                    currentToken.setLength(0);
-                    tokenStarted = false;
-                }
-
-            } else {
-                currentToken.append(character);
-                tokenStarted = true;
-            }
-        }
-
-        if (openingQuote != 0) {
-            throw new IllegalArgumentException("Unclosed " + openingQuote + " quote in tag '" + trimmed + "'. "
-                    + "Close it, or escape it as '\\" + openingQuote + "' to use it as a plain character.");
-        }
-
-        if (tokenStarted) {
-            tokens.add(currentToken.toString());
-        }
-
-        return List.copyOf(tokens);
     }
 }
