@@ -31,14 +31,11 @@ import fr.loudo.narrativecraft.api.inkAction.syntax.CommandSpec;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.inkAction.syntax.SyntaxParser;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 /**
@@ -102,7 +99,12 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
     @Nullable
     public DispatchResult dispatch(String rawTag, IScene scene, UnaryOperator<String> tokenLocalizer)
             throws InkTagHandlerException {
-        List<String> tokens = tokenize(rawTag).stream().map(tokenLocalizer).toList();
+        List<String> tokens;
+        try {
+            tokens = TagTokenizer.tokenize(rawTag).stream().map(tokenLocalizer).toList();
+        } catch (IllegalArgumentException e) {
+            throw new InkTagHandlerException(e.getMessage(), e);
+        }
         if (tokens.isEmpty()) return null;
 
         String keyword = tokens.get(0);
@@ -143,47 +145,5 @@ public final class InkTagDispatcherImpl implements InkTagDispatcher {
             return null;
         }
         return entry.factory().get();
-    }
-
-    /**
-     * Matches three token forms, in priority order:
-     * <ol>
-     *   <li>{@code name:"quoted value"} → named arg whose value may contain spaces</li>
-     *   <li>{@code "quoted value"}      → standalone positional value with spaces</li>
-     *   <li>{@code \S+}                 → regular whitespace-delimited token</li>
-     * </ol>
-     */
-    private static final Pattern TOKEN_PATTERN = Pattern.compile("(\\w+):\"([^\"]*)\"|\"([^\"]*)\"|([\\S]+)");
-
-    /** Strips everything from the first {@code //} not inside a quoted string. */
-    private static String stripComment(String s) {
-        boolean inQuote = false;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '"') {
-                inQuote = !inQuote;
-            } else if (!inQuote && c == '/' && i + 1 < s.length() && s.charAt(i + 1) == '/') {
-                return s.substring(0, i).trim();
-            }
-        }
-        return s;
-    }
-
-    /** Splits a raw tag into tokens, treating double-quoted spans as single tokens. */
-    private static List<String> tokenize(String rawTag) {
-        String trimmed = stripComment(rawTag.trim());
-        if (trimmed.isEmpty()) return List.of();
-        List<String> tokens = new ArrayList<>();
-        Matcher matcher = TOKEN_PATTERN.matcher(trimmed);
-        while (matcher.find()) {
-            if (matcher.group(1) != null) {
-                tokens.add(matcher.group(1) + ":" + matcher.group(2));
-            } else if (matcher.group(3) != null) {
-                tokens.add(matcher.group(3));
-            } else {
-                tokens.add(matcher.group(4));
-            }
-        }
-        return List.copyOf(tokens);
     }
 }
