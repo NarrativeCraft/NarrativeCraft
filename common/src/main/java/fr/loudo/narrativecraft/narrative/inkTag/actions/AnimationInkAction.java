@@ -153,16 +153,13 @@ public class AnimationInkAction extends InkAction {
                     .getCharacterEntities()
                     .get(animation.getCharacterStory().getName().toLowerCase());
             Entity masterEntity = playback.getMasterEntity();
-            if (masterEntity != null && (initialEntity == null || !masterEntity.is(initialEntity))) {
+            if (masterEntity != null && masterEntity != initialEntity) {
                 storyHandler.registerEntity(characterStory, masterEntity);
             }
         }
 
         if (blocking) {
             return InkActionResult.block();
-        }
-        if (!loop) {
-            return InkActionResult.singleOk();
         }
         return InkActionResult.ok();
     }
