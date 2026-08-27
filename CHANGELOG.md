@@ -7,3 +7,4 @@
 - Interaction with item not recorded on neoforge (wrong event called)
 - Quotes inside a quoted tag value breaking the parsing (e.g. a command tag holding SNBT/JSON)
 - Returning to main screen after story finished not correctly working
+- False positive error with minecraft command
