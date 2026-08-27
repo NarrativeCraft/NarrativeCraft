@@ -110,7 +110,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     public ClientCutsceneMakerEditorMaker(Cutscene cutscene, NarrativeEnvironment environment) {
         this.cutscene = cutscene;
         this.control = new CutsceneMakerEditorControl(15, 15);
-        this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getLastTick());
+        this.playback = new CutsceneEditorPlayback(editorLayers, playerSession, cutscene.getMaxTick());
         control.setPlaybackCallbacks(this::startPlayback, () -> {
             playback.pause();
             setPreviewRoll(0.0f);
@@ -172,6 +172,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
                 .build();
         buttons.add(addLayerButton);
         totalTick = cutscene.getMaxTick();
+        playback.setTotalTick(totalTick);
         zoomFactor = getMinZoomFactor();
         viewStartTick = 0f;
 
