@@ -217,6 +217,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         dialogVisible = false;
         choicesVisible = false;
         inkTagHandler.stopAll();
+        stopCurrentBobbing();
         dialogEntityBobbingMap.clear();
         characterEntities.forEach((s, entity) -> {
             entity.remove(Entity.RemovalReason.DISCARDED);
@@ -330,16 +331,11 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             }
 
             if (dialogVisible) {
-                dialogVisible = false;
-                Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+                closeDialog();
                 return;
             }
 
-            DialogEntityBobbing currentBobbing = dialogEntityBobbingMap.get(lastCharacterSpoke.toLowerCase());
-            if (currentBobbing != null) {
-                currentBobbing.reset();
-                dialogEntityBobbingMap.remove(lastCharacterSpoke.toLowerCase());
-            }
+            stopCurrentBobbing();
             List<Choice> choices = story.getCurrentChoices();
             if (!choices.isEmpty()) {
                 sendChoices(choices);
@@ -372,8 +368,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         currentLine = line;
         playerSession.setGameplayMode(false);
         if (needClose(line)) {
-            dialogVisible = false;
-            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+            closeDialog();
             step = Step.AWAIT_CLOSE;
             return true;
         }
@@ -400,6 +395,21 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         return false;
     }
 
+    private void closeDialog() {
+        dialogVisible = false;
+        stopCurrentBobbing();
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+    }
+
+    private void stopCurrentBobbing() {
+        if (currentSpeaker.isEmpty()) return;
+        DialogEntityBobbing currentBobbing = dialogEntityBobbingMap.get(currentSpeaker.toLowerCase());
+        if (currentBobbing != null) {
+            currentBobbing.reset();
+        }
+        currentSpeaker = "";
+    }
+
     private boolean needClose(Line line) {
         return dialogVisible && ((line.hasText() && speakerChanged(line.speaker())) || willTagsBlock(line.tags()));
     }
@@ -424,13 +434,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     private void pushDialogue(Line line) {
         String speaker = line.speaker();
-        currentSpeaker = line.speaker();
-        if (!lastCharacterSpoke.equals(speaker)) {
-            DialogEntityBobbing currentBobbing = dialogEntityBobbingMap.get(lastCharacterSpoke.toLowerCase());
-            if (currentBobbing != null) {
-                currentBobbing.reset();
-            }
+        if (!speaker.equalsIgnoreCase(currentSpeaker)) {
+            stopCurrentBobbing();
         }
+        currentSpeaker = speaker;
         String dialogueText = playerSession.localize(line.dialogueText());
 
         int entityId = S2CShowDialogue.NO_ENTITY;
@@ -485,7 +492,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void unregisterEntity(ICharacterStory characterStory, Entity entity) {
         characterEntities.remove(characterStory.getName().toLowerCase(), entity);
-        dialogEntityBobbingMap.remove(characterStory.getName().toLowerCase());
+        removeBobbing(characterStory.getName());
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new CharacterDespawnEvent(characterStory, playerSession.getScene()));
         }
@@ -493,9 +500,20 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void unregisterEntity(ICharacterStory characterStory) {
         characterEntities.remove(characterStory.getName().toLowerCase());
-        dialogEntityBobbingMap.remove(characterStory.getName().toLowerCase());
+        removeBobbing(characterStory.getName());
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new CharacterDespawnEvent(characterStory, playerSession.getScene()));
+        }
+    }
+
+    private void removeBobbing(String characterName) {
+        String name = characterName.toLowerCase();
+        DialogEntityBobbing bobbing = dialogEntityBobbingMap.remove(name);
+        if (bobbing != null) {
+            bobbing.reset();
+        }
+        if (currentSpeaker.equalsIgnoreCase(name)) {
+            currentSpeaker = "";
         }
     }
 
@@ -548,6 +566,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     public void triggerChangeScene() {
+        stopCurrentBobbing();
+        dialogEntityBobbingMap.clear();
         for (Entity entity : characterEntities.values()) {
             entity.remove(Entity.RemovalReason.KILLED);
         }
@@ -561,8 +581,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     public void finish() {
         if (dialogVisible) {
-            dialogVisible = false;
-            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+            closeDialog();
         }
         NarrativeCraftMod.LOGGER.info(
                 "Story finished for player {}.",
