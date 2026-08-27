@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.dialog;
 
+import fr.loudo.narrativecraft.utils.FakePlayer;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
@@ -68,6 +70,11 @@ public class DialogEntityBobbing {
         entity.setYRot(lastYRot + currentOffsetY);
         entity.setYHeadRot(lastYRot + currentOffsetY);
         entity.setXRot(lastXRot + currentOffsetX);
+        if (entity instanceof FakePlayer fakePlayer) {
+
+            fakePlayer.connection.send(
+                    new ClientboundRotateHeadPacket(entity, (byte) (lastYRot + currentOffsetY * 256 / 360)));
+        }
     }
 
     public float getNoiseShakeSpeed() {
