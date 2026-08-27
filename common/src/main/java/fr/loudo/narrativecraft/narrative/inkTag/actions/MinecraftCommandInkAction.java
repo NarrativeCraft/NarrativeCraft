@@ -115,7 +115,7 @@ public class MinecraftCommandInkAction extends InkAction {
             fakePlayer.level().getServer().getCommands().getDispatcher().execute(resolved, source);
             NarrativeCraftMod.LOGGER.info("CommandExec executed command {} from command tag", resolved);
         } catch (CommandSyntaxException e) {
-            return InkActionResult.error("Command execution failed: " + e.getMessage());
+            NarrativeCraftMod.LOGGER.warn("Command execution failed: ", e);
         }
         return InkActionResult.singleOk();
     }
