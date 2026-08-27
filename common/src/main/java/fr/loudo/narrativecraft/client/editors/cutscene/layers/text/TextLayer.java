@@ -91,7 +91,7 @@ public class TextLayer extends CutsceneLayer {
     private void executeKeyframe(TextKeyframe keyframe) {
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        InkTagDispatcherImpl dispatcher = NarrativeCraftMod.getInstance().getInkTagDispatcher();
+        InkTagDispatcherImpl dispatcher = ClientNarrativeCraftMod.getInstance().getInkTagDispatcher();
         List<TextInkAction> textInkActions =
                 executedText.computeIfAbsent(keyframe.getTick(), tick -> new ArrayList<>());
 
