@@ -178,7 +178,7 @@ jobs:
         run: |
           ICON_URL="https://raw.githubusercontent.com/NarrativeCraft/NarrativeCraft/refs/heads/${DEFAULT_BRANCH}/common/src/main/resources/narrativecraft.png"
           TIMESTAMP=$(date +%s)
-          ROLE_ID="1515653721621794968"
+          ROLE_ID="1542428563398197329"
 
           ACCENT_COLOR=13729047
 
