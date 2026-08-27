@@ -87,6 +87,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     private boolean dialogVisible;
     private boolean choicesVisible;
     private boolean ended = false;
+    private boolean stopped = false;
     private boolean finishedStory;
     private boolean loadedFromSave = false;
 
@@ -205,6 +206,8 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     public void stop() {
+        if (stopped) return;
+        stopped = true;
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new SceneEndEvent(playerSession, playerSession.getScene()));
         }
@@ -219,6 +222,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         characterEntities.forEach((s, entity) -> {
             entity.remove(Entity.RemovalReason.DISCARDED);
         });
+        characterEntities.clear();
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(),
                 new S2CCharacterStoryAction(UUID.randomUUID(), S2CCharacterStoryAction.Action.CLEAR));
@@ -557,7 +561,10 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
     }
 
     public void finish() {
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+        if (dialogVisible) {
+            dialogVisible = false;
+            Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CDialogStop());
+        }
         NarrativeCraftMod.LOGGER.info(
                 "Story finished for player {}.",
                 playerSession.getPlayer().getName().getString());
