@@ -46,8 +46,8 @@ public class DialogData {
     private float scale = 1f;
     private float letterSpacing = 0f;
     private float lineGap = 2f;
-    private float bobbingNoiseShakeSpeed = 2.9f;
-    private float bobbingNoiseShakeStrength = 2.15f;
+    private float bobbingNoiseShakeSpeed = 2.3f;
+    private float bobbingNoiseShakeStrength = 2.5f;
 
     private int backgroundColor = 0xCC000000;
     private int textColor = 0xFFFFFFFF;
