@@ -29,6 +29,7 @@
 - Delta movement of dropped item in playback random and buggy
 - Interaction with item not recorded on neoforge (wrong event called)
 - Quotes inside a quoted tag value breaking the parsing (e.g. a command tag holding SNBT/JSON)
+- False positive error with minecraft command
 
 ## Misc
 - Shows a sentence in chat when a story has finished
