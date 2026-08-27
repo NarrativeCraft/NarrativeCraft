@@ -37,14 +37,10 @@ public class DialogEntityBobbing {
     private final SimplexNoise noise;
     private float noiseI = 0.0f;
 
-    private float lastXRot;
-    private float lastYRot;
+    private float appliedOffsetXRot;
+    private float appliedOffsetYRot;
 
     public DialogEntityBobbing(Entity entity, float noiseShakeSpeed, float noiseShakeStrength) {
-        if (entity != null) {
-            lastXRot = entity.getXRot();
-            lastYRot = entity.getYRot();
-        }
         this.entity = entity;
         noise = new SimplexNoise(RandomSource.create());
         this.noiseShakeSpeed = noiseShakeSpeed;
@@ -53,21 +49,35 @@ public class DialogEntityBobbing {
 
     public void reset() {
         if (entity == null) return;
-        entity.setYRot(lastYRot);
-        entity.setYHeadRot(lastYRot);
-        entity.setXRot(lastXRot);
+        applyOffset(0.0f, 0.0f);
     }
 
     public void tick() {
         if (entity == null) return;
+        if (noiseShakeSpeed == 0.0f && noiseShakeStrength == 0.0f) {
+            reset();
+            return;
+        }
         noiseI += (1.0f / 20.0f) * noiseShakeSpeed;
 
-        float currentOffsetX = (float) noise.getValue(1, noiseI) * noiseShakeStrength;
-        float currentOffsetY = (float) noise.getValue(100, noiseI) * noiseShakeStrength;
+        float currentOffsetXRot = (float) noise.getValue(1, noiseI) * noiseShakeStrength;
+        float currentOffsetYRot = (float) noise.getValue(100, noiseI) * noiseShakeStrength;
 
-        entity.setYRot(lastYRot + currentOffsetY);
-        entity.setYHeadRot(lastYRot + currentOffsetY);
-        entity.setXRot(lastXRot + currentOffsetX);
+        applyOffset(currentOffsetXRot, currentOffsetYRot);
+    }
+
+    private void applyOffset(float offsetXRot, float offsetYRot) {
+        if (offsetXRot == appliedOffsetXRot && offsetYRot == appliedOffsetYRot) return;
+
+        float deltaXRot = offsetXRot - appliedOffsetXRot;
+        float deltaYRot = offsetYRot - appliedOffsetYRot;
+
+        entity.setYRot(entity.getYRot() + deltaYRot);
+        entity.setYHeadRot(entity.getYHeadRot() + deltaYRot);
+        entity.setXRot(entity.getXRot() + deltaXRot);
+
+        appliedOffsetXRot = offsetXRot;
+        appliedOffsetYRot = offsetYRot;
     }
 
     public float getNoiseShakeSpeed() {
