@@ -106,12 +106,12 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         totalTick = cutscene.getMaxTick();
         teleportToEditorOrigin();
 
-        if (cutscene.getEditorLayers() != null && !cutscene.getEditorLayers().isEmpty()) {
-            String layersJson = CutsceneSerializer.serializeLayers(cutscene.getEditorLayers());
-            Services.PACKET.sendToPlayer(
-                    playerSession.getPlayer(),
-                    new S2CCutsceneEditorData(cutscene.getId(), layersJson, cutscene.getManualMaxTick()));
-        }
+        List<CutsceneMakerEditorLayer> editorLayers = cutscene.getEditorLayers();
+        String layersJson =
+                CutsceneSerializer.serializeLayers(editorLayers == null ? Collections.emptyList() : editorLayers);
+        Services.PACKET.sendToPlayer(
+                playerSession.getPlayer(),
+                new S2CCutsceneEditorData(cutscene.getId(), layersJson, cutscene.getManualMaxTick()));
         lastKeyframeTick = cutscene.getLastTick();
     }
 
@@ -122,7 +122,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         if (!playbacks.isEmpty()) {
             Playback playback = playbacks.get(0);
             position = playback.getFirstPosition();
-        } else {
+        } else if (cutscene.getEditorLayers() != null) {
             for (CutsceneMakerEditorLayer editorLayer : cutscene.getEditorLayers()) {
                 ICutsceneLayer layer = editorLayer.getLayer();
                 if (layer instanceof CameraLayer cameraLayer) {
