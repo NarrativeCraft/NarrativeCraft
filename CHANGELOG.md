@@ -4,3 +4,4 @@
 
 ### Fixes
 - Returning to main screen after story finished not correctly working
+- False positive error with minecraft command
