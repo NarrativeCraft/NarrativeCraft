@@ -21,33 +21,19 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.signals;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.api.signals.Signal;
-import fr.loudo.narrativecraft.api.signals.SignalType;
-import fr.loudo.narrativecraft.api.utils.Side;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.Entity;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.signals.SignalPlayerRespawn;
+import net.minecraft.server.level.ServerPlayer;
 
-public class SignalPlayerAttackEntity extends Signal {
+public class OnPlayerRespawnEvent {
 
-    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_attack_entity", 5, Side.SERVER);
-
-    public SignalPlayerAttackEntity(Entity entity) {
-        BlockPos attackPosition = entity.blockPosition();
-        registerStringArgument(
-                "entity_id",
-                BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
-        registerStringArgument(
-                "entity_name", entity.getDisplayName().getString().toLowerCase());
-        registerIntArgument("x", attackPosition.getX());
-        registerIntArgument("y", attackPosition.getY());
-        registerIntArgument("z", attackPosition.getZ());
+    public static void onPlayerRespawn(ServerPlayer player) {
+        handleSignal(player);
     }
 
-    @Override
-    public SignalType getSignalType() {
-        return SIGNAL_TYPE;
+    private static void handleSignal(ServerPlayer player) {
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerRespawn(), player);
     }
 }

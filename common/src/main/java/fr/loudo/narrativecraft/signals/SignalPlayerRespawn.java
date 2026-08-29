@@ -26,25 +26,10 @@ package fr.loudo.narrativecraft.signals;
 import fr.loudo.narrativecraft.api.signals.Signal;
 import fr.loudo.narrativecraft.api.signals.SignalType;
 import fr.loudo.narrativecraft.api.utils.Side;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.Entity;
 
-public class SignalPlayerAttackEntity extends Signal {
+public class SignalPlayerRespawn extends Signal {
 
-    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_attack_entity", 5, Side.SERVER);
-
-    public SignalPlayerAttackEntity(Entity entity) {
-        BlockPos attackPosition = entity.blockPosition();
-        registerStringArgument(
-                "entity_id",
-                BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
-        registerStringArgument(
-                "entity_name", entity.getDisplayName().getString().toLowerCase());
-        registerIntArgument("x", attackPosition.getX());
-        registerIntArgument("y", attackPosition.getY());
-        registerIntArgument("z", attackPosition.getZ());
-    }
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_respawn", 0, Side.SERVER);
 
     @Override
     public SignalType getSignalType() {
