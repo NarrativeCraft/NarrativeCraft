@@ -114,6 +114,7 @@ public class PressKeyListener {
         for (EditorMaker interactionSession : session.getInteractionSessions()) {
             if (!(interactionSession instanceof ClientInteractionMakerEditorMaker interactionEditor)) continue;
             if (interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT) continue;
+            if (interactionEditor.getEnvironment() == NarrativeEnvironment.PRODUCTION && session.inCamera()) continue;
             for (InteractionPoint point : interactionEditor.getInteraction().getPoints()) {
                 if (point.isOneTimeClick() && session.hasClickedInteractionPoint(point.getId())) continue;
                 if (point.canSee(player) && point.canClick(player)) {

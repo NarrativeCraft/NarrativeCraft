@@ -1,6 +1,10 @@
 # Changelog
 
-## [2.3.0-beta.4]
+## [2.3.0-beta.5]
 
-### Fixes
-- Dialog bobbing
+### Feature
+- Signals (with a bunch of events)
+
+### Fix
+
+- Still can see interaction point and interact if not in gameplay

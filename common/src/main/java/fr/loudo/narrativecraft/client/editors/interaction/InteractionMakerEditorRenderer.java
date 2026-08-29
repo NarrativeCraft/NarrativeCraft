@@ -79,6 +79,8 @@ public class InteractionMakerEditorRenderer {
         Vec3 cameraPosition = minecraft.gameRenderer.getMainCamera().getPosition();
         Interaction interaction = interactionEditor.getInteraction();
         boolean isDev = interactionEditor.getEnvironment() == NarrativeEnvironment.DEVELOPMENT;
+        if (!isDev && ClientNarrativeCraftMod.getInstance().getPlayerSession().inCamera()) return;
+
         float deltaSeconds = Minecraft.getInstance().getDeltaFrameTime() / 20.0f;
 
         RenderSystem.lineWidth(4.0f);
