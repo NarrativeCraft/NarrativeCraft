@@ -21,30 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import com.mojang.blaze3d.platform.InputConstants;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.signals.SignalKeyboardPressed;
+import net.minecraft.client.input.KeyEvent;
 
-public class OnAttackEvent {
+public class OnKeyInputEvent {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
+    public static void keyInputEvent(KeyEvent keyEvent) {
+        handleSignal(keyEvent);
     }
 
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
-
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+    private static void handleSignal(KeyEvent keyEvent) {
+        InputConstants.Key key = InputConstants.getKey(keyEvent);
+        ClientNarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalKeyboardPressed(key));
     }
 }

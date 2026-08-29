@@ -21,30 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.signals;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class OnAttackEvent {
+public class SignalPlayerRightClickBlock extends Signal {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_right_click_block", 4, Side.SERVER);
+
+    public SignalPlayerRightClickBlock(BlockState blockState, BlockPos position) {
+        registerStringArgument(
+                "block_id",
+                BuiltInRegistries.ITEM.getKey(blockState.getBlock().asItem()).toString());
+        registerIntArgument("x", position.getX());
+        registerIntArgument("y", position.getY());
+        registerIntArgument("z", position.getZ());
     }
 
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
-
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }

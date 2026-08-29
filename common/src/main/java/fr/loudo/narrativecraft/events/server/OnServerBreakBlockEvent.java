@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.BreakBlockAction;
 import fr.loudo.narrativecraft.recording.actions.SilentPlaceBlockAction;
+import fr.loudo.narrativecraft.signals.SignalPlayerBreakBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,6 +41,17 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 public class OnServerBreakBlockEvent {
 
     public static void onBreakEvent(BlockState blockState, BlockPos blockPos, ServerPlayer player) {
+        handleSignal(blockState, blockPos, player);
+        handleRecording(blockState, blockPos, player);
+    }
+
+    private static void handleSignal(BlockState blockState, BlockPos blockPos, ServerPlayer player) {
+        NarrativeCraftMod.getInstance()
+                .getSignalEmitter()
+                .emit(new SignalPlayerBreakBlock(blockState, blockPos), player);
+    }
+
+    private static void handleRecording(BlockState blockState, BlockPos blockPos, ServerPlayer player) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (data == null) return;

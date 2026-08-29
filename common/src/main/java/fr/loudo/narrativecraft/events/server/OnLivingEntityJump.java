@@ -24,27 +24,19 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
+import fr.loudo.narrativecraft.signals.SignalPlayerJump;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
-public class OnAttackEvent {
+public class OnLivingEntityJump {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
+    public static void livingEntityJump(LivingEntity entity) {
+        handleSignal(entity);
     }
 
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
+    private static void handleSignal(LivingEntity entity) {
+        if (!(entity instanceof ServerPlayer player)) return;
 
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerJump(), player);
     }
 }

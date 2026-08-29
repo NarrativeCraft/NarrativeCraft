@@ -25,9 +25,11 @@ package fr.loudo.narrativecraft.utils;
 
 import com.mojang.blaze3d.platform.Window;
 import fr.loudo.narrativecraft.client.screens.NarrativeEntryListScreen;
+import java.util.Locale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
@@ -45,6 +47,14 @@ public class UtilsClient {
         if (minecraft.gui.screen() instanceof NarrativeEntryListScreen<?> screen) {
             screen.reload();
         }
+    }
+
+    public static String getScreenId(Screen screen) {
+        String screenName = screen.getClass().getSimpleName();
+        if (screenName.isEmpty()) {
+            screenName = screen.getClass().getName();
+        }
+        return screenName.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toLowerCase(Locale.ROOT);
     }
 
     public static int[] getScaledMousePos() {

@@ -21,30 +21,32 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import com.mojang.blaze3d.platform.NativeImage;
+import fr.loudo.narrativecraft.events.client.OnScreenshotEvent;
+import java.util.function.Consumer;
+import net.minecraft.client.Screenshot;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-public class OnAttackEvent {
+@Mixin(Screenshot.class)
+public class ScreenshotMixinFabric {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
-    }
-
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
-
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+    @ModifyArg(
+            method =
+                    "grab(Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/Screenshot;takeScreenshot(Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V"),
+            index = 2)
+    private static Consumer<NativeImage> narrativecraft$onScreenshotTaken(Consumer<NativeImage> callback) {
+        return image -> {
+            OnScreenshotEvent.onScreenshot();
+            callback.accept(image);
+        };
     }
 }

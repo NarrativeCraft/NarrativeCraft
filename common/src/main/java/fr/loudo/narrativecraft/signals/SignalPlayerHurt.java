@@ -21,30 +21,35 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.signals;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 
-public class OnAttackEvent {
+public class SignalPlayerHurt extends Signal {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_hurt", 3, Side.SERVER);
+
+    public SignalPlayerHurt(DamageSource damageSource) {
+        Entity attacker = damageSource.getEntity();
+        registerStringArgument("damage_id", damageSource.getMsgId());
+        registerStringArgument(
+                "attacker_id",
+                attacker == null
+                        ? ""
+                        : BuiltInRegistries.ENTITY_TYPE
+                                .getKey(attacker.getType())
+                                .toString());
+        registerStringArgument(
+                "attacker_name", attacker == null ? "" : attacker.getName().getString());
     }
 
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
-
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }

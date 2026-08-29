@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.input.CharacterEvent;
@@ -35,6 +36,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(KeyboardHandler.class)
 public class KeyboardHandlerMixinFabric {
 
+    @Inject(method = "keyPress", at = @At("RETURN"))
+    private void narrativecraft$onInputKeyPressed(long handle, int action, KeyEvent event, CallbackInfo ci) {
+        OnKeyInputEvent.keyInputEvent(event);
+    }
+
     @Inject(
             method = "keyPress",
             at =
@@ -43,7 +49,9 @@ public class KeyboardHandlerMixinFabric {
                             target =
                                     "Lnet/minecraft/client/gui/screens/Screen;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z"))
     private void narrativecraft$onKeyPressed(long handle, int action, KeyEvent event, CallbackInfo ci) {
-        OnScreenKeyEvent.onKeyPressed(event);
+        if (action == 1) {
+            OnScreenKeyEvent.onKeyPressed(event);
+        }
     }
 
     @Inject(

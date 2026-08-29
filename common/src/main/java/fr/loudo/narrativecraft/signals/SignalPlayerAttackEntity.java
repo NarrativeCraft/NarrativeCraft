@@ -21,30 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.signals;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 
-public class OnAttackEvent {
+public class SignalPlayerAttackEntity extends Signal {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_attack_entity", 5, Side.SERVER);
+
+    public SignalPlayerAttackEntity(Entity entity) {
+        BlockPos attackPosition = entity.blockPosition();
+        registerStringArgument(
+                "entity_id",
+                BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
+        registerStringArgument(
+                "entity_name",
+                entity.getCustomName() == null ? "" : entity.getCustomName().getString());
+        registerIntArgument("x", attackPosition.getX());
+        registerIntArgument("y", attackPosition.getY());
+        registerIntArgument("z", attackPosition.getZ());
     }
 
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
-
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }

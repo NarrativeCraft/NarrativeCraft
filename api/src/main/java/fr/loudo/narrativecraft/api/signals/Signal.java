@@ -36,6 +36,9 @@ public abstract class Signal {
                     "Signal '%s' as already '%s' argument registered!",
                     this.getClass().getSimpleName(), argumentValue.toLowerCase()));
         }
+        if (argumentValue == null) {
+            argumentValue = "";
+        }
         arguments.add(new SignalArgument(argumentName, argumentValue, type));
     }
 
@@ -72,10 +75,6 @@ public abstract class Signal {
         if (signalType == null) {
             throw new IllegalStateException(String.format(
                     "Signal '%s' as no signal type!", this.getClass().getSimpleName()));
-        }
-        if (arguments.isEmpty()) {
-            throw new IllegalStateException(
-                    String.format("Signal '%s' as no arguments registered!", signalType.eventName()));
         }
         if (arguments.size() != signalType.argumentCount()) {
             throw new IllegalStateException(String.format(

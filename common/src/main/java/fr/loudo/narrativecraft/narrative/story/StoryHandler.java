@@ -56,6 +56,8 @@ import fr.loudo.narrativecraft.network.S2CRenderSaveIcon;
 import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.signals.SignalCharacterDespawn;
+import fr.loudo.narrativecraft.signals.SignalCharacterSpawn;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.*;
@@ -511,6 +513,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new CharacterSpawnEvent(characterStory, playerSession.getScene()));
         }
+        NarrativeCraftMod.getInstance()
+                .getSignalEmitter()
+                .emit(new SignalCharacterSpawn(characterStory), playerSession.getPlayer());
     }
 
     public void unregisterEntity(ICharacterStory characterStory, Entity entity) {
@@ -519,6 +524,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new CharacterDespawnEvent(characterStory, playerSession.getScene()));
         }
+        NarrativeCraftMod.getInstance()
+                .getSignalEmitter()
+                .emit(new SignalCharacterDespawn(characterStory), playerSession.getPlayer());
     }
 
     public void unregisterEntity(ICharacterStory characterStory) {
@@ -527,6 +535,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         if (playerSession.getScene() != null) {
             NarrativeCraftMod.EVENT_BUS.post(new CharacterDespawnEvent(characterStory, playerSession.getScene()));
         }
+        NarrativeCraftMod.getInstance()
+                .getSignalEmitter()
+                .emit(new SignalCharacterDespawn(characterStory), playerSession.getPlayer());
     }
 
     private void removeBobbing(String characterName) {

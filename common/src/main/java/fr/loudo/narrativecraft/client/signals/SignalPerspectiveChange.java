@@ -21,30 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.client.signals;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
+import java.util.Locale;
+import net.minecraft.client.CameraType;
 
-public class OnAttackEvent {
+public class SignalPerspectiveChange extends Signal {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_perspective_change", 1, Side.CLIENT);
+
+    public SignalPerspectiveChange(CameraType cameraType) {
+        registerStringArgument("perspective", cameraType.name().toLowerCase(Locale.ROOT));
     }
 
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
-
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }

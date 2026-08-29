@@ -21,30 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.signals;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.api.signals.Signal;
-import fr.loudo.narrativecraft.api.signals.SignalType;
-import fr.loudo.narrativecraft.api.utils.Side;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.level.block.state.BlockState;
+import fr.loudo.narrativecraft.events.server.OnLivingEntityJump;
+import net.minecraft.world.entity.LivingEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class SignalPlaceBlock extends Signal {
+@Mixin(LivingEntity.class)
+public class LivingEntityMixinFabric {
 
-    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_place_block", 4, Side.SERVER);
-
-    public SignalPlaceBlock(BlockState blockState, BlockPos position) {
-        registerStringArgument(
-                "block_id",
-                BuiltInRegistries.ITEM.getKey(blockState.getBlock().asItem()).toString());
-        registerIntArgument("x", position.getX());
-        registerIntArgument("y", position.getY());
-        registerIntArgument("z", position.getZ());
-    }
-
-    @Override
-    public SignalType getSignalType() {
-        return SIGNAL_TYPE;
+    @Inject(method = "jumpFromGround", at = @At("RETURN"))
+    private void narrativecraft$jumpEvent(CallbackInfo ci) {
+        OnLivingEntityJump.livingEntityJump((LivingEntity) (Object) this);
     }
 }

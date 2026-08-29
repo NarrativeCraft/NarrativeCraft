@@ -21,30 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events.server;
+package fr.loudo.narrativecraft.client.signals;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
+import fr.loudo.narrativecraft.utils.UtilsClient;
+import net.minecraft.client.gui.screens.Screen;
 
-public class OnAttackEvent {
+public class SignalScreenOpen extends Signal {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_screen_open", 1, Side.CLIENT);
+
+    public SignalScreenOpen(Screen screen) {
+        registerStringArgument("screen_id", UtilsClient.getScreenId(screen));
     }
 
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
-
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }

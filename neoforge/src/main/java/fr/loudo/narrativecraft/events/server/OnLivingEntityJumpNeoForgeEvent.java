@@ -24,27 +24,19 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.recording.RecordingEntityData;
-import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
 
-public class OnAttackEvent {
+@Mod(NarrativeCraftMod.MOD_ID)
+public class OnLivingEntityJumpNeoForgeEvent {
 
-    public static void onAttack(ServerPlayer player, Entity entity) {
-        handleSignal(player, entity);
-        handleRecording(entity);
+    public OnLivingEntityJumpNeoForgeEvent(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(OnLivingEntityJumpNeoForgeEvent::onLivingEntityJump);
     }
 
-    private static void handleSignal(ServerPlayer player, Entity entity) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
-    }
-
-    private static void handleRecording(Entity entity) {
-        RecordingEntityData data =
-                NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
-        if (data == null) return;
-
-        data.markAsTracked();
+    private static void onLivingEntityJump(LivingEvent.LivingJumpEvent event) {
+        OnLivingEntityJump.livingEntityJump(event.getEntity());
     }
 }

@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.signals;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.signals.Signal;
 import fr.loudo.narrativecraft.api.signals.SignalEmitter;
+import fr.loudo.narrativecraft.api.utils.Side;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,6 +43,11 @@ public class SignalEmitterImpl implements SignalEmitter {
         if (storyHandler == null) return;
 
         signal.emitOrThrow();
+        if (signal.getSignalType().side() != Side.SERVER) {
+            throw new IllegalStateException(String.format(
+                    "Signal '%s' must be emitted on server side.",
+                    signal.getSignalType().eventName().toLowerCase()));
+        }
 
         if (!NarrativeCraftMod.getInstance().getSignalRegistry().isRegistered(signal.getSignalType())) {
             throw new IllegalStateException(String.format(

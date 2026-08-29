@@ -27,14 +27,36 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.RightClickBlockAction;
 import fr.loudo.narrativecraft.recording.actions.UseItemOnBlockAction;
+import fr.loudo.narrativecraft.signals.SignalPlayerRightClickBlock;
+import fr.loudo.narrativecraft.signals.SignalPlayerUseItemOnBlock;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class OnRightClickBlockEvent {
 
     public static void rightClickBlock(ServerPlayer player, InteractionHand hand, BlockHitResult hitResult) {
+        handleSignal(player, hand, hitResult);
+        handleRecording(player, hand, hitResult);
+    }
+
+    private static void handleSignal(ServerPlayer player, InteractionHand hand, BlockHitResult hitResult) {
+        BlockState state = player.level().getBlockState(hitResult.getBlockPos());
+        NarrativeCraftMod.getInstance()
+                .getSignalEmitter()
+                .emit(new SignalPlayerRightClickBlock(state, hitResult.getBlockPos()), player);
+
+        ItemStack itemStack = player.getItemInHand(hand);
+        if (itemStack.isEmpty()) return;
+
+        NarrativeCraftMod.getInstance()
+                .getSignalEmitter()
+                .emit(new SignalPlayerUseItemOnBlock(itemStack, state, hitResult.getBlockPos()), player);
+    }
+
+    private static void handleRecording(ServerPlayer player, InteractionHand hand, BlockHitResult hitResult) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (data == null) return;

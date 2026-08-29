@@ -42,6 +42,8 @@ import net.minecraft.client.Minecraft;
 public class OnClientTickEvent {
 
     public static void tick(Minecraft minecraft) {
+        ClientNarrativeCraftMod.getInstance().getPlayerStateSignalWatcher().tick(minecraft);
+
         if (Minecraft.getInstance().isPaused()) return;
 
         PressKeyListener.onKeyPressed(minecraft);
