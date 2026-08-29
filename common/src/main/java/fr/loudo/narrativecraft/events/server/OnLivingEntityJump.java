@@ -21,29 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.events.server;
 
-import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
-import net.minecraft.client.KeyboardHandler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.signals.SignalPlayerJump;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 
-@Mixin(KeyboardHandler.class)
-public class KeyboardHandlerMixinFabric {
+public class OnLivingEntityJump {
 
-    @Inject(method = "charTyped", at = @At("HEAD"))
-    private void narrativecraft$keyboardHandler(long windowPointer, int codePoint, int modifiers, CallbackInfo ci) {
-        OnScreenKeyEvent.onCharTyped(Character.toChars(codePoint)[0], modifiers);
+    public static void livingEntityJump(LivingEntity entity) {
+        handleSignal(entity);
     }
 
-    @Inject(method = "keyPress", at = @At("RETURN"))
-    private void narrativecraft$onInputKeyPressed(
-            long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (action == 1) {
-            OnKeyInputEvent.keyInputEvent(key, scancode);
-        }
+    private static void handleSignal(LivingEntity entity) {
+        if (!(entity instanceof ServerPlayer player)) return;
+
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerJump(), player);
     }
 }

@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -38,6 +39,7 @@ public class OnAttackEventNeoForge {
 
     private static void onHurt(AttackEntityEvent event) {
         if (event.getEntity().level().isClientSide()) return;
-        OnAttackEvent.onAttack(event.getEntity());
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        OnAttackEvent.onAttack(player, event.getTarget());
     }
 }

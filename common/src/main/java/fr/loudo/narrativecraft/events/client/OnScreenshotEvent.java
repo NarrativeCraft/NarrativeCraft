@@ -21,29 +21,18 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
-import net.minecraft.client.KeyboardHandler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.signals.SignalScreenshotTaken;
 
-@Mixin(KeyboardHandler.class)
-public class KeyboardHandlerMixinFabric {
+public class OnScreenshotEvent {
 
-    @Inject(method = "charTyped", at = @At("HEAD"))
-    private void narrativecraft$keyboardHandler(long windowPointer, int codePoint, int modifiers, CallbackInfo ci) {
-        OnScreenKeyEvent.onCharTyped(Character.toChars(codePoint)[0], modifiers);
+    public static void onScreenshot() {
+        handleSignal();
     }
 
-    @Inject(method = "keyPress", at = @At("RETURN"))
-    private void narrativecraft$onInputKeyPressed(
-            long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (action == 1) {
-            OnKeyInputEvent.keyInputEvent(key, scancode);
-        }
+    private static void handleSignal() {
+        ClientNarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalScreenshotTaken());
     }
 }

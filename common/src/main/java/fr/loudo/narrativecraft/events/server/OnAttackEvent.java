@@ -25,11 +25,22 @@ package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
+import fr.loudo.narrativecraft.signals.SignalPlayerAttackEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
 public class OnAttackEvent {
 
-    public static void onAttack(Entity entity) {
+    public static void onAttack(ServerPlayer player, Entity entity) {
+        handleSignal(player, entity);
+        handleRecording(entity);
+    }
+
+    private static void handleSignal(ServerPlayer player, Entity entity) {
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerAttackEntity(entity), player);
+    }
+
+    private static void handleRecording(Entity entity) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
         if (data == null) return;

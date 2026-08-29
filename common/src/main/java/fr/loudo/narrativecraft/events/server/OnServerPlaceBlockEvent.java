@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.PlaceBlockAction;
 import fr.loudo.narrativecraft.recording.actions.SilentPlaceBlockAction;
-import fr.loudo.narrativecraft.signals.SignalPlaceBlock;
+import fr.loudo.narrativecraft.signals.SignalPlayerPlaceBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,7 +43,7 @@ public class OnServerPlaceBlockEvent {
     }
 
     private static void handleSignal(BlockState state, BlockPos clickedPos, ServerPlayer player) {
-        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlaceBlock(state, clickedPos), player);
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerPlaceBlock(state, clickedPos), player);
     }
 
     private static void handleRecordingPlace(BlockState state, BlockPos clickedPos, ServerPlayer player) {

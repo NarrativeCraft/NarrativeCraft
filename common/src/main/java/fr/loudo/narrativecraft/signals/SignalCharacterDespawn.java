@@ -21,29 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.signals;
 
-import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
-import net.minecraft.client.KeyboardHandler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
 
-@Mixin(KeyboardHandler.class)
-public class KeyboardHandlerMixinFabric {
+public class SignalCharacterDespawn extends Signal {
 
-    @Inject(method = "charTyped", at = @At("HEAD"))
-    private void narrativecraft$keyboardHandler(long windowPointer, int codePoint, int modifiers, CallbackInfo ci) {
-        OnScreenKeyEvent.onCharTyped(Character.toChars(codePoint)[0], modifiers);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_character_despawn", 1, Side.SERVER);
+
+    public SignalCharacterDespawn(ICharacter character) {
+        registerStringArgument("character_name", character.getName());
     }
 
-    @Inject(method = "keyPress", at = @At("RETURN"))
-    private void narrativecraft$onInputKeyPressed(
-            long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (action == 1) {
-            OnKeyInputEvent.keyInputEvent(key, scancode);
-        }
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }

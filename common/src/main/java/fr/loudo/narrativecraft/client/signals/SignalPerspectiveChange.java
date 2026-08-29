@@ -21,29 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.client.signals;
 
-import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
-import net.minecraft.client.KeyboardHandler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
+import java.util.Locale;
+import net.minecraft.client.CameraType;
 
-@Mixin(KeyboardHandler.class)
-public class KeyboardHandlerMixinFabric {
+public class SignalPerspectiveChange extends Signal {
 
-    @Inject(method = "charTyped", at = @At("HEAD"))
-    private void narrativecraft$keyboardHandler(long windowPointer, int codePoint, int modifiers, CallbackInfo ci) {
-        OnScreenKeyEvent.onCharTyped(Character.toChars(codePoint)[0], modifiers);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_perspective_change", 1, Side.CLIENT);
+
+    public SignalPerspectiveChange(CameraType cameraType) {
+        registerStringArgument("perspective", cameraType.name().toLowerCase(Locale.ROOT));
     }
 
-    @Inject(method = "keyPress", at = @At("RETURN"))
-    private void narrativecraft$onInputKeyPressed(
-            long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (action == 1) {
-            OnKeyInputEvent.keyInputEvent(key, scancode);
-        }
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }

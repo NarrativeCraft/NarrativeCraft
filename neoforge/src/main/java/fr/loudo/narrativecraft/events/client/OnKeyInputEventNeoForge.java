@@ -21,29 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
-import net.minecraft.client.KeyboardHandler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
-@Mixin(KeyboardHandler.class)
-public class KeyboardHandlerMixinFabric {
+@Mod(value = NarrativeCraftMod.MOD_ID, dist = Dist.CLIENT)
+public class OnKeyInputEventNeoForge {
 
-    @Inject(method = "charTyped", at = @At("HEAD"))
-    private void narrativecraft$keyboardHandler(long windowPointer, int codePoint, int modifiers, CallbackInfo ci) {
-        OnScreenKeyEvent.onCharTyped(Character.toChars(codePoint)[0], modifiers);
+    public OnKeyInputEventNeoForge(IEventBus eventBus) {
+        NeoForge.EVENT_BUS.addListener(OnKeyInputEventNeoForge::onInput);
     }
 
-    @Inject(method = "keyPress", at = @At("RETURN"))
-    private void narrativecraft$onInputKeyPressed(
-            long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (action == 1) {
-            OnKeyInputEvent.keyInputEvent(key, scancode);
+    private static void onInput(InputEvent.Key event) {
+        if (event.getAction() == 1) {
+            OnKeyInputEvent.keyInputEvent(event.getKey(), event.getScanCode());
         }
     }
 }

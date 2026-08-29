@@ -27,12 +27,31 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.Recording;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.HurtAction;
+import fr.loudo.narrativecraft.signals.SignalPlayerFall;
+import fr.loudo.narrativecraft.signals.SignalPlayerHurt;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
 public class OnHurtEvent {
     public static void onHurt(LivingEntity entity, DamageSource damageSource) {
+        handleSignal(entity, damageSource);
+        handleRecording(entity, damageSource);
+    }
+
+    private static void handleSignal(LivingEntity entity, DamageSource damageSource) {
+        if (!(entity instanceof ServerPlayer player)) return;
+
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerHurt(damageSource), player);
+
+        if (!damageSource.is(DamageTypes.FALL)) return;
+
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerFall(player.fallDistance), player);
+    }
+
+    private static void handleRecording(LivingEntity entity, DamageSource damageSource) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
         if (data == null) return;

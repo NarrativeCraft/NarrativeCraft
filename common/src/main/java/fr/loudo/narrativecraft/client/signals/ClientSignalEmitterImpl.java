@@ -30,11 +30,13 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.network.signals.C2SEmitSignal;
 import fr.loudo.narrativecraft.platform.Services;
+import net.minecraft.client.Minecraft;
 
 public class ClientSignalEmitterImpl implements ClientSignalEmitter {
 
     @Override
     public void emit(Signal signal) {
+        if (Minecraft.getInstance().isPaused()) return;
         ClientPlayerSession playerSession =
                 ClientNarrativeCraftMod.getInstance().getPlayerSession();
         if (playerSession == null) return;
@@ -42,6 +44,11 @@ public class ClientSignalEmitterImpl implements ClientSignalEmitter {
         if (!playerSession.isInStory()) return;
 
         signal.emitOrThrow();
+        if (signal.getSignalType().side() != Side.CLIENT) {
+            throw new IllegalStateException(String.format(
+                    "Signal '%s' must be emitted on client side.",
+                    signal.getSignalType().eventName().toLowerCase()));
+        }
 
         if (!ClientNarrativeCraftMod.getInstance().getSignalRegistry().isRegistered(signal.getSignalType())) {
             throw new IllegalStateException(String.format(

@@ -23,27 +23,30 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
-import net.minecraft.client.KeyboardHandler;
+import com.mojang.blaze3d.platform.NativeImage;
+import fr.loudo.narrativecraft.events.client.OnScreenshotEvent;
+import java.util.function.Consumer;
+import net.minecraft.client.Screenshot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(KeyboardHandler.class)
-public class KeyboardHandlerMixinFabric {
+@Mixin(Screenshot.class)
+public class ScreenshotMixinFabric {
 
-    @Inject(method = "charTyped", at = @At("HEAD"))
-    private void narrativecraft$keyboardHandler(long windowPointer, int codePoint, int modifiers, CallbackInfo ci) {
-        OnScreenKeyEvent.onCharTyped(Character.toChars(codePoint)[0], modifiers);
-    }
-
-    @Inject(method = "keyPress", at = @At("RETURN"))
-    private void narrativecraft$onInputKeyPressed(
-            long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (action == 1) {
-            OnKeyInputEvent.keyInputEvent(key, scancode);
-        }
+    @ModifyArg(
+            method =
+                    "grab(Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/Screenshot;takeScreenshot(Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V"),
+            index = 2)
+    private static Consumer<NativeImage> narrativecraft$onScreenshotTaken(Consumer<NativeImage> callback) {
+        return image -> {
+            OnScreenshotEvent.onScreenshot();
+            callback.accept(image);
+        };
     }
 }

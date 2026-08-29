@@ -21,29 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.signals;
 
-import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
-import net.minecraft.client.KeyboardHandler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
 
-@Mixin(KeyboardHandler.class)
-public class KeyboardHandlerMixinFabric {
+public class SignalPlayerAttackEntity extends Signal {
 
-    @Inject(method = "charTyped", at = @At("HEAD"))
-    private void narrativecraft$keyboardHandler(long windowPointer, int codePoint, int modifiers, CallbackInfo ci) {
-        OnScreenKeyEvent.onCharTyped(Character.toChars(codePoint)[0], modifiers);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_attack_entity", 5, Side.SERVER);
+
+    public SignalPlayerAttackEntity(Entity entity) {
+        BlockPos attackPosition = entity.blockPosition();
+        registerStringArgument(
+                "entity_id",
+                BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
+        registerStringArgument(
+                "entity_name",
+                entity.getCustomName() == null ? "" : entity.getCustomName().getString());
+        registerIntArgument("x", attackPosition.getX());
+        registerIntArgument("y", attackPosition.getY());
+        registerIntArgument("z", attackPosition.getZ());
     }
 
-    @Inject(method = "keyPress", at = @At("RETURN"))
-    private void narrativecraft$onInputKeyPressed(
-            long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (action == 1) {
-            OnKeyInputEvent.keyInputEvent(key, scancode);
-        }
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }

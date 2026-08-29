@@ -25,13 +25,15 @@ package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.events.IFabricEventRegister;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 
 public class OnEntityRightClickFabric implements IFabricEventRegister {
     @Override
     public void register() {
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
-            if (!level.isClientSide) return InteractionResult.PASS;
+            if (!level.isClientSide()) return InteractionResult.PASS;
+            if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
             OnEntityRightClick.entityRightClick(entity);
             return InteractionResult.PASS;
         });

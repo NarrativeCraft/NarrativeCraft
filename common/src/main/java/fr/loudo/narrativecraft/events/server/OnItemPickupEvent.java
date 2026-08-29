@@ -30,12 +30,24 @@ import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.ItemPickupAction;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.signals.SignalPlayerItemPickup;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 
 public class OnItemPickupEvent {
 
     public static void onPickup(ServerPlayer player, ItemEntity itemEntity) {
+        handleSignal(player, itemEntity);
+        handleRecording(player, itemEntity);
+    }
+
+    private static void handleSignal(ServerPlayer player, ItemEntity itemEntity) {
+        NarrativeCraftMod.getInstance()
+                .getSignalEmitter()
+                .emit(new SignalPlayerItemPickup(itemEntity.getItem()), player);
+    }
+
+    private static void handleRecording(ServerPlayer player, ItemEntity itemEntity) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (data != null) {
