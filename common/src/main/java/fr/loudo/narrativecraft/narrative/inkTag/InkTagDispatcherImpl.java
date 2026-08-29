@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.inkTag;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.client.inkAction.ClientInkTagDispatcher;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
 import fr.loudo.narrativecraft.api.inkAction.InkTagDispatcher;
@@ -49,7 +50,7 @@ import javax.annotation.Nullable;
  * <p>The dispatcher reads {@link InkCommand} at registration time, compiles the
  * {@link CommandSpec} once via {@link SyntaxParser}, and reuses it for every tag.
  */
-public final class InkTagDispatcherImpl implements InkTagDispatcher {
+public final class InkTagDispatcherImpl implements InkTagDispatcher, ClientInkTagDispatcher {
 
     private final Map<String, Entry> registrations = new LinkedHashMap<>();
 

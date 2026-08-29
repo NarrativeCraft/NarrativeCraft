@@ -27,13 +27,26 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.PlaceBlockAction;
 import fr.loudo.narrativecraft.recording.actions.SilentPlaceBlockAction;
+import fr.loudo.narrativecraft.signals.SignalPlaceBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class OnServerPlaceBlockEvent {
     public static void onPlaceBlock(BlockState state, BlockPos clickedPos, ServerPlayer player) {
+        handleRecordingPlace(state, clickedPos, player);
+        handleSignal(state, clickedPos, player);
+    }
 
+    public static void onPlaceBlockSilently(BlockState state, BlockPos clickedPos, ServerPlayer player) {
+        handleRecordingPlaceSilent(state, clickedPos, player);
+    }
+
+    private static void handleSignal(BlockState state, BlockPos clickedPos, ServerPlayer player) {
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlaceBlock(state, clickedPos), player);
+    }
+
+    private static void handleRecordingPlace(BlockState state, BlockPos clickedPos, ServerPlayer player) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (data == null) return;
@@ -41,8 +54,7 @@ public class OnServerPlaceBlockEvent {
         data.addAction(new PlaceBlockAction(data.getRecordingTick(), clickedPos, state));
     }
 
-    public static void onPlaceBlockSilently(BlockState state, BlockPos clickedPos, ServerPlayer player) {
-
+    private static void handleRecordingPlaceSilent(BlockState state, BlockPos clickedPos, ServerPlayer player) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (data == null) return;

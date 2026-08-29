@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.api.APISetup;
+import fr.loudo.narrativecraft.api.utils.Side;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.effects.TextEffectRegister;
 import fr.loudo.narrativecraft.dialog.effects.TextEffectRegistry;
@@ -46,6 +47,9 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandlerManager;
 import fr.loudo.narrativecraft.playback.PlaybackManager;
 import fr.loudo.narrativecraft.recording.actions.ActionRegister;
 import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
+import fr.loudo.narrativecraft.signals.SignalEmitterImpl;
+import fr.loudo.narrativecraft.signals.SignalRegistryImpl;
+import fr.loudo.narrativecraft.signals.SignalRegistryRegister;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -59,6 +63,7 @@ public class NarrativeCraftMod {
     public static final EventBus EVENT_BUS = new EventBus();
     private static final NarrativeCraftMod instance = new NarrativeCraftMod();
 
+    private final SignalEmitterImpl signalEmitter = new SignalEmitterImpl();
     private final ChapterManager chapterManager = new ChapterManager();
     private final CharacterManager characterManager = new CharacterManager();
     private final RecordingManager recordingManager = new RecordingManager();
@@ -72,6 +77,7 @@ public class NarrativeCraftMod {
     private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
     private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
     private final SaveFileManager saveFileManager = new SaveFileManager();
+    private final SignalRegistryImpl signalRegistry = new SignalRegistryImpl(Side.SERVER);
     private CameraAngle mainScreenData;
 
     private String compiledStoryJson;
@@ -92,6 +98,7 @@ public class NarrativeCraftMod {
         CutsceneLayerRegister.register(getInstance().getCutsceneLayerRegistry());
         TextEffectRegister.register(getInstance().getTextEffectRegistry());
         InkActionRegister.register();
+        SignalRegistryRegister.register();
     }
 
     public ChapterManager getChapterManager() {
@@ -188,6 +195,14 @@ public class NarrativeCraftMod {
 
     public SaveFileManager getSaveFileManager() {
         return saveFileManager;
+    }
+
+    public SignalRegistryImpl getSignalRegistry() {
+        return signalRegistry;
+    }
+
+    public SignalEmitterImpl getSignalEmitter() {
+        return signalEmitter;
     }
 
     public static NarrativeCraftMod getInstance() {

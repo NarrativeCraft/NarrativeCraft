@@ -180,8 +180,8 @@ public class MainScreen extends Screen {
         currentY += BUTTON_HEIGHT + BUTTON_GAP;
 
         addRenderableWidget(Button.builder(Translation.message("screen.main.quit"), button -> {
+                    close();
                     if (!isPause) {
-                        close();
                         minecraft.disconnectFromWorld(Component.empty());
                     } else {
                         Services.PACKET.sendToServer(new C2SStopStory(true));

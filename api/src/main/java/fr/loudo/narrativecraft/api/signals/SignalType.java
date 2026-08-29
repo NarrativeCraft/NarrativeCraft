@@ -21,10 +21,8 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.api.inkAction;
+package fr.loudo.narrativecraft.api.signals;
 
-public enum Side {
-    SERVER,
-    CLIENT,
-    CLIENT_SERVER
-}
+import fr.loudo.narrativecraft.api.utils.Side;
+
+public record SignalType(String eventName, int argumentCount, Side side) {}

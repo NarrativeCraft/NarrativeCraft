@@ -28,9 +28,10 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.api.utils.Side;
 
 /**
- * Server-side placeholder for a blocking {@link fr.loudo.narrativecraft.api.inkAction.Side#CLIENT}
+ * Server-side placeholder for a blocking {@link Side#CLIENT}
  * action. Holds no business logic, its sole purpose is to keep {@code isRunning = true} until
  * the client sends back a {@link fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished} ack.
  */

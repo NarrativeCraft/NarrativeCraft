@@ -43,6 +43,7 @@ import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
+import fr.loudo.narrativecraft.network.signals.C2SEmitSignal;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
@@ -89,5 +90,6 @@ public class ServerPacketRegisterFabric {
         PayloadTypeRegistry.serverboundPlay().register(C2SEnterDialogEditor.TYPE, C2SEnterDialogEditor.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SStopStory.TYPE, C2SStopStory.STREAM_CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SSetStoryLocale.TYPE, C2SSetStoryLocale.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SEmitSignal.TYPE, C2SEmitSignal.STREAM_CODEC);
     }
 }
