@@ -43,7 +43,6 @@ public class OnPlayerLeaveEvent {
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler != null) {
             storyHandler.stop();
-            playerSession.setStoryHandler(null);
         }
 
         playerSession.clear();
