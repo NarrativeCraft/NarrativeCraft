@@ -23,14 +23,32 @@
 
 package fr.loudo.narrativecraft.signals;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.signals.SignalRegistry;
+import fr.loudo.narrativecraft.api.signals.Signal;
+import fr.loudo.narrativecraft.api.signals.SignalType;
+import fr.loudo.narrativecraft.api.utils.Side;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
 
-public class SignalRegistryRegister {
+public class SignalPlayerKillEntity extends Signal {
 
-    public static void register() {
-        SignalRegistry signalRegistry = NarrativeCraftMod.getInstance().getSignalRegistry();
-        signalRegistry.register(SignalPlayerKillEntity.SIGNAL_TYPE);
-        signalRegistry.register(SignalPlaceBlock.SIGNAL_TYPE);
+    public static final SignalType SIGNAL_TYPE = new SignalType("on_player_kill_entity", 5, Side.SERVER);
+
+    public SignalPlayerKillEntity(Entity entity) {
+        BlockPos killPosition = entity.blockPosition();
+        registerStringArgument(
+                "entity_id",
+                BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
+        registerStringArgument(
+                "entity_name",
+                entity.getCustomName() == null ? "" : entity.getCustomName().getString());
+        registerIntArgument("x", killPosition.getX());
+        registerIntArgument("y", killPosition.getY());
+        registerIntArgument("z", killPosition.getZ());
+    }
+
+    @Override
+    public SignalType getSignalType() {
+        return SIGNAL_TYPE;
     }
 }
