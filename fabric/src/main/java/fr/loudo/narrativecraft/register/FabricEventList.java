@@ -43,6 +43,7 @@ public class FabricEventList {
         events.add(new OnDeathEventFabric());
         events.add(new OnHurtEventFabric());
         events.add(new OnUseItemEventFabric());
+        events.add(new OnPlayerRespawnEventFabric());
     }
 
     public void register() {
