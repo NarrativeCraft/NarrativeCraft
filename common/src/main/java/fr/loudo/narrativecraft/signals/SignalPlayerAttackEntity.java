@@ -39,9 +39,7 @@ public class SignalPlayerAttackEntity extends Signal {
         registerStringArgument(
                 "entity_id",
                 BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
-        registerStringArgument(
-                "entity_name",
-                entity.getCustomName() == null ? "" : entity.getCustomName().getString());
+        registerStringArgument("entity_name", entity.getDisplayName().getString().toLowerCase());
         registerIntArgument("x", attackPosition.getX());
         registerIntArgument("y", attackPosition.getY());
         registerIntArgument("z", attackPosition.getZ());
