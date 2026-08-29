@@ -47,5 +47,6 @@ public class SignalRegistryRegister {
         signalRegistry.register(SignalCharacterDeath.SIGNAL_TYPE);
         signalRegistry.register(SignalCharacterSpawn.SIGNAL_TYPE);
         signalRegistry.register(SignalCharacterDespawn.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerRespawn.SIGNAL_TYPE);
     }
 }
