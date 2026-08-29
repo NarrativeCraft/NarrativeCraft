@@ -39,6 +39,8 @@ public class APISetup {
                 mod.getPlayerSessionManager(),
                 mod.getChapterManager(),
                 mod.getCharacterManager(),
-                mod.getInkTagDispatcher());
+                mod.getInkTagDispatcher(),
+                mod.getSignalRegistry(),
+                mod.getSignalEmitter());
     }
 }

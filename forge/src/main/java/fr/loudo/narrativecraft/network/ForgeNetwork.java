@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
 import fr.loudo.narrativecraft.network.inkAction.*;
 import fr.loudo.narrativecraft.network.interaction.*;
 import fr.loudo.narrativecraft.network.mainScreen.*;
+import fr.loudo.narrativecraft.network.signals.C2SEmitSignal;
 import fr.loudo.narrativecraft.network.story.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -238,5 +239,6 @@ public final class ForgeNetwork {
         server(C2SStopStory.TYPE, C2SStopStory::read, ServerPacketHandler::stopStory);
         server(C2SChangeGamemodePacket.TYPE, C2SChangeGamemodePacket::read, ServerPacketHandler::changeGamemode);
         server(C2SSetStoryLocale.TYPE, C2SSetStoryLocale::read, ServerPacketHandler::setStoryLocale);
+        server(C2SEmitSignal.TYPE, C2SEmitSignal::read, ServerPacketHandler::emitSignal);
     }
 }

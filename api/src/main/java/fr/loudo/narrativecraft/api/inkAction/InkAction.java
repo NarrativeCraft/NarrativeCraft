@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.api.utils.Side;
 import java.util.regex.Pattern;
 import net.minecraft.client.gui.GuiGraphics;
 

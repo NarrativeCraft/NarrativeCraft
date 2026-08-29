@@ -23,12 +23,14 @@
 
 package fr.loudo.narrativecraft.api;
 
+import fr.loudo.narrativecraft.api.client.NarrativeCraftClientAPI;
 import fr.loudo.narrativecraft.api.dialog.ITextEffect;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.api.events.Event;
 import fr.loudo.narrativecraft.api.events.EventListener;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.api.signals.SignalType;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import org.slf4j.Logger;
@@ -77,6 +79,21 @@ public class AddonContext {
     public <T extends InkAction> void registerInkAction(Class<T> clazz, Supplier<T> factory) {
         if (state == State.DISABLED) return;
         api.getInkTagDispatcher().register(clazz, factory);
+    }
+
+    public <T extends InkAction> void registerClientInkAction(Class<T> clazz, Supplier<T> factory) {
+        if (state == State.DISABLED) return;
+        NarrativeCraftClientAPI.getInstance().getInkTagDispatcher().register(clazz, factory);
+    }
+
+    public void registerSignal(SignalType signalType) {
+        if (state == State.DISABLED) return;
+        api.getSignalRegistry().register(signalType);
+    }
+
+    public void registerClientSignal(SignalType signalType) {
+        if (state == State.DISABLED) return;
+        NarrativeCraftClientAPI.getInstance().getSignalRegistry().register(signalType);
     }
 
     public <E extends Event> void registerEvent(Class<E> eventType, EventListener<? super E> listener) {

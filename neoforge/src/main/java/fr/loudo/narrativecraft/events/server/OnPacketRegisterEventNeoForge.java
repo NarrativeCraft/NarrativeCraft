@@ -45,6 +45,7 @@ import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
+import fr.loudo.narrativecraft.network.signals.C2SEmitSignal;
 import fr.loudo.narrativecraft.network.story.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -222,6 +223,7 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playToServer(C2SStopStory.TYPE, C2SStopStory.STREAM_CODEC, ServerPacketHandlerNeoForge::stopStory);
         registrar.playToServer(
                 C2SSetStoryLocale.TYPE, C2SSetStoryLocale.STREAM_CODEC, ServerPacketHandlerNeoForge::setStoryLocale);
+        registrar.playToServer(C2SEmitSignal.TYPE, C2SEmitSignal.STREAM_CODEC, ServerPacketHandlerNeoForge::emitSignal);
     }
 
     private static void registerBiPackets(PayloadRegistrar registrar) {

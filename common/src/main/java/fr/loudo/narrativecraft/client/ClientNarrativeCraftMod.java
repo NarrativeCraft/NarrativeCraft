@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.client;
 
+import fr.loudo.narrativecraft.api.client.ClientAPISetup;
+import fr.loudo.narrativecraft.api.utils.Side;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
@@ -30,11 +32,13 @@ import fr.loudo.narrativecraft.client.inkTag.ClientInkActionRegister;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegister;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.signals.ClientSignalEmitterImpl;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
+import fr.loudo.narrativecraft.signals.SignalRegistryImpl;
 import java.util.UUID;
 
 public class ClientNarrativeCraftMod {
@@ -44,9 +48,12 @@ public class ClientNarrativeCraftMod {
     private final CharacterManager characterManager = new CharacterManager();
     private final ClientPlayerSession playerSession = new ClientPlayerSession();
     private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
+    private final SignalRegistryImpl signalRegistry = new SignalRegistryImpl(Side.CLIENT);
+    private final ClientSignalEmitterImpl signalEmitter = new ClientSignalEmitterImpl();
     private CameraAngle mainScreenData;
 
     public static void commonInit() {
+        ClientAPISetup.init(getInstance());
         ClientNarrativeEditorsRegister.register();
         ClientNarrativeUIActionRegister.register();
         ClientInkActionRegister.register();
@@ -102,6 +109,14 @@ public class ClientNarrativeCraftMod {
 
     public InkTagDispatcherImpl getInkTagDispatcher() {
         return inkTagDispatcher;
+    }
+
+    public SignalRegistryImpl getSignalRegistry() {
+        return signalRegistry;
+    }
+
+    public ClientSignalEmitterImpl getSignalEmitter() {
+        return signalEmitter;
     }
 
     public static ClientNarrativeCraftMod getInstance() {

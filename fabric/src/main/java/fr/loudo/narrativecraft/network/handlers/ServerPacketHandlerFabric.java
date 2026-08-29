@@ -46,6 +46,7 @@ import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
+import fr.loudo.narrativecraft.network.signals.C2SEmitSignal;
 import fr.loudo.narrativecraft.network.story.C2SChoiceSelected;
 import fr.loudo.narrativecraft.network.story.C2SDialogueFinished;
 import fr.loudo.narrativecraft.network.story.C2SPlayStitchStory;
@@ -258,6 +259,13 @@ public class ServerPacketHandlerFabric {
                     C2SSetStoryLocale packet = C2SSetStoryLocale.read(buf);
                     server.execute(() -> {
                         ServerPacketHandler.setStoryLocale(packet, player);
+                    });
+                });
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SEmitSignal.TYPE, (server, player, handler, buf, responseSender) -> {
+                    C2SEmitSignal packet = C2SEmitSignal.read(buf);
+                    server.execute(() -> {
+                        ServerPacketHandler.emitSignal(packet, player);
                     });
                 });
     }

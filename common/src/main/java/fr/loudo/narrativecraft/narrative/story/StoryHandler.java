@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.story;
 
 import com.bladecoder.ink.runtime.Choice;
+import com.bladecoder.ink.runtime.Path;
 import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.events.character.CharacterDespawnEvent;
@@ -300,6 +301,26 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                     playerSession.getPlayer().getName().getString(),
                     e);
             stop();
+        }
+    }
+
+    public void playSignal(String eventName, Object[] arguments) {
+        if (step != Step.READY) return;
+        eventName = eventName.toLowerCase();
+        String signalStitch = String.format("%s.%s", playerSession.getScene().knotName(), eventName);
+        try {
+            if (story.contentAtPath(new Path(signalStitch)).correctObj() == null) {
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
+        try {
+            story.choosePathString(signalStitch, false, arguments);
+            advance();
+        } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error(
+                    "A signal with event name '{}' was emitted, but failed to play.", eventName, e);
         }
     }
 
