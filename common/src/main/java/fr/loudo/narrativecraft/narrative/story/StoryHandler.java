@@ -230,6 +230,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
                 new S2CCharacterStoryAction(UUID.randomUUID(), S2CCharacterStoryAction.Action.CLEAR));
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CStopStory());
         playerSession.clear();
+        playerSession.setStoryHandler(null);
     }
 
     public void onChoiceSelected(int index) {

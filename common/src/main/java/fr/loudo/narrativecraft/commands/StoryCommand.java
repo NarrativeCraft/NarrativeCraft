@@ -281,7 +281,6 @@ public class StoryCommand {
         }
 
         storyHandler.stop();
-        session.setStoryHandler(null);
 
         context.getSource()
                 .sendSuccess(
