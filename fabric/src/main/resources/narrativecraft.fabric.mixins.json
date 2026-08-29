@@ -8,6 +8,7 @@
     "BedItemMixinFabric",
     "BlockItemMixinFabric",
     "DoubleHighBlockItemFabricMixin",
+    "LivingEntityMixinFabric",
     "PlayerMixinFabric",
     "ServerPlayerGameModeMixinFabric",
     "ServerPlayerMixinFabric"
@@ -19,7 +20,8 @@
     "KeyboardHandlerMixinFabric",
     "LevelRendererMixin",
     "MouseHandlerMixinFabric",
-    "ScreenFabricMixin"
+    "ScreenFabricMixin",
+    "ScreenshotMixinFabric"
   ],
   "server": [],
   "injectors": {

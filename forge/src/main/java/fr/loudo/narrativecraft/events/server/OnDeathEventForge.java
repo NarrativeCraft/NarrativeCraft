@@ -33,6 +33,6 @@ public class OnDeathEventForge {
 
     @SubscribeEvent
     public static void onDeath(LivingDeathEvent event) {
-        OnDeathEvent.onDeath(event.getEntity());
+        OnDeathEvent.onDeath(event.getEntity(), event.getSource());
     }
 }

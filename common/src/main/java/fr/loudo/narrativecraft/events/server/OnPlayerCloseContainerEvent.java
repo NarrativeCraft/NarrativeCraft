@@ -26,11 +26,21 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.CloseContainerAction;
+import fr.loudo.narrativecraft.signals.SignalPlayerCloseContainer;
 import net.minecraft.server.level.ServerPlayer;
 
 public class OnPlayerCloseContainerEvent {
 
     public static void onCloseContainer(ServerPlayer player) {
+        handleSignal(player);
+        handleRecording(player);
+    }
+
+    private static void handleSignal(ServerPlayer player) {
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerCloseContainer(player), player);
+    }
+
+    private static void handleRecording(ServerPlayer player) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (data == null) return;

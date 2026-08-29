@@ -26,12 +26,24 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.UseItemAction;
+import fr.loudo.narrativecraft.signals.SignalPlayerUseItem;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 
 public class OnUseItemEvent {
 
     public static void onUseItem(ServerPlayer player, InteractionHand hand) {
+        handleSignal(player, hand);
+        handleRecording(player, hand);
+    }
+
+    private static void handleSignal(ServerPlayer player, InteractionHand hand) {
+        NarrativeCraftMod.getInstance()
+                .getSignalEmitter()
+                .emit(new SignalPlayerUseItem(player.getItemInHand(hand), hand), player);
+    }
+
+    private static void handleRecording(ServerPlayer player, InteractionHand hand) {
         RecordingEntityData entityData =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(player);
         if (entityData == null) return;

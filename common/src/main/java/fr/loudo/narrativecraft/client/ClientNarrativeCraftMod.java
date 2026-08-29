@@ -32,7 +32,9 @@ import fr.loudo.narrativecraft.client.inkTag.ClientInkActionRegister;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
 import fr.loudo.narrativecraft.client.narrative.ui.ClientNarrativeUIActionRegister;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.signals.ClientPlayerStateSignalWatcher;
 import fr.loudo.narrativecraft.client.signals.ClientSignalEmitterImpl;
+import fr.loudo.narrativecraft.client.signals.ClientSignalRegistryRegister;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
@@ -50,6 +52,7 @@ public class ClientNarrativeCraftMod {
     private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
     private final SignalRegistryImpl signalRegistry = new SignalRegistryImpl(Side.CLIENT);
     private final ClientSignalEmitterImpl signalEmitter = new ClientSignalEmitterImpl();
+    private final ClientPlayerStateSignalWatcher playerStateSignalWatcher = new ClientPlayerStateSignalWatcher();
     private CameraAngle mainScreenData;
 
     public static void commonInit() {
@@ -57,6 +60,7 @@ public class ClientNarrativeCraftMod {
         ClientNarrativeEditorsRegister.register();
         ClientNarrativeUIActionRegister.register();
         ClientInkActionRegister.register();
+        ClientSignalRegistryRegister.register();
     }
 
     public ChapterManager getChapterManager() {
@@ -117,6 +121,10 @@ public class ClientNarrativeCraftMod {
 
     public ClientSignalEmitterImpl getSignalEmitter() {
         return signalEmitter;
+    }
+
+    public ClientPlayerStateSignalWatcher getPlayerStateSignalWatcher() {
+        return playerStateSignalWatcher;
     }
 
     public static ClientNarrativeCraftMod getInstance() {

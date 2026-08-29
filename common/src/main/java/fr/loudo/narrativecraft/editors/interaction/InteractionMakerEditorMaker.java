@@ -35,6 +35,8 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
+import fr.loudo.narrativecraft.signals.SignalPlayerEnterZone;
+import fr.loudo.narrativecraft.signals.SignalPlayerLeaveZone;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -82,6 +84,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
             boolean wasInside = insideZoneIds.contains(zone.getId());
 
             if (isInside && !wasInside) {
+                NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerEnterZone(zone), player);
                 if (!(zone.isOneTime() && storyHandler.hasAlreadyInteracted(zone.getId()))
                         && playerSession.isGameplayMode()) {
                     storyHandler.playStitch(zone.getStitchName());
@@ -91,6 +94,7 @@ public class InteractionMakerEditorMaker implements EditorMaker {
                 NarrativeCraftMod.EVENT_BUS.post(new InteractionZoneEnterEvent(player, zone));
             } else if (!isInside && wasInside) {
                 insideZoneIds.remove(zone.getId());
+                NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerLeaveZone(zone), player);
                 NarrativeCraftMod.EVENT_BUS.post(new InteractionZoneLeaveEvent(player, zone));
             }
         }

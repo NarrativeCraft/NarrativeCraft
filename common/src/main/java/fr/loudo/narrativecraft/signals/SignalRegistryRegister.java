@@ -31,6 +31,21 @@ public class SignalRegistryRegister {
     public static void register() {
         SignalRegistry signalRegistry = NarrativeCraftMod.getInstance().getSignalRegistry();
         signalRegistry.register(SignalPlayerKillEntity.SIGNAL_TYPE);
-        signalRegistry.register(SignalPlaceBlock.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerPlaceBlock.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerBreakBlock.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerRightClickBlock.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerUseItem.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerItemPickup.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerHurt.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerDeath.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerCloseContainer.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerAttackEntity.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerUseItemOnBlock.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerFall.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerEnterZone.SIGNAL_TYPE);
+        signalRegistry.register(SignalPlayerLeaveZone.SIGNAL_TYPE);
+        signalRegistry.register(SignalCharacterDeath.SIGNAL_TYPE);
+        signalRegistry.register(SignalCharacterSpawn.SIGNAL_TYPE);
+        signalRegistry.register(SignalCharacterDespawn.SIGNAL_TYPE);
     }
 }
