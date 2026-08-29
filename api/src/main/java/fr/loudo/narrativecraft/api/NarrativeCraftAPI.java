@@ -33,10 +33,12 @@ import fr.loudo.narrativecraft.api.managers.IPlayerSessionManager;
 import fr.loudo.narrativecraft.api.managers.IRecordingManager;
 import fr.loudo.narrativecraft.api.narrative.IStoryHandlerManager;
 import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
+import fr.loudo.narrativecraft.api.signals.SignalEmitter;
+import fr.loudo.narrativecraft.api.signals.SignalRegistry;
 
 public class NarrativeCraftAPI {
 
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     private static volatile NarrativeCraftAPI INSTANCE;
 
@@ -52,6 +54,8 @@ public class NarrativeCraftAPI {
     private final ICharacterManager characterManager;
     private final InkTagDispatcher inkTagDispatcher;
     private final AddonRegistry addonRegistry;
+    private final SignalRegistry signalRegistry;
+    private final SignalEmitter signalEmitter;
 
     private NarrativeCraftAPI(
             String modId,
@@ -64,7 +68,9 @@ public class NarrativeCraftAPI {
             IPlayerSessionManager playerSessionManager,
             IChapterManager chapterManager,
             ICharacterManager characterManager,
-            InkTagDispatcher inkTagDispatcher) {
+            InkTagDispatcher inkTagDispatcher,
+            SignalRegistry signalRegistry,
+            SignalEmitter signalEmitter) {
         this.modId = modId;
         this.actionRegistry = actionRegistry;
         this.cutsceneLayerRegistry = cutsceneLayerRegistry;
@@ -76,6 +82,8 @@ public class NarrativeCraftAPI {
         this.chapterManager = chapterManager;
         this.characterManager = characterManager;
         this.inkTagDispatcher = inkTagDispatcher;
+        this.signalRegistry = signalRegistry;
+        this.signalEmitter = signalEmitter;
         this.addonRegistry = new AddonRegistry();
     }
 
@@ -90,7 +98,9 @@ public class NarrativeCraftAPI {
             IPlayerSessionManager playerSessionManager,
             IChapterManager chapterManager,
             ICharacterManager characterManager,
-            InkTagDispatcher inkTagDispatcher) {
+            InkTagDispatcher inkTagDispatcher,
+            SignalRegistry signalRegistry,
+            SignalEmitter signalEmitter) {
         INSTANCE = new NarrativeCraftAPI(
                 modId,
                 actionRegistry,
@@ -102,7 +112,9 @@ public class NarrativeCraftAPI {
                 playerSessionManager,
                 chapterManager,
                 characterManager,
-                inkTagDispatcher);
+                inkTagDispatcher,
+                signalRegistry,
+                signalEmitter);
     }
 
     public static NarrativeCraftAPI getInstance() {
@@ -168,5 +180,13 @@ public class NarrativeCraftAPI {
 
     InkTagDispatcher getInkTagDispatcher() {
         return inkTagDispatcher;
+    }
+
+    public SignalRegistry getSignalRegistry() {
+        return signalRegistry;
+    }
+
+    public SignalEmitter getSignalEmitter() {
+        return signalEmitter;
     }
 }

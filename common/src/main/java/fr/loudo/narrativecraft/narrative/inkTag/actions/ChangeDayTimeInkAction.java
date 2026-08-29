@@ -28,10 +28,10 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Interpolation;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkCommand;
-import fr.loudo.narrativecraft.api.inkAction.Side;
 import fr.loudo.narrativecraft.api.inkAction.syntax.ParsedCommand;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.api.utils.Side;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 

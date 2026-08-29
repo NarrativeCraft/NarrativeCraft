@@ -29,8 +29,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 public class OnDeathEventFabric implements IFabricEventRegister {
     @Override
     public void register() {
-        ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
-            OnDeathEvent.onDeath(entity);
-        });
+        ServerLivingEntityEvents.AFTER_DEATH.register(OnDeathEvent::onDeath);
     }
 }

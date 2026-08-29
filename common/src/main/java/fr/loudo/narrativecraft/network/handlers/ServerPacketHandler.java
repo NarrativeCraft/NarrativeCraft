@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.signals.SignalArgument;
 import fr.loudo.narrativecraft.commands.LocaleCommand;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.editors.cameraangle.CameraAngleMakerEditorMaker;
@@ -63,6 +64,7 @@ import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
+import fr.loudo.narrativecraft.network.signals.C2SEmitSignal;
 import fr.loudo.narrativecraft.network.story.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -70,6 +72,7 @@ import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
@@ -354,6 +357,30 @@ public class ServerPacketHandler {
         if (storyHandler != null) {
             storyHandler.getInkTagHandler().onClientActionFinished(packet.instanceId());
         }
+    }
+
+    public static void emitSignal(C2SEmitSignal packet, Player player) {
+        PlayerSession session =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getByPlayer(player);
+        if (session == null) return;
+        StoryHandler storyHandler = session.getStoryHandler();
+        if (storyHandler == null) return;
+
+        List<SignalArgument> signalArguments = packet.arguments();
+        Object[] arguments = new Object[signalArguments.size()];
+        for (int index = 0; index < arguments.length; index++) {
+            SignalArgument signalArgument = signalArguments.get(index);
+            if (!signalArgument.isValid()) {
+                NarrativeCraftMod.LOGGER.warn(
+                        "Player {} emitted signal '{}' with an invalid argument: {}",
+                        player.getName().getString(),
+                        packet.eventName(),
+                        signalArgument.errorMessage());
+                return;
+            }
+            arguments[index] = signalArgument.toInkValue();
+        }
+        storyHandler.playSignal(packet.eventName(), arguments);
     }
 
     public static void stopStory(C2SStopStory packet, Player player) {

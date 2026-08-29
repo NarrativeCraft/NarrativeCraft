@@ -37,6 +37,6 @@ public class OnDeathEventNeoForge {
     }
 
     private static void onDeath(LivingDeathEvent event) {
-        OnDeathEvent.onDeath(event.getEntity());
+        OnDeathEvent.onDeath(event.getEntity(), event.getSource());
     }
 }

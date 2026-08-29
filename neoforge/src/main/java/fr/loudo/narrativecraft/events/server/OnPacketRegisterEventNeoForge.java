@@ -41,6 +41,7 @@ import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.*;
+import fr.loudo.narrativecraft.network.signals.C2SEmitSignal;
 import fr.loudo.narrativecraft.network.story.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -223,6 +224,7 @@ public class OnPacketRegisterEventNeoForge {
                 ServerPacketHandlerNeoForge::changeGamemode);
         registrar.playToServer(
                 C2SSetStoryLocale.TYPE, C2SSetStoryLocale.STREAM_CODEC, ServerPacketHandlerNeoForge::setStoryLocale);
+        registrar.playToServer(C2SEmitSignal.TYPE, C2SEmitSignal.STREAM_CODEC, ServerPacketHandlerNeoForge::emitSignal);
     }
 
     private static void registerBiPackets(PayloadRegistrar registrar) {

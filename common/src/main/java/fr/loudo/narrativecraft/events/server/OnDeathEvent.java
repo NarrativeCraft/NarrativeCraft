@@ -26,11 +26,25 @@ package fr.loudo.narrativecraft.events.server;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.recording.actions.DeathAction;
+import fr.loudo.narrativecraft.signals.SignalPlayerKillEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 
 public class OnDeathEvent {
 
-    public static void onDeath(LivingEntity entity) {
+    public static void onDeath(LivingEntity entity, DamageSource damageSource) {
+        handleRecording(entity);
+        handleSignal(entity, damageSource);
+    }
+
+    private static void handleSignal(LivingEntity entity, DamageSource damageSource) {
+        if (!(damageSource.getEntity() instanceof ServerPlayer player)) return;
+
+        NarrativeCraftMod.getInstance().getSignalEmitter().emit(new SignalPlayerKillEntity(entity), player);
+    }
+
+    private static void handleRecording(LivingEntity entity) {
         RecordingEntityData data =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(entity);
         if (data == null) return;

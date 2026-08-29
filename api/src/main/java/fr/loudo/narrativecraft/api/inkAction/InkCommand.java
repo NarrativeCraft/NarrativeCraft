@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.api.inkAction;
 
+import fr.loudo.narrativecraft.api.utils.Side;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
