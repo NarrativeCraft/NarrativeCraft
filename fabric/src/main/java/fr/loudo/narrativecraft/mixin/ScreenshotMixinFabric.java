@@ -23,30 +23,30 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import fr.loudo.narrativecraft.events.client.OnScreenshotEvent;
+import java.io.File;
 import java.util.function.Consumer;
 import net.minecraft.client.Screenshot;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Screenshot.class)
 public class ScreenshotMixinFabric {
 
-    @ModifyArg(
+    @Inject(
             method =
-                    "grab(Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target =
-                                    "Lnet/minecraft/client/Screenshot;takeScreenshot(Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V"),
-            index = 2)
-    private static Consumer<NativeImage> narrativecraft$onScreenshotTaken(Consumer<NativeImage> callback) {
-        return image -> {
-            OnScreenshotEvent.onScreenshot();
-            callback.accept(image);
-        };
+                    "grab(Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;Ljava/util/function/Consumer;)V",
+            at = @At("HEAD"))
+    private static void narrativecraft$onScreenshotTaken(
+            File gameDirectory,
+            String screenshotName,
+            RenderTarget buffer,
+            Consumer<Component> messageConsumer,
+            CallbackInfo ci) {
+        OnScreenshotEvent.onScreenshot();
     }
 }
