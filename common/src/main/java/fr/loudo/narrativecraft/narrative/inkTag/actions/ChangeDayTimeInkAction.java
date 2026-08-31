@@ -61,20 +61,11 @@ public class ChangeDayTimeInkAction extends InkAction {
             return InkActionResult.error("Invalid time value '" + cmd.getString("from") + "'");
         }
 
-        if (action.equals("add")) {
-            return InkActionResult.ok();
-        }
-
         String toStr = cmd.getString("to");
         float forDuration = cmd.getFloat("for");
 
-        if (toStr == null || toStr.isEmpty() || forDuration == 0) {
-            toTick = fromTick;
-            return InkActionResult.ok();
-        }
-
         toTick = parseDayTime(toStr);
-        if (toTick == -1) {
+        if (toTick == -1 && !toStr.isEmpty()) {
             return InkActionResult.error("Invalid time value '" + toStr + "'");
         }
 
@@ -114,15 +105,18 @@ public class ChangeDayTimeInkAction extends InkAction {
         level = (ServerLevel) playerSession.getPlayer().level();
 
         if (action.equals("add")) {
+            if (totalTick > 0) {
+                toTick = level.getDayTime() + fromTick;
+                fromTick = level.getDayTime();
+                return InkActionResult.ok();
+            }
             changeTime(level.getDayTime() + fromTick);
-            stop();
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
 
         if (totalTick == 0) {
             changeTime(fromTick);
-            stop();
-            return InkActionResult.ok();
+            return InkActionResult.singleOk();
         }
 
         return InkActionResult.ok();
