@@ -55,6 +55,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
     private int currentTick;
     private int lastKeyframeTick;
     private boolean playing;
+    private boolean standalone;
     private NarrativeEnvironment environment;
 
     public CutsceneMakerEditorMaker(Cutscene cutscene, PlayerSession playerSession) {
@@ -78,6 +79,10 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
         Services.PACKET.sendToPlayer(playerSession.getPlayer(), new BiCutscenePlayHeadPacket(currentTick));
 
         currentTick++;
+
+        if (standalone && isFinished()) {
+            playerSession.closeEditor();
+        }
     }
 
     public void init() {
@@ -158,7 +163,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
 
     @Override
     public void close() {
-        if (environment == NarrativeEnvironment.PRODUCTION) {
+        if (environment == NarrativeEnvironment.PRODUCTION && !standalone) {
             for (Playback playback : playbacks) {
                 playback.stop();
             }
@@ -206,6 +211,14 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
 
     public Cutscene getCutscene() {
         return cutscene;
+    }
+
+    public boolean isStandalone() {
+        return standalone;
+    }
+
+    public void setStandalone(boolean standalone) {
+        this.standalone = standalone;
     }
 
     public List<Playback> getPlaybacks() {

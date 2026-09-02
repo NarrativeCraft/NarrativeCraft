@@ -125,8 +125,10 @@
   "narrativecraft.record.recorded_nothing": "Нечего сохранять — запись пуста!",
   "narrativecraft.record.recording": "Остановите запись перед сохранением.",
 
-  "narrativecraft.playback.start": "Воспроизведение анимации «%s»...",
-  "narrativecraft.playback.start_for_players": "Воспроизведение анимации «%s» для выбранных игроков...",
+  "narrativecraft.playback.start": "Воспроизведение: %s «%s»...",
+  "narrativecraft.playback.start_for_players": "Воспроизведение для выбранных игроков: %s «%s»...",
+  "narrativecraft.playback.stop": "Остановлено: %s «%s».",
+  "narrativecraft.playback.not_playing": "Не воспроизводится: %s «%s».",
 
   "narrativecraft.session.set": "Сессия: §lглава§r %s, §lсцена§r %s.",
   "narrativecraft.session.clear": "Сессия сброшена.",

@@ -24,14 +24,18 @@
 package fr.loudo.narrativecraft.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.NarrativeCraftAPI;
+import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.locale.StoryLocaleManager;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 
@@ -67,12 +71,56 @@ public class CommandSuggestions {
         if (chapter == null) return builder.buildFuture();
 
         for (Scene scene : chapter.getSceneManager().getList()) {
-            if (scene.getName().split(" ").length > 1) {
-                builder.suggest("\"" + scene.getName() + "\"");
-            } else {
-                builder.suggest(scene.getName());
-            }
+            suggestName(builder, scene.getName());
         }
         return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestAnimationsByScene(
+            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        Scene scene = getScene(context);
+        if (scene == null) return builder.buildFuture();
+
+        for (Animation animation : scene.getAnimationManager().getList()) {
+            suggestName(builder, animation.getName());
+        }
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestSubscenesByScene(
+            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        Scene scene = getScene(context);
+        if (scene == null) return builder.buildFuture();
+
+        for (Subscene subscene : scene.getSubsceneManager().getList()) {
+            suggestName(builder, subscene.getName());
+        }
+        return builder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestCutscenesByScene(
+            CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        Scene scene = getScene(context);
+        if (scene == null) return builder.buildFuture();
+
+        for (Cutscene cutscene : scene.getCutsceneManager().getList()) {
+            suggestName(builder, cutscene.getName());
+        }
+        return builder.buildFuture();
+    }
+
+    private static Scene getScene(CommandContext<CommandSourceStack> context) {
+        int chapterIndex = IntegerArgumentType.getInteger(context, "chapter_index");
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
+        if (chapter == null) return null;
+        return chapter.getSceneManager().getByName(StringArgumentType.getString(context, "scene_name"));
+    }
+
+    private static void suggestName(SuggestionsBuilder builder, String name) {
+        if (name.contains(" ")) {
+            builder.suggest("\"" + name + "\"");
+        } else {
+            builder.suggest(name);
+        }
     }
 }
