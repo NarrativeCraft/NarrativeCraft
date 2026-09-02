@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
+import java.util.UUID;
 
 public class NarrativeServerSettings {
 
@@ -43,23 +44,41 @@ public class NarrativeServerSettings {
     public static boolean showNametagGlobalCharacter = true;
     public static String defaultLocale = DEFAULT_LOCALE;
 
+    private static String storyId = "";
+
     public static void init(Path dataDir) {
         settingsFile = dataDir.resolve(FILE_NAME);
 
-        if (Files.exists(settingsFile)) {
+        PROPS.clear();
+        resetToDefault();
+
+        boolean settingsFileExists = Files.exists(settingsFile);
+        if (settingsFileExists) {
             try {
                 load();
                 loadFromProps();
             } catch (IOException e) {
                 NarrativeCraftMod.LOGGER.error("Failed to load server world settings!", e);
+                return;
             }
-        } else {
+        }
+
+        boolean storyIdGenerated = storyId.isBlank();
+        if (storyIdGenerated) {
+            storyId = UUID.randomUUID().toString();
+        }
+
+        if (!settingsFileExists || storyIdGenerated) {
             try {
                 save();
             } catch (IOException e) {
                 NarrativeCraftMod.LOGGER.error("Failed to save default server world settings!", e);
             }
         }
+    }
+
+    public static String getStoryId() {
+        return storyId;
     }
 
     public static void save() throws IOException {
@@ -75,15 +94,24 @@ public class NarrativeServerSettings {
         }
     }
 
+    private static void resetToDefault() {
+        showMainScreenOnJoin = false;
+        showNametagGlobalCharacter = true;
+        defaultLocale = DEFAULT_LOCALE;
+        storyId = "";
+    }
+
     private static void loadFromProps() {
         showMainScreenOnJoin = Boolean.parseBoolean(PROPS.getProperty("showMainScreenOnJoin", "false"));
         showNametagGlobalCharacter = Boolean.parseBoolean(PROPS.getProperty("showNametagGlobalCharacter", "true"));
         defaultLocale = PROPS.getProperty("defaultLocale", DEFAULT_LOCALE);
+        storyId = PROPS.getProperty("storyId", "").trim();
     }
 
     private static void setToProps() {
         PROPS.setProperty("showMainScreenOnJoin", String.valueOf(showMainScreenOnJoin));
         PROPS.setProperty("showNametagGlobalCharacter", String.valueOf(showNametagGlobalCharacter));
         PROPS.setProperty("defaultLocale", defaultLocale);
+        PROPS.setProperty("storyId", storyId);
     }
 }
