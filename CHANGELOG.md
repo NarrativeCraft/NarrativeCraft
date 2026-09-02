@@ -19,6 +19,7 @@
 - Return player to main screen when finished story (if available)
 - Togglable settings to render names of global characters
 - Local save file
+- Play animation, subscene or cutscene directly to a player using commands
 
 ### Fix
 
