@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.0.0-beta]
+## [4.0.0]
 
 ### Break Changes
 - Moved `Side` enum to `utils` package

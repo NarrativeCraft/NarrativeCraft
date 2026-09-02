@@ -18,6 +18,7 @@
 - Launch multiple interaction instead of one in the story
 - Return player to main screen when finished story (if available)
 - Togglable settings to render names of global characters
+- Local save file
 
 ### Fix
 
