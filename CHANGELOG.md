@@ -25,3 +25,4 @@
 ### Fix
 
 - Cannot interpolate with "add" action in time tag
+- Rename interaction not removing old files

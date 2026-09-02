@@ -74,24 +74,24 @@ public class InteractionEditor implements NarrativeEntryEditor<InteractionPayloa
 
     @Override
     public void edit(UUID entryId, InteractionPayload payload, UUID playerId) {
-        Interaction interaction = resolve(entryId, payload);
-        if (interaction == null) return;
+        Interaction oldInteraction = resolve(entryId, payload);
+        if (oldInteraction == null) return;
 
-        String oldName = interaction.getName();
-        String oldDescription = interaction.getDescription();
+        Interaction newInteraction =
+                new Interaction(entryId, payload.getName(), payload.getDescription(), oldInteraction.getScene());
+        newInteraction.getZones().addAll(oldInteraction.getZones());
+        newInteraction.getPoints().addAll(oldInteraction.getPoints());
 
-        interaction.setName(payload.getName());
-        interaction.setDescription(payload.getDescription());
-
-        int result = NarrativeCraftFileRegistry.getInstance().edit(interaction);
+        int result = NarrativeCraftFileRegistry.getInstance().edit(newInteraction);
 
         if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            interaction.setName(oldName);
-            interaction.setDescription(oldDescription);
             ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
             UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
             return;
         }
+
+        oldInteraction.setName(payload.getName());
+        oldInteraction.setDescription(payload.getDescription());
 
         UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
     }
