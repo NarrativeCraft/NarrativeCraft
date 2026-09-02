@@ -127,6 +127,7 @@
   "narrativecraft.error.start_story": "Failed to start story!",
   "narrativecraft.error.save_settings": "Failed to save your settings!",
   "narrativecraft.error.no_on_enter": "You must have the tag \"# on_enter\" after your knot!",
+  "narrativecraft.error.unknown_tag": "The tag \"%s\" does not exist!",
 
   "narrativecraft.record.start": "Recording started...",
   "narrativecraft.record.stop": "Recording stopped.",

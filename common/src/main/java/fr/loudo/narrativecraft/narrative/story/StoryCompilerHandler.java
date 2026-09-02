@@ -121,7 +121,15 @@ public class StoryCompilerHandler {
             while (matcher.find()) {
                 String rawTag = matcher.group(1).trim();
                 try {
-                    dispatcher.dispatch(rawTag, scene);
+                    if (dispatcher.dispatch(rawTag, scene) == null) {
+                        errors.add(new TagError(
+                                chapter,
+                                scene,
+                                inkFile.getName(),
+                                lineIndex + 1,
+                                rawTag,
+                                Translation.message("error.unknown_tag", rawTag).getString()));
+                    }
                 } catch (InkTagHandlerException e) {
                     errors.add(new TagError(chapter, scene, inkFile.getName(), lineIndex + 1, rawTag, e.getMessage()));
                 }
