@@ -139,8 +139,10 @@
   "narrativecraft.record.recorded_nothing": "You recorded nothing!",
   "narrativecraft.record.recording": "Please stop your recording before saving.",
 
-  "narrativecraft.playback.start": "Animation %s playing back...",
-  "narrativecraft.playback.start_for_players": "Animation %s playing back to targeted players...",
+  "narrativecraft.playback.start": "%s %s playing back...",
+  "narrativecraft.playback.start_for_players": "%s %s playing back to targeted players...",
+  "narrativecraft.playback.stop": "%s %s stopped.",
+  "narrativecraft.playback.not_playing": "%s %s is not playing.",
 
   "narrativecraft.session.set": "Your session is now set to §lchapter§r %s and §lscene§r %s.",
   "narrativecraft.session.current": "Your current session is : §lchapter§r %s and §lscene§r %s.",
