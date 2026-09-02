@@ -15,13 +15,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - branch: 26.2-beta
+          - branch: 26.2
             mc_version: 26.2
             loader: neoforge
-          - branch: 1.21.1-beta
+          - branch: 1.21.1
             mc_version: 1.21.1
             loader: neoforge
-          - branch: 1.20.1-beta
+          - branch: 1.20.1
             mc_version: 1.20.1
             loader: forge
 
@@ -124,7 +124,6 @@ jobs:
         with:
           body: ${{ env.CHANGELOG }}
           files: artifacts/**/*.jar
-          prerelease: true
 
       - name: Publish to Modrinth
         env:
@@ -155,7 +154,7 @@ jobs:
                 changelog: $changelog,
                 dependencies: $deps,
                 game_versions: [$mc_version],
-                version_type: "beta",
+                version_type: "release",
                 environment: "client_and_server",
                 loaders: [$loader],
                 featured: true,
@@ -178,9 +177,7 @@ jobs:
         run: |
           ICON_URL="https://raw.githubusercontent.com/NarrativeCraft/NarrativeCraft/refs/heads/${DEFAULT_BRANCH}/common/src/main/resources/narrativecraft.png"
           TIMESTAMP=$(date +%s)
-          ROLE_ID="1542428563398197329"
-
-          ACCENT_COLOR=13729047
+          ROLE_ID="1515653721621794968"
 
           PAYLOAD=$(jq -n \
             --arg version "${MOD_VERSION}" \
@@ -188,14 +185,13 @@ jobs:
             --arg changelog "${CHANGELOG}" \
             --arg ts "${TIMESTAMP}" \
             --arg role "${ROLE_ID}" \
-            --argjson accent "${ACCENT_COLOR}" \
             '{
               flags: 32768,
               allowed_mentions: { roles: [$role] },
               components: [
                 {
                   type: 17,
-                  accent_color: $accent,
+                  accent_color: 11479789,
                   components: [
                     {
                       type: 9,

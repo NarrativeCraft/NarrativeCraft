@@ -22,6 +22,7 @@
 - Play animation, subscene or cutscene directly to a player using commands
 - Error if a tag does not exist
 - Shadow flag in text tag when creating a text
+- Simplified Chinese and Traditional Chinese lang by @LinLei0102
 
 ### Fix
 
