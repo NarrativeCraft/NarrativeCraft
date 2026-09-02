@@ -21,8 +21,10 @@
 - Local save file
 - Play animation, subscene or cutscene directly to a player using commands
 - Error if a tag does not exist
+- Shadow flag in text tag when creating a text
 
 ### Fix
 
 - Cannot interpolate with "add" action in time tag
 - Rename interaction not removing old files
+- Text ink text tag scale not fixed
