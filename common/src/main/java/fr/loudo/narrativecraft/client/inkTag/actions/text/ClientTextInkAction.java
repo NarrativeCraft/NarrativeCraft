@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.TextInkAction;
+import fr.loudo.narrativecraft.utils.UtilsClient;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -36,6 +37,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.FastColor;
 
 public class ClientTextInkAction extends TextInkAction {
+
+    private static final float REFERENCE_GUI_SCALE = 3f;
 
     @Nullable
     private ClientTextInkAction monitoredInstance;
@@ -76,21 +79,22 @@ public class ClientTextInkAction extends TextInkAction {
         Font font = Minecraft.getInstance().font;
         cachedTextDimensions = scrollText.computeTextDimensions(width, font, dialogData);
 
-        float[] origin = computeOrigin(
-                guiGraphics.guiWidth(), guiGraphics.guiHeight(), cachedTextDimensions[0], cachedTextDimensions[1]);
+        float uiScale = UtilsClient.computeUiScale(REFERENCE_GUI_SCALE);
+        float renderedWidth = cachedTextDimensions[0] * uiScale;
+        float renderedHeight = cachedTextDimensions[1] * uiScale;
+
+        float[] origin = computeOrigin(guiGraphics.guiWidth(), guiGraphics.guiHeight(), renderedWidth, renderedHeight);
         float[] animationOffset = computeAnimationOffset(
-                guiGraphics.guiWidth(),
-                guiGraphics.guiHeight(),
-                cachedTextDimensions[0],
-                cachedTextDimensions[1],
-                1f,
-                partialTick);
+                guiGraphics.guiWidth(), guiGraphics.guiHeight(), renderedWidth, renderedHeight, uiScale, partialTick);
 
         guiGraphics.pose().pushPose();
         guiGraphics
                 .pose()
-                .translate(origin[0] + space.x + animationOffset[0], origin[1] + space.y + animationOffset[1], 0);
-        guiGraphics.pose().scale(scale, scale, 1f);
+                .translate(
+                        origin[0] + space.x * uiScale + animationOffset[0],
+                        origin[1] + space.y * uiScale + animationOffset[1],
+                        0f);
+        guiGraphics.pose().scale(scale * uiScale, scale * uiScale, 1f);
         scrollText.render2D(guiGraphics, 0, 0, dialogData, partialTick);
         guiGraphics.pose().popPose();
     }

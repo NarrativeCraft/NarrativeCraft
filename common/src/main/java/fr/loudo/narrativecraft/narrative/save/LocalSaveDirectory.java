@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 
 public class LocalSaveDirectory {
 

@@ -35,7 +35,7 @@ import fr.loudo.narrativecraft.dialog.DialogData;
         keyword = "text",
         description = "Creates, moves, edits, or removes a named text overlay displayed on the client HUD.",
         syntax =
-                "text <id:string> <action:string> (param1:string) (param2:string) (param3:string) (param4:string) [--block]",
+                "text <id:string> <action:string> (param1:string) (param2:string) (param3:string) (param4:string) [--block] [--shadow]",
         side = Side.CLIENT)
 public class TextInkAction extends OverlayInkAction {
 
@@ -57,6 +57,7 @@ public class TextInkAction extends OverlayInkAction {
                 }
                 text = value1;
                 noTyping = true;
+                shadow = cmd.flag("shadow");
                 if (value2 != null && !value2.isEmpty()) {
                     try {
                         color = Integer.parseInt(value2, 16);
