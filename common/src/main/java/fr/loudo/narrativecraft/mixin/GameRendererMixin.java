@@ -26,8 +26,10 @@ package fr.loudo.narrativecraft.mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.imgui.ClientImGui;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.studio.NarrativeStudio;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -39,6 +41,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
+
+    @Inject(method = "render", at = @At("RETURN"))
+    private void narrativecraft$renderStudio(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
+        NarrativeStudio studio = NarrativeStudio.getInstance();
+        if (!studio.isOpen()) return;
+        ClientImGui.getInstance().draw(studio::render);
+    }
 
     @Inject(method = "bobHurt", at = @At("RETURN"), cancellable = true)
     private void narrativecraft$shakeScreenInkAction(

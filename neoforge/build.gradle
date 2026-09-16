@@ -39,12 +39,16 @@ dependencies {
             prefer "${imgui_version}"
         }
     }
+    jarJar(implementation("io.github.spair:imgui-java-lwjgl3")) {
+        version { prefer "${imgui_version}" }
+        exclude group: 'org.lwjgl'
+    }
+    implementation("io.github.spair:imgui-java-lwjgl3:${imgui_version}") { exclude group: 'org.lwjgl' }
     implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}"
     implementation "com.bladecoder.ink:blade-ink-compiler:${blade_ink_version}"
     implementation "org.yaml:snakeyaml:${snakeyaml_version}"
     implementation "io.github.spair:imgui-java-binding:${imgui_version}"
     implementation project(':api')
-    implementation project(':widgets')
 }
 
 neoForge {
@@ -80,7 +84,6 @@ neoForge {
         "${mod_id}" {
             sourceSet sourceSets.main
             sourceSet project(':api').sourceSets.main
-            sourceSet project(':widgets').sourceSets.main
         }
     }
 }
@@ -89,7 +92,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 jar {
     from project(':api').sourceSets.main.output
-    from project(':widgets').sourceSets.main.output
 }
 
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)

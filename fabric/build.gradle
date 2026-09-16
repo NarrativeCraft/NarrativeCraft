@@ -13,8 +13,8 @@ dependencies {
     include(runtimeOnly "io.github.spair:imgui-java-natives-windows:${imgui_version}")
     include(runtimeOnly "io.github.spair:imgui-java-natives-linux:${imgui_version}")
     include(runtimeOnly "io.github.spair:imgui-java-natives-macos:${imgui_version}")
+    include(implementation("io.github.spair:imgui-java-lwjgl3:${imgui_version}") { exclude group: 'org.lwjgl' })
     include(implementation project(':api'))
-    include(implementation project(':widgets'))
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 

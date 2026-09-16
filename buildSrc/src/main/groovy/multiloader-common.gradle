@@ -73,7 +73,6 @@ processResources {
             'java_version'                 : java_version,
             'blade_ink_version'            : blade_ink_version,
             'api_version'                  : api_version,
-            'widgets_version'              : widgets_version,
             'imgui_version'                : imgui_version,
     ]
 
