@@ -23,37 +23,25 @@
 
 package fr.loudo.narrativecraft.client.imgui;
 
-import com.mojang.blaze3d.opengl.FrameBufferAttachment;
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.CommandEncoder;
-import com.mojang.blaze3d.systems.GpuDeviceBackend;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.commands.CommandEncoder;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.mixin.accessor.GlDeviceAccessor;
-import fr.loudo.narrativecraft.mixin.accessor.GpuDeviceAccessor;
 import imgui.ImDrawData;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
-import imgui.gl3.ImGuiImplGl3;
-import imgui.glfw.ImGuiImplGlfw;
-import java.util.List;
+import imgui.sdl3.ImGuiImplSdl3;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL30C;
 
 public class ClientImGui {
 
-    private static final String VULKAN_BACKEND_NAME = "Vulkan";
     private static final ClientImGui instance = new ClientImGui();
 
-    private final ImGuiImplGlfw platform = new ImGuiImplGlfw();
-    private ImGuiImplGl3 openGlRenderer;
-    private ClientImGuiBlaze3DRenderer blaze3dRenderer;
+    private final ImGuiImplSdl3 platform = new ImGuiImplSdl3();
+    private ClientImGuiBlaze3DRenderer renderer;
     private boolean created;
 
     private ClientImGui() {}
@@ -72,54 +60,33 @@ public class ClientImGui {
         io.setIniFilename(NarrativeCraftMod.MOD_ID + ".ini");
         io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 
-        String backendName = RenderSystem.getDevice().getDeviceInfo().backendName();
-        if (VULKAN_BACKEND_NAME.equals(backendName)) {
-            blaze3dRenderer = new ClientImGuiBlaze3DRenderer();
-            platform.initForVulkan(windowHandle, true);
-        } else {
-            openGlRenderer = new ImGuiImplGl3();
-            platform.initForOpenGL(windowHandle, true);
-            openGlRenderer.init();
-        }
+        renderer = new ClientImGuiBlaze3DRenderer();
+        platform.initForVulkan(windowHandle);
         created = true;
-        NarrativeCraftMod.LOGGER.info("ImGui initialized with {} backend", backendName);
+        NarrativeCraftMod.LOGGER.info(
+                "ImGui initialized with {} backend",
+                RenderSystem.getDevice().getDeviceInfo().backendName());
     }
 
     public boolean isCreated() {
         return created;
     }
 
+    /**
+     * Forwards a raw SDL event to ImGui so it can track mouse, keyboard and text input.
+     *
+     * @param eventAddress native address of the {@code SDL_Event}
+     */
+    public void processEvent(long eventAddress) {
+        if (!created) return;
+        platform.processEvent(eventAddress);
+    }
+
     public void draw(ClientImGuiRenderable renderable) {
         if (!created) return;
         RenderTarget framebuffer = Minecraft.getInstance().gameRenderer.mainRenderTarget();
-        if (openGlRenderer != null) {
-            drawOpenGl(framebuffer, renderable);
-        } else if (blaze3dRenderer != null) {
-            drawBlaze3d(framebuffer, renderable);
-        }
-    }
 
-    private void drawOpenGl(RenderTarget framebuffer, ClientImGuiRenderable renderable) {
-        GpuDeviceBackend backend = ((GpuDeviceAccessor) RenderSystem.getDevice()).getBackend();
-        GlDeviceAccessor glDevice = (GlDeviceAccessor) backend;
-        List<FrameBufferAttachment> colorAttachments = List.of((GlTexture) framebuffer.getColorTexture());
-        int framebufferId =
-                glDevice.getFrameBufferCache().getFbo(glDevice.getDirectStateAccess(), colorAttachments, null);
-        GlStateManager._glBindFramebuffer(GL30C.GL_FRAMEBUFFER, framebufferId);
-        GL11C.glViewport(0, 0, framebuffer.width, framebuffer.height);
-
-        openGlRenderer.newFrame();
-        platform.newFrame();
-        ImGui.newFrame();
-        renderable.render(ImGui.getIO());
-        ImGui.render();
-        openGlRenderer.renderDrawData(ImGui.getDrawData());
-
-        GlStateManager._glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
-    }
-
-    private void drawBlaze3d(RenderTarget framebuffer, ClientImGuiRenderable renderable) {
-        blaze3dRenderer.newFrame();
+        renderer.newFrame();
         platform.newFrame();
         ImGui.newFrame();
         renderable.render(ImGui.getIO());
@@ -127,23 +94,20 @@ public class ClientImGui {
 
         ImDrawData drawData = ImGui.getDrawData();
         CommandEncoder encoder = RenderSystem.getDevice().createCommandEncoder();
-        blaze3dRenderer.uploadDrawData(drawData, encoder);
+        // Buffer uploads must happen outside the render pass
+        renderer.uploadDrawData(drawData, encoder);
         try (RenderPass renderPass = encoder.createRenderPass(
                 () -> "NarrativeCraft ImGui", framebuffer.getColorTextureView(), Optional.empty())) {
-            blaze3dRenderer.renderDrawData(drawData, renderPass);
+            renderer.renderDrawData(drawData, renderPass);
         }
         encoder.submit();
     }
 
     public void dispose() {
         if (!created) return;
-        if (openGlRenderer != null) {
-            openGlRenderer.shutdown();
-            openGlRenderer = null;
-        }
-        if (blaze3dRenderer != null) {
-            blaze3dRenderer.dispose();
-            blaze3dRenderer = null;
+        if (renderer != null) {
+            renderer.dispose();
+            renderer = null;
         }
         platform.shutdown();
         ImGui.destroyContext();

@@ -4,12 +4,12 @@ layout(std140, binding = 0) uniform ProjMtx {
     mat4 Value;
 };
 
-in vec2 Position;
-in vec2 UV;
-in vec4 Color;
+layout(location = 0) in vec2 Position;
+layout(location = 1) in vec2 UV;
+layout(location = 2) in vec4 Color;
 
-out vec2 Frag_UV;
-out vec4 Frag_Color;
+layout(location = 0) out vec2 Frag_UV;
+layout(location = 1) out vec4 Frag_Color;
 
 void main() {
     Frag_UV = UV;

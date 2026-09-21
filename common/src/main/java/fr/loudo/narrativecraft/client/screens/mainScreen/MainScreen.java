@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.screens.mainScreen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
@@ -47,7 +48,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import org.lwjgl.glfw.GLFW;
 
 public class MainScreen extends Screen {
 
@@ -268,7 +268,7 @@ public class MainScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (event.key() == GLFW.GLFW_KEY_LEFT_CONTROL) {
+        if (event.input() == InputConstants.KEY_LCONTROL) {
             ctrlPressCount++;
             if (ctrlPressCount >= SECRET_CTRL_PRESSES && leaveScreenButton != null) {
                 leaveScreenButton.visible = true;

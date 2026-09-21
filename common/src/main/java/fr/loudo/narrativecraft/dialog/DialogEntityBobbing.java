@@ -60,8 +60,8 @@ public class DialogEntityBobbing {
         }
         noiseI += (1.0f / 20.0f) * noiseShakeSpeed;
 
-        float currentOffsetXRot = (float) noise.getValue(1, noiseI) * noiseShakeStrength;
-        float currentOffsetYRot = (float) noise.getValue(100, noiseI) * noiseShakeStrength;
+        float currentOffsetXRot = (float) noise.get(1, noiseI) * noiseShakeStrength;
+        float currentOffsetYRot = (float) noise.get(100, noiseI) * noiseShakeStrength;
 
         applyOffset(currentOffsetXRot, currentOffsetYRot);
     }

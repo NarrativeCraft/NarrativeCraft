@@ -43,7 +43,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class GameRendererMixin {
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void narrativecraft$renderStudio(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
+    private void narrativecraft$renderStudio(CallbackInfo ci) {
         NarrativeStudio studio = NarrativeStudio.getInstance();
         if (!studio.isOpen()) return;
         ClientImGui.getInstance().draw(studio::render);

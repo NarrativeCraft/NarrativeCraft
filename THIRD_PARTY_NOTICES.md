@@ -12,15 +12,19 @@ third-party work and remain subject to their original license terms in addition 
 Derived files:
 
 - `common/src/main/java/fr/loudo/narrativecraft/client/imgui/ClientImGuiBlaze3DRenderer.java`
-  (from `game/26.2/src/main/java/cn/enaium/fabric/imgui/blaze3d/ImGuiImplBlaze3D.java`)
+  (from `game/26.3/src/main/java/cn/enaium/fabric/imgui/blaze3d/ImGuiImplBlaze3D.java`)
 - `common/src/main/java/fr/loudo/narrativecraft/client/imgui/ClientImGui.java`
-  (from `game/26.2/src/main/java/cn/enaium/fabric/imgui/DefaultImGui.java` and
+  (from `game/26.3/src/main/java/cn/enaium/fabric/imgui/DefaultImGui.java` and
   `core/src/main/java/cn/enaium/fabric/imgui/ImGuiService.java`)
+- `common/src/main/java/fr/loudo/narrativecraft/mixin/SDLEventHandlerMixin.java`
+  (from `game/26.3/src/main/java/cn/enaium/fabric/imgui/mixin/SDLEventHandlerMixin.java`)
 - `common/src/main/resources/assets/narrativecraft/shaders/core/imgui.vsh`
 - `common/src/main/resources/assets/narrativecraft/shaders/core/imgui.fsh`
+  (from `game/26.3/src/main/resources/assets/fabric-gui-imgui/shaders/core/`)
 
-Modifications: renamed to the NarrativeCraft package and identifiers, removed ImPlot, multi-viewport support and
-the ImGui texture registry, adapted naming conventions.
+Modifications: renamed to the NarrativeCraft package and identifiers, removed ImPlot, multi-viewport support,
+the OpenGL (`ImGuiImplGl3`) code path and the ImGui texture registry, kept only the Blaze3D/RenderPearl renderer
+(Vulkan), replaced the SDL event redirect with an injection, adapted naming conventions.
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");

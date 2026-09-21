@@ -21,15 +21,23 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin.accessor;
+package fr.loudo.narrativecraft.mixin;
 
-import com.mojang.blaze3d.systems.GpuDevice;
-import com.mojang.blaze3d.systems.GpuDeviceBackend;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.platform.SDLEventHandler;
+import fr.loudo.narrativecraft.client.imgui.ClientImGui;
+import org.lwjgl.sdl.SDL_Event;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GpuDevice.class)
-public interface GpuDeviceAccessor {
-    @Accessor
-    GpuDeviceBackend getBackend();
+@Mixin(SDLEventHandler.class)
+public class SDLEventHandlerMixin {
+
+    // Forward every polled SDL event to ImGui before Minecraft dispatches it
+    @Inject(method = "pollEvents", at = @At(value = "INVOKE", target = "Lorg/lwjgl/sdl/SDL_Event;type()I"))
+    private void narrativecraft$forwardEventToImGui(CallbackInfo ci, @Local(name = "event") SDL_Event event) {
+        ClientImGui.getInstance().processEvent(event.address());
+    }
 }

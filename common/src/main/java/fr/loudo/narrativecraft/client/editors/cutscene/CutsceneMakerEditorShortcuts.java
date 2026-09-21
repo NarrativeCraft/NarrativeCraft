@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.client.editors.cutscene;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
@@ -32,9 +33,8 @@ import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 public class CutsceneMakerEditorShortcuts {
 
@@ -58,30 +58,31 @@ public class CutsceneMakerEditorShortcuts {
     }
 
     public boolean handleKeyPressed(KeyEvent event) {
-        boolean ctrl = Minecraft.getInstance().hasControlDown();
-        int keyCode = event.key();
+        boolean ctrl = event.hasControlDown();
+        // Shortcuts use the layout-dependent SDL keycode, physical keys use the scancode
+        int shortcutKey = event.shortcutKey();
 
-        if (ctrl && keyCode == GLFW.GLFW_KEY_S) {
+        if (ctrl && shortcutKey == SDLKeycode.SDLK_S) {
             save();
             return true;
         }
-        if (ctrl && keyCode == GLFW.GLFW_KEY_Z) {
+        if (ctrl && shortcutKey == SDLKeycode.SDLK_Z) {
             undo();
             return true;
         }
-        if (ctrl && keyCode == GLFW.GLFW_KEY_Y) {
+        if (ctrl && shortcutKey == SDLKeycode.SDLK_Y) {
             redo();
             return true;
         }
-        if (ctrl && keyCode == GLFW.GLFW_KEY_C) {
+        if (event.isCopy()) {
             copy();
             return true;
         }
-        if (ctrl && keyCode == GLFW.GLFW_KEY_V) {
+        if (event.isPaste()) {
             paste();
             return true;
         }
-        if (keyCode == GLFW.GLFW_KEY_DELETE) {
+        if (event.input() == InputConstants.KEY_DELETE) {
             deleteSelected();
             return true;
         }

@@ -23,28 +23,28 @@
 
 package fr.loudo.narrativecraft.client.imgui;
 
-import com.mojang.blaze3d.GpuFormat;
-import com.mojang.blaze3d.IndexType;
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.pipeline.BindGroupLayout;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.CompiledRenderPipeline;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.BlendFactor;
-import com.mojang.blaze3d.platform.PolygonMode;
-import com.mojang.blaze3d.shaders.UniformType;
-import com.mojang.blaze3d.systems.CommandEncoder;
-import com.mojang.blaze3d.systems.GpuDevice;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.AddressMode;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuSampler;
-import com.mojang.blaze3d.textures.GpuTexture;
-import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
+import com.mojang.renderpearl.api.commands.CommandEncoder;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.device.GpuDevice;
+import com.mojang.renderpearl.api.pipeline.BindGroupLayout;
+import com.mojang.renderpearl.api.pipeline.BlendFactor;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.CompiledRenderPipeline;
+import com.mojang.renderpearl.api.pipeline.IndexType;
+import com.mojang.renderpearl.api.pipeline.PolygonMode;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.UniformType;
+import com.mojang.renderpearl.api.textures.AddressMode;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuSampler;
+import com.mojang.renderpearl.api.textures.GpuTexture;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import imgui.ImDrawData;
 import imgui.ImFontAtlas;
@@ -85,8 +85,9 @@ public class ClientImGuiBlaze3DRenderer {
         if (renderPipeline == null) {
             createPipeline();
         }
-        if (compiledPipeline == null || !compiledPipeline.isValid()) {
-            compiledPipeline = RenderSystem.getDevice().precompilePipeline(renderPipeline);
+        // Shaders are only resolvable once the initial resource reload has finished; retry every frame until then
+        if (compiledPipeline == null || compiledPipeline.isClosed()) {
+            compiledPipeline = RenderSystem.getCompiledPipelineNullable(renderPipeline);
         }
         if (!isReady()) {
             return;
@@ -98,7 +99,7 @@ public class ClientImGuiBlaze3DRenderer {
     }
 
     private boolean isReady() {
-        return compiledPipeline != null && compiledPipeline.isValid() && projectionMatrixUniform != null;
+        return compiledPipeline != null && !compiledPipeline.isClosed() && projectionMatrixUniform != null;
     }
 
     private void createPipeline() {
@@ -119,8 +120,9 @@ public class ClientImGuiBlaze3DRenderer {
                 .withBindGroupLayout(BindGroupLayout.builder()
                         .withUniform("ProjMtx", UniformType.UNIFORM_BUFFER)
                         .build())
-                .withBindGroupLayout(
-                        BindGroupLayout.builder().withSampler("Texture").build())
+                .withBindGroupLayout(BindGroupLayout.builder()
+                        .withUniform("Texture", UniformType.COMBINED_IMAGE_SAMPLER)
+                        .build())
                 .build();
 
         if (projectionMatrixUniform != null) {
@@ -274,7 +276,7 @@ public class ClientImGuiBlaze3DRenderer {
             return;
         }
 
-        renderPass.setPipeline(renderPipeline);
+        renderPass.setPipeline(compiledPipeline);
         renderPass.setUniform("ProjMtx", projectionMatrixUniform);
 
         float clipOffsetX = drawData.getDisplayPosX();
@@ -322,7 +324,7 @@ public class ClientImGuiBlaze3DRenderer {
                 if (textureId != FONT_TEXTURE_ID) {
                     continue;
                 }
-                renderPass.bindTexture("Texture", fontTextureView, fontSampler);
+                renderPass.setUniform("Texture", fontTextureView, fontSampler);
 
                 int elementCount = drawData.getCmdListCmdBufferElemCount(commandListIndex, commandIndex);
                 int indexBufferOffset = drawData.getCmdListCmdBufferIdxOffset(commandListIndex, commandIndex);
