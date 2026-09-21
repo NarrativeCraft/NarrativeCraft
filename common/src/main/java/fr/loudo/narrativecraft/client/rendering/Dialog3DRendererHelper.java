@@ -58,22 +58,6 @@ public final class Dialog3DRendererHelper {
         ((SubmitNodeStorage) collector).order(order).submitCustomGeometry(poseStack, renderType, renderer);
     }
 
-    public static void textBackground(
-            SubmitNodeCollector collector,
-            int order,
-            PoseStack poseStack,
-            float x0,
-            float y0,
-            float x1,
-            float y1,
-            int color,
-            Font.DisplayMode displayMode,
-            int lightCoords) {
-        ((SubmitNodeStorage) collector)
-                .order(order)
-                .submitTextBackground(poseStack, x0, y0, x1, y1, color, displayMode, lightCoords);
-    }
-
     public static void text(
             SubmitNodeCollector collector,
             int order,

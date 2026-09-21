@@ -31,6 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
@@ -157,46 +158,33 @@ public class DialogRenderer3D extends DialogRenderer {
 
     private void renderBackground(
             PoseStack poseStack, SubmitNodeCollector collector, float totalWidth, float totalHeight, float opacity) {
-        if (data.getBackgroundImage() != null) {
-            int color = applyOpacity(0xFFFFFFFF, opacity);
-            Dialog3DRendererHelper.geometry(
-                    collector,
-                    Dialog3DRendererHelper.LAYER_BACKGROUND,
-                    poseStack,
-                    RenderTypes.textSeeThrough(data.getBackgroundImage()),
-                    (pose, consumer) -> {
-                        Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, 0, 0, 0)
-                                .setColor(color)
-                                .setUv(0f, 0f)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT));
-                        Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, 0, totalHeight, 0)
-                                .setColor(color)
-                                .setUv(0f, 1f)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT));
-                        Dialog3DRendererHelper.fillUnusedVertexAttributes(
-                                consumer.addVertex(pose, totalWidth, totalHeight, 0)
-                                        .setColor(color)
-                                        .setUv(1f, 1f)
-                                        .setLight(LightCoordsUtil.FULL_BRIGHT));
-                        Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, totalWidth, 0, 0)
-                                .setColor(color)
-                                .setUv(1f, 0f)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT));
-                    });
-        } else {
-            int color = applyOpacity(data.getBackgroundColor(), opacity);
-            Dialog3DRendererHelper.textBackground(
-                    collector,
-                    Dialog3DRendererHelper.LAYER_BACKGROUND,
-                    poseStack,
-                    0,
-                    0,
-                    totalWidth,
-                    totalHeight,
-                    color,
-                    Font.DisplayMode.SEE_THROUGH,
-                    LightCoordsUtil.FULL_BRIGHT);
-        }
+        boolean hasImage = data.getBackgroundImage() != null;
+        Identifier texture = hasImage ? data.getBackgroundImage() : Dialog3DRendererHelper.WHITE_TEXTURE;
+        int color = applyOpacity(hasImage ? 0xFFFFFFFF : data.getBackgroundColor(), opacity);
+        Dialog3DRendererHelper.geometry(
+                collector,
+                Dialog3DRendererHelper.LAYER_BACKGROUND,
+                poseStack,
+                RenderTypes.textSeeThrough(texture),
+                (pose, consumer) -> {
+                    Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, 0, 0, 0)
+                            .setColor(color)
+                            .setUv(0f, 0f)
+                            .setLight(LightCoordsUtil.FULL_BRIGHT));
+                    Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, 0, totalHeight, 0)
+                            .setColor(color)
+                            .setUv(0f, 1f)
+                            .setLight(LightCoordsUtil.FULL_BRIGHT));
+                    Dialog3DRendererHelper.fillUnusedVertexAttributes(
+                            consumer.addVertex(pose, totalWidth, totalHeight, 0)
+                                    .setColor(color)
+                                    .setUv(1f, 1f)
+                                    .setLight(LightCoordsUtil.FULL_BRIGHT));
+                    Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, totalWidth, 0, 0)
+                            .setColor(color)
+                            .setUv(1f, 0f)
+                            .setLight(LightCoordsUtil.FULL_BRIGHT));
+                });
     }
 
     private void renderText(PoseStack poseStack, SubmitNodeCollector collector, float partialTick) {
