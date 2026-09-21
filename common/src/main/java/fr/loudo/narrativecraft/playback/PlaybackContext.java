@@ -43,6 +43,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -161,7 +162,7 @@ public class PlaybackContext implements IPlaybackContext {
             mob.setNoAi(true);
         }
 
-        entity.setInvulnerable(true);
+        entity.setPermanentlyInvulnerable(true);
         entity.entityTags().add(Playback.ENTITY_TAG);
     }
 
@@ -180,8 +181,8 @@ public class PlaybackContext implements IPlaybackContext {
             if (entity instanceof ItemEntity itemEntity) {
                 Entity masterEntity = playback.getMasterEntity();
                 if (masterEntity instanceof ServerPlayer player) {
-                    entity = player.drop(itemEntity.getItem(), false, false);
-                    entity.setInvulnerable(true);
+                    entity = player.drop(itemEntity.getItem(), false, Prediction.SERVER_ONLY);
+                    entity.setPermanentlyInvulnerable(true);
                     entity.entityTags().add(Playback.ENTITY_TAG);
                     level.addFreshEntity(entity);
                 }

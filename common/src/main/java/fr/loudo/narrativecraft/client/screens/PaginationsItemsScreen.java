@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.client.screens;
 
+import com.mojang.blaze3d.Blaze3D;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
@@ -36,7 +37,6 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 
 public abstract class PaginationsItemsScreen<T> extends Screen {
 
@@ -104,8 +104,8 @@ public abstract class PaginationsItemsScreen<T> extends Screen {
         this.addRenderableWidget(title);
 
         if (folder != null && this.minecraft != null && this.minecraft.hasSingleplayerServer()) {
-            Button folderButton = Button.builder(Component.literal(CustomFont.FOLDER), b -> Util.getPlatform()
-                            .openFile(folder))
+            Button folderButton = Button.builder(
+                            Component.literal(CustomFont.FOLDER), b -> Blaze3D.openPath(folder.toPath()))
                     .bounds(title.getX() + title.getWidth() + 5, title.getY() + this.font.lineHeight / 2 - 10, 20, 20)
                     .build();
             this.addRenderableWidget(folderButton);

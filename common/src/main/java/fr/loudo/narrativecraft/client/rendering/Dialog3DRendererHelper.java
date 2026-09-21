@@ -24,14 +24,14 @@
 package fr.loudo.narrativecraft.client.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
-import net.minecraft.client.renderer.feature.TextFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
-import org.joml.Matrix4f;
 
 public final class Dialog3DRendererHelper {
 
@@ -39,7 +39,15 @@ public final class Dialog3DRendererHelper {
     public static final int LAYER_TEXT = 1;
     public static final int LAYER_FOREGROUND = 2;
 
+    /** Plain white 1x1 texture, used to draw flat-colored geometry through the text-see-through render type. */
+    public static final Identifier WHITE_TEXTURE =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/misc/white.png");
+
     private Dialog3DRendererHelper() {}
+
+    public static VertexConsumer fillUnusedVertexAttributes(VertexConsumer consumer) {
+        return consumer.setUv1(0, 0).setUv3(0f, 0f).setNormal(0f, 0f, 1f).setLineWidth(1f);
+    }
 
     public static void geometry(
             SubmitNodeCollector collector,
@@ -47,10 +55,23 @@ public final class Dialog3DRendererHelper {
             PoseStack poseStack,
             RenderType renderType,
             SubmitNodeCollector.CustomGeometryRenderer renderer) {
+        ((SubmitNodeStorage) collector).order(order).submitCustomGeometry(poseStack, renderType, renderer);
+    }
+
+    public static void textBackground(
+            SubmitNodeCollector collector,
+            int order,
+            PoseStack poseStack,
+            float x0,
+            float y0,
+            float x1,
+            float y1,
+            int color,
+            Font.DisplayMode displayMode,
+            int lightCoords) {
         ((SubmitNodeStorage) collector)
                 .order(order)
-                .alwaysOnTop
-                .submit(new CustomFeatureRenderer.Submit(poseStack.last().copy(), renderType, renderer));
+                .submitTextBackground(poseStack, x0, y0, x1, y1, color, displayMode, lightCoords);
     }
 
     public static void text(
@@ -68,9 +89,8 @@ public final class Dialog3DRendererHelper {
             int outlineColor) {
         ((SubmitNodeStorage) collector)
                 .order(order)
-                .alwaysOnTop
-                .submit(new TextFeatureRenderer.Submit(
-                        new Matrix4f(poseStack.last().pose()),
+                .submitText(
+                        poseStack,
                         x,
                         y,
                         text,
@@ -79,6 +99,6 @@ public final class Dialog3DRendererHelper {
                         lightCoords,
                         color,
                         backgroundColor,
-                        outlineColor));
+                        outlineColor);
     }
 }

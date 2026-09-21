@@ -56,7 +56,7 @@ public class ModKeys {
             registerKey("narrativecraft.key.stop_recording", InputConstants.KEY_B);
 
     private static KeyMapping registerKey(String translationKey, int code) {
-        KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);
+        KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYBOARD, code, CATEGORY);
         ALL_KEYS.add(key);
         return key;
     }

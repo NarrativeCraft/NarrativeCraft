@@ -23,8 +23,10 @@
 
 package fr.loudo.narrativecraft.events.client;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.editors.cameraangle.CameraAngleMakerEditorCameraRenderer;
@@ -34,10 +36,14 @@ import fr.loudo.narrativecraft.client.editors.interaction.InteractionMakerEditor
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalDouble;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.joml.Matrix4fStack;
 import org.joml.Matrix4fc;
 
@@ -50,7 +56,23 @@ public class OnRenderWorldEvent {
         Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
         modelViewStack.pushMatrix();
         modelViewStack.mul(modelViewMatrix);
-        Minecraft.getInstance().gameRenderer.featureRenderDispatcher().renderAllFeatures(storage);
+
+        GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
+        RenderTarget mainRenderTarget = gameRenderer.mainRenderTarget();
+        try (FeatureRenderDispatcher.PreparedFrame frame =
+                        gameRenderer.featureRenderDispatcher().prepareFrame(storage);
+                RenderPass renderPass = RenderSystem.getDevice()
+                        .createCommandEncoder()
+                        .createRenderPass(
+                                () -> "NarrativeCraft world overlay",
+                                mainRenderTarget.getColorTextureView(),
+                                Optional.empty(),
+                                mainRenderTarget.getDepthTextureView(),
+                                OptionalDouble.empty())) {
+            RenderSystem.bindDefaultUniforms(renderPass);
+            FeatureRenderDispatcher.renderAllFeatures(renderPass, frame);
+        }
+
         modelViewStack.popMatrix();
     }
 

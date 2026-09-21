@@ -23,15 +23,13 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import fr.loudo.narrativecraft.events.client.OnRenderWorldEvent;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import org.joml.Matrix4fc;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,15 +42,16 @@ public class LevelRendererMixinFabric {
     @Inject(method = "render", at = @At("TAIL"))
     private void narrativecraft$renderAfterWorld(
             GraphicsResourceAllocator resourceAllocator,
-            DeltaTracker deltaTracker,
             boolean renderOutline,
             CameraRenderState cameraState,
-            Matrix4fc modelViewMatrix,
             GpuBufferSlice terrainFog,
             Vector4f fogColor,
             boolean shouldRenderSky,
+            boolean consistentDepthRequired,
             CallbackInfo ci) {
         OnRenderWorldEvent.renderWorldImmediate(
-                new PoseStack(), modelViewMatrix, Minecraft.getInstance().getDeltaTracker());
+                new PoseStack(),
+                cameraState.viewRotationMatrix,
+                Minecraft.getInstance().getDeltaTracker());
     }
 }

@@ -31,6 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -41,7 +42,7 @@ public class ClientPlayerStateSignalWatcher {
     private boolean sneaking;
     private boolean sprinting;
     private boolean swinging;
-    private int swingTime;
+    private float swingProgress;
     private Item heldItem;
     private int selectedSlot;
     private CameraType cameraType;
@@ -77,8 +78,8 @@ public class ClientPlayerStateSignalWatcher {
         Inventory inventory = player.getInventory();
         sneaking = player.isShiftKeyDown();
         sprinting = player.isSprinting();
-        swinging = player.swinging;
-        swingTime = player.swingTime;
+        swinging = player.isSwinging();
+        swingProgress = player.getSwingAnimation(1.0F);
         heldItem = inventory.getSelectedItem().getItem();
         selectedSlot = inventory.getSelectedSlot();
         cameraType = minecraft.options.getCameraType();
@@ -101,13 +102,14 @@ public class ClientPlayerStateSignalWatcher {
     }
 
     private void tickSwingHand(LocalPlayer player) {
-        boolean currentlySwinging = player.swinging;
-        int currentSwingTime = player.swingTime;
-        boolean swingStarted = currentlySwinging && (!swinging || currentSwingTime <= swingTime);
+        boolean currentlySwinging = player.isSwinging();
+        float currentSwingProgress = player.getSwingAnimation(1.0F);
+        boolean swingStarted = currentlySwinging && (!swinging || currentSwingProgress <= swingProgress);
         swinging = currentlySwinging;
-        swingTime = currentSwingTime;
+        swingProgress = currentSwingProgress;
         if (!swingStarted) return;
-        emit(new SignalPlayerSwingHand(player.swingingArm));
+        LivingEntity.SwingDescription currentSwing = player.getCurrentSwing();
+        emit(new SignalPlayerSwingHand(currentSwing != null ? currentSwing.hand() : null));
     }
 
     private void tickHeldItem(LocalPlayer player) {

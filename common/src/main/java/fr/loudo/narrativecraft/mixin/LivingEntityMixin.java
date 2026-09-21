@@ -35,18 +35,19 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
     @Inject(method = "startSleeping", at = @At("HEAD"))
-    private void narrativecraft$startSleeping(BlockPos pos, CallbackInfo ci) {
+    private void narrativecraft$startSleeping(BlockPos bedPosition, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         RecordingEntityData recordingEntityData =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecordingEntityData(livingEntity);
         if (recordingEntityData == null) return;
 
-        recordingEntityData.addAction(new SleepAction(recordingEntityData.getRecordingTick(), pos));
+        recordingEntityData.addAction(new SleepAction(recordingEntityData.getRecordingTick(), bedPosition));
     }
 
     @Inject(method = "dropAllDeathLoot", at = @At("HEAD"), cancellable = true)

@@ -70,7 +70,7 @@ public class MinecraftCommandInkAction extends InkAction {
         }
         MinecraftServer server = NarrativeCraftMod.getInstance().getServer();
         CommandSourceStack source =
-                new CommandSourceStack(null, null, null, null, PermissionSet.ALL_PERMISSIONS, null, null, server, null);
+                new CommandSourceStack(null, null, null, null, PermissionSet.ALL_PERMISSIONS, server, null);
         ParseResults<CommandSourceStack> parse =
                 server.getCommands().getDispatcher().parse(new StringReader(tempCmd), source);
 
@@ -107,8 +107,6 @@ public class MinecraftCommandInkAction extends InkAction {
                 fakePlayer.getRotationVector(),
                 fakePlayer.level(),
                 PermissionSet.ALL_PERMISSIONS,
-                fakePlayer.getName().getString(),
-                fakePlayer.getDisplayName(),
                 fakePlayer.level().getServer(),
                 entityTargeted);
         try {

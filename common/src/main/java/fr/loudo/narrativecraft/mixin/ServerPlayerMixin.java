@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.mixin;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.recording.Recording;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,12 +38,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ServerPlayerMixin {
 
     @Inject(
-            method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
+            method =
+                    "drop(Lnet/minecraft/world/item/ItemStack;ZLnet/minecraft/util/Prediction;)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At("RETURN"))
     private void narrativecraft$trackDropEvent(
-            ItemStack droppedItem,
-            boolean dropAround,
-            boolean includeThrowerName,
+            ItemStack itemStack,
+            boolean thrownFromHand,
+            Prediction prediction,
             CallbackInfoReturnable<ItemEntity> cir) {
         ItemEntity itemEntity = cir.getReturnValue();
         if (itemEntity == null) return;

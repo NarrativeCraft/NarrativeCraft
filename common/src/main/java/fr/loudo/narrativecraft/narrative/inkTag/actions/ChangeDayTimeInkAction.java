@@ -137,7 +137,7 @@ public class ChangeDayTimeInkAction extends InkAction {
         ServerClockManager clockManager = level.getServer().clockManager();
         DimensionType dimensionType = level.dimensionType();
         Holder<WorldClock> worldClock = dimensionType.defaultClock().get();
-        return clockManager.getTotalTicks(worldClock);
+        return clockManager.getInstance(worldClock).totalTicks();
     }
 
     private static long parseDayTime(String dayTime) {

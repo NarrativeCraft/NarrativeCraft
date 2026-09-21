@@ -360,7 +360,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
                     ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
             level.addNewPlayer(fakePlayer);
         } else {
-            entity.setInvulnerable(true);
+            entity.setPermanentlyInvulnerable(true);
             if (entity instanceof Mob mob) {
                 mob.setNoAi(true);
             }

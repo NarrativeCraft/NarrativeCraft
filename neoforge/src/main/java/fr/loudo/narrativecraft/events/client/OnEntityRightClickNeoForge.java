@@ -38,7 +38,7 @@ public class OnEntityRightClickNeoForge {
         NeoForge.EVENT_BUS.addListener(OnEntityRightClickNeoForge::onEntityRightClick);
     }
 
-    public static void onEntityRightClick(PlayerInteractEvent.EntityInteractSpecific event) {
+    public static void onEntityRightClick(PlayerInteractEvent.EntityInteract event) {
         if (event.getLevel().isClientSide() && event.getHand() == InteractionHand.MAIN_HAND) {
             OnEntityRightClick.entityRightClick(event.getTarget());
         }

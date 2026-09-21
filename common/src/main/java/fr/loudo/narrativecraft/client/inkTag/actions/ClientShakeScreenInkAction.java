@@ -65,8 +65,8 @@ public class ClientShakeScreenInkAction extends ShakeScreenInkAction {
 
         lastOffsetX = currentOffsetX;
         lastOffsetY = currentOffsetY;
-        currentOffsetX = (float) noise.getValue(1, noiseIndex) * shakeStrength;
-        currentOffsetY = (float) noise.getValue(100, noiseIndex) * shakeStrength;
+        currentOffsetX = noise.get(1, noiseIndex) * shakeStrength;
+        currentOffsetY = noise.get(100, noiseIndex) * shakeStrength;
 
         if (Math.abs(shakeStrength) < 0.001f) {
             stop();

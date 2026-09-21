@@ -26,35 +26,27 @@ package fr.loudo.narrativecraft.mixin;
 import fr.loudo.narrativecraft.events.server.OnServerPlaceBlockEventFabric;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.BedItem;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AbstractBedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(BedItem.class)
+@Mixin(AbstractBedBlock.class)
 public class BedItemMixinFabric {
 
-    @Inject(method = "placeBlock", at = @At(value = "HEAD"))
-    private void narrativecraft$atPlaceBlockStart(
-            BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if (!context.getLevel().isClientSide()) {
-            OnServerPlaceBlockEventFabric.placeBlock(
-                    state, context.getClickedPos(), (ServerPlayer) context.getPlayer());
-        }
-    }
-
-    @Inject(method = "placeBlock", at = @At(value = "TAIL"))
-    private void narrativecraft$atPlaceBlockEnd(
-            BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if (!context.getLevel().isClientSide() && Boolean.TRUE.equals(cir.getReturnValue())) {
-            BlockPos headPos = context.getClickedPos().relative(state.getValue(BedBlock.FACING));
-            BlockState headState = state.setValue(BedBlock.PART, BedPart.HEAD);
-            OnServerPlaceBlockEventFabric.placeBlockSilently(headState, headPos, (ServerPlayer) context.getPlayer());
+    @Inject(method = "setPlacedBy", at = @At(value = "TAIL"))
+    private void narrativecraft$atSetPlacedByEnd(
+            Level level, BlockPos pos, BlockState state, LivingEntity by, ItemStack itemStack, CallbackInfo ci) {
+        if (!level.isClientSide() && by instanceof ServerPlayer player) {
+            BlockPos headPos = pos.relative(state.getValue(AbstractBedBlock.FACING));
+            BlockState headState = state.setValue(AbstractBedBlock.PART, BedPart.HEAD);
+            OnServerPlaceBlockEventFabric.placeBlockSilently(headState, headPos, player);
         }
     }
 }

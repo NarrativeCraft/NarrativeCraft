@@ -89,7 +89,7 @@ public class CameraAngleMakerEditorCameraRenderer {
             Vec3 position = cameraView.getPosition();
             poseStack.pushPose();
             poseStack.translate(position.x - cameraPos.x, position.y - cameraPos.y + 0.6, position.z - cameraPos.z);
-            poseStack.mulPose(minecraft.gameRenderer.mainCamera().rotation());
+            poseStack.rotate(minecraft.gameRenderer.mainCamera().rotation());
             poseStack.scale(NAME_TAG_SCALE, -NAME_TAG_SCALE, NAME_TAG_SCALE);
 
             int width = font.width(cameraView.getName());

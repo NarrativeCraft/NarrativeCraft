@@ -193,7 +193,7 @@ public class InteractionMakerEditorRenderer {
                 worldPosition.x - cameraPosition.x,
                 worldPosition.y - cameraPosition.y,
                 worldPosition.z - cameraPosition.z);
-        poseStack.mulPose(minecraft.gameRenderer.mainCamera().rotation());
+        poseStack.rotate(minecraft.gameRenderer.mainCamera().rotation());
         poseStack.scale(scale, scale, 1.0f);
         int light = LightCoordsUtil.FULL_BRIGHT;
         collector.submitCustomGeometry(poseStack, RenderTypes.beaconBeam(POINT_TEXTURE, true), (pose, buffer) -> {
@@ -240,7 +240,7 @@ public class InteractionMakerEditorRenderer {
                 worldPosition.x - cameraPosition.x,
                 worldPosition.y - cameraPosition.y + yOffset,
                 worldPosition.z - cameraPosition.z);
-        poseStack.mulPose(minecraft.gameRenderer.mainCamera().rotation());
+        poseStack.rotate(minecraft.gameRenderer.mainCamera().rotation());
         poseStack.scale(scale, -scale, scale);
         Font font = minecraft.font;
         collector.submitText(

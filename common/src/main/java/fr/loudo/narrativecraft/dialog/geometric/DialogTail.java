@@ -68,7 +68,7 @@ public class DialogTail {
                 collector,
                 Dialog3DRendererHelper.LAYER_BACKGROUND,
                 poseStack,
-                RenderTypes.textBackgroundSeeThrough(),
+                RenderTypes.textSeeThrough(Dialog3DRendererHelper.WHITE_TEXTURE),
                 (pose, vertexConsumer) -> {
                     switch (tailDirection) {
                         case TOP -> drawTailTop(pose, vertexConsumer, topRight, topLeft, opacity);
@@ -109,9 +109,10 @@ public class DialogTail {
                 net.minecraft.util.ARGB.red(base),
                 net.minecraft.util.ARGB.green(base),
                 net.minecraft.util.ARGB.blue(base));
-        consumer.addVertex(matrix, x, y, 0)
-                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                .setColor(color);
+        Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(matrix, x, y, 0)
+                .setColor(color)
+                .setUv(0f, 0f)
+                .setLight(LightCoordsUtil.FULL_BRIGHT));
     }
 
     private void drawTailTop(PoseStack.Pose m, VertexConsumer c, float topRight, float topLeft, float op) {

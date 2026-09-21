@@ -95,7 +95,7 @@ public class DialogRenderer3D extends DialogRenderer {
 
         poseStack.translate(dialogPos.x - cameraPos.x, dialogPos.y - cameraPos.y, dialogPos.z - cameraPos.z);
 
-        poseStack.mulPose(camera.rotation());
+        poseStack.rotate(camera.rotation());
 
         poseStack.scale(scale, -scale, scale);
 
@@ -165,44 +165,37 @@ public class DialogRenderer3D extends DialogRenderer {
                     poseStack,
                     RenderTypes.textSeeThrough(data.getBackgroundImage()),
                     (pose, consumer) -> {
-                        consumer.addVertex(pose, 0, 0, 0)
+                        Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, 0, 0, 0)
                                 .setColor(color)
                                 .setUv(0f, 0f)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT);
-                        consumer.addVertex(pose, 0, totalHeight, 0)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT));
+                        Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, 0, totalHeight, 0)
                                 .setColor(color)
                                 .setUv(0f, 1f)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT);
-                        consumer.addVertex(pose, totalWidth, totalHeight, 0)
-                                .setColor(color)
-                                .setUv(1f, 1f)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT);
-                        consumer.addVertex(pose, totalWidth, 0, 0)
+                                .setLight(LightCoordsUtil.FULL_BRIGHT));
+                        Dialog3DRendererHelper.fillUnusedVertexAttributes(
+                                consumer.addVertex(pose, totalWidth, totalHeight, 0)
+                                        .setColor(color)
+                                        .setUv(1f, 1f)
+                                        .setLight(LightCoordsUtil.FULL_BRIGHT));
+                        Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, totalWidth, 0, 0)
                                 .setColor(color)
                                 .setUv(1f, 0f)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT);
+                                .setLight(LightCoordsUtil.FULL_BRIGHT));
                     });
         } else {
             int color = applyOpacity(data.getBackgroundColor(), opacity);
-            Dialog3DRendererHelper.geometry(
+            Dialog3DRendererHelper.textBackground(
                     collector,
                     Dialog3DRendererHelper.LAYER_BACKGROUND,
                     poseStack,
-                    RenderTypes.textBackgroundSeeThrough(),
-                    (pose, consumer) -> {
-                        consumer.addVertex(pose, 0, 0, 0)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                                .setColor(color);
-                        consumer.addVertex(pose, 0, totalHeight, 0)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                                .setColor(color);
-                        consumer.addVertex(pose, totalWidth, totalHeight, 0)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                                .setColor(color);
-                        consumer.addVertex(pose, totalWidth, 0, 0)
-                                .setLight(LightCoordsUtil.FULL_BRIGHT)
-                                .setColor(color);
-                    });
+                    0,
+                    0,
+                    totalWidth,
+                    totalHeight,
+                    color,
+                    Font.DisplayMode.SEE_THROUGH,
+                    LightCoordsUtil.FULL_BRIGHT);
         }
     }
 
@@ -242,20 +235,26 @@ public class DialogRenderer3D extends DialogRenderer {
                 collector,
                 Dialog3DRendererHelper.LAYER_FOREGROUND,
                 poseStack,
-                RenderTypes.textBackgroundSeeThrough(),
+                RenderTypes.textSeeThrough(Dialog3DRendererHelper.WHITE_TEXTURE),
                 (pose, consumer) -> {
-                    consumer.addVertex(pose, x, y, 0)
+                    Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, x, y, 0)
                             .setLight(LightCoordsUtil.FULL_BRIGHT)
-                            .setColor(color);
-                    consumer.addVertex(pose, x, y + SKIP_INDICATOR_SIZE, 0)
+                            .setUv(0f, 0f)
+                            .setColor(color));
+                    Dialog3DRendererHelper.fillUnusedVertexAttributes(
+                            consumer.addVertex(pose, x, y + SKIP_INDICATOR_SIZE, 0)
+                                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                                    .setUv(0f, 0f)
+                                    .setColor(color));
+                    Dialog3DRendererHelper.fillUnusedVertexAttributes(
+                            consumer.addVertex(pose, x + SKIP_INDICATOR_SIZE, y + SKIP_INDICATOR_SIZE / 2f, 0)
+                                    .setLight(LightCoordsUtil.FULL_BRIGHT)
+                                    .setUv(0f, 0f)
+                                    .setColor(color));
+                    Dialog3DRendererHelper.fillUnusedVertexAttributes(consumer.addVertex(pose, x, y, 0)
                             .setLight(LightCoordsUtil.FULL_BRIGHT)
-                            .setColor(color);
-                    consumer.addVertex(pose, x + SKIP_INDICATOR_SIZE, y + SKIP_INDICATOR_SIZE / 2f, 0)
-                            .setLight(LightCoordsUtil.FULL_BRIGHT)
-                            .setColor(color);
-                    consumer.addVertex(pose, x, y, 0)
-                            .setLight(LightCoordsUtil.FULL_BRIGHT)
-                            .setColor(color);
+                            .setUv(0f, 0f)
+                            .setColor(color));
                 });
     }
 

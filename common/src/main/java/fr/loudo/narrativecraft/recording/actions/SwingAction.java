@@ -30,20 +30,22 @@ import fr.loudo.narrativecraft.api.recording.action.ActionResult;
 import java.io.IOException;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.component.SwingAnimation;
 
 public class SwingAction extends AbstractAction {
 
     public static final String ID = "swing";
 
     private InteractionHand hand;
-    private int swingTime;
+    private float swingProgress;
     private boolean swinging;
 
     public SwingAction(int tick, LivingEntity livingEntity) {
         super(tick);
-        hand = livingEntity.swingingArm;
-        swingTime = livingEntity.swingTime;
-        swinging = livingEntity.swinging;
+        LivingEntity.SwingDescription currentSwing = livingEntity.getCurrentSwing();
+        hand = currentSwing != null ? currentSwing.hand() : InteractionHand.MAIN_HAND;
+        swingProgress = livingEntity.getSwingAnimation(1.0F);
+        swinging = livingEntity.isSwinging();
     }
 
     public SwingAction(int tick) {
@@ -53,7 +55,7 @@ public class SwingAction extends AbstractAction {
     @Override
     public boolean differs(AbstractAction other) {
         if (!(other instanceof SwingAction that)) return false;
-        return swinging && (!that.swinging || swingTime <= that.swingTime);
+        return swinging && (!that.swinging || swingProgress <= that.swingProgress);
     }
 
     @Override
@@ -70,7 +72,7 @@ public class SwingAction extends AbstractAction {
     public ActionResult execute(IPlaybackContext context, IPlaybackSession session) {
         if (!(context.getEntity() instanceof LivingEntity livingEntity)) return ActionResult.IGNORED;
 
-        livingEntity.swing(hand);
+        livingEntity.swing(hand, SwingAnimation.DEFAULT, true);
         return ActionResult.OK;
     }
 

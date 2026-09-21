@@ -66,7 +66,7 @@ public class FakePlayer extends ServerPlayer {
         getEntityData().set(AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
         this.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
 
-        this.invulnerableTime = 0;
+        this.setInvulnerableTime(0);
     }
 
     @Override
