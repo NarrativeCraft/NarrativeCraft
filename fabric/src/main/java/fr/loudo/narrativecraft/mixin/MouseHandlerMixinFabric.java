@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import fr.loudo.narrativecraft.events.client.OnMouseInputEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseDragEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseScrollEvent;
@@ -30,6 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -68,6 +70,21 @@ public abstract class MouseHandlerMixinFabric {
     private boolean narrativecraft$onScreenMouseRelease(Screen instance, MouseButtonEvent mouseButtonEvent) {
         OnScreenMouseClickEvent.cutsceneHudRelease(mouseButtonEvent);
         return instance.mouseReleased(mouseButtonEvent);
+    }
+
+    @Inject(
+            method = "onButton",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/gui/Gui;overlay()Lnet/minecraft/client/gui/screens/Overlay;",
+                            ordinal = 0),
+            cancellable = true)
+    private void narrativecraft$preMouseInput(long handle, MouseButtonInfo rawButtonInfo, int action, CallbackInfo ci) {
+        if (OnMouseInputEvent.preMouseInput()) {
+            ci.cancel();
+        }
     }
 
     @Inject(

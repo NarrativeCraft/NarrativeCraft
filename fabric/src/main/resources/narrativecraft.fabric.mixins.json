@@ -16,6 +16,7 @@
   "client": [
     "EntityRendererMixinFabric",
     "GuiGraphicsExtractorMixinFabric",
+    "GuiMixinFabric",
     "HuiMixinFabric",
     "KeyboardHandlerMixinFabric",
     "LevelRendererMixinFabric",

@@ -38,7 +38,9 @@ public class KeyboardHandlerMixinFabric {
 
     @Inject(method = "keyPress", at = @At("RETURN"))
     private void narrativecraft$onInputKeyPressed(long handle, int action, KeyEvent event, CallbackInfo ci) {
-        OnKeyInputEvent.keyInputEvent(event);
+        if (action == 1) {
+            OnKeyInputEvent.keyInputEvent(event);
+        }
     }
 
     @Inject(

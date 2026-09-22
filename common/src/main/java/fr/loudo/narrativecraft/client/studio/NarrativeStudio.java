@@ -24,23 +24,29 @@
 package fr.loudo.narrativecraft.client.studio;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import fr.loudo.narrativecraft.utils.UtilsClient;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;
 import imgui.type.ImBoolean;
 import imgui.type.ImFloat;
 import imgui.type.ImString;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.game.ServerboundChangeGameModePacket;
+import net.minecraft.world.level.GameType;
 
 public class NarrativeStudio {
 
+    private static final Minecraft minecraft = Minecraft.getInstance();
     private static final NarrativeStudio instance = new NarrativeStudio();
 
-    private boolean open = true;
+    private boolean open = false;
 
     private final ImBoolean showDemoWindow = new ImBoolean(false);
     private final ImFloat exampleValue = new ImFloat(0.5f);
     private final ImString exampleText = new ImString("Hello NarrativeCraft", 256);
     private int clickCount;
+    private GameType lastGameType;
 
     private NarrativeStudio() {}
 
@@ -54,14 +60,25 @@ public class NarrativeStudio {
 
     public void open() {
         open = true;
+        lastGameType = minecraft.gameMode.getPlayerMode();
+        minecraft.mouseHandler.releaseMouse();
+        minecraft.player.connection.send(new ServerboundChangeGameModePacket(GameType.SPECTATOR));
+        UtilsClient.setHudHidden(true);
     }
 
     public void close() {
         open = false;
+        minecraft.mouseHandler.grabMouse();
+        minecraft.player.connection.send(new ServerboundChangeGameModePacket(lastGameType));
+        UtilsClient.setHudHidden(false);
     }
 
     public void toggle() {
-        open = !open;
+        if (open) {
+            close();
+        } else {
+            open();
+        }
     }
 
     public void render(ImGuiIO io) {

@@ -25,10 +25,9 @@ package fr.loudo.narrativecraft.keys;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.studio.NarrativeStudio;
 import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
@@ -41,16 +40,9 @@ import net.minecraft.client.player.LocalPlayer;
 public class PressKeyListener {
 
     public static void onKeyPressed(Minecraft minecraft) {
-        if (ModKeys.HIDE_EDITOR_MAKER_HUD.consumeClick()) {
-            EditorMaker editor =
-                    ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-            if (editor == null) return;
-            if (editor instanceof ClientCutsceneMakerEditorMaker clientCutsceneMakerEditorMaker) {
-                clientCutsceneMakerEditorMaker.toggleHud();
-            }
-            if (editor instanceof ClientCameraAngleMakerEditorMaker cameraAngleMakerEditorMaker) {
-                cameraAngleMakerEditorMaker.toggleHud();
-            }
+
+        if (ModKeys.STUDIO_TOGGLE.consumeClick()) {
+            NarrativeStudio.getInstance().toggle();
         }
 
         if (ModKeys.START_RECORDING.consumeClick()) {
