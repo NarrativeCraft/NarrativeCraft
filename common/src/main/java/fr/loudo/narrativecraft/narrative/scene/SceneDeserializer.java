@@ -42,13 +42,12 @@ public class SceneDeserializer extends NarrativeDeserializer<Scene> {
 
         UUID id = parseId(jsonObject);
         String name = parseName(jsonObject);
-        String description = parseDescription(jsonObject);
         UUID chapterId = UUID.fromString(jsonObject.get("chapterId").getAsString());
         int rank = Integer.parseInt(jsonObject.get("rank").getAsString());
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(chapterId);
+        Chapter chapter = NarrativeCraftMod.getInstance().getEntryResolver().chapter(chapterId);
         if (chapter == null) {
             return null;
         }
-        return new Scene(id, name, description, chapter, rank);
+        return new Scene(id, name, chapter, rank);
     }
 }

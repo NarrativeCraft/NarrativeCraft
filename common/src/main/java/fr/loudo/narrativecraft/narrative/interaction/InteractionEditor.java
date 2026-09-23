@@ -23,93 +23,49 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
 
-public class InteractionEditor implements NarrativeEntryEditor<InteractionPayload, Interaction> {
-
-    final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+public class InteractionEditor extends AbstractSceneEntryEditor<InteractionPayload, Interaction> {
 
     @Override
-    public Interaction resolve(UUID entryId, InteractionPayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getInteractionManager().getById(entryId);
+    protected String getTypeKey() {
+        return "interaction";
     }
 
     @Override
-    public void add(UUID entryId, InteractionPayload payload, UUID playerId) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Interaction interaction = new Interaction(entryId, payload.getName(), payload.getDescription(), scene);
-        int result = NarrativeCraftFileRegistry.getInstance().create(interaction);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.add", payload.getName()), player);
-            return;
-        }
-
-        scene.getInteractionManager().add(interaction);
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(entryId, payload));
+    protected NarrativeManager<Interaction> getManager(Scene scene) {
+        return scene.getInteractionManager();
     }
 
     @Override
-    public void edit(UUID entryId, InteractionPayload payload, UUID playerId) {
-        Interaction oldInteraction = resolve(entryId, payload);
-        if (oldInteraction == null) return;
-
-        Interaction newInteraction =
-                new Interaction(entryId, payload.getName(), payload.getDescription(), oldInteraction.getScene());
-        newInteraction.getZones().addAll(oldInteraction.getZones());
-        newInteraction.getPoints().addAll(oldInteraction.getPoints());
-
-        int result = NarrativeCraftFileRegistry.getInstance().edit(newInteraction);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
-            return;
+    protected Interaction build(UUID entryId, InteractionPayload payload, Scene scene, Interaction existing) {
+        Interaction interaction = new Interaction(entryId, payload.getName(), scene);
+        if (existing != null) {
+            interaction.copyDataFrom(existing);
         }
-
-        oldInteraction.setName(payload.getName());
-        oldInteraction.setDescription(payload.getDescription());
-
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
+        return interaction;
     }
 
     @Override
-    public void delete(UUID entryId, InteractionPayload payload, UUID playerId) {
-        Interaction interaction = resolve(entryId, payload);
-        if (interaction == null) return;
+    protected void copyAttributes(Interaction target, Interaction source) {}
 
-        int result = NarrativeCraftFileRegistry.getInstance().delete(interaction);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.delete", payload.getName()), player);
-            return;
+    public OperationResult saveData(Interaction interaction, String dataJson) {
+        Interaction updated = new Interaction(interaction.getId(), interaction.getName(), interaction.getScene());
+        try {
+            InteractionDeserializer.deserializeInto(dataJson, updated);
+        } catch (RuntimeException e) {
+            return OperationResult.failure("error.invalid_data", interaction.getName());
         }
 
-        interaction.getScene().getInteractionManager().remove(interaction);
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.delete(entryId, payload));
+        OperationResult storage = NarrativeCraftFileRegistry.getInstance().edit(interaction, updated);
+        if (storage.isFailure()) return storage;
+
+        interaction.copyDataFrom(updated);
+        return OperationResult.success();
     }
 }

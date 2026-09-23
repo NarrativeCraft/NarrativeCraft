@@ -35,7 +35,6 @@ import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import java.lang.reflect.Type;
@@ -51,20 +50,14 @@ public class CutsceneDeserializer extends NarrativeDeserializer<Cutscene> {
             throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
 
-        if (!obj.has("sceneId") || !obj.has("chapterId")) {
+        if (!hasSceneReference(obj)) {
             return null;
         }
 
         UUID id = parseId(obj);
         String name = parseName(obj);
-        String description = parseDescription(obj);
-        UUID sceneId = UUID.fromString(obj.get("sceneId").getAsString());
-        UUID chapterId = UUID.fromString(obj.get("chapterId").getAsString());
 
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(chapterId);
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(sceneId);
+        Scene scene = resolveScene(obj);
         if (scene == null) return null;
 
         List<Animation> animations = new ArrayList<>();
@@ -83,49 +76,24 @@ public class CutsceneDeserializer extends NarrativeDeserializer<Cutscene> {
             }
         }
 
-        Cutscene cutscene = new Cutscene(id, name, description, scene, animations, subscenes);
+        Cutscene cutscene = new Cutscene(id, name, scene, animations, subscenes);
 
         if (obj.has("manualMaxTick")) {
             cutscene.setManualMaxTick(obj.get("manualMaxTick").getAsInt());
         }
 
         if (obj.has("layers")) {
-            List<CutsceneLayer> cutsceneLayers = new ArrayList<>();
-            for (JsonElement layerElement : obj.getAsJsonArray("layers")) {
-                JsonObject layerObject = layerElement.getAsJsonObject();
-                if (!layerObject.has("type")) continue;
-
-                String typeId = layerObject.get("type").getAsString();
-                int sortIndex = layerObject.has("sortIndex")
-                        ? layerObject.get("sortIndex").getAsInt()
-                        : 0;
-
-                ICutsceneLayerType layerType = NarrativeCraftMod.getInstance()
-                        .getCutsceneLayerRegistry()
-                        .getType(typeId);
-                if (layerType == null) continue;
-
-                CutsceneLayer layer = layerType.createLayer();
-                layer.setSortIndex(sortIndex);
-
-                if (layerObject.has("keyframes")) {
-                    for (JsonElement keyframeElement : layerObject.getAsJsonArray("keyframes")) {
-                        Keyframe keyframe = layerType.deserializeKeyframe(layer, keyframeElement.getAsJsonObject());
-                        if (keyframe != null) layer.addKeyframe(keyframe);
-                    }
-                }
-
-                cutsceneLayers.add(layer);
-            }
-            cutsceneLayers.sort(Comparator.comparingInt(CutsceneLayer::getSortIndex));
-            cutscene.setLayers(cutsceneLayers);
+            cutscene.setLayers(parseLayers(obj.getAsJsonArray("layers")));
         }
 
         return cutscene;
     }
 
-    public static void deserializeLayers(String layersJson, Cutscene cutscene) {
-        JsonArray layersArray = JsonParser.parseString(layersJson).getAsJsonArray();
+    public static List<CutsceneLayer> parseLayers(String layersJson) {
+        return parseLayers(JsonParser.parseString(layersJson).getAsJsonArray());
+    }
+
+    private static List<CutsceneLayer> parseLayers(JsonArray layersArray) {
         List<CutsceneLayer> cutsceneLayers = new ArrayList<>();
 
         for (JsonElement layerElement : layersArray) {
@@ -154,6 +122,6 @@ public class CutsceneDeserializer extends NarrativeDeserializer<Cutscene> {
         }
 
         cutsceneLayers.sort(Comparator.comparingInt(CutsceneLayer::getSortIndex));
-        cutscene.setLayers(cutsceneLayers);
+        return cutsceneLayers;
     }
 }

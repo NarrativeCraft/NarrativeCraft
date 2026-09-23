@@ -32,71 +32,82 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class InkFileGenerator {
 
-    public static void generateChapterInkFile(Chapter chapter) {
-        File chapterDir = new File(NarrativeCraftFileUtil.getChaptersFolder(), chapter.toFileName());
-        File inkFile = new File(chapterDir, chapterInkFileName(chapter));
-        try {
-            NarrativeCraftFileWriter.writeString(inkFile, "=== " + chapterKnotName(chapter) + " ===\n");
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to write chapter ink file for {}", chapter.getName(), e);
+    public static void writeChapterInkFile(FileTransaction transaction, File chapterFolder, Chapter chapter)
+            throws IOException {
+        transaction.writeString(
+                new File(chapterFolder, chapterInkFileName(chapter.getChapterIndex())),
+                chapterInkContent(chapter.getChapterIndex()));
+    }
+
+    public static void writeSceneInkFile(FileTransaction transaction, File sceneFolder, Scene scene)
+            throws IOException {
+        transaction.writeString(new File(sceneFolder, scene.inkFileName()), sceneInkContent(scene.knotName()));
+    }
+
+    public static void renameSceneInkFile(FileTransaction transaction, File sceneFolder, Scene existing, Scene updated)
+            throws IOException {
+        File oldInkFile = new File(sceneFolder, existing.inkFileName());
+        File newInkFile = new File(sceneFolder, updated.inkFileName());
+        rewriteInkFile(
+                transaction,
+                oldInkFile,
+                newInkFile,
+                Map.of(existing.knotName(), updated.knotName()),
+                sceneInkContent(updated.knotName()));
+    }
+
+    public static void reindexChapterInkFiles(
+            FileTransaction transaction, File chapterFolder, Chapter chapter, int oldIndex, int newIndex)
+            throws IOException {
+        Map<String, String> knotRenames = new LinkedHashMap<>();
+        knotRenames.put(chapterKnotName(oldIndex), chapterKnotName(newIndex));
+        for (Scene scene : chapter.getSceneManager().getList()) {
+            knotRenames.put(scene.knotName(oldIndex), scene.knotName(newIndex));
+        }
+
+        rewriteInkFile(
+                transaction,
+                new File(chapterFolder, chapterInkFileName(oldIndex)),
+                new File(chapterFolder, chapterInkFileName(newIndex)),
+                knotRenames,
+                chapterInkContent(newIndex));
+
+        File scenesFolder = new File(chapterFolder, NarrativeCraftFileDefault.SCENES_FOLDER_NAME);
+        for (Scene scene : chapter.getSceneManager().getList()) {
+            File sceneInkFile = new File(new File(scenesFolder, scene.toFileName(newIndex)), scene.inkFileName());
+            rewriteInkFile(
+                    transaction, sceneInkFile, sceneInkFile, knotRenames, sceneInkContent(scene.knotName(newIndex)));
         }
     }
 
-    public static void generateSceneInkFile(Scene scene) {
-        File inkFile = new File(NarrativeCraftFileUtil.getSceneFolder(scene), sceneInkFileName(scene));
-        try {
-            String knotName = sceneKnotName(scene);
-            String content = "=== " + knotName + " ===\n# on_enter " + knotName + "\n-> END\n";
-            NarrativeCraftFileWriter.writeString(inkFile, content);
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to write scene ink file for {}", scene.getName(), e);
-        }
-    }
-
-    public static void renameSceneInkFile(Scene oldScene, Scene newScene) {
-        File sceneDir = NarrativeCraftFileUtil.getSceneFolder(newScene);
-        File oldInkFile = new File(sceneDir, sceneInkFileName(oldScene));
-        File newInkFile = new File(sceneDir, sceneInkFileName(newScene));
-
-        // No previous ink file to preserve: just generate a fresh one
+    private static void rewriteInkFile(
+            FileTransaction transaction,
+            File oldInkFile,
+            File newInkFile,
+            Map<String, String> knotRenames,
+            String defaultContent)
+            throws IOException {
         if (!oldInkFile.exists()) {
-            generateSceneInkFile(newScene);
+            transaction.writeString(newInkFile, defaultContent);
             return;
         }
-
-        try {
-            String content = Files.readString(oldInkFile.toPath());
-            String oldKnot = sceneKnotName(oldScene);
-            String newKnot = sceneKnotName(newScene);
-
-            // Update the knot name (header and any self-divert) while keeping the user's content
-            content = content.replaceAll("\\b" + Pattern.quote(oldKnot) + "\\b", newKnot);
-
-            NarrativeCraftFileWriter.writeString(newInkFile, content);
-            if (!oldInkFile.equals(newInkFile)) {
-                oldInkFile.delete();
-            }
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to rename scene ink file for {}", newScene.getName(), e);
+        String content = Files.readString(oldInkFile.toPath());
+        for (Map.Entry<String, String> knotRename : knotRenames.entrySet()) {
+            content = content.replaceAll(
+                    "\\b" + Pattern.quote(knotRename.getKey()) + "\\b",
+                    Matcher.quoteReplacement(knotRename.getValue()));
         }
-    }
-
-    public static void renameChapterInkFile(File chapterDir, int oldIndex, int newIndex) {
-        File oldFile = new File(chapterDir, "chapter_" + oldIndex + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE);
-        if (oldFile.exists()) {
-            oldFile.delete();
-        }
-        File newFile = new File(chapterDir, "chapter_" + newIndex + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE);
-        try {
-            NarrativeCraftFileWriter.writeString(newFile, "=== chapter_" + newIndex + " ===\n");
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to rename chapter ink file from {} to {}", oldIndex, newIndex, e);
+        transaction.writeString(newInkFile, content);
+        if (!oldInkFile.equals(newInkFile)) {
+            transaction.delete(oldInkFile);
         }
     }
 
@@ -104,7 +115,7 @@ public class InkFileGenerator {
         File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
         List<File> inkFiles = new ArrayList<>();
 
-        File[] chapterDirs = chaptersFolder.listFiles(File::isDirectory);
+        File[] chapterDirs = chaptersFolder.listFiles(InkFileGenerator::isStoryDirectory);
         if (chapterDirs == null) return inkFiles;
 
         Arrays.sort(chapterDirs, Comparator.comparingInt(dir -> extractLeadingInt(dir.getName())));
@@ -120,7 +131,7 @@ public class InkFileGenerator {
             File scenesDir = new File(chapterDir, NarrativeCraftFileDefault.SCENES_FOLDER_NAME);
             if (!scenesDir.isDirectory()) continue;
 
-            File[] sceneDirs = scenesDir.listFiles(File::isDirectory);
+            File[] sceneDirs = scenesDir.listFiles(InkFileGenerator::isStoryDirectory);
             if (sceneDirs == null) continue;
 
             Arrays.sort(sceneDirs, Comparator.comparingInt(dir -> extractSceneRank(dir.getName())));
@@ -165,6 +176,10 @@ public class InkFileGenerator {
         return getSourceFile(NarrativeCraftFileInit.MAIN_INK_NAME);
     }
 
+    private static boolean isStoryDirectory(File file) {
+        return file.isDirectory() && !NarrativeCraftFileWriter.isTemporary(file);
+    }
+
     private static File getSourceFile(String name) {
         return new File(getMainDirectory(), name);
     }
@@ -199,21 +214,19 @@ public class InkFileGenerator {
         return Integer.MAX_VALUE;
     }
 
-    private static String chapterInkFileName(Chapter chapter) {
-        return "chapter_" + chapter.getChapterIndex() + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE;
+    private static String chapterInkFileName(int chapterIndex) {
+        return chapterKnotName(chapterIndex) + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE;
     }
 
-    private static String sceneInkFileName(Scene scene) {
-        return scene.getName().toLowerCase(Locale.ROOT).replace(' ', '_')
-                + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE;
+    private static String chapterKnotName(int chapterIndex) {
+        return "chapter_" + chapterIndex;
     }
 
-    private static String chapterKnotName(Chapter chapter) {
-        return "chapter_" + chapter.getChapterIndex();
+    private static String chapterInkContent(int chapterIndex) {
+        return "=== " + chapterKnotName(chapterIndex) + " ===\n";
     }
 
-    private static String sceneKnotName(Scene scene) {
-        return "chapter_" + scene.getChapterIndex() + "_"
-                + scene.getName().toLowerCase(Locale.ROOT).replace(' ', '_');
+    private static String sceneInkContent(String knotName) {
+        return "=== " + knotName + " ===\n# on_enter " + knotName + "\n-> END\n";
     }
 }

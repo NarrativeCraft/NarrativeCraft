@@ -23,138 +23,91 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.dialog.DialogFieldSet;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.CharacterManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
+import fr.loudo.narrativecraft.narrative.AbstractNarrativeEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 
-public class CharacterEditor implements NarrativeEntryEditor<CharacterStoryPayload, CharacterStory> {
+public class CharacterEditor extends AbstractNarrativeEntryEditor<CharacterStoryPayload, CharacterStory> {
 
     private final CharacterManager characterManager =
             NarrativeCraftMod.getInstance().getCharacterManager();
 
     @Override
-    public CharacterStory resolve(UUID entryId, CharacterStoryPayload payload) {
-        return characterManager.getById(entryId);
+    protected String getTypeKey() {
+        return "character";
     }
 
     @Override
-    public void add(UUID entryId, CharacterStoryPayload payload, UUID playerId) {
-        CharacterStory character = buildFromPayload(entryId, payload);
-
-        ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-
-        if (character.getMainCharacterAttribute().isMainCharacter()) {
-            demotePreviousMainCharacter(entryId);
-        }
-
-        int result = NarrativeCraftFileRegistry.getInstance().create(character);
-        if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
-            characterManager.add(character);
-            UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(entryId, payload));
-        } else {
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.add", payload.getName()), player);
-        }
+    protected NarrativeManager<CharacterStory> getSiblings(CharacterStoryPayload payload) {
+        return characterManager;
     }
 
     @Override
-    public void edit(UUID entryId, CharacterStoryPayload payload, UUID playerId) {
-        CharacterStory oldCharacter = resolve(entryId, payload);
-        if (oldCharacter == null) return;
-
-        CharacterStory newCharacter = buildFromPayload(entryId, payload);
-        MainCharacterAttribute newAttribute = newCharacter.getMainCharacterAttribute();
-
-        if (newAttribute.isMainCharacter()
-                && !oldCharacter.getMainCharacterAttribute().isMainCharacter()) {
-            demotePreviousMainCharacter(entryId);
-        }
-
-        int result = NarrativeCraftFileRegistry.getInstance().edit(newCharacter);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
-            return;
-        }
-
-        oldCharacter.setName(payload.getName());
-        oldCharacter.setDescription(payload.getDescription());
-        if (!payload.getModelType().isEmpty()) {
-            oldCharacter.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
-        }
-        oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
-        oldCharacter.setMainCharacterAttribute(newAttribute);
-        oldCharacter.setDialogData(newCharacter.getDialogData());
-        oldCharacter.setCustomNbt(newCharacter.getCustomNbt());
-
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
-    }
-
-    @Override
-    public void delete(UUID entryId, CharacterStoryPayload payload, UUID playerId) {
-        CharacterStory character = resolve(entryId, payload);
-
-        ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-
-        int result = NarrativeCraftFileRegistry.getInstance().delete(character);
-        if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
-            characterManager.remove(character);
-            UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.delete(entryId, payload));
-        } else {
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.delete", payload.getName()), player);
-        }
-    }
-
-    private void demotePreviousMainCharacter(UUID excludeId) {
-        for (CharacterStory character : characterManager.getList()) {
-            if (!character.getId().equals(excludeId)
-                    && character.getMainCharacterAttribute().isMainCharacter()) {
-                character.getMainCharacterAttribute().setMainCharacter(false);
-                NarrativeCraftFileRegistry.getInstance().edit(character);
-                UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(character.getId(), character.toPayload()));
-                break;
-            }
-        }
-    }
-
-    private CharacterStory buildFromPayload(UUID entryId, CharacterStoryPayload payload) {
-        CharacterStory character = new CharacterStory(entryId, payload.getName(), payload.getDescription());
+    protected CharacterStory build(UUID entryId, CharacterStoryPayload payload, CharacterStory existing) {
+        CharacterStory character = new CharacterStory(entryId, payload.getName());
         if (!payload.getModelType().isEmpty()) {
             character.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
         }
-        character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        character.setEntityType(Utils.resolveEntityType(payload.getEntityTypeId()));
         character.setMainCharacterAttribute(new MainCharacterAttribute(payload.getMainCharacterAttribute()));
         character.setCustomNbt(payload.getCustomNbt());
-        String dialogDataJson = payload.getDialogDataJson();
-        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
-            try {
-                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-                character.setDialogData(DialogDataIO.deserialize(json, DialogFieldSet.CHARACTER));
-            } catch (Exception ignored) {
-            }
-        }
+        DialogDataIO.parse(payload.getDialogDataJson(), DialogFieldSet.CHARACTER)
+                .ifPresent(character::setDialogData);
         return character;
     }
 
-    private EntityType<?> resolveEntityType(String entityTypeId) {
-        return BuiltInRegistries.ENTITY_TYPE
-                .getOptional(Identifier.parse(entityTypeId))
-                .orElse(EntityTypes.PLAYER);
+    @Override
+    protected void copyAttributes(CharacterStory target, CharacterStory source) {
+        target.copyAttributesFrom(source);
+    }
+
+    @Override
+    public OperationResult add(UUID entryId, CharacterStoryPayload payload) {
+        OperationResult result = super.add(entryId, payload);
+        CharacterStory character = characterManager.getById(entryId);
+        if (result.isSuccess() && character.isMainCharacter()) {
+            demoteOtherMainCharacters(character);
+        }
+        return result;
+    }
+
+    @Override
+    public OperationResult edit(UUID entryId, CharacterStoryPayload payload) {
+        CharacterStory existing = characterManager.getById(entryId);
+        boolean wasMainCharacter = existing != null && existing.isMainCharacter();
+        OperationResult result = super.edit(entryId, payload);
+        if (result.isSuccess() && existing.isMainCharacter() && !wasMainCharacter) {
+            demoteOtherMainCharacters(existing);
+        }
+        return result;
+    }
+
+    private void demoteOtherMainCharacters(CharacterStory mainCharacter) {
+        for (CharacterStory character : characterManager.getList()) {
+            if (character == mainCharacter || !character.isMainCharacter()) continue;
+
+            CharacterStory demoted = new CharacterStory(character.getId(), character.getName());
+            demoted.copyAttributesFrom(character);
+            MainCharacterAttribute attribute = new MainCharacterAttribute(character.getMainCharacterAttribute());
+            attribute.setMainCharacter(false);
+            demoted.setMainCharacterAttribute(attribute);
+
+            OperationResult storage = NarrativeCraftFileRegistry.getInstance().edit(character, demoted);
+            if (storage.isFailure()) {
+                NarrativeCraftMod.LOGGER.warn("Failed to demote previous main character {}", character.getName());
+                continue;
+            }
+            character.copyAttributesFrom(demoted);
+            UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(character.getId(), character.toPayload()));
+        }
     }
 }

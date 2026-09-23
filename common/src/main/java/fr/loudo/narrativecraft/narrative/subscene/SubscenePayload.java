@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.subscene;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
 import io.netty.buffer.ByteBuf;
 import java.util.List;
 import java.util.UUID;
@@ -31,17 +31,13 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public class SubscenePayload extends NarrativeEntryPayload {
+public class SubscenePayload extends SceneEntryPayload {
 
-    private final UUID chapterId;
-    private final UUID sceneId;
     private final List<UUID> animationIds;
 
     public static final StreamCodec<ByteBuf, SubscenePayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
             SubscenePayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            SubscenePayload::getDescription,
             UUIDUtil.STREAM_CODEC,
             SubscenePayload::getSceneId,
             UUIDUtil.STREAM_CODEC,
@@ -50,19 +46,9 @@ public class SubscenePayload extends NarrativeEntryPayload {
             SubscenePayload::getAnimationIds,
             SubscenePayload::new);
 
-    public SubscenePayload(String name, String description, UUID sceneId, UUID chapterId, List<UUID> animationIds) {
-        super(name, description);
-        this.sceneId = sceneId;
-        this.chapterId = chapterId;
+    public SubscenePayload(String name, UUID sceneId, UUID chapterId, List<UUID> animationIds) {
+        super(name, sceneId, chapterId);
         this.animationIds = animationIds;
-    }
-
-    public UUID getChapterId() {
-        return chapterId;
-    }
-
-    public UUID getSceneId() {
-        return sceneId;
     }
 
     public List<UUID> getAnimationIds() {

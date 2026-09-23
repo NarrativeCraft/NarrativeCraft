@@ -36,7 +36,6 @@ public class SceneSerializer implements JsonSerializer<Scene> {
         JsonObject json = new JsonObject();
         json.addProperty("id", src.getId().toString());
         json.addProperty("name", src.getName());
-        json.addProperty("description", src.getDescription());
         json.addProperty("chapterId", src.getChapter().getId().toString());
         json.addProperty("rank", src.getRank());
         return json;

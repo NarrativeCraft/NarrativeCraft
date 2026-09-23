@@ -21,40 +21,42 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.narrative;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
-import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import fr.loudo.narrativecraft.utils.Translation;
+import net.minecraft.network.chat.Component;
 
-public class ScenePayload extends NarrativeEntryPayload {
+public final class OperationResult {
 
-    public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ScenePayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            ScenePayload::getChapterId,
-            ByteBufCodecs.INT,
-            ScenePayload::getRank,
-            ScenePayload::new);
+    private static final OperationResult SUCCESS = new OperationResult(null);
 
-    private final UUID chapterId;
-    private final int rank;
+    private final Component error;
 
-    public ScenePayload(String name, UUID chapterId, int rank) {
-        super(name);
-        this.chapterId = chapterId;
-        this.rank = rank;
+    private OperationResult(Component error) {
+        this.error = error;
     }
 
-    public UUID getChapterId() {
-        return chapterId;
+    public static OperationResult success() {
+        return SUCCESS;
     }
 
-    public int getRank() {
-        return rank;
+    public static OperationResult failure(Component error) {
+        return new OperationResult(error);
+    }
+
+    public static OperationResult failure(String translationKey, Object... arguments) {
+        return new OperationResult(Translation.message(translationKey, arguments));
+    }
+
+    public boolean isSuccess() {
+        return error == null;
+    }
+
+    public boolean isFailure() {
+        return error != null;
+    }
+
+    public Component getError() {
+        return error;
     }
 }

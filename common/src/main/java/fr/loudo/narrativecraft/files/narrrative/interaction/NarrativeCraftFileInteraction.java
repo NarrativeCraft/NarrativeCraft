@@ -23,19 +23,17 @@
 
 package fr.loudo.narrativecraft.files.narrrative.interaction;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.io.IOException;
 
 public class NarrativeCraftFileInteraction extends AbstractNarrativeCraftFileSceneJsonEntry<Interaction> {
+
+    public NarrativeCraftFileInteraction() {
+        super(Interaction.class, new InteractionSerializer(), new InteractionDeserializer());
+    }
 
     @Override
     protected String getSubFolderName() {
@@ -45,34 +43,5 @@ public class NarrativeCraftFileInteraction extends AbstractNarrativeCraftFileSce
     @Override
     protected Scene getScene(Interaction entry) {
         return entry.getScene();
-    }
-
-    @Override
-    protected Interaction getOldEntry(Interaction entry) {
-        return entry.getScene().getInteractionManager().getById(entry.getId());
-    }
-
-    @Override
-    protected void registerDeserializer(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(Interaction.class, new InteractionDeserializer());
-    }
-
-    @Override
-    protected Interaction deserializeEntry(Gson gson, String content) throws Exception {
-        return gson.fromJson(content, Interaction.class);
-    }
-
-    @Override
-    protected int writeJson(Interaction entry, File file) {
-        Gson gson = gsonBuilder
-                .registerTypeAdapter(Interaction.class, new InteractionSerializer())
-                .create();
-        try {
-            NarrativeCraftFileWriter.write(file, writer -> gson.toJson(entry, writer));
-            return OPERATION_SUCCESS;
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to write interaction data {}", entry.getName(), e);
-            return OPERATION_FAILED;
-        }
     }
 }

@@ -21,40 +21,26 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.narrative;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
-public class ScenePayload extends NarrativeEntryPayload {
+public abstract class SceneEntryPayload extends NarrativeEntryPayload {
 
-    public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ScenePayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            ScenePayload::getChapterId,
-            ByteBufCodecs.INT,
-            ScenePayload::getRank,
-            ScenePayload::new);
-
+    private final UUID sceneId;
     private final UUID chapterId;
-    private final int rank;
 
-    public ScenePayload(String name, UUID chapterId, int rank) {
+    protected SceneEntryPayload(String name, UUID sceneId, UUID chapterId) {
         super(name);
+        this.sceneId = sceneId;
         this.chapterId = chapterId;
-        this.rank = rank;
+    }
+
+    public UUID getSceneId() {
+        return sceneId;
     }
 
     public UUID getChapterId() {
         return chapterId;
-    }
-
-    public int getRank() {
-        return rank;
     }
 }

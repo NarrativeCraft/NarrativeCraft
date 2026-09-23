@@ -23,19 +23,17 @@
 
 package fr.loudo.narrativecraft.files.narrrative.cameraangle;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.io.IOException;
 
 public class NarrativeCraftFileCameraAngle extends AbstractNarrativeCraftFileSceneJsonEntry<CameraAngle> {
+
+    public NarrativeCraftFileCameraAngle() {
+        super(CameraAngle.class, new CameraAngleSerializer(), new CameraAngleDeserializer());
+    }
 
     @Override
     protected String getSubFolderName() {
@@ -45,34 +43,5 @@ public class NarrativeCraftFileCameraAngle extends AbstractNarrativeCraftFileSce
     @Override
     protected Scene getScene(CameraAngle entry) {
         return entry.getScene();
-    }
-
-    @Override
-    protected CameraAngle getOldEntry(CameraAngle entry) {
-        return entry.getScene().getCameraAngleManager().getById(entry.getId());
-    }
-
-    @Override
-    protected void registerDeserializer(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(CameraAngle.class, new CameraAngleDeserializer());
-    }
-
-    @Override
-    protected CameraAngle deserializeEntry(Gson gson, String content) throws Exception {
-        return gson.fromJson(content, CameraAngle.class);
-    }
-
-    @Override
-    protected int writeJson(CameraAngle entry, File file) {
-        Gson gson = gsonBuilder
-                .registerTypeAdapter(CameraAngle.class, new CameraAngleSerializer())
-                .create();
-        try {
-            NarrativeCraftFileWriter.write(file, writer -> gson.toJson(entry, writer));
-            return OPERATION_SUCCESS;
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to write camera angle data {}", entry.getName(), e);
-            return OPERATION_FAILED;
-        }
     }
 }

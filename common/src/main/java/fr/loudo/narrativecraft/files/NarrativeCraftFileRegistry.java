@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,33 +40,43 @@ public class NarrativeCraftFileRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntry<?>> NarrativeCraftFileEditor<T> getEditor(T entry) {
-        if (entry == null) return null;
-        return (NarrativeCraftFileEditor<T>) registry.get(entry.getClass());
-    }
-
-    public <T extends NarrativeEntry<?>> int create(T entry) {
-        NarrativeCraftFileEditor<T> editor = getEditor(entry);
-        if (editor != null) return editor.create(entry);
-        return NarrativeCraftFileEditor.OPERATION_FAILED;
-    }
-
-    public <T extends NarrativeEntry<?>> int edit(T entry) {
-        NarrativeCraftFileEditor<T> editor = getEditor(entry);
-        if (editor != null) return editor.edit(entry);
-        return NarrativeCraftFileEditor.OPERATION_FAILED;
-    }
-
-    public <T extends NarrativeEntry<?>> int delete(T entry) {
-        NarrativeCraftFileEditor<T> editor = getEditor(entry);
-        if (editor != null) return editor.delete(entry);
-        return NarrativeCraftFileEditor.OPERATION_FAILED;
+    public <T extends NarrativeEntry<?>> NarrativeCraftFileEditor<T> getEditor(Class<T> entryClass) {
+        return (NarrativeCraftFileEditor<T>) registry.get(entryClass);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntry<?>> List<DeserializationResult<T>> deserialize(
-            Class<? extends NarrativeEntry<?>> entryClass) {
-        NarrativeCraftFileEditor<T> editor = (NarrativeCraftFileEditor<T>) registry.get(entryClass);
+    public <T extends NarrativeEntry<?>> RankedNarrativeCraftFileEditor<T> getRankedEditor(Class<T> entryClass) {
+        if (registry.get(entryClass) instanceof RankedNarrativeCraftFileEditor<?> rankedEditor) {
+            return (RankedNarrativeCraftFileEditor<T>) rankedEditor;
+        }
+        throw new IllegalStateException(entryClass.getSimpleName() + " has no ranked file editor");
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends NarrativeEntry<?>> NarrativeCraftFileEditor<T> getEditor(T entry) {
+        return (NarrativeCraftFileEditor<T>) registry.get(entry.getClass());
+    }
+
+    public <T extends NarrativeEntry<?>> OperationResult create(T entry) {
+        NarrativeCraftFileEditor<T> editor = getEditor(entry);
+        if (editor == null) return NarrativeCraftFileEditor.storageFailure(entry);
+        return editor.create(entry);
+    }
+
+    public <T extends NarrativeEntry<?>> OperationResult edit(T existing, T updated) {
+        NarrativeCraftFileEditor<T> editor = getEditor(existing);
+        if (editor == null) return NarrativeCraftFileEditor.storageFailure(existing);
+        return editor.edit(existing, updated);
+    }
+
+    public <T extends NarrativeEntry<?>> OperationResult delete(T entry) {
+        NarrativeCraftFileEditor<T> editor = getEditor(entry);
+        if (editor == null) return NarrativeCraftFileEditor.storageFailure(entry);
+        return editor.delete(entry);
+    }
+
+    public <T extends NarrativeEntry<?>> List<DeserializationResult<T>> deserialize(Class<T> entryClass) {
+        NarrativeCraftFileEditor<T> editor = getEditor(entryClass);
         if (editor != null) return editor.deserialize();
         return null;
     }

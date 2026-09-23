@@ -23,23 +23,24 @@
 
 package fr.loudo.narrativecraft.narrative;
 
+import java.util.Locale;
 import java.util.UUID;
 
 public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
     protected final UUID id;
     protected String name;
-    protected String description;
 
-    public NarrativeEntry(UUID id, String name, String description) {
+    public NarrativeEntry(UUID id, String name) {
         this.id = id;
         this.name = name;
-        this.description = description;
     }
 
-    public NarrativeEntry(String name, String description) {
-        this.id = UUID.randomUUID();
-        this.name = name;
-        this.description = description;
+    public NarrativeEntry(String name) {
+        this(UUID.randomUUID(), name);
+    }
+
+    public static String normalizeName(String name) {
+        return name.toLowerCase(Locale.ROOT).replace(' ', '_');
     }
 
     public String getName() {
@@ -50,12 +51,8 @@ public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public String getNormalizedName() {
+        return normalizeName(name);
     }
 
     public UUID getId() {

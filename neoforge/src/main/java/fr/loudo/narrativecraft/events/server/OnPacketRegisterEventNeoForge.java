@@ -72,6 +72,10 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playToClient(
                 S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC, ClientPacketHandlerNeoForge::showToast);
         registrar.playToClient(
+                S2CNarrativeEntryRejected.TYPE,
+                S2CNarrativeEntryRejected.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::narrativeEntryRejected);
+        registrar.playToClient(
                 S2CCutsceneEditorData.TYPE,
                 S2CCutsceneEditorData.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::loadCutsceneEditorData);

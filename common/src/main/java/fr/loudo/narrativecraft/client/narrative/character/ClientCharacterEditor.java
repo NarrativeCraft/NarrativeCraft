@@ -23,8 +23,6 @@
 
 package fr.loudo.narrativecraft.client.narrative.character;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
@@ -34,10 +32,6 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryPayload;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.util.UUID;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 
 public class ClientCharacterEditor implements ClientNarrativeEntryEditor<CharacterStoryPayload, CharacterStory> {
 
@@ -51,61 +45,34 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
 
     @Override
     public void add(UUID entryId, CharacterStoryPayload payload) {
-        CharacterStory character = buildFromPayload(entryId, payload);
+        CharacterStory character = new CharacterStory(entryId, payload.getName());
+        update(character, payload);
         characterManager.add(character);
     }
 
     @Override
     public void edit(UUID entryId, CharacterStoryPayload payload) {
-        CharacterStory oldCharacter = resolve(entryId, payload);
-        if (oldCharacter == null) return;
-
-        oldCharacter.setName(payload.getName());
-        oldCharacter.setDescription(payload.getDescription());
-        if (!payload.getModelType().isEmpty()) {
-            oldCharacter.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
-        }
-        oldCharacter.setEntityType(resolveEntityType(payload.getEntityTypeId()));
-        oldCharacter.setMainCharacterAttribute(payload.getMainCharacterAttribute());
-        oldCharacter.setCustomNbt(payload.getCustomNbt());
-        String dialogDataJson = payload.getDialogDataJson();
-        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
-            try {
-                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-                oldCharacter.setDialogData(DialogDataIO.deserialize(json, DialogFieldSet.CHARACTER));
-            } catch (Exception ignored) {
-            }
-        }
+        CharacterStory character = resolve(entryId, payload);
+        if (character == null) return;
+        character.setName(payload.getName());
+        update(character, payload);
     }
 
     @Override
     public void delete(UUID entryId, CharacterStoryPayload payload) {
         CharacterStory character = resolve(entryId, payload);
+        if (character == null) return;
         characterManager.remove(character);
     }
 
-    private CharacterStory buildFromPayload(UUID entryId, CharacterStoryPayload payload) {
-        CharacterStory character = new CharacterStory(entryId, payload.getName(), payload.getDescription());
+    private void update(CharacterStory character, CharacterStoryPayload payload) {
         if (!payload.getModelType().isEmpty()) {
             character.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
         }
-        character.setEntityType(resolveEntityType(payload.getEntityTypeId()));
+        character.setEntityType(Utils.resolveEntityType(payload.getEntityTypeId()));
         character.setMainCharacterAttribute(payload.getMainCharacterAttribute());
         character.setCustomNbt(payload.getCustomNbt());
-        String dialogDataJson = payload.getDialogDataJson();
-        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
-            try {
-                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-                character.setDialogData(DialogDataIO.deserialize(json, DialogFieldSet.CHARACTER));
-            } catch (Exception ignored) {
-            }
-        }
-        return character;
-    }
-
-    private EntityType<?> resolveEntityType(String entityTypeId) {
-        return BuiltInRegistries.ENTITY_TYPE
-                .getOptional(Identifier.parse(entityTypeId))
-                .orElse(EntityTypes.PLAYER);
+        DialogDataIO.parse(payload.getDialogDataJson(), DialogFieldSet.CHARACTER)
+                .ifPresent(character::setDialogData);
     }
 }

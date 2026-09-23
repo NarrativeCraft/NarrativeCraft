@@ -21,40 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.narrative;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
-public class ScenePayload extends NarrativeEntryPayload {
+public abstract class AbstractSceneEntryEditor<T extends SceneEntryPayload, E extends NarrativeEntry<T>>
+        extends AbstractNarrativeEntryEditor<T, E> {
 
-    public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ScenePayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            ScenePayload::getChapterId,
-            ByteBufCodecs.INT,
-            ScenePayload::getRank,
-            ScenePayload::new);
+    protected final NarrativeEntryResolver resolver =
+            NarrativeCraftMod.getInstance().getEntryResolver();
 
-    private final UUID chapterId;
-    private final int rank;
+    protected abstract NarrativeManager<E> getManager(Scene scene);
 
-    public ScenePayload(String name, UUID chapterId, int rank) {
-        super(name);
-        this.chapterId = chapterId;
-        this.rank = rank;
+    protected abstract E build(UUID entryId, T payload, Scene scene, E existing);
+
+    @Override
+    protected NarrativeManager<E> getSiblings(T payload) {
+        Scene scene = resolver.scene(payload);
+        if (scene == null) return null;
+        return getManager(scene);
     }
 
-    public UUID getChapterId() {
-        return chapterId;
-    }
-
-    public int getRank() {
-        return rank;
+    @Override
+    protected E build(UUID entryId, T payload, E existing) {
+        return build(entryId, payload, resolver.scene(payload), existing);
     }
 }

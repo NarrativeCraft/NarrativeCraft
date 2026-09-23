@@ -24,82 +24,48 @@
 package fr.loudo.narrativecraft.narrative.chapter;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.UtilsServer;
+import fr.loudo.narrativecraft.narrative.AbstractRankedNarrativeEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
 
-public class ChapterEditor implements NarrativeEntryEditor<ChapterPayload, Chapter> {
+public class ChapterEditor extends AbstractRankedNarrativeEntryEditor<ChapterPayload, Chapter> {
 
-    final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+    private final ChapterManager chapterManager =
+            NarrativeCraftMod.getInstance().getChapterManager();
 
-    @Override
-    public Chapter resolve(UUID entryId, ChapterPayload payload) {
-        return chapterManager.getById(entryId);
+    public ChapterEditor() {
+        super(Chapter.class);
     }
 
     @Override
-    public void add(UUID entryId, ChapterPayload payload, UUID playerId) {
-        Chapter chapter = new Chapter(entryId, payload.getName(), payload.getDescription(), payload.getChapterIndex());
-
-        ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-
-        int result = NarrativeCraftFileRegistry.getInstance().create(chapter);
-        if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
-            chapterManager.add(chapter);
-            UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(entryId, payload));
-        } else {
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.add", payload.getName()), player);
-        }
+    protected String getTypeKey() {
+        return "chapter";
     }
 
     @Override
-    public void edit(UUID entryId, ChapterPayload payload, UUID playerId) {
-
-        Chapter oldChapter = resolve(entryId, payload);
-
-        if (oldChapter == null) {
-            return;
-        }
-
-        Chapter newChapter =
-                new Chapter(entryId, payload.getName(), payload.getDescription(), payload.getChapterIndex());
-        int result = NarrativeCraftFileRegistry.getInstance().edit(newChapter);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
-            return;
-        }
-
-        int oldIndex = oldChapter.getChapterIndex();
-        oldChapter.setName(payload.getName());
-        oldChapter.setDescription(payload.getDescription());
-        oldChapter.setChapterIndex(payload.getChapterIndex());
-        if (oldIndex != payload.getChapterIndex()) {
-            chapterManager.forceSort();
-        }
-
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
+    protected NarrativeManager<Chapter> getSiblings(ChapterPayload payload) {
+        return chapterManager;
     }
 
     @Override
-    public void delete(UUID entryId, ChapterPayload payload, UUID playerId) {
-        Chapter chapter = resolve(entryId, payload);
+    protected Chapter build(UUID entryId, ChapterPayload payload, Chapter existing) {
+        int chapterIndex = existing == null ? getNextRank(chapterManager) : payload.getChapterIndex();
+        return new Chapter(entryId, payload.getName(), chapterIndex);
+    }
 
-        ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
+    @Override
+    protected void copyAttributes(Chapter target, Chapter source) {
+        target.setChapterIndex(source.getChapterIndex());
+    }
 
-        int result = NarrativeCraftFileRegistry.getInstance().delete(chapter);
-        if (result == NarrativeCraftFileEditor.OPERATION_SUCCESS) {
-            chapterManager.remove(chapter);
-            UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.delete(entryId, payload));
-        } else {
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.delete", payload.getName()), player);
-        }
+    @Override
+    protected int getRank(Chapter entry) {
+        return entry.getChapterIndex();
+    }
+
+    @Override
+    protected Chapter withRank(Chapter entry, int rank) {
+        return new Chapter(entry.getId(), entry.getName(), rank);
     }
 }

@@ -36,7 +36,6 @@ public class ChapterSerializer implements JsonSerializer<Chapter> {
         JsonObject json = new JsonObject();
         json.addProperty("id", src.getId().toString());
         json.addProperty("name", src.getName());
-        json.addProperty("description", src.getDescription());
         json.addProperty("chapterIndex", src.getChapterIndex());
         return json;
     }

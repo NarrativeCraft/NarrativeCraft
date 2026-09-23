@@ -24,11 +24,22 @@
 package fr.loudo.narrativecraft.dialog;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.util.Optional;
 import net.minecraft.resources.Identifier;
 
 public final class DialogDataIO {
 
     private DialogDataIO() {}
+
+    public static Optional<DialogData> parse(String json, DialogFieldSet fieldSet) {
+        if (json == null || json.isEmpty() || json.equals("{}")) return Optional.empty();
+        try {
+            return Optional.of(deserialize(JsonParser.parseString(json).getAsJsonObject(), fieldSet));
+        } catch (RuntimeException e) {
+            return Optional.empty();
+        }
+    }
 
     public static JsonObject serialize(DialogData data, DialogFieldSet fieldSet) {
         JsonObject json = new JsonObject();

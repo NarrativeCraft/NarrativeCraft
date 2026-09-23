@@ -23,11 +23,9 @@
 
 package fr.loudo.narrativecraft.client.narrative.subscene;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
-import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
@@ -35,62 +33,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ClientSubsceneEditor implements ClientNarrativeEntryEditor<SubscenePayload, Subscene> {
-
-    final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
+public class ClientSubsceneEditor extends ClientSceneEntryEditor<SubscenePayload, Subscene> {
 
     @Override
-    public void add(UUID entryId, SubscenePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
+    protected NarrativeManager<Subscene> getManager(Scene scene) {
+        return scene.getSubsceneManager();
+    }
 
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
+    @Override
+    protected Subscene create(UUID entryId, SubscenePayload payload, Scene scene) {
+        return new Subscene(entryId, payload.getName(), scene, resolveAnimations(payload, scene));
+    }
 
-        List<Animation> animations = payload.getAnimationIds().stream()
-                .map(id -> scene.getAnimationManager().getById(id))
+    @Override
+    protected void update(Subscene subscene, SubscenePayload payload) {
+        subscene.setAnimations(resolveAnimations(payload, subscene.getScene()));
+    }
+
+    private List<Animation> resolveAnimations(SubscenePayload payload, Scene scene) {
+        return payload.getAnimationIds().stream()
+                .map(animationId -> scene.getAnimationManager().getById(animationId))
                 .filter(Objects::nonNull)
                 .toList();
-        Subscene subscene = new Subscene(entryId, payload.getName(), payload.getDescription(), scene, animations);
-        scene.getSubsceneManager().add(subscene);
-    }
-
-    @Override
-    public void edit(UUID entryId, SubscenePayload payload) {
-        Subscene subscene = resolve(entryId, payload);
-        if (subscene == null) return;
-
-        List<Animation> animations = payload.getAnimationIds().stream()
-                .map(id -> subscene.getScene().getAnimationManager().getById(id))
-                .filter(Objects::nonNull)
-                .toList();
-        subscene.setName(payload.getName());
-        subscene.setDescription(payload.getDescription());
-        subscene.setAnimations(animations);
-    }
-
-    @Override
-    public void delete(UUID entryId, SubscenePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Subscene subscene = scene.getSubsceneManager().getById(entryId);
-        if (subscene == null) return;
-
-        scene.getSubsceneManager().remove(subscene);
-    }
-
-    @Override
-    public Subscene resolve(UUID entryId, SubscenePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getSubsceneManager().getById(entryId);
     }
 }

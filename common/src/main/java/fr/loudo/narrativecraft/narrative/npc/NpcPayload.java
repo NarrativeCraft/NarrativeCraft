@@ -23,14 +23,14 @@
 
 package fr.loudo.narrativecraft.narrative.npc;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public class NpcPayload extends NarrativeEntryPayload {
+public class NpcPayload extends SceneEntryPayload {
 
     public static final StreamCodec<ByteBuf, NpcPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
@@ -51,8 +51,6 @@ public class NpcPayload extends NarrativeEntryPayload {
 
     private final String modelType;
     private final String entityTypeId;
-    private final UUID sceneId;
-    private final UUID chapterId;
     private final String dialogDataJson;
     private final String customNbt;
 
@@ -64,11 +62,9 @@ public class NpcPayload extends NarrativeEntryPayload {
             UUID chapterId,
             String dialogDataJson,
             String customNbt) {
-        super(name, "");
+        super(name, sceneId, chapterId);
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
-        this.sceneId = sceneId;
-        this.chapterId = chapterId;
         this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
         this.customNbt = customNbt != null ? customNbt : "";
     }
@@ -79,14 +75,6 @@ public class NpcPayload extends NarrativeEntryPayload {
 
     public String getEntityTypeId() {
         return entityTypeId;
-    }
-
-    public UUID getSceneId() {
-        return sceneId;
-    }
-
-    public UUID getChapterId() {
-        return chapterId;
     }
 
     public String getDialogDataJson() {

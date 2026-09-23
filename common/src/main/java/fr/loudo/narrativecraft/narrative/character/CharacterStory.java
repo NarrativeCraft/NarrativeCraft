@@ -49,12 +49,16 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
     private String customNbt = "";
     private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
 
-    public CharacterStory(String name, String description) {
-        super(name, description);
+    public CharacterStory(UUID id, String name) {
+        super(id, name);
     }
 
-    public CharacterStory(UUID id, String name, String description) {
-        super(id, name, description);
+    public void copyAttributesFrom(CharacterStory source) {
+        dialogData = source.dialogData;
+        entityType = source.entityType;
+        modelType = source.modelType;
+        customNbt = source.customNbt;
+        mainCharacterAttribute = source.mainCharacterAttribute;
     }
 
     public DialogData getDialogData() {
@@ -128,7 +132,7 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
         String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
         String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData, DialogFieldSet.CHARACTER));
         return new CharacterStoryPayload(
-                name, description, modelTypeName, entityTypeId, customNbt, mainCharacterAttribute, dialogDataJson);
+                name, modelTypeName, entityTypeId, customNbt, mainCharacterAttribute, dialogDataJson);
     }
 
     @Override
@@ -138,6 +142,6 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
 
     @Override
     public String toFileName() {
-        return name.toLowerCase().replace(" ", "_");
+        return getNormalizedName();
     }
 }

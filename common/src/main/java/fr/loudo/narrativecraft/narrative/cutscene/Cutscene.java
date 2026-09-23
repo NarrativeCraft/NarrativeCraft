@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.cutscene;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.narrative.cutscene.ICutscene;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.layers.camera.CameraKeyframe;
@@ -43,31 +44,15 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutsce
     private List<CutsceneLayer> layers;
     private int manualMaxTick = 0;
 
-    public Cutscene(
-            UUID id,
-            String name,
-            String description,
-            Scene scene,
-            List<Animation> animations,
-            List<Subscene> subscenes) {
-        super(id, name, description);
+    public Cutscene(UUID id, String name, Scene scene, List<Animation> animations, List<Subscene> subscenes) {
+        super(id, name);
         this.scene = scene;
         this.animations = new ArrayList<>(animations);
         this.subscenes = new ArrayList<>(subscenes);
     }
 
-    public Cutscene(UUID id, String name, String description, Scene scene) {
-        super(id, name, description);
-        this.scene = scene;
-        this.animations = new ArrayList<>();
-        this.subscenes = new ArrayList<>();
-    }
-
-    public Cutscene(String name, String description, Scene scene) {
-        super(name, description);
-        this.scene = scene;
-        this.animations = new ArrayList<>();
-        this.subscenes = new ArrayList<>();
+    public Cutscene(UUID id, String name, Scene scene) {
+        this(id, name, scene, List.of(), List.of());
     }
 
     public int getMaxTick() {
@@ -153,14 +138,13 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutsce
 
     @Override
     public String toFileName() {
-        return name.replace(" ", "_").toLowerCase() + ".json";
+        return getNormalizedName() + NarrativeCraftFileDefault.EXTENSION_DATA_FILE;
     }
 
     @Override
     public CutscenePayload toPayload() {
         List<UUID> animationIds = animations.stream().map(Animation::getId).toList();
         List<UUID> subsceneIds = subscenes.stream().map(Subscene::getId).toList();
-        return new CutscenePayload(
-                name, description, scene.getId(), scene.getChapter().getId(), animationIds, subsceneIds);
+        return new CutscenePayload(name, scene.getId(), scene.getChapter().getId(), animationIds, subsceneIds);
     }
 }

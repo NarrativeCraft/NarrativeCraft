@@ -45,7 +45,6 @@ public class CutsceneSerializer implements JsonSerializer<Cutscene> {
 
         json.addProperty("id", src.getId().toString());
         json.addProperty("name", src.getName());
-        json.addProperty("description", src.getDescription());
         json.addProperty("sceneId", src.getScene().getId().toString());
         json.addProperty("chapterId", src.getScene().getChapter().getId().toString());
 

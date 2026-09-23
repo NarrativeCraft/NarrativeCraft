@@ -23,94 +23,49 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
 
-public class CameraAngleEditor implements NarrativeEntryEditor<CameraAnglePayload, CameraAngle> {
-
-    final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+public class CameraAngleEditor extends AbstractSceneEntryEditor<CameraAnglePayload, CameraAngle> {
 
     @Override
-    public CameraAngle resolve(UUID entryId, CameraAnglePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getCameraAngleManager().getById(entryId);
+    protected String getTypeKey() {
+        return "camera_angle";
     }
 
     @Override
-    public void add(UUID entryId, CameraAnglePayload payload, UUID playerId) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        CameraAngle cameraAngle = new CameraAngle(entryId, payload.getName(), payload.getDescription(), scene);
-        int result = NarrativeCraftFileRegistry.getInstance().create(cameraAngle);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.add", payload.getName()), player);
-            return;
-        }
-
-        scene.getCameraAngleManager().add(cameraAngle);
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(entryId, payload));
+    protected NarrativeManager<CameraAngle> getManager(Scene scene) {
+        return scene.getCameraAngleManager();
     }
 
     @Override
-    public void edit(UUID entryId, CameraAnglePayload payload, UUID playerId) {
-        CameraAngle cameraAngle = resolve(entryId, payload);
-        if (cameraAngle == null) return;
-
-        CameraAngle updatedCameraAngle =
-                new CameraAngle(entryId, payload.getName(), payload.getDescription(), cameraAngle.getScene());
-        updatedCameraAngle.getCameras().addAll(cameraAngle.getCameras());
-        updatedCameraAngle.getCharacterPlacements().addAll(cameraAngle.getCharacterPlacements());
-        updatedCameraAngle.getTemplateReferences().addAll(cameraAngle.getTemplateReferences());
-
-        int result = NarrativeCraftFileRegistry.getInstance().edit(updatedCameraAngle);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
-            return;
+    protected CameraAngle build(UUID entryId, CameraAnglePayload payload, Scene scene, CameraAngle existing) {
+        CameraAngle cameraAngle = new CameraAngle(entryId, payload.getName(), scene);
+        if (existing != null) {
+            cameraAngle.copyDataFrom(existing);
         }
-
-        cameraAngle.setName(payload.getName());
-        cameraAngle.setDescription(payload.getDescription());
-
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
+        return cameraAngle;
     }
 
     @Override
-    public void delete(UUID entryId, CameraAnglePayload payload, UUID playerId) {
-        CameraAngle cameraAngle = resolve(entryId, payload);
-        if (cameraAngle == null) return;
+    protected void copyAttributes(CameraAngle target, CameraAngle source) {}
 
-        int result = NarrativeCraftFileRegistry.getInstance().delete(cameraAngle);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.delete", payload.getName()), player);
-            return;
+    public OperationResult saveData(CameraAngle cameraAngle, String dataJson) {
+        CameraAngle updated = new CameraAngle(cameraAngle.getId(), cameraAngle.getName(), cameraAngle.getScene());
+        try {
+            CameraAngleDeserializer.deserializeInto(dataJson, updated);
+        } catch (RuntimeException e) {
+            return OperationResult.failure("error.invalid_data", cameraAngle.getName());
         }
 
-        cameraAngle.getScene().getCameraAngleManager().remove(cameraAngle);
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.delete(entryId, payload));
+        OperationResult storage = NarrativeCraftFileRegistry.getInstance().edit(cameraAngle, updated);
+        if (storage.isFailure()) return storage;
+
+        cameraAngle.copyDataFrom(updated);
+        return OperationResult.success();
     }
 }

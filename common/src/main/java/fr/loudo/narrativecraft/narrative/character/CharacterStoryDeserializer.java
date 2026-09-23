@@ -74,9 +74,8 @@ public class CharacterStoryDeserializer extends NarrativeDeserializer<CharacterS
 
         UUID id = parseId(jsonObject);
         String name = parseName(jsonObject);
-        String description = parseDescription(jsonObject);
 
-        CharacterStory character = new CharacterStory(id, name, description);
+        CharacterStory character = new CharacterStory(id, name);
 
         applySharedCharacterFields(jsonObject, character);
 

@@ -23,108 +23,38 @@
 
 package fr.loudo.narrativecraft.client.narrative.character;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
+import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.dialog.DialogFieldSet;
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.npc.NpcPayload;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.util.UUID;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 
-public class ClientNpcEditor implements ClientNarrativeEntryEditor<NpcPayload, Npc> {
-
-    private final ChapterManager chapterManager =
-            ClientNarrativeCraftMod.getInstance().getChapterManager();
+public class ClientNpcEditor extends ClientSceneEntryEditor<NpcPayload, Npc> {
 
     @Override
-    public void add(UUID entryId, NpcPayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Npc npc = buildFromPayload(entryId, payload, scene);
-        scene.getNpcManager().add(npc);
+    protected NarrativeManager<Npc> getManager(Scene scene) {
+        return scene.getNpcManager();
     }
 
     @Override
-    public void edit(UUID entryId, NpcPayload payload) {
-        Npc npc = resolve(entryId, payload);
-        if (npc == null) return;
-
-        npc.setName(payload.getName());
-        if (!payload.getModelType().isEmpty()) {
-            npc.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
-        }
-        npc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
-        String dialogDataJson = payload.getDialogDataJson();
-        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
-            try {
-                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-                npc.setDialogData(DialogDataIO.deserialize(json, DialogFieldSet.CHARACTER));
-            } catch (Exception ignored) {
-            }
-        }
-        npc.setCustomNbt(payload.getCustomNbt());
-    }
-
-    @Override
-    public void delete(UUID entryId, NpcPayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Npc npc = scene.getNpcManager().getById(entryId);
-        if (npc == null) return;
-
-        scene.getNpcManager().remove(npc);
-    }
-
-    @Override
-    public Npc resolve(UUID entryId, NpcPayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getNpcManager().getById(entryId);
-    }
-
-    private Npc buildFromPayload(UUID entryId, NpcPayload payload, Scene scene) {
+    protected Npc create(UUID entryId, NpcPayload payload, Scene scene) {
         Npc npc = new Npc(entryId, payload.getName(), scene);
-        if (!payload.getModelType().isEmpty()) {
-            npc.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
-        }
-        npc.setEntityType(resolveEntityType(payload.getEntityTypeId()));
-        npc.setCustomNbt(payload.getDialogDataJson());
-        String dialogDataJson = payload.getDialogDataJson();
-        if (dialogDataJson != null && !dialogDataJson.isEmpty() && !dialogDataJson.equals("{}")) {
-            try {
-                JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-                npc.setDialogData(DialogDataIO.deserialize(json, DialogFieldSet.CHARACTER));
-            } catch (Exception ignored) {
-            }
-        }
+        update(npc, payload);
         return npc;
     }
 
-    private EntityType<?> resolveEntityType(String entityTypeId) {
-        return BuiltInRegistries.ENTITY_TYPE
-                .getOptional(Identifier.parse(entityTypeId))
-                .orElse(EntityTypes.PLAYER);
+    @Override
+    protected void update(Npc npc, NpcPayload payload) {
+        if (!payload.getModelType().isEmpty()) {
+            npc.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
+        }
+        npc.setEntityType(Utils.resolveEntityType(payload.getEntityTypeId()));
+        DialogDataIO.parse(payload.getDialogDataJson(), DialogFieldSet.CHARACTER)
+                .ifPresent(npc::setDialogData);
+        npc.setCustomNbt(payload.getCustomNbt());
     }
 }

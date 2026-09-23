@@ -25,13 +25,17 @@ package fr.loudo.narrativecraft.files.narrrative;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonSerializer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.files.FileTransaction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.io.File;
 import java.io.IOException;
@@ -43,81 +47,96 @@ import java.util.function.Consumer;
 public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends NarrativeEntry<?>>
         extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<T> {
 
+    private final Class<T> entryClass;
+    private final Gson serializer;
+    private final Gson deserializer;
+
+    protected AbstractNarrativeCraftFileSceneJsonEntry(
+            Class<T> entryClass, JsonSerializer<T> jsonSerializer, JsonDeserializer<T> jsonDeserializer) {
+        this.entryClass = entryClass;
+        this.serializer = new GsonBuilder()
+                .registerTypeAdapter(entryClass, jsonSerializer)
+                .create();
+        this.deserializer = new GsonBuilder()
+                .registerTypeAdapter(entryClass, jsonDeserializer)
+                .create();
+    }
+
     protected abstract String getSubFolderName();
 
     protected abstract Scene getScene(T entry);
-
-    protected abstract T getOldEntry(T entry);
-
-    protected abstract void registerDeserializer(GsonBuilder gsonBuilder);
-
-    protected abstract T deserializeEntry(Gson gson, String content) throws Exception;
-
-    protected abstract int writeJson(T entry, File file);
 
     protected boolean entryHasOwnFolder() {
         return false;
     }
 
-    private File getEntryFolder(T entry) {
-        Scene scene = getScene(entry);
-        return createDirectory(NarrativeCraftFileUtil.getSceneFolder(scene), getSubFolderName());
+    private File getEntriesFolder(T entry) {
+        return new File(NarrativeCraftFileUtil.getSceneFolder(getScene(entry)), getSubFolderName());
+    }
+
+    private File getEntryTarget(T entry) {
+        return new File(getEntriesFolder(entry), entry.toFileName());
+    }
+
+    private File getDataFile(T entry) {
+        File target = getEntryTarget(entry);
+        return entryHasOwnFolder() ? new File(target, DATA_FILE_NAME) : target;
     }
 
     @Override
-    public int create(T entry) {
-        File folder = getEntryFolder(entry);
-        File file;
-        if (entryHasOwnFolder()) {
-            File entryDirectory = createDirectory(folder, entry.toFileName());
-            if (entryDirectory == null) {
-                NarrativeCraftMod.LOGGER.error("Failed to create directory {}", entry.getName());
-                return OPERATION_FAILED;
-            }
-            file = createFile(entryDirectory, DATA_FILE_NAME);
-        } else {
-            file = createFile(folder, entry.toFileName());
-        }
-        if (file == null) {
-            NarrativeCraftMod.LOGGER.error("Failed to create file {}", entry.getName());
-            return OPERATION_FAILED;
-        }
-        return writeJson(entry, file);
-    }
-
-    @Override
-    public int edit(T entry) {
-        File folder = getEntryFolder(entry);
-        T oldEntry = getOldEntry(entry);
+    public OperationResult create(T entry) {
+        FileTransaction transaction = new FileTransaction();
         try {
-            if (oldEntry != null && !oldEntry.toFileName().equals(entry.toFileName())) {
-                File oldTarget = new File(folder, oldEntry.toFileName());
-                File newTarget = new File(folder, entry.toFileName());
-                Files.move(oldTarget.toPath(), newTarget.toPath());
+            File target = getEntryTarget(entry);
+            if (target.exists()) {
+                throw new IOException(target + " already exists");
             }
-            if (entryHasOwnFolder()) {
-                return writeJson(entry, new File(new File(folder, entry.toFileName()), DATA_FILE_NAME));
-            }
-            return writeJson(entry, new File(folder, entry.toFileName()));
+            transaction.createDirectories(entryHasOwnFolder() ? target : getEntriesFolder(entry));
+            writeData(transaction, entry);
+            transaction.commit();
         } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to edit {}", entry.getName(), e);
-            return OPERATION_FAILED;
+            transaction.rollback();
+            NarrativeCraftMod.LOGGER.error("Failed to create {}", entry.getName(), e);
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
+        return OperationResult.success();
     }
 
     @Override
-    public int delete(T entry) {
-        File target = new File(getEntryFolder(entry), entry.toFileName());
-        if (!target.exists()) {
-            NarrativeCraftMod.LOGGER.error("Failed to delete {} because file doesn't exist", entry.getName());
-            return OPERATION_FAILED;
+    public OperationResult edit(T existing, T updated) {
+        FileTransaction transaction = new FileTransaction();
+        try {
+            transaction.move(getEntryTarget(existing), getEntryTarget(updated));
+            writeData(transaction, updated);
+            transaction.commit();
+        } catch (IOException e) {
+            transaction.rollback();
+            NarrativeCraftMod.LOGGER.error("Failed to edit {}", existing.getName(), e);
+            return NarrativeCraftFileEditor.storageFailure(existing);
         }
-        boolean deleted = entryHasOwnFolder() ? deleteDirectory(target) : target.delete();
-        if (!deleted) {
-            NarrativeCraftMod.LOGGER.error("Failed to delete {}", entry.getName());
-            return OPERATION_FAILED;
+        return OperationResult.success();
+    }
+
+    @Override
+    public OperationResult delete(T entry) {
+        FileTransaction transaction = new FileTransaction();
+        try {
+            File target = getEntryTarget(entry);
+            if (!target.exists()) {
+                throw new IOException(target + " does not exist");
+            }
+            transaction.delete(target);
+            transaction.commit();
+        } catch (IOException e) {
+            transaction.rollback();
+            NarrativeCraftMod.LOGGER.error("Failed to delete {}", entry.getName(), e);
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
-        return OPERATION_SUCCESS;
+        return OperationResult.success();
+    }
+
+    private void writeData(FileTransaction transaction, T entry) throws IOException {
+        transaction.write(getDataFile(entry), writer -> serializer.toJson(entry, writer));
     }
 
     @Override
@@ -125,9 +144,6 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
         List<DeserializationResult<T>> results = new ArrayList<>();
 
         migrateLooseEntries();
-
-        registerDeserializer(gsonBuilder);
-        Gson gson = gsonBuilder.create();
 
         forEachEntryFolder(entryFolder -> {
             File[] entryFiles = entryFolder.listFiles();
@@ -144,7 +160,7 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
                 }
                 try {
                     String content = Files.readString(dataFile.toPath());
-                    T entry = deserializeEntry(gson, content);
+                    T entry = deserializer.fromJson(content, entryClass);
                     if (entry == null) {
                         throw new Exception(String.format("Deserialization of %s returned null", entryFile.getName()));
                     }
@@ -205,11 +221,13 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
         if (chapterDirs == null) return;
 
         for (File chapterDir : chapterDirs) {
+            if (NarrativeCraftFileWriter.isTemporary(chapterDir)) continue;
             File scenesFolder = new File(chapterDir, SCENES_FOLDER_NAME);
             File[] sceneDirs = scenesFolder.listFiles();
             if (sceneDirs == null) continue;
 
             for (File sceneDir : sceneDirs) {
+                if (NarrativeCraftFileWriter.isTemporary(sceneDir)) continue;
                 File entryFolder = new File(sceneDir, getSubFolderName());
                 if (!entryFolder.exists()) continue;
                 consumer.accept(entryFolder);

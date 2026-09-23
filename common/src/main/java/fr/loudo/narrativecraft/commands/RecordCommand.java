@@ -32,6 +32,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.playback.Playback;
@@ -267,26 +268,26 @@ public class RecordCommand {
                 return 0;
             }
             recording.setPendingOverwriteName(null);
-            context.getSource().sendSuccess(() -> Translation.message("record.saving"), false);
-            if (recording.save(recordName, existingAnimation)) {
-                context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);
-            } else {
-                context.getSource().sendFailure(Translation.message("error.record.save"));
-            }
-            RECORDING_MANAGER.remove(recording);
-            return Command.SINGLE_SUCCESS;
+            return saveRecording(context, recording, recordName, existingAnimation);
         }
 
         recording.setPendingOverwriteName(null);
+        return saveRecording(context, recording, recordName, null);
+    }
+
+    private static int saveRecording(
+            CommandContext<CommandSourceStack> context,
+            Recording recording,
+            String recordName,
+            Animation animationToOverwrite) {
         context.getSource().sendSuccess(() -> Translation.message("record.saving"), false);
-        if (recording.save(recordName)) {
-            context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);
-        } else {
-            context.getSource().sendFailure(Translation.message("error.record.save"));
+        OperationResult result = recording.save(recordName, animationToOverwrite);
+        if (result.isFailure()) {
+            context.getSource().sendFailure(result.getError());
+            return 0;
         }
-
+        context.getSource().sendSuccess(() -> Translation.message("record.saved"), false);
         RECORDING_MANAGER.remove(recording);
-
         return Command.SINGLE_SUCCESS;
     }
 

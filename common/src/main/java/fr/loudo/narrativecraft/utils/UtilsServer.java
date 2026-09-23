@@ -32,7 +32,6 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.network.S2CCharacterSkin;
-import fr.loudo.narrativecraft.network.S2CScreenClear;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2COpenMainScreen;
 import fr.loudo.narrativecraft.platform.Services;
@@ -40,17 +39,11 @@ import fr.loudo.narrativecraft.server.settings.NarrativeServerSettings;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import java.io.File;
 import java.util.Collection;
-import java.util.UUID;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
 public class UtilsServer {
-
-    public static ServerPlayer getPlayerByUUID(UUID playerId) {
-        return NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayer(playerId);
-    }
 
     public static void broadcastPacket(CustomPacketPayload packet) {
         for (ServerPlayer player :
@@ -64,12 +57,6 @@ public class UtilsServer {
                 NarrativeCraftMod.getInstance().getServer().getPlayerList().getPlayers()) {
             player.connection.send(packet);
         }
-    }
-
-    public static void sendErrorClearScreen(Component message, ServerPlayer player) {
-        if (player == null) return;
-        Utils.sendError(message, player);
-        Services.PACKET.sendToPlayer(player, S2CScreenClear.INSTANCE);
     }
 
     public static PlayerSession getPlayerSessionByPlayer(ServerPlayer player) {

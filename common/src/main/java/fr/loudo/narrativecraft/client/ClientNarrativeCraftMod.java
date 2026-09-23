@@ -39,6 +39,7 @@ import fr.loudo.narrativecraft.client.signals.ClientSignalRegistryRegister;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryResolver;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
 import fr.loudo.narrativecraft.signals.SignalRegistryImpl;
@@ -48,6 +49,7 @@ public class ClientNarrativeCraftMod {
     private static final ClientNarrativeCraftMod instance = new ClientNarrativeCraftMod();
 
     private final ChapterManager chapterManager = new ChapterManager();
+    private final NarrativeEntryResolver entryResolver = new NarrativeEntryResolver(chapterManager);
     private final CharacterManager characterManager = new CharacterManager();
     private final ClientPlayerSession playerSession = new ClientPlayerSession();
     private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
@@ -71,6 +73,10 @@ public class ClientNarrativeCraftMod {
 
     public ChapterManager getChapterManager() {
         return chapterManager;
+    }
+
+    public NarrativeEntryResolver getEntryResolver() {
+        return entryResolver;
     }
 
     public CharacterManager getCharacterManager() {

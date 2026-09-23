@@ -34,8 +34,6 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
             ByteBufCodecs.STRING_UTF8,
             CharacterStoryPayload::getName,
             ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getDescription,
-            ByteBufCodecs.STRING_UTF8,
             CharacterStoryPayload::getModelType,
             ByteBufCodecs.STRING_UTF8,
             CharacterStoryPayload::getEntityTypeId,
@@ -55,13 +53,12 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
 
     public CharacterStoryPayload(
             String name,
-            String description,
             String modelType,
             String entityTypeId,
             String customNbt,
             MainCharacterAttribute mainCharacterAttribute,
             String dialogDataJson) {
-        super(name, description);
+        super(name);
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
         this.customNbt = customNbt != null ? customNbt : "";

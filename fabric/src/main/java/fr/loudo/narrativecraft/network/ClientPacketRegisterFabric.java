@@ -49,6 +49,8 @@ public class ClientPacketRegisterFabric {
         PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay()
+                .register(S2CNarrativeEntryRejected.TYPE, S2CNarrativeEntryRejected.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);

@@ -36,8 +36,7 @@ public class ChapterDeserializer extends NarrativeDeserializer<Chapter> {
 
         UUID id = parseId(jsonObject);
         String name = parseName(jsonObject);
-        String description = parseDescription(jsonObject);
         int chapterIndex = jsonObject.get("chapterIndex").getAsInt();
-        return new Chapter(id, name, description, chapterIndex);
+        return new Chapter(id, name, chapterIndex);
     }
 }

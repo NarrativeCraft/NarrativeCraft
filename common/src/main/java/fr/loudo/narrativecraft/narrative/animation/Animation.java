@@ -49,21 +49,15 @@ public class Animation extends NarrativeEntry<AnimationPayload> implements IAnim
     private int totalTick;
     private ICharacterStory characterStory;
 
-    public Animation(UUID id, String name, String description, Scene scene, ICharacterStory characterStory) {
-        super(id, name, description);
-        this.scene = scene;
-        this.characterStory = characterStory;
-    }
-
     public Animation(UUID id, String name, Scene scene, int totalTick, ICharacterStory characterStory) {
-        super(id, name, "");
+        super(id, name);
         this.scene = scene;
         this.totalTick = totalTick;
         this.characterStory = characterStory;
     }
 
     public Animation(UUID id, String name, Scene scene) {
-        super(id, name, "");
+        super(id, name);
         this.scene = scene;
     }
 
@@ -133,8 +127,7 @@ public class Animation extends NarrativeEntry<AnimationPayload> implements IAnim
 
     @Override
     public AnimationPayload toPayload() {
-        return new AnimationPayload(
-                name, description, scene.getId(), scene.getChapter().getId(), totalTick, characterStory.getId());
+        return new AnimationPayload(name, scene.getId(), scene.getChapter().getId(), totalTick, characterStory.getId());
     }
 
     @Override
@@ -144,7 +137,7 @@ public class Animation extends NarrativeEntry<AnimationPayload> implements IAnim
 
     @Override
     public String toFileName() {
-        return name.replace(" ", "_").toLowerCase() + Recording.RECORDING_EXTENSION;
+        return getNormalizedName() + Recording.RECORDING_EXTENSION;
     }
 
     public Scene getScene() {

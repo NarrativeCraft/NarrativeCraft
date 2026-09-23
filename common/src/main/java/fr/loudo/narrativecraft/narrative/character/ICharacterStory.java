@@ -32,8 +32,6 @@ import net.minecraft.world.entity.player.PlayerModelType;
 
 public interface ICharacterStory extends ICharacter {
 
-    String getDescription();
-
     DialogData getDialogData();
 
     void setDialogData(DialogData dialogData);

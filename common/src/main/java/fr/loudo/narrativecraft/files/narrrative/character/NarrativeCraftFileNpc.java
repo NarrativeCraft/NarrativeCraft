@@ -23,19 +23,17 @@
 
 package fr.loudo.narrativecraft.files.narrrative.character;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
 import fr.loudo.narrativecraft.narrative.npc.NpcDeserializer;
 import fr.loudo.narrativecraft.narrative.npc.NpcSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.io.IOException;
 
 public class NarrativeCraftFileNpc extends AbstractNarrativeCraftFileSceneJsonEntry<Npc> {
+
+    public NarrativeCraftFileNpc() {
+        super(Npc.class, new NpcSerializer(), new NpcDeserializer());
+    }
 
     @Override
     protected String getSubFolderName() {
@@ -50,33 +48,5 @@ public class NarrativeCraftFileNpc extends AbstractNarrativeCraftFileSceneJsonEn
     @Override
     protected Scene getScene(Npc entry) {
         return entry.getScene();
-    }
-
-    @Override
-    protected Npc getOldEntry(Npc entry) {
-        return entry.getScene().getNpcManager().getById(entry.getId());
-    }
-
-    @Override
-    protected void registerDeserializer(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(Npc.class, new NpcDeserializer());
-    }
-
-    @Override
-    protected Npc deserializeEntry(Gson gson, String content) throws Exception {
-        return gson.fromJson(content, Npc.class);
-    }
-
-    @Override
-    protected int writeJson(Npc entry, File file) {
-        Gson gson =
-                gsonBuilder.registerTypeAdapter(Npc.class, new NpcSerializer()).create();
-        try {
-            NarrativeCraftFileWriter.write(file, writer -> gson.toJson(entry, writer));
-            return OPERATION_SUCCESS;
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to write npc data {}", entry.getName(), e);
-            return OPERATION_FAILED;
-        }
     }
 }

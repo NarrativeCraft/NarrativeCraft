@@ -23,11 +23,9 @@
 
 package fr.loudo.narrativecraft.client.narrative.cutscene;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
-import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -36,72 +34,36 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ClientCutsceneEditor implements ClientNarrativeEntryEditor<CutscenePayload, Cutscene> {
-
-    final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
+public class ClientCutsceneEditor extends ClientSceneEntryEditor<CutscenePayload, Cutscene> {
 
     @Override
-    public void add(UUID entryId, CutscenePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        List<Animation> animations = payload.getAnimationIds().stream()
-                .map(id -> scene.getAnimationManager().getById(id))
-                .filter(Objects::nonNull)
-                .toList();
-        List<Subscene> subscenes = payload.getSubsceneIds().stream()
-                .map(id -> scene.getSubsceneManager().getById(id))
-                .filter(Objects::nonNull)
-                .toList();
-        Cutscene cutscene =
-                new Cutscene(entryId, payload.getName(), payload.getDescription(), scene, animations, subscenes);
-        scene.getCutsceneManager().add(cutscene);
+    protected NarrativeManager<Cutscene> getManager(Scene scene) {
+        return scene.getCutsceneManager();
     }
 
     @Override
-    public void edit(UUID entryId, CutscenePayload payload) {
-        Cutscene cutscene = resolve(entryId, payload);
-        if (cutscene == null) return;
-
-        List<Animation> animations = payload.getAnimationIds().stream()
-                .map(id -> cutscene.getScene().getAnimationManager().getById(id))
-                .filter(Objects::nonNull)
-                .toList();
-        List<Subscene> subscenes = payload.getSubsceneIds().stream()
-                .map(id -> cutscene.getScene().getSubsceneManager().getById(id))
-                .filter(Objects::nonNull)
-                .toList();
-        cutscene.setName(payload.getName());
-        cutscene.setDescription(payload.getDescription());
-        cutscene.setAnimations(animations);
-        cutscene.setSubscenes(subscenes);
+    protected Cutscene create(UUID entryId, CutscenePayload payload, Scene scene) {
+        return new Cutscene(
+                entryId, payload.getName(), scene, resolveAnimations(payload, scene), resolveSubscenes(payload, scene));
     }
 
     @Override
-    public void delete(UUID entryId, CutscenePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Cutscene cutscene = scene.getCutsceneManager().getById(entryId);
-        if (cutscene == null) return;
-
-        scene.getCutsceneManager().remove(cutscene);
+    protected void update(Cutscene cutscene, CutscenePayload payload) {
+        cutscene.setAnimations(resolveAnimations(payload, cutscene.getScene()));
+        cutscene.setSubscenes(resolveSubscenes(payload, cutscene.getScene()));
     }
 
-    @Override
-    public Cutscene resolve(UUID entryId, CutscenePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
+    private List<Animation> resolveAnimations(CutscenePayload payload, Scene scene) {
+        return payload.getAnimationIds().stream()
+                .map(animationId -> scene.getAnimationManager().getById(animationId))
+                .filter(Objects::nonNull)
+                .toList();
+    }
 
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getCutsceneManager().getById(entryId);
+    private List<Subscene> resolveSubscenes(CutscenePayload payload, Scene scene) {
+        return payload.getSubsceneIds().stream()
+                .map(subsceneId -> scene.getSubsceneManager().getById(subsceneId))
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

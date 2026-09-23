@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.interaction;
 
 import fr.loudo.narrativecraft.api.narrative.interaction.IInteraction;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.ArrayList;
@@ -36,13 +37,8 @@ public class Interaction extends NarrativeEntry<InteractionPayload> implements I
     private final List<InteractionZone> zones = new ArrayList<>();
     private final List<InteractionPoint> points = new ArrayList<>();
 
-    public Interaction(UUID id, String name, String description, Scene scene) {
-        super(id, name, description);
-        this.scene = scene;
-    }
-
-    public Interaction(String name, String description, Scene scene) {
-        super(name, description);
+    public Interaction(UUID id, String name, Scene scene) {
+        super(id, name);
         this.scene = scene;
     }
 
@@ -58,10 +54,16 @@ public class Interaction extends NarrativeEntry<InteractionPayload> implements I
         return points;
     }
 
+    public void copyDataFrom(Interaction source) {
+        zones.clear();
+        zones.addAll(source.getZones());
+        points.clear();
+        points.addAll(source.getPoints());
+    }
+
     @Override
     public InteractionPayload toPayload() {
-        return new InteractionPayload(
-                name, description, scene.getId(), scene.getChapter().getId());
+        return new InteractionPayload(name, scene.getId(), scene.getChapter().getId());
     }
 
     @Override
@@ -71,6 +73,6 @@ public class Interaction extends NarrativeEntry<InteractionPayload> implements I
 
     @Override
     public String toFileName() {
-        return name.replace(" ", "_").toLowerCase() + ".json";
+        return getNormalizedName() + NarrativeCraftFileDefault.EXTENSION_DATA_FILE;
     }
 }

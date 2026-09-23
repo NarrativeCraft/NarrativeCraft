@@ -23,25 +23,21 @@
 
 package fr.loudo.narrativecraft.narrative.animation;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public class AnimationPayload extends NarrativeEntryPayload {
+public class AnimationPayload extends SceneEntryPayload {
 
-    private final UUID sceneId;
-    private final UUID chapterId;
     private final int totalTick;
     private final UUID characterId;
 
     public static final StreamCodec<ByteBuf, AnimationPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
             AnimationPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            AnimationPayload::getDescription,
             UUIDUtil.STREAM_CODEC,
             AnimationPayload::getSceneId,
             UUIDUtil.STREAM_CODEC,
@@ -52,21 +48,10 @@ public class AnimationPayload extends NarrativeEntryPayload {
             AnimationPayload::getCharacterId,
             AnimationPayload::new);
 
-    public AnimationPayload(
-            String name, String description, UUID sceneId, UUID chapterId, int totalTick, UUID characterId) {
-        super(name, description);
-        this.sceneId = sceneId;
-        this.chapterId = chapterId;
+    public AnimationPayload(String name, UUID sceneId, UUID chapterId, int totalTick, UUID characterId) {
+        super(name, sceneId, chapterId);
         this.totalTick = totalTick;
         this.characterId = characterId;
-    }
-
-    public UUID getChapterId() {
-        return chapterId;
-    }
-
-    public UUID getSceneId() {
-        return sceneId;
     }
 
     public int getTotalTick() {

@@ -24,293 +24,161 @@
 package fr.loudo.narrativecraft.files.narrrative.scene;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
+import fr.loudo.narrativecraft.files.EntryChange;
+import fr.loudo.narrativecraft.files.FileTransaction;
 import fr.loudo.narrativecraft.files.InkFileGenerator;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
-import fr.loudo.narrativecraft.managers.SceneManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.files.RankedNarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.scene.SceneDeserializer;
 import fr.loudo.narrativecraft.narrative.scene.SceneSerializer;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class NarrativeCraftFileScene extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<Scene> {
+public class NarrativeCraftFileScene extends NarrativeCraftFileDefault
+        implements RankedNarrativeCraftFileEditor<Scene> {
+
+    private static final List<String> SCENE_SUB_FOLDERS = List.of(
+            ANIMATIONS_FOLDER_NAME,
+            SUBSCENES_FOLDER_NAME,
+            CUTSCENES_FOLDER_NAME,
+            CAMERA_ANGLES_FOLDER_NAME,
+            NPC_FOLDER_NAME,
+            INTERACTIONS_FOLDER_NAME);
+
+    private static final Gson SERIALIZER = new GsonBuilder()
+            .registerTypeAdapter(Scene.class, new SceneSerializer())
+            .create();
+    private static final Gson DESERIALIZER = new GsonBuilder()
+            .registerTypeAdapter(Scene.class, new SceneDeserializer())
+            .create();
 
     @Override
-    public int create(Scene entry) {
-
-        File sceneFile =
-                createDirectory(NarrativeCraftFileUtil.getScenesFolder(entry.getChapter()), entry.toFileName());
-        if (sceneFile == null) {
-            NarrativeCraftMod.LOGGER.error("Failed to create scene directory {}", entry.getName());
-            return OPERATION_FAILED;
+    public OperationResult create(Scene entry) {
+        FileTransaction transaction = new FileTransaction();
+        try {
+            File sceneFolder = NarrativeCraftFileUtil.getSceneFolder(entry);
+            if (sceneFolder.exists()) {
+                throw new IOException("Scene directory " + sceneFolder + " already exists");
+            }
+            for (String subFolder : SCENE_SUB_FOLDERS) {
+                transaction.createDirectories(new File(sceneFolder, subFolder));
+            }
+            writeData(transaction, sceneFolder, entry);
+            InkFileGenerator.writeSceneInkFile(transaction, sceneFolder, entry);
+            transaction.commit();
+        } catch (IOException e) {
+            transaction.rollback();
+            NarrativeCraftMod.LOGGER.error("Failed to create scene {}", entry.getName(), e);
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
-
-        File animationsFolder = createDirectory(sceneFile, ANIMATIONS_FOLDER_NAME);
-        if (animationsFolder == null) {
-            NarrativeCraftMod.LOGGER.error("Failed to create animations directory of scene {}", entry.getName());
-            return OPERATION_FAILED;
-        }
-
-        File subsceneFolder = createDirectory(sceneFile, SUBSCENES_FOLDER_NAME);
-        if (subsceneFolder == null) {
-            NarrativeCraftMod.LOGGER.error("Failed to create subscenes directory of scene {}", entry.getName());
-            return OPERATION_FAILED;
-        }
-
-        File cutsceneFolder = createDirectory(sceneFile, CUTSCENES_FOLDER_NAME);
-        if (cutsceneFolder == null) {
-            NarrativeCraftMod.LOGGER.error("Failed to create cutscenes directory of scene {}", entry.getName());
-            return OPERATION_FAILED;
-        }
-
-        File cameraAngleFolder = createDirectory(sceneFile, CAMERA_ANGLES_FOLDER_NAME);
-        if (cameraAngleFolder == null) {
-            NarrativeCraftMod.LOGGER.error("Failed to create camera angles directory of scene {}", entry.getName());
-            return OPERATION_FAILED;
-        }
-
-        File npcFolder = createDirectory(sceneFile, NPC_FOLDER_NAME);
-        if (npcFolder == null) {
-            NarrativeCraftMod.LOGGER.error("Failed to create npc directory of scene {}", entry.getName());
-            return OPERATION_FAILED;
-        }
-
-        File interactionFolder = createDirectory(sceneFile, INTERACTIONS_FOLDER_NAME);
-        if (interactionFolder == null) {
-            NarrativeCraftMod.LOGGER.error("Failed to create interaction directory of scene {}", entry.getName());
-            return OPERATION_FAILED;
-        }
-
-        int result = edit(entry);
-        if (result == OPERATION_SUCCESS) {
-            InkFileGenerator.generateSceneInkFile(entry);
-            InkFileGenerator.regenerateMainInk();
-        }
-        return result;
+        InkFileGenerator.regenerateMainInk();
+        return OperationResult.success();
     }
 
     @Override
-    public int edit(Scene entry) {
-
-        File workingFolder = NarrativeCraftFileUtil.getScenesFolder(entry.getChapter());
-        SceneManager sceneManager = entry.getChapter().getSceneManager();
-        Scene oldScene = sceneManager.getById(entry.getId());
-
+    public OperationResult editAll(List<EntryChange<Scene>> changes) {
+        FileTransaction transaction = new FileTransaction();
         try {
-
-            // If user is editing scene
-            if (oldScene != null) {
-                File oldSceneDirectory = new File(workingFolder, oldScene.toFileName());
-                File newSceneDirectory = new File(workingFolder, entry.toFileName());
-
-                // If the user wants to change the scene rank, let's move everything...
-                if (oldScene.getRank() != entry.getRank()) {
-                    int oldRank = oldScene.getRank();
-                    int newRank = entry.getRank();
-                    String errorMsg = String.format("Failed to shift scene directory %s", oldScene.getName());
-
-                    if (newRank > oldRank) {
-                        // Shift scenes left to free the target slot
-                        if (!shiftSceneRange(sceneManager, workingFolder, oldRank + 1, newRank, -1, true)) {
-                            NarrativeCraftMod.LOGGER.error(errorMsg);
-                            return OPERATION_FAILED;
-                        }
-                    } else {
-                        // Shift scenes right to free the target slot
-                        if (!shiftSceneRange(sceneManager, workingFolder, oldRank - 1, newRank, 1, false)) {
-                            NarrativeCraftMod.LOGGER.error(errorMsg);
-                            return OPERATION_FAILED;
-                        }
-                    }
-
-                    if (newSceneDirectory.exists()) {
-                        NarrativeCraftMod.LOGGER.error(
-                                "Failed to rename scene {} because target directory already exists",
-                                oldScene.getName());
-                        return OPERATION_FAILED;
-                    }
-                }
-
-                Files.move(oldSceneDirectory.toPath(), newSceneDirectory.toPath());
-            }
-
-            File sceneFile = new File(workingFolder, entry.toFileName());
-            if (!sceneFile.exists()) {
-                NarrativeCraftMod.LOGGER.error("Failed to shift scene directory {}", entry.getName());
-                return OPERATION_FAILED;
-            }
-
-            File dataFile = createFile(sceneFile, DATA_FILE_NAME);
-
-            Gson gson = gsonBuilder
-                    .registerTypeAdapter(Scene.class, new SceneSerializer())
-                    .create();
-            NarrativeCraftFileWriter.write(dataFile, writer -> gson.toJson(entry, writer));
-
-            if (oldScene != null) {
-                if (!oldScene.getName()
-                        .toLowerCase(Locale.ROOT)
-                        .equals(entry.getName().toLowerCase(Locale.ROOT))) {
-                    InkFileGenerator.renameSceneInkFile(oldScene, entry);
-                }
-                InkFileGenerator.regenerateMainInk();
-            }
-
-        } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Failed to write scene data {}", entry.formattedName(), e);
-            return OPERATION_FAILED;
+            applyChanges(transaction, changes);
+            transaction.commit();
+        } catch (IOException e) {
+            transaction.rollback();
+            NarrativeCraftMod.LOGGER.error("Failed to edit scenes", e);
+            return NarrativeCraftFileEditor.storageFailure(changes.getFirst().existing());
         }
-
-        return OPERATION_SUCCESS;
+        InkFileGenerator.regenerateMainInk();
+        return OperationResult.success();
     }
 
     @Override
-    public int delete(Scene entry) {
-
-        File workingFolder = NarrativeCraftFileUtil.getScenesFolder(entry.getChapter());
-        File sceneFile = new File(workingFolder, entry.toFileName());
-        if (!sceneFile.exists()) {
-            NarrativeCraftMod.LOGGER.error(
-                    "Failed to delete scene {} because target directory {} doesn't exists",
-                    entry.getName(),
-                    entry.toFileName());
-            return OPERATION_FAILED;
-        }
-
-        SceneManager sceneManager = entry.getChapter().getSceneManager();
-
+    public OperationResult deleteAndShift(Scene entry, List<EntryChange<Scene>> shiftedEntries) {
+        FileTransaction transaction = new FileTransaction();
         try {
-            if (!deleteDirectory(sceneFile)) {
-                NarrativeCraftMod.LOGGER.error("Failed to delete scene {}", entry.getName());
-                return OPERATION_FAILED;
+            File sceneFolder = NarrativeCraftFileUtil.getSceneFolder(entry);
+            if (!sceneFolder.exists()) {
+                throw new IOException("Scene directory " + sceneFolder + " does not exist");
             }
-
-            // Shift every scene after the deleted one to fill the gap
-            int deletedRank = entry.getRank();
-            int lastRank = getLastSceneRank(sceneManager);
-
-            if (deletedRank < lastRank) {
-                if (!shiftSceneRange(sceneManager, workingFolder, deletedRank + 1, lastRank, -1, true)) {
-                    return OPERATION_FAILED;
-                }
-            }
-
-            InkFileGenerator.regenerateMainInk();
-            return OPERATION_SUCCESS;
-        } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error("Failed to delete scene {}", entry.formattedName(), e);
-            return OPERATION_FAILED;
+            transaction.delete(sceneFolder);
+            applyChanges(transaction, shiftedEntries);
+            transaction.commit();
+        } catch (IOException e) {
+            transaction.rollback();
+            NarrativeCraftMod.LOGGER.error("Failed to delete scene {}", entry.getName(), e);
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
+        InkFileGenerator.regenerateMainInk();
+        return OperationResult.success();
+    }
+
+    private void applyChanges(FileTransaction transaction, List<EntryChange<Scene>> changes) throws IOException {
+        List<FileTransaction.Move> sceneMoves = new ArrayList<>();
+        for (EntryChange<Scene> change : changes) {
+            sceneMoves.add(new FileTransaction.Move(
+                    NarrativeCraftFileUtil.getSceneFolder(change.existing()),
+                    NarrativeCraftFileUtil.getSceneFolder(change.updated())));
+        }
+        transaction.moveAll(sceneMoves);
+
+        for (EntryChange<Scene> change : changes) {
+            File sceneFolder = NarrativeCraftFileUtil.getSceneFolder(change.updated());
+            if (!change.existing().getNormalizedName().equals(change.updated().getNormalizedName())) {
+                InkFileGenerator.renameSceneInkFile(transaction, sceneFolder, change.existing(), change.updated());
+            }
+            writeData(transaction, sceneFolder, change.updated());
+        }
+    }
+
+    private void writeData(FileTransaction transaction, File sceneFolder, Scene scene) throws IOException {
+        transaction.write(new File(sceneFolder, DATA_FILE_NAME), writer -> SERIALIZER.toJson(scene, writer));
     }
 
     @Override
     public List<DeserializationResult<Scene>> deserialize() {
-
         List<DeserializationResult<Scene>> deserializationResults = new ArrayList<>();
 
-        File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
-        File[] allContents = chaptersFolder.listFiles();
-
-        if (allContents == null) {
-            return null;
+        File[] chapterFolders = NarrativeCraftFileUtil.getChaptersFolder().listFiles();
+        if (chapterFolders == null) {
+            return deserializationResults;
         }
 
-        gsonBuilder.registerTypeAdapter(Scene.class, new SceneDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        for (File file : allContents) {
-            File scenesFolder = new File(file, SCENES_FOLDER_NAME);
-            File[] scenes = scenesFolder.listFiles();
-            if (scenes == null) {
+        for (File chapterFolder : chapterFolders) {
+            if (NarrativeCraftFileWriter.isTemporary(chapterFolder)) continue;
+            File[] sceneFolders = new File(chapterFolder, SCENES_FOLDER_NAME).listFiles();
+            if (sceneFolders == null) {
                 continue;
             }
 
-            for (File file1 : scenes) {
-                File dataFile = new File(file1, DATA_FILE_NAME);
+            for (File sceneFolder : sceneFolders) {
+                if (NarrativeCraftFileWriter.isTemporary(sceneFolder)) continue;
+                File dataFile = new File(sceneFolder, DATA_FILE_NAME);
                 try {
                     String content = Files.readString(dataFile.toPath());
-                    Scene scene = gson.fromJson(content, Scene.class);
+                    Scene scene = DESERIALIZER.fromJson(content, Scene.class);
                     if (scene == null) {
                         throw new Exception(String.format(
                                 "Scene %s of chapter %s deserialization returned null",
-                                file1.getName(), file.getName()));
+                                sceneFolder.getName(), chapterFolder.getName()));
                     }
-                    deserializationResults.add(new DeserializationResult<>(scene, false, file1.getName()));
+                    deserializationResults.add(new DeserializationResult<>(scene, false, sceneFolder.getName()));
                 } catch (Exception e) {
                     NarrativeCraftMod.LOGGER.error(
-                            "Failed to init scene {} of chapter {}", file.getName(), file1.getName(), e);
-                    deserializationResults.add(new DeserializationResult<>(null, true, file1.getName()));
+                            "Failed to init scene {} of chapter {}", sceneFolder.getName(), chapterFolder.getName(), e);
+                    deserializationResults.add(new DeserializationResult<>(null, true, sceneFolder.getName()));
                 }
             }
         }
 
         return deserializationResults;
-    }
-
-    private boolean shiftSceneRange(
-            SceneManager sceneManager,
-            File workingFolder,
-            int fromInclusive,
-            int toInclusive,
-            int offset,
-            boolean ascending)
-            throws Exception {
-        if (ascending) {
-            for (int i = fromInclusive; i <= toInclusive; i++) {
-                if (!shiftSingleScene(sceneManager, workingFolder, i, offset)) {
-                    return false;
-                }
-            }
-        } else {
-            for (int i = fromInclusive; i >= toInclusive; i--) {
-                if (!shiftSingleScene(sceneManager, workingFolder, i, offset)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private boolean shiftSingleScene(SceneManager sceneManager, File workingFolder, int currentRank, int offset)
-            throws Exception {
-        Scene sceneToShift = sceneManager.getByRank(currentRank);
-        if (sceneToShift == null) {
-            return true;
-        }
-
-        File oldFolder = new File(workingFolder, sceneToShift.toFileName());
-
-        int targetRank = currentRank + offset;
-        sceneToShift.setRank(targetRank);
-
-        File newFolder = new File(workingFolder, sceneToShift.toFileName());
-
-        if (newFolder.exists()) {
-            return false;
-        }
-
-        Files.move(oldFolder.toPath(), newFolder.toPath());
-
-        NarrativeEntryEditorRegistry.getInstance().edit(sceneToShift.getId(), sceneToShift.toPayload(), null);
-
-        return true;
-    }
-
-    private int getLastSceneRank(SceneManager sceneManager) {
-        int rank = 0;
-        while (sceneManager.getByRank(rank + 1) != null) {
-            rank++;
-        }
-        return rank;
     }
 }

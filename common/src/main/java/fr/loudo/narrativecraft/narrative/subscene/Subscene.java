@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.subscene;
 
 import fr.loudo.narrativecraft.api.narrative.subscene.ISubscene;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -36,22 +37,14 @@ public class Subscene extends NarrativeEntry<SubscenePayload> implements ISubsce
     private final Scene scene;
     private List<Animation> animations;
 
-    public Subscene(UUID id, String name, String description, Scene scene, List<Animation> animations) {
-        super(id, name, description);
+    public Subscene(UUID id, String name, Scene scene, List<Animation> animations) {
+        super(id, name);
         this.scene = scene;
         this.animations = new ArrayList<>(animations);
     }
 
-    public Subscene(UUID id, String name, String description, Scene scene) {
-        super(id, name, description);
-        this.scene = scene;
-        this.animations = new ArrayList<>();
-    }
-
-    public Subscene(String name, String description, Scene scene) {
-        super(name, description);
-        this.scene = scene;
-        this.animations = new ArrayList<>();
+    public Subscene(UUID id, String name, Scene scene) {
+        this(id, name, scene, List.of());
     }
 
     public Scene getScene() {
@@ -73,13 +66,12 @@ public class Subscene extends NarrativeEntry<SubscenePayload> implements ISubsce
 
     @Override
     public String toFileName() {
-        return name.replace(" ", "_").toLowerCase() + ".json";
+        return getNormalizedName() + NarrativeCraftFileDefault.EXTENSION_DATA_FILE;
     }
 
     @Override
     public SubscenePayload toPayload() {
         List<UUID> animationIds = animations.stream().map(Animation::getId).toList();
-        return new SubscenePayload(
-                name, description, scene.getId(), scene.getChapter().getId(), animationIds);
+        return new SubscenePayload(name, scene.getId(), scene.getChapter().getId(), animationIds);
     }
 }

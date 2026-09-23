@@ -71,6 +71,12 @@ public class ClientPacketHandlerNeoForge {
         });
     }
 
+    public static void narrativeEntryRejected(S2CNarrativeEntryRejected packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.narrativeEntryRejected(packet);
+        });
+    }
+
     public static void loadCutsceneEditorData(S2CCutsceneEditorData packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.loadCutsceneEditorData(packet);

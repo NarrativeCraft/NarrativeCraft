@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.narrative;
 
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.UUID;
 
 public abstract class NarrativeDeserializer<T> implements JsonDeserializer<T> {
@@ -37,7 +39,13 @@ public abstract class NarrativeDeserializer<T> implements JsonDeserializer<T> {
         return json.get("name").getAsString();
     }
 
-    protected String parseDescription(JsonObject json) {
-        return json.get("description").getAsString();
+    protected boolean hasSceneReference(JsonObject json) {
+        return json.has("chapterId") && json.has("sceneId");
+    }
+
+    protected Scene resolveScene(JsonObject json) {
+        UUID chapterId = UUID.fromString(json.get("chapterId").getAsString());
+        UUID sceneId = UUID.fromString(json.get("sceneId").getAsString());
+        return NarrativeCraftMod.getInstance().getEntryResolver().scene(chapterId, sceneId);
     }
 }

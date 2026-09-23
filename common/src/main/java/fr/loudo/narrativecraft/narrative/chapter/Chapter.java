@@ -33,13 +33,13 @@ public class Chapter extends NarrativeEntry<ChapterPayload> implements IChapter 
     private int chapterIndex;
     private final SceneManager sceneManager = new SceneManager();
 
-    public Chapter(UUID id, String name, String description, int chapterIndex) {
-        super(id, name, description);
+    public Chapter(UUID id, String name, int chapterIndex) {
+        super(id, name);
         this.chapterIndex = chapterIndex;
     }
 
-    public Chapter(String name, String description, int chapterIndex) {
-        super(name, description);
+    public Chapter(String name, int chapterIndex) {
+        super(name);
         this.chapterIndex = chapterIndex;
     }
 
@@ -61,11 +61,11 @@ public class Chapter extends NarrativeEntry<ChapterPayload> implements IChapter 
 
     @Override
     public ChapterPayload toPayload() {
-        return new ChapterPayload(name, description, chapterIndex);
+        return new ChapterPayload(name, chapterIndex);
     }
 
     @Override
     public String toFileName() {
-        return chapterIndex + "_" + name.toLowerCase();
+        return chapterIndex + "_" + getNormalizedName();
     }
 }

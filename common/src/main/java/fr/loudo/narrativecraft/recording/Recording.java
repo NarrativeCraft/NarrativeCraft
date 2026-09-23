@@ -30,16 +30,13 @@ import fr.loudo.narrativecraft.api.events.recording.RecordingStopEvent;
 import fr.loudo.narrativecraft.api.recording.IRecording;
 import fr.loudo.narrativecraft.api.recording.IRecordingEntityData;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.mixin.accessor.AbstractHorseAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.narrative.animation.AnimationEditor;
 import fr.loudo.narrativecraft.playback.Playback;
 import fr.loudo.narrativecraft.recording.actions.*;
 import fr.loudo.narrativecraft.session.PlayerSession;
@@ -225,44 +222,14 @@ public class Recording implements IRecording {
         return null;
     }
 
-    public boolean save(String name) {
-        return save(name, null);
-    }
-
-    public boolean save(String name, Animation animationToOverwrite) {
-        CharacterStory characterStory =
-                NarrativeCraftMod.getInstance().getCharacterManager().getList().get(0);
-        Animation animation = new Animation(id, name, playerSession.getScene(), tick, characterStory);
-
-        if (animationToOverwrite != null) {
-            List<Subscene> linkedSubscenes = animationToOverwrite.getLinkedSubscenes();
-            if (NarrativeCraftFileRegistry.getInstance().delete(animationToOverwrite)
-                    == NarrativeCraftFileEditor.OPERATION_FAILED) {
-                return false;
-            }
-            animationToOverwrite.getScene().getAnimationManager().remove(animationToOverwrite);
-            Services.PACKET.sendToPlayer(
-                    getPlayer(),
-                    BiSyncNarrativeEntryPacket.delete(animationToOverwrite.getId(), animationToOverwrite.toPayload()));
-            for (Subscene linkedSubscene : linkedSubscenes) {
-                linkedSubscene.getAnimations().add(animation);
-            }
+    public OperationResult save(String name, Animation animationToOverwrite) {
+        OperationResult result = NarrativeEntryEditorRegistry.getInstance()
+                .getEditor(AnimationEditor.class)
+                .saveRecording(this, playerSession.getScene(), name, animationToOverwrite);
+        if (result.isSuccess()) {
+            NarrativeCraftMod.EVENT_BUS.post(new RecordingSaveEvent(getPlayer(), this, name));
         }
-
-        if (NarrativeCraftFileRegistry.getInstance().create(animation) == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            return false;
-        }
-
-        for (RecordingEntityData data : recordingEntityDataList) {
-            if (!data.isTracked()) continue;
-            animation.getRecordingDataList().add(data.getRecordingData());
-        }
-
-        playerSession.getScene().getAnimationManager().add(animation);
-        Services.PACKET.sendToPlayer(
-                getPlayer(), BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
-        NarrativeCraftMod.EVENT_BUS.post(new RecordingSaveEvent(getPlayer(), this, animation.getName()));
-        return true;
+        return result;
     }
 
     public int getEntityTrackedSize() {

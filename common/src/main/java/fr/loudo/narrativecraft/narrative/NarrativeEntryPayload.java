@@ -28,7 +28,6 @@ import net.minecraft.network.codec.StreamCodec;
 
 public class NarrativeEntryPayload {
     private final String name;
-    private final String description;
 
     public static final StreamCodec<ByteBuf, NarrativeEntryPayload> STREAM_CODEC = new StreamCodec<>() {
         @Override
@@ -46,16 +45,11 @@ public class NarrativeEntryPayload {
         }
     };
 
-    public NarrativeEntryPayload(String name, String description) {
+    public NarrativeEntryPayload(String name) {
         this.name = name;
-        this.description = description;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getDescription() {
-        return description;
     }
 }

@@ -51,13 +51,11 @@ import fr.loudo.narrativecraft.client.settings.NarrativeClientSettings;
 import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.dialog.*;
 import fr.loudo.narrativecraft.editors.EditorMaker;
-import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
@@ -107,14 +105,20 @@ public class ClientPacketHandler {
         }
     }
 
+    public static void narrativeEntryRejected(S2CNarrativeEntryRejected packet) {
+        NarrativeCraftMod.LOGGER.warn(
+                "Server rejected {} of entry {}: {}",
+                packet.action(),
+                packet.entryId(),
+                packet.reason().getString());
+        UtilsClient.sendToast(Translation.message("error"), packet.reason());
+    }
+
     public static void cutsceneState(BiCutsceneEnter packet) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        Chapter chapter =
-                ClientNarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
-        if (chapter == null) return;
-        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
-        if (scene == null) return;
-        Cutscene cutscene = scene.getCutsceneManager().getById(packet.getCutsceneId());
+        Cutscene cutscene = ClientNarrativeCraftMod.getInstance()
+                .getEntryResolver()
+                .cutscene(packet.getChapterId(), packet.getSceneId(), packet.getCutsceneId());
         if (cutscene == null) return;
 
         ClientCutsceneMakerEditorMaker cutsceneEditor =
@@ -133,15 +137,11 @@ public class ClientPacketHandler {
     }
 
     public static void setSession(S2CPlayerSession packet) {
-
-        ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
-        Chapter chapter = chapterManager.getById(packet.chapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(packet.sceneId());
+        Scene scene =
+                ClientNarrativeCraftMod.getInstance().getEntryResolver().scene(packet.chapterId(), packet.sceneId());
         if (scene == null) return;
 
-        ClientNarrativeCraftMod.getInstance().getPlayerSession().apply(chapter, scene);
+        ClientNarrativeCraftMod.getInstance().getPlayerSession().apply(scene.getChapter(), scene);
     }
 
     public static void showToast(S2CToastMessage packet) {
@@ -467,12 +467,9 @@ public class ClientPacketHandler {
     }
 
     public static void cameraAngleEnter(BiCameraAngleEnter packet) {
-        Chapter chapter =
-                ClientNarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
-        if (chapter == null) return;
-        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
-        if (scene == null) return;
-        CameraAngle cameraAngle = scene.getCameraAngleManager().getById(packet.getCameraAngleId());
+        CameraAngle cameraAngle = ClientNarrativeCraftMod.getInstance()
+                .getEntryResolver()
+                .cameraAngle(packet.getChapterId(), packet.getSceneId(), packet.getCameraAngleId());
         if (cameraAngle == null) return;
 
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
@@ -495,12 +492,9 @@ public class ClientPacketHandler {
     }
 
     public static void interactionEnter(BiInteractionEnter packet) {
-        Chapter chapter =
-                ClientNarrativeCraftMod.getInstance().getChapterManager().getById(packet.getChapterId());
-        if (chapter == null) return;
-        Scene scene = chapter.getSceneManager().getById(packet.getSceneId());
-        if (scene == null) return;
-        Interaction interaction = scene.getInteractionManager().getById(packet.getInteractionId());
+        Interaction interaction = ClientNarrativeCraftMod.getInstance()
+                .getEntryResolver()
+                .interaction(packet.getChapterId(), packet.getSceneId(), packet.getInteractionId());
         if (interaction == null) return;
 
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
@@ -561,7 +555,7 @@ public class ClientPacketHandler {
     }
 
     public static void receiveMainScreenData(S2CMainScreenData packet) {
-        CameraAngle cameraAngle = new CameraAngle("", "", null);
+        CameraAngle cameraAngle = new CameraAngle("", null);
         CameraAngleDeserializer.deserializeInto(packet.dataJson(), cameraAngle);
         ClientNarrativeCraftMod.getInstance().setMainScreenData(cameraAngle);
     }

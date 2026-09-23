@@ -21,40 +21,36 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class ScenePayload extends NarrativeEntryPayload {
+public record S2CNarrativeEntryRejected(UUID entryId, NarrativeEntryAction action, Component reason)
+        implements CustomPacketPayload {
 
-    public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ScenePayload::getName,
+    public static final Type<S2CNarrativeEntryRejected> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "narrative_entry_rejected"));
+
+    public static final StreamCodec<ByteBuf, S2CNarrativeEntryRejected> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            ScenePayload::getChapterId,
-            ByteBufCodecs.INT,
-            ScenePayload::getRank,
-            ScenePayload::new);
+            S2CNarrativeEntryRejected::entryId,
+            ByteBufCodecs.idMapper(i -> NarrativeEntryAction.values()[i], NarrativeEntryAction::ordinal),
+            S2CNarrativeEntryRejected::action,
+            ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,
+            S2CNarrativeEntryRejected::reason,
+            S2CNarrativeEntryRejected::new);
 
-    private final UUID chapterId;
-    private final int rank;
-
-    public ScenePayload(String name, UUID chapterId, int rank) {
-        super(name);
-        this.chapterId = chapterId;
-        this.rank = rank;
-    }
-
-    public UUID getChapterId() {
-        return chapterId;
-    }
-
-    public int getRank() {
-        return rank;
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

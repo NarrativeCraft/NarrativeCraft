@@ -23,19 +23,17 @@
 
 package fr.loudo.narrativecraft.files.narrrative.cutscene;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.io.File;
-import java.io.IOException;
 
 public class NarrativeCraftFileCutscene extends AbstractNarrativeCraftFileSceneJsonEntry<Cutscene> {
+
+    public NarrativeCraftFileCutscene() {
+        super(Cutscene.class, new CutsceneSerializer(), new CutsceneDeserializer());
+    }
 
     @Override
     protected String getSubFolderName() {
@@ -45,34 +43,5 @@ public class NarrativeCraftFileCutscene extends AbstractNarrativeCraftFileSceneJ
     @Override
     protected Scene getScene(Cutscene entry) {
         return entry.getScene();
-    }
-
-    @Override
-    protected Cutscene getOldEntry(Cutscene entry) {
-        return entry.getScene().getCutsceneManager().getById(entry.getId());
-    }
-
-    @Override
-    protected void registerDeserializer(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(Cutscene.class, new CutsceneDeserializer());
-    }
-
-    @Override
-    protected Cutscene deserializeEntry(Gson gson, String content) throws Exception {
-        return gson.fromJson(content, Cutscene.class);
-    }
-
-    @Override
-    protected int writeJson(Cutscene entry, File file) {
-        Gson gson = gsonBuilder
-                .registerTypeAdapter(Cutscene.class, new CutsceneSerializer())
-                .create();
-        try {
-            NarrativeCraftFileWriter.write(file, writer -> gson.toJson(entry, writer));
-            return OPERATION_SUCCESS;
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.error("Failed to write cutscene data {}", entry.getName(), e);
-            return OPERATION_FAILED;
-        }
     }
 }

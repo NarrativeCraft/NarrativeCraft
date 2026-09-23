@@ -24,95 +24,113 @@
 package fr.loudo.narrativecraft.narrative.animation;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.managers.AnimationManager;
+import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.narrative.OperationResult;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.recording.Recording;
+import fr.loudo.narrativecraft.recording.RecordingEntityData;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.UtilsServer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
 
-public class AnimationEditor implements NarrativeEntryEditor<AnimationPayload, Animation> {
-
-    final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+public class AnimationEditor extends AbstractSceneEntryEditor<AnimationPayload, Animation> {
 
     @Override
-    public Animation resolve(UUID entryId, AnimationPayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getAnimationManager().getById(entryId);
+    protected String getTypeKey() {
+        return "animation";
     }
 
     @Override
-    public void add(UUID entryId, AnimationPayload payload, UUID playerId) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
+    protected NarrativeManager<Animation> getManager(Scene scene) {
+        return scene.getAnimationManager();
+    }
 
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
+    @Override
+    protected Animation build(UUID entryId, AnimationPayload payload, Scene scene, Animation existing) {
         ICharacterStory characterStory =
                 NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(payload.getCharacterId(), scene);
-        Animation animation =
-                new Animation(entryId, payload.getName(), payload.getDescription(), scene, characterStory);
-        int result = NarrativeCraftFileRegistry.getInstance().create(animation);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.add", payload.getName()), player);
-            return;
-        }
-
-        scene.getAnimationManager().add(animation);
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(entryId, payload));
+        int totalTick = existing == null ? payload.getTotalTick() : existing.getTotalTick();
+        return new Animation(entryId, payload.getName(), scene, totalTick, characterStory);
     }
 
     @Override
-    public void edit(UUID entryId, AnimationPayload payload, UUID playerId) {
-        Animation oldAnimation = resolve(entryId, payload);
-        if (oldAnimation == null) return;
-
-        ICharacterStory characterStory = NarrativeCraftMod.getInstance()
-                .getCharacterManager()
-                .resolveCharacter(payload.getCharacterId(), oldAnimation.getScene());
-        Animation newAnimation = new Animation(
-                entryId, payload.getName(), payload.getDescription(), oldAnimation.getScene(), characterStory);
-        int result = NarrativeCraftFileRegistry.getInstance().edit(newAnimation);
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
-            return;
+    protected OperationResult validate(Animation entry, NarrativeManager<Animation> siblings) {
+        OperationResult validation = super.validate(entry, siblings);
+        if (validation.isFailure()) return validation;
+        if (entry.getCharacterStory() == null) {
+            return OperationResult.failure("error.not_exists", Translation.message("character"), entry.getName());
         }
-
-        oldAnimation.setName(payload.getName());
-        oldAnimation.setDescription(payload.getDescription());
-        oldAnimation.setCharacterStory(characterStory);
-
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
+        return OperationResult.success();
     }
 
     @Override
-    public void delete(UUID entryId, AnimationPayload payload, UUID playerId) {
-        Animation animation = resolve(entryId, payload);
-        if (animation == null) return;
+    protected void copyAttributes(Animation target, Animation source) {
+        target.setCharacterStory(source.getCharacterStory());
+    }
 
-        int result = NarrativeCraftFileRegistry.getInstance().delete(animation);
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.delete", payload.getName()), player);
-            return;
+    public OperationResult saveRecording(
+            Recording recording, Scene scene, String name, Animation animationToOverwrite) {
+        List<CharacterStory> characters =
+                NarrativeCraftMod.getInstance().getCharacterManager().getList();
+        if (characters.isEmpty()) return OperationResult.failure("error.record.no_characters");
+
+        Animation animation = new Animation(recording.getId(), name, scene, recording.getTick(), characters.getFirst());
+        AnimationManager animationManager = scene.getAnimationManager();
+
+        if (animationToOverwrite != null
+                && !animationToOverwrite.getNormalizedName().equals(animation.getNormalizedName())) {
+            return alreadyExists(animationToOverwrite.getName());
+        }
+        if (animationToOverwrite == null) {
+            OperationResult validation = validate(animation, animationManager);
+            if (validation.isFailure()) return validation;
         }
 
-        animation.getScene().getAnimationManager().remove(animation);
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.delete(entryId, payload));
+        OperationResult storage = NarrativeCraftFileRegistry.getInstance().create(animation);
+        if (storage.isFailure()) return storage;
+
+        for (RecordingEntityData data : recording.getRecordingEntityDataList()) {
+            if (!data.isTracked()) continue;
+            animation.getRecordingDataList().add(data.getRecordingData());
+        }
+
+        List<Subscene> linkedSubscenes = List.of();
+        if (animationToOverwrite != null) {
+            linkedSubscenes = animationToOverwrite.getLinkedSubscenes();
+            animationManager.remove(animationToOverwrite);
+            UtilsServer.broadcastPacket(
+                    BiSyncNarrativeEntryPacket.delete(animationToOverwrite.getId(), animationToOverwrite.toPayload()));
+        }
+
+        animationManager.add(animation);
+        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(animation.getId(), animation.toPayload()));
+
+        for (Subscene linkedSubscene : linkedSubscenes) {
+            relinkSubscene(linkedSubscene, animation);
+        }
+        return OperationResult.success();
+    }
+
+    private void relinkSubscene(Subscene subscene, Animation animation) {
+        List<Animation> animations = new ArrayList<>(subscene.getAnimations());
+        animations.add(animation);
+        Subscene updated = new Subscene(subscene.getId(), subscene.getName(), subscene.getScene(), animations);
+        OperationResult storage = NarrativeCraftFileRegistry.getInstance().edit(subscene, updated);
+        if (storage.isFailure()) {
+            NarrativeCraftMod.LOGGER.warn(
+                    "Failed to link animation {} back to subscene {}", animation.getName(), subscene.getName());
+            return;
+        }
+        subscene.setAnimations(animations);
+        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(subscene.getId(), subscene.toPayload()));
     }
 }

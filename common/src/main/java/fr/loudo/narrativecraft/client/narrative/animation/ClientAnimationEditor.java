@@ -23,75 +23,36 @@
 
 package fr.loudo.narrativecraft.client.narrative.animation;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
-import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.UUID;
 
-public class ClientAnimationEditor implements ClientNarrativeEntryEditor<AnimationPayload, Animation> {
-
-    final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
+public class ClientAnimationEditor extends ClientSceneEntryEditor<AnimationPayload, Animation> {
 
     @Override
-    public void add(UUID entryId, AnimationPayload payload) {
+    protected NarrativeManager<Animation> getManager(Scene scene) {
+        return scene.getAnimationManager();
+    }
 
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
+    @Override
+    protected Animation create(UUID entryId, AnimationPayload payload, Scene scene) {
+        return new Animation(
+                entryId, payload.getName(), scene, payload.getTotalTick(), resolveCharacter(payload, scene));
+    }
 
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
+    @Override
+    protected void update(Animation animation, AnimationPayload payload) {
+        animation.setCharacterStory(resolveCharacter(payload, animation.getScene()));
+    }
 
-        ICharacterStory characterStory = ClientNarrativeCraftMod.getInstance()
+    private ICharacterStory resolveCharacter(AnimationPayload payload, Scene scene) {
+        return ClientNarrativeCraftMod.getInstance()
                 .getCharacterManager()
                 .resolveCharacter(payload.getCharacterId(), scene);
-        Animation animation = new Animation(entryId, payload.getName(), scene, payload.getTotalTick(), characterStory);
-        scene.getAnimationManager().add(animation);
-    }
-
-    @Override
-    public void edit(UUID entryId, AnimationPayload payload) {
-
-        Animation animation = resolve(entryId, payload);
-        if (animation == null) return;
-
-        ICharacterStory characterStory = NarrativeCraftMod.getInstance()
-                .getCharacterManager()
-                .resolveCharacter(payload.getCharacterId(), animation.getScene());
-        animation.setName(payload.getName());
-        animation.setCharacterStory(characterStory);
-    }
-
-    @Override
-    public void delete(UUID entryId, AnimationPayload payload) {
-
-        // uhhhh duplicated code but I need to access manager from the scene
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Animation animation = scene.getAnimationManager().getById(entryId);
-        if (animation == null) return;
-
-        scene.getAnimationManager().remove(animation);
-    }
-
-    @Override
-    public Animation resolve(UUID entryId, AnimationPayload payload) {
-
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getAnimationManager().getById(entryId);
     }
 }

@@ -59,7 +59,7 @@ public class NarrativeCraftFile {
                 NarrativeCraftMod.LOGGER.error("Failed to init main screen data!", e);
             }
         }
-        return new CameraAngle("Main Screen", "Some super secret data...", null);
+        return new CameraAngle("Main Screen", null);
     }
 
     public void saveMainScreenData(CameraAngle mainScreenData) throws IOException {

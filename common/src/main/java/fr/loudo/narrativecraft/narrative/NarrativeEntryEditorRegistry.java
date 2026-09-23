@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.narrative;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,8 +32,8 @@ import java.util.UUID;
  * When implementing {@link NarrativeEntryEditor} from your {@link NarrativeEntry} heritor, you need to register it on {@link NarrativeEditorsRegister#register()}.
  * using {@link #register(Class, NarrativeEntryEditor)}.
  * <br>
- * This class should be used to deal with managers <b>and</b> world files using {@link NarrativeCraftFile}.
- *
+ * This is the single entry point for mutating narrative entries: editors validate, write to disk, apply in memory
+ * then broadcast, and report the outcome as an {@link OperationResult}.
  */
 public class NarrativeEntryEditorRegistry {
 
@@ -60,21 +59,29 @@ public class NarrativeEntryEditorRegistry {
         return (NarrativeEntryEditor<T, E>) registry.get(entry.getClass());
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void add(
-            UUID entryId, T entry, UUID playerId) {
-        NarrativeEntryEditor<T, E> editor = getEditor(entry);
-        if (editor != null) editor.add(entryId, entry, playerId);
+    public <E extends NarrativeEntryEditor<?, ?>> E getEditor(Class<E> editorClass) {
+        for (NarrativeEntryEditor<?, ?> editor : registry.values()) {
+            if (editorClass.isInstance(editor)) return editorClass.cast(editor);
+        }
+        throw new IllegalStateException(editorClass.getSimpleName() + " is not registered");
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void edit(
-            UUID entryId, T entry, UUID playerId) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> OperationResult add(UUID entryId, T entry) {
         NarrativeEntryEditor<T, E> editor = getEditor(entry);
-        if (editor != null) editor.edit(entryId, entry, playerId);
+        if (editor == null) return OperationResult.failure("error.unsupported_entry");
+        return editor.add(entryId, entry);
     }
 
-    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> void delete(
-            UUID entryId, T entry, UUID playerId) {
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> OperationResult edit(UUID entryId, T entry) {
         NarrativeEntryEditor<T, E> editor = getEditor(entry);
-        if (editor != null) editor.delete(entryId, entry, playerId);
+        if (editor == null) return OperationResult.failure("error.unsupported_entry");
+        return editor.edit(entryId, entry);
+    }
+
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> OperationResult delete(
+            UUID entryId, T entry) {
+        NarrativeEntryEditor<T, E> editor = getEditor(entry);
+        if (editor == null) return OperationResult.failure("error.unsupported_entry");
+        return editor.delete(entryId, entry);
     }
 }

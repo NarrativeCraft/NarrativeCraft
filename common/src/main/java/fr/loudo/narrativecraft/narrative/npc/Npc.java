@@ -50,13 +50,15 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
     private PlayerModelType modelType;
 
     public Npc(UUID id, String name, Scene scene) {
-        super(id, name, "");
+        super(id, name);
         this.scene = scene;
     }
 
-    public Npc(String name, Scene scene) {
-        super(name, "");
-        this.scene = scene;
+    public void copyAttributesFrom(Npc source) {
+        dialogData = source.dialogData;
+        entityType = source.entityType;
+        modelType = source.modelType;
+        customNbt = source.customNbt;
     }
 
     public Scene getScene() {
@@ -140,6 +142,6 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
 
     @Override
     public String toFileName() {
-        return name.toLowerCase().replace(" ", "_");
+        return getNormalizedName();
     }
 }

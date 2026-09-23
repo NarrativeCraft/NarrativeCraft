@@ -137,7 +137,7 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         selectedKeyframes.clear();
         history.clear();
         clipboard.clear();
-        CutsceneDeserializer.deserializeLayers(layersJson, cutscene);
+        cutscene.setLayers(CutsceneDeserializer.parseLayers(layersJson));
         if (cutscene.getLayers() != null) {
             layers.addAll(cutscene.getLayers());
         }

@@ -64,6 +64,9 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CToastMessage.TYPE, (packet, context) -> {
             ClientPacketHandler.showToast(packet);
         });
+        ClientPlayNetworking.registerGlobalReceiver(S2CNarrativeEntryRejected.TYPE, (packet, context) -> {
+            ClientPacketHandler.narrativeEntryRejected(packet);
+        });
         ClientPlayNetworking.registerGlobalReceiver(S2CCutsceneEditorData.TYPE, (packet, context) -> {
             ClientPacketHandler.loadCutsceneEditorData(packet);
         });

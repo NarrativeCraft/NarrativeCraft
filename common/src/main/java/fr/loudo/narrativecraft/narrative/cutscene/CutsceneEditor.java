@@ -23,112 +23,76 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
+import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import net.minecraft.server.level.ServerPlayer;
 
-public class CutsceneEditor implements NarrativeEntryEditor<CutscenePayload, Cutscene> {
-
-    final ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+public class CutsceneEditor extends AbstractSceneEntryEditor<CutscenePayload, Cutscene> {
 
     @Override
-    public Cutscene resolve(UUID entryId, CutscenePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getCutsceneManager().getById(entryId);
+    protected String getTypeKey() {
+        return "cutscene";
     }
 
     @Override
-    public void add(UUID entryId, CutscenePayload payload, UUID playerId) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Cutscene cutscene = new Cutscene(entryId, payload.getName(), payload.getDescription(), scene);
-        int result = NarrativeCraftFileRegistry.getInstance().create(cutscene);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.add", payload.getName()), player);
-            return;
-        }
-
-        scene.getCutsceneManager().add(cutscene);
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.add(entryId, payload));
+    protected NarrativeManager<Cutscene> getManager(Scene scene) {
+        return scene.getCutsceneManager();
     }
 
     @Override
-    public void edit(UUID entryId, CutscenePayload payload, UUID playerId) {
-        Cutscene oldCutscene = resolve(entryId, payload);
-        if (oldCutscene == null) return;
-
+    protected Cutscene build(UUID entryId, CutscenePayload payload, Scene scene, Cutscene existing) {
         List<Animation> animations = payload.getAnimationIds().stream()
-                .map(id -> oldCutscene.getScene().getAnimationManager().getById(id))
+                .map(animationId -> scene.getAnimationManager().getById(animationId))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
+                .toList();
         List<Subscene> subscenes = payload.getSubsceneIds().stream()
-                .map(id -> oldCutscene.getScene().getSubsceneManager().getById(id))
+                .map(subsceneId -> scene.getSubsceneManager().getById(subsceneId))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        List<CutsceneLayer> layers = oldCutscene.getLayers();
-
-        Cutscene newCutscene = new Cutscene(
-                entryId, payload.getName(), payload.getDescription(), oldCutscene.getScene(), animations, subscenes);
-        newCutscene.setLayers(layers);
-        int result = NarrativeCraftFileRegistry.getInstance().edit(newCutscene);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.edit", payload.getName()), player);
-            return;
+                .toList();
+        Cutscene cutscene = new Cutscene(entryId, payload.getName(), scene, animations, subscenes);
+        if (existing != null) {
+            cutscene.setLayers(existing.getLayers());
+            cutscene.setManualMaxTick(existing.getManualMaxTick());
         }
-
-        oldCutscene.setName(payload.getName());
-        oldCutscene.setDescription(payload.getDescription());
-        oldCutscene.setAnimations(animations);
-        oldCutscene.setSubscenes(subscenes);
-        oldCutscene.setLayers(layers);
-
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.edit(entryId, payload));
+        return cutscene;
     }
 
     @Override
-    public void delete(UUID entryId, CutscenePayload payload, UUID playerId) {
-        Cutscene cutscene = resolve(entryId, payload);
-        if (cutscene == null) return;
+    protected void copyAttributes(Cutscene target, Cutscene source) {
+        target.setAnimations(source.getAnimations());
+        target.setSubscenes(source.getSubscenes());
+    }
 
-        int result = NarrativeCraftFileRegistry.getInstance().delete(cutscene);
-
-        if (result == NarrativeCraftFileEditor.OPERATION_FAILED) {
-            ServerPlayer player = UtilsServer.getPlayerByUUID(playerId);
-            UtilsServer.sendErrorClearScreen(Translation.message("error.crud.delete", payload.getName()), player);
-            return;
+    public OperationResult saveLayers(Cutscene cutscene, String layersJson, int manualMaxTick) {
+        List<CutsceneLayer> layers;
+        try {
+            layers = CutsceneDeserializer.parseLayers(layersJson);
+        } catch (RuntimeException e) {
+            return OperationResult.failure("error.invalid_data", cutscene.getName());
         }
 
-        cutscene.getScene().getCutsceneManager().remove(cutscene);
-        UtilsServer.broadcastPacket(BiSyncNarrativeEntryPacket.delete(entryId, payload));
+        Cutscene updated = new Cutscene(
+                cutscene.getId(),
+                cutscene.getName(),
+                cutscene.getScene(),
+                cutscene.getAnimations(),
+                cutscene.getSubscenes());
+        updated.setLayers(layers);
+        updated.setManualMaxTick(manualMaxTick);
+
+        OperationResult storage = NarrativeCraftFileRegistry.getInstance().edit(cutscene, updated);
+        if (storage.isFailure()) return storage;
+
+        cutscene.setLayers(layers);
+        cutscene.setManualMaxTick(manualMaxTick);
+        return OperationResult.success();
     }
 }

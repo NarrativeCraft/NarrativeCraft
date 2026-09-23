@@ -23,62 +23,25 @@
 
 package fr.loudo.narrativecraft.client.narrative.cameraangle;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
-import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAnglePayload;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.UUID;
 
-public class ClientCameraAngleEditor implements ClientNarrativeEntryEditor<CameraAnglePayload, CameraAngle> {
-
-    final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
+public class ClientCameraAngleEditor extends ClientSceneEntryEditor<CameraAnglePayload, CameraAngle> {
 
     @Override
-    public void add(UUID entryId, CameraAnglePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        CameraAngle cameraAngle = new CameraAngle(entryId, payload.getName(), payload.getDescription(), scene);
-        scene.getCameraAngleManager().add(cameraAngle);
+    protected NarrativeManager<CameraAngle> getManager(Scene scene) {
+        return scene.getCameraAngleManager();
     }
 
     @Override
-    public void edit(UUID entryId, CameraAnglePayload payload) {
-        CameraAngle cameraAngle = resolve(entryId, payload);
-        if (cameraAngle == null) return;
-
-        cameraAngle.setName(payload.getName());
-        cameraAngle.setDescription(payload.getDescription());
+    protected CameraAngle create(UUID entryId, CameraAnglePayload payload, Scene scene) {
+        return new CameraAngle(entryId, payload.getName(), scene);
     }
 
     @Override
-    public void delete(UUID entryId, CameraAnglePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        CameraAngle cameraAngle = scene.getCameraAngleManager().getById(entryId);
-        if (cameraAngle == null) return;
-
-        scene.getCameraAngleManager().remove(cameraAngle);
-    }
-
-    @Override
-    public CameraAngle resolve(UUID entryId, CameraAnglePayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getCameraAngleManager().getById(entryId);
-    }
+    protected void update(CameraAngle cameraAngle, CameraAnglePayload payload) {}
 }

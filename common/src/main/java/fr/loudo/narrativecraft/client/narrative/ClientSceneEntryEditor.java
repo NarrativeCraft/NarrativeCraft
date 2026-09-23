@@ -21,46 +21,56 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.narrative.scene;
+package fr.loudo.narrativecraft.client.narrative;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryResolver;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
+import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import java.util.UUID;
 
-public class ClientSceneEditor implements ClientNarrativeEntryEditor<ScenePayload, Scene> {
+public abstract class ClientSceneEntryEditor<T extends SceneEntryPayload, E extends NarrativeEntry<T>>
+        implements ClientNarrativeEntryEditor<T, E> {
 
-    private final NarrativeEntryResolver resolver =
+    protected final NarrativeEntryResolver resolver =
             ClientNarrativeCraftMod.getInstance().getEntryResolver();
 
-    @Override
-    public Scene resolve(UUID entryId, ScenePayload payload) {
-        return resolver.scene(payload.getChapterId(), entryId);
-    }
+    protected abstract NarrativeManager<E> getManager(Scene scene);
+
+    protected abstract E create(UUID entryId, T payload, Scene scene);
+
+    protected abstract void update(E entry, T payload);
 
     @Override
-    public void add(UUID entryId, ScenePayload payload) {
-        Chapter chapter = resolver.chapter(payload.getChapterId());
-        if (chapter == null) return;
-        chapter.getSceneManager().add(new Scene(entryId, payload.getName(), chapter, payload.getRank()));
-    }
-
-    @Override
-    public void edit(UUID entryId, ScenePayload payload) {
-        Scene scene = resolve(entryId, payload);
+    public void add(UUID entryId, T payload) {
+        Scene scene = resolver.scene(payload);
         if (scene == null) return;
-        scene.setName(payload.getName());
-        scene.setRank(payload.getRank());
-        scene.getChapter().getSceneManager().forceSort();
+        getManager(scene).add(create(entryId, payload, scene));
     }
 
     @Override
-    public void delete(UUID entryId, ScenePayload payload) {
-        Scene scene = resolve(entryId, payload);
+    public void edit(UUID entryId, T payload) {
+        E entry = resolve(entryId, payload);
+        if (entry == null) return;
+        entry.setName(payload.getName());
+        update(entry, payload);
+    }
+
+    @Override
+    public void delete(UUID entryId, T payload) {
+        Scene scene = resolver.scene(payload);
         if (scene == null) return;
-        scene.getChapter().getSceneManager().remove(scene);
+        E entry = getManager(scene).getById(entryId);
+        if (entry == null) return;
+        getManager(scene).remove(entry);
+    }
+
+    @Override
+    public E resolve(UUID entryId, T payload) {
+        Scene scene = resolver.scene(payload);
+        if (scene == null) return null;
+        return getManager(scene).getById(entryId);
     }
 }

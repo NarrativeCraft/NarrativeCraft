@@ -33,16 +33,14 @@ public class ChapterPayload extends NarrativeEntryPayload {
     public static final StreamCodec<ByteBuf, ChapterPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
             ChapterPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            ChapterPayload::getDescription,
             ByteBufCodecs.VAR_INT,
             ChapterPayload::getChapterIndex,
             ChapterPayload::new);
 
     private final int chapterIndex;
 
-    public ChapterPayload(String name, String description, int chapterIndex) {
-        super(name, description);
+    public ChapterPayload(String name, int chapterIndex) {
+        super(name);
         this.chapterIndex = chapterIndex;
     }
 

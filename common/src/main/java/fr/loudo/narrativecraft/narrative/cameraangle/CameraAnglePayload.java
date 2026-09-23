@@ -23,40 +23,25 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public class CameraAnglePayload extends NarrativeEntryPayload {
-
-    private final UUID chapterId;
-    private final UUID sceneId;
+public class CameraAnglePayload extends SceneEntryPayload {
 
     public static final StreamCodec<ByteBuf, CameraAnglePayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
             CameraAnglePayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            CameraAnglePayload::getDescription,
             UUIDUtil.STREAM_CODEC,
             CameraAnglePayload::getSceneId,
             UUIDUtil.STREAM_CODEC,
             CameraAnglePayload::getChapterId,
             CameraAnglePayload::new);
 
-    public CameraAnglePayload(String name, String description, UUID sceneId, UUID chapterId) {
-        super(name, description);
-        this.sceneId = sceneId;
-        this.chapterId = chapterId;
-    }
-
-    public UUID getChapterId() {
-        return chapterId;
-    }
-
-    public UUID getSceneId() {
-        return sceneId;
+    public CameraAnglePayload(String name, UUID sceneId, UUID chapterId) {
+        super(name, sceneId, chapterId);
     }
 }

@@ -29,7 +29,6 @@ import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Utils;
@@ -55,23 +54,16 @@ public class CameraAngleDeserializer extends NarrativeDeserializer<CameraAngle> 
 
         UUID id = parseId(obj);
         String name = parseName(obj);
-        String description = parseDescription(obj);
-        if (!obj.has("sceneId") || !obj.has("chapterId")) {
-            CameraAngle cameraAngle = new CameraAngle(id, name, description, null);
+        if (!hasSceneReference(obj)) {
+            CameraAngle cameraAngle = new CameraAngle(id, name, null);
             deserializeInto(obj, cameraAngle);
             return cameraAngle;
         }
 
-        UUID sceneId = UUID.fromString(obj.get("sceneId").getAsString());
-        UUID chapterId = UUID.fromString(obj.get("chapterId").getAsString());
-
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(chapterId);
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(sceneId);
+        Scene scene = resolveScene(obj);
         if (scene == null) return null;
 
-        CameraAngle cameraAngle = new CameraAngle(id, name, description, scene);
+        CameraAngle cameraAngle = new CameraAngle(id, name, scene);
         deserializeInto(obj, cameraAngle);
         return cameraAngle;
     }

@@ -27,11 +27,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.utils.Utils;
 import java.lang.reflect.Type;
@@ -51,17 +49,9 @@ public class NpcDeserializer extends NarrativeDeserializer<Npc> {
         UUID id = parseId(jsonObject);
         String name = parseName(jsonObject);
 
-        UUID chapterId = UUID.fromString(jsonObject.get("chapterId").getAsString());
-        UUID sceneId = UUID.fromString(jsonObject.get("sceneId").getAsString());
-
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(chapterId);
-        if (chapter == null) {
-            throw new JsonParseException("Chapter " + chapterId + " not found for NPC " + name);
-        }
-
-        Scene scene = chapter.getSceneManager().getById(sceneId);
+        Scene scene = resolveScene(jsonObject);
         if (scene == null) {
-            throw new JsonParseException("Scene " + sceneId + " not found for NPC " + name);
+            throw new JsonParseException("Scene of NPC " + name + " not found");
         }
 
         Npc npc = new Npc(id, name, scene);

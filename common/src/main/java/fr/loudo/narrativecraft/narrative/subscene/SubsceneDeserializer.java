@@ -24,10 +24,8 @@
 package fr.loudo.narrativecraft.narrative.subscene;
 
 import com.google.gson.*;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -41,32 +39,26 @@ public class SubsceneDeserializer extends NarrativeDeserializer<Subscene> {
             throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
 
-        if (!obj.has("sceneId") || !obj.has("chapterId")) {
+        if (!hasSceneReference(obj)) {
             return null;
         }
 
         UUID id = parseId(obj);
         String name = parseName(obj);
-        String description = parseDescription(obj);
-        UUID sceneId = UUID.fromString(obj.get("sceneId").getAsString());
-        UUID chapterId = UUID.fromString(obj.get("chapterId").getAsString());
 
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(chapterId);
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(sceneId);
+        Scene scene = resolveScene(obj);
         if (scene == null) return null;
 
         List<Animation> animations = new ArrayList<>();
         if (obj.has("animationIds")) {
             JsonArray idsArray = obj.getAsJsonArray("animationIds");
             for (JsonElement element : idsArray) {
-                UUID animId = UUID.fromString(element.getAsString());
-                Animation animation = scene.getAnimationManager().getById(animId);
+                UUID animationId = UUID.fromString(element.getAsString());
+                Animation animation = scene.getAnimationManager().getById(animationId);
                 if (animation != null) animations.add(animation);
             }
         }
 
-        return new Subscene(id, name, description, scene, animations);
+        return new Subscene(id, name, scene, animations);
     }
 }

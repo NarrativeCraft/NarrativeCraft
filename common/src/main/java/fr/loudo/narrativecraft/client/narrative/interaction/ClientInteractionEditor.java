@@ -23,62 +23,25 @@
 
 package fr.loudo.narrativecraft.client.narrative.interaction;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPayload;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.UUID;
 
-public class ClientInteractionEditor implements ClientNarrativeEntryEditor<InteractionPayload, Interaction> {
-
-    final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
+public class ClientInteractionEditor extends ClientSceneEntryEditor<InteractionPayload, Interaction> {
 
     @Override
-    public void add(UUID entryId, InteractionPayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Interaction interaction = new Interaction(entryId, payload.getName(), payload.getDescription(), scene);
-        scene.getInteractionManager().add(interaction);
+    protected NarrativeManager<Interaction> getManager(Scene scene) {
+        return scene.getInteractionManager();
     }
 
     @Override
-    public void edit(UUID entryId, InteractionPayload payload) {
-        Interaction interaction = resolve(entryId, payload);
-        if (interaction == null) return;
-
-        interaction.setName(payload.getName());
-        interaction.setDescription(payload.getDescription());
+    protected Interaction create(UUID entryId, InteractionPayload payload, Scene scene) {
+        return new Interaction(entryId, payload.getName(), scene);
     }
 
     @Override
-    public void delete(UUID entryId, InteractionPayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return;
-
-        Interaction interaction = scene.getInteractionManager().getById(entryId);
-        if (interaction == null) return;
-
-        scene.getInteractionManager().remove(interaction);
-    }
-
-    @Override
-    public Interaction resolve(UUID entryId, InteractionPayload payload) {
-        Chapter chapter = chapterManager.getById(payload.getChapterId());
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(payload.getSceneId());
-        if (scene == null) return null;
-
-        return scene.getInteractionManager().getById(entryId);
-    }
+    protected void update(Interaction interaction, InteractionPayload payload) {}
 }

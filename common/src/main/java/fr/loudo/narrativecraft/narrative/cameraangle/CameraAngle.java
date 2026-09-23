@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import fr.loudo.narrativecraft.api.narrative.cameraangle.ICameraAngle;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.ArrayList;
@@ -37,13 +38,13 @@ public class CameraAngle extends NarrativeEntry<CameraAnglePayload> implements I
     private final List<CharacterPlacement> characterPlacements = new ArrayList<>();
     private final List<TemplateReference> templateReferences = new ArrayList<>();
 
-    public CameraAngle(UUID id, String name, String description, Scene scene) {
-        super(id, name, description);
+    public CameraAngle(UUID id, String name, Scene scene) {
+        super(id, name);
         this.scene = scene;
     }
 
-    public CameraAngle(String name, String description, Scene scene) {
-        super(name, description);
+    public CameraAngle(String name, Scene scene) {
+        super(name);
         this.scene = scene;
     }
 
@@ -63,6 +64,15 @@ public class CameraAngle extends NarrativeEntry<CameraAnglePayload> implements I
         return templateReferences;
     }
 
+    public void copyDataFrom(CameraAngle source) {
+        cameraViews.clear();
+        cameraViews.addAll(source.getCameras());
+        characterPlacements.clear();
+        characterPlacements.addAll(source.getCharacterPlacements());
+        templateReferences.clear();
+        templateReferences.addAll(source.getTemplateReferences());
+    }
+
     public CameraView getCameraByName(String name) {
         for (CameraView cameraView : cameraViews) {
             if (cameraView.getName().equalsIgnoreCase(name)) return cameraView;
@@ -72,8 +82,7 @@ public class CameraAngle extends NarrativeEntry<CameraAnglePayload> implements I
 
     @Override
     public CameraAnglePayload toPayload() {
-        return new CameraAnglePayload(
-                name, description, scene.getId(), scene.getChapter().getId());
+        return new CameraAnglePayload(name, scene.getId(), scene.getChapter().getId());
     }
 
     @Override
@@ -83,6 +92,6 @@ public class CameraAngle extends NarrativeEntry<CameraAnglePayload> implements I
 
     @Override
     public String toFileName() {
-        return name.replace(" ", "_").toLowerCase() + ".json";
+        return getNormalizedName() + NarrativeCraftFileDefault.EXTENSION_DATA_FILE;
     }
 }

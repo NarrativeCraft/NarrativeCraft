@@ -24,18 +24,20 @@
 package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import java.util.List;
 
 public interface NarrativeCraftFileEditor<T extends NarrativeEntry<?>> {
 
-    int OPERATION_SUCCESS = 0;
-    int OPERATION_FAILED = 1;
+    OperationResult create(T entry);
 
-    int create(T entry);
+    OperationResult edit(T existing, T updated);
 
-    int edit(T entry);
-
-    int delete(T entry);
+    OperationResult delete(T entry);
 
     List<DeserializationResult<T>> deserialize();
+
+    static OperationResult storageFailure(NarrativeEntry<?> entry) {
+        return OperationResult.failure("error.storage", entry.getName());
+    }
 }

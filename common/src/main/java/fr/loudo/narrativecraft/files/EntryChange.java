@@ -21,12 +21,8 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.files;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 
-public class SceneDataPayload extends NarrativeEntryPayload {
-    public SceneDataPayload(String name, String description) {
-        super(name, description);
-    }
-}
+public record EntryChange<T extends NarrativeEntry<?>>(T existing, T updated) {}

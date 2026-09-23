@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryResolver;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
 import fr.loudo.narrativecraft.narrative.cutscene.layers.CutsceneLayerRegister;
 import fr.loudo.narrativecraft.narrative.cutscene.layers.CutsceneLayerRegistry;
@@ -65,6 +66,7 @@ public class NarrativeCraftMod {
 
     private final SignalEmitterImpl signalEmitter = new SignalEmitterImpl();
     private final ChapterManager chapterManager = new ChapterManager();
+    private final NarrativeEntryResolver entryResolver = new NarrativeEntryResolver(chapterManager);
     private final CharacterManager characterManager = new CharacterManager();
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
@@ -103,6 +105,10 @@ public class NarrativeCraftMod {
 
     public ChapterManager getChapterManager() {
         return chapterManager;
+    }
+
+    public NarrativeEntryResolver getEntryResolver() {
+        return entryResolver;
     }
 
     public CharacterManager getCharacterManager() {

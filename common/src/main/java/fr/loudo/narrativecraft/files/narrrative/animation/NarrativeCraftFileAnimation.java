@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
+import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
@@ -49,7 +50,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
     private record EntityData(RecordingReader.EntityHeader header, List<AbstractAction> actions) {}
 
     @Override
-    public int create(Animation entry) {
+    public OperationResult create(Animation entry) {
 
         File animationsFolder = NarrativeCraftFileUtil.getAnimationsFolder(entry.getScene());
 
@@ -59,7 +60,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
             NarrativeCraftMod.LOGGER.error(
                     "Failed to create animation file {} because the associated record could not be found.",
                     entry.getName());
-            return NarrativeCraftFileEditor.OPERATION_FAILED;
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
 
         try {
@@ -89,20 +90,24 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
             });
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to save animation {}!", entry.getName(), e);
-            return NarrativeCraftFileEditor.OPERATION_FAILED;
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
 
-        return NarrativeCraftFileEditor.OPERATION_SUCCESS;
+        return OperationResult.success();
     }
 
     @Override
-    public int edit(Animation entry) {
-
-        Animation oldAnimation = entry.getScene().getAnimationManager().getById(entry.getId());
+    public OperationResult edit(Animation oldAnimation, Animation entry) {
 
         File animationsFolder = NarrativeCraftFileUtil.getAnimationsFolder(entry.getScene());
         File oldFileRecord = new File(animationsFolder, oldAnimation.toFileName());
         File newFileRecord = new File(animationsFolder, entry.toFileName());
+
+        if (!oldFileRecord.equals(newFileRecord) && newFileRecord.exists()) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Failed to rename animation {} because {} already exists", oldAnimation.getName(), newFileRecord);
+            return NarrativeCraftFileEditor.storageFailure(oldAnimation);
+        }
 
         RecordingReader.RecordingHeader header;
         Map<Byte, String> actionsDict;
@@ -119,7 +124,7 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
             }
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to read animation {}", oldAnimation.getName(), e);
-            return NarrativeCraftFileEditor.OPERATION_FAILED;
+            return NarrativeCraftFileEditor.storageFailure(oldAnimation);
         }
 
         try {
@@ -150,20 +155,20 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
             });
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.error("Failed to write animation {}", entry.getName(), e);
-            return NarrativeCraftFileEditor.OPERATION_FAILED;
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
 
-        if (!oldFileRecord.getName().equals(newFileRecord.getName())) {
+        if (!oldFileRecord.equals(newFileRecord)) {
             if (!oldFileRecord.delete()) {
                 NarrativeCraftMod.LOGGER.warn("Failed to delete old animation file {}", oldFileRecord.getName());
             }
         }
 
-        return NarrativeCraftFileEditor.OPERATION_SUCCESS;
+        return OperationResult.success();
     }
 
     @Override
-    public int delete(Animation entry) {
+    public OperationResult delete(Animation entry) {
 
         File animationsFolder = NarrativeCraftFileUtil.getAnimationsFolder(entry.getScene());
         File fileRecord = new File(animationsFolder, entry.toFileName());
@@ -171,15 +176,15 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
         if (!fileRecord.exists()) {
             NarrativeCraftMod.LOGGER.error(
                     "Failed to delete animation {} because the file doesn't exists", entry.getName());
-            return NarrativeCraftFileEditor.OPERATION_FAILED;
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
 
         if (!fileRecord.delete()) {
             NarrativeCraftMod.LOGGER.error("Failed to delete animation {}", entry.getName());
-            return NarrativeCraftFileEditor.OPERATION_FAILED;
+            return NarrativeCraftFileEditor.storageFailure(entry);
         }
 
-        return NarrativeCraftFileEditor.OPERATION_SUCCESS;
+        return OperationResult.success();
     }
 
     @Override

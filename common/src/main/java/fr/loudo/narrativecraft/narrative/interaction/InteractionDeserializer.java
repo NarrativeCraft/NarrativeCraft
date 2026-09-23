@@ -24,9 +24,7 @@
 package fr.loudo.narrativecraft.narrative.interaction;
 
 import com.google.gson.*;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.lang.reflect.Type;
 import java.util.UUID;
@@ -39,21 +37,15 @@ public class InteractionDeserializer extends NarrativeDeserializer<Interaction> 
             throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
 
-        if (!obj.has("sceneId") || !obj.has("chapterId")) return null;
+        if (!hasSceneReference(obj)) return null;
 
         UUID id = parseId(obj);
         String name = parseName(obj);
-        String description = parseDescription(obj);
-        UUID sceneId = UUID.fromString(obj.get("sceneId").getAsString());
-        UUID chapterId = UUID.fromString(obj.get("chapterId").getAsString());
 
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getById(chapterId);
-        if (chapter == null) return null;
-
-        Scene scene = chapter.getSceneManager().getById(sceneId);
+        Scene scene = resolveScene(obj);
         if (scene == null) return null;
 
-        Interaction interaction = new Interaction(id, name, description, scene);
+        Interaction interaction = new Interaction(id, name, scene);
         deserializeInto(obj, interaction);
         return interaction;
     }

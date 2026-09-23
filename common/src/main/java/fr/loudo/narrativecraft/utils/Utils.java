@@ -31,8 +31,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.phys.AABB;
@@ -69,6 +71,12 @@ public class Utils {
         } catch (IllegalArgumentException e) {
             return PlayerModelType.values()[0];
         }
+    }
+
+    public static EntityType<?> resolveEntityType(String entityTypeId) {
+        Identifier identifier = Identifier.tryParse(entityTypeId);
+        if (identifier == null) return EntityTypes.PLAYER;
+        return BuiltInRegistries.ENTITY_TYPE.getOptional(identifier).orElse(EntityTypes.PLAYER);
     }
 
     public static boolean isOnGround(Entity entity) {

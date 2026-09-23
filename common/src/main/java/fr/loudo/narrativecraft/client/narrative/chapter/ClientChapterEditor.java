@@ -32,7 +32,8 @@ import java.util.UUID;
 
 public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPayload, Chapter> {
 
-    final ChapterManager chapterManager = ClientNarrativeCraftMod.getInstance().getChapterManager();
+    private final ChapterManager chapterManager =
+            ClientNarrativeCraftMod.getInstance().getChapterManager();
 
     @Override
     public Chapter resolve(UUID entryId, ChapterPayload payload) {
@@ -41,26 +42,22 @@ public class ClientChapterEditor implements ClientNarrativeEntryEditor<ChapterPa
 
     @Override
     public void add(UUID entryId, ChapterPayload payload) {
-        Chapter chapter = new Chapter(entryId, payload.getName(), payload.getDescription(), payload.getChapterIndex());
-
-        chapterManager.add(chapter);
+        chapterManager.add(new Chapter(entryId, payload.getName(), payload.getChapterIndex()));
     }
 
     @Override
     public void edit(UUID entryId, ChapterPayload payload) {
-        Chapter oldChapter = resolve(entryId, payload);
-        int oldIndex = oldChapter.getChapterIndex();
-        oldChapter.setName(payload.getName());
-        oldChapter.setDescription(payload.getDescription());
-        oldChapter.setChapterIndex(payload.getChapterIndex());
-        if (oldIndex != payload.getChapterIndex()) {
-            chapterManager.forceSort();
-        }
+        Chapter chapter = resolve(entryId, payload);
+        if (chapter == null) return;
+        chapter.setName(payload.getName());
+        chapter.setChapterIndex(payload.getChapterIndex());
+        chapterManager.forceSort();
     }
 
     @Override
     public void delete(UUID entryId, ChapterPayload payload) {
         Chapter chapter = resolve(entryId, payload);
+        if (chapter == null) return;
         chapterManager.remove(chapter);
     }
 }

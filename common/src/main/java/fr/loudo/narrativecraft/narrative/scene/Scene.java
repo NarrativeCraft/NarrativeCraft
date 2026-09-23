@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.scene;
 
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
+import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.managers.AnimationManager;
 import fr.loudo.narrativecraft.managers.NpcManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
@@ -46,25 +47,24 @@ public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
 
     private int rank;
 
-    public Scene(UUID id, String name, String description, Chapter chapter, int rank) {
-        super(id, name, description);
+    public Scene(UUID id, String name, Chapter chapter, int rank) {
+        super(id, name);
         this.chapter = chapter;
         this.rank = rank;
     }
 
-    public Scene(String name, String description, Chapter chapter) {
-        super(name, description);
-        this.chapter = chapter;
-    }
-
-    public Scene(String name, String description, Chapter chapter, int rank) {
-        super(name, description);
+    public Scene(String name, Chapter chapter, int rank) {
+        super(name);
         this.chapter = chapter;
         this.rank = rank;
     }
 
     public String knotName() {
-        return "chapter_" + chapter.getChapterIndex() + "_" + name.toLowerCase().replace(' ', '_');
+        return knotName(chapter.getChapterIndex());
+    }
+
+    public String knotName(int chapterIndex) {
+        return "chapter_" + chapterIndex + "_" + getNormalizedName();
     }
 
     public int getChapterIndex() {
@@ -99,11 +99,6 @@ public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
         return npcManager;
     }
 
-    @Override
-    public void setName(String name) {
-        super.setName(name);
-    }
-
     public int getRank() {
         return rank;
     }
@@ -119,11 +114,19 @@ public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
 
     @Override
     public ScenePayload toPayload() {
-        return new ScenePayload(name, description, chapter.getId(), rank);
+        return new ScenePayload(name, chapter.getId(), rank);
+    }
+
+    public String inkFileName() {
+        return getNormalizedName() + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE;
     }
 
     @Override
     public String toFileName() {
-        return chapter.getChapterIndex() + "_" + rank + "_" + name.toLowerCase().replace(' ', '_');
+        return toFileName(chapter.getChapterIndex());
+    }
+
+    public String toFileName(int chapterIndex) {
+        return chapterIndex + "_" + rank + "_" + getNormalizedName();
     }
 }

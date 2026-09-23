@@ -21,40 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.files;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
-import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.OperationResult;
+import java.util.List;
 
-public class ScenePayload extends NarrativeEntryPayload {
+public interface RankedNarrativeCraftFileEditor<T extends NarrativeEntry<?>> extends NarrativeCraftFileEditor<T> {
 
-    public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ScenePayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            ScenePayload::getChapterId,
-            ByteBufCodecs.INT,
-            ScenePayload::getRank,
-            ScenePayload::new);
+    OperationResult editAll(List<EntryChange<T>> changes);
 
-    private final UUID chapterId;
-    private final int rank;
+    OperationResult deleteAndShift(T entry, List<EntryChange<T>> shiftedEntries);
 
-    public ScenePayload(String name, UUID chapterId, int rank) {
-        super(name);
-        this.chapterId = chapterId;
-        this.rank = rank;
+    @Override
+    default OperationResult edit(T existing, T updated) {
+        return editAll(List.of(new EntryChange<>(existing, updated)));
     }
 
-    public UUID getChapterId() {
-        return chapterId;
-    }
-
-    public int getRank() {
-        return rank;
+    @Override
+    default OperationResult delete(T entry) {
+        return deleteAndShift(entry, List.of());
     }
 }
