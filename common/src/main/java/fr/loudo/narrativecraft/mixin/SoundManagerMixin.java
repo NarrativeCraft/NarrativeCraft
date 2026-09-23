@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.utils.VolumeAudio;
+import fr.loudo.narrativecraft.client.utils.VolumeAudio;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(SoundManager.class)
-public class SoundManagerMixin implements fr.loudo.narrativecraft.utils.VolumeAudio {
+public class SoundManagerMixin implements VolumeAudio {
     @Shadow
     @Final
     private SoundEngine soundEngine;

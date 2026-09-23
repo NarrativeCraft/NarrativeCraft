@@ -25,10 +25,10 @@ package fr.loudo.narrativecraft.keys;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.client.studio.NarrativeStudio;
-import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPoint;

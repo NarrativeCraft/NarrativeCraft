@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.api.client;
 
+import fr.loudo.narrativecraft.api.client.editors.cutscene.ClientCutsceneLayerRegistry;
 import fr.loudo.narrativecraft.api.client.inkAction.ClientInkTagDispatcher;
 import fr.loudo.narrativecraft.api.client.signals.ClientSignalEmitter;
 import fr.loudo.narrativecraft.api.client.signals.ClientSignalRegistry;
@@ -34,21 +35,25 @@ public class NarrativeCraftClientAPI {
     private final ClientInkTagDispatcher inkTagDispatcher;
     private final ClientSignalRegistry signalRegistry;
     private final ClientSignalEmitter signalEmitter;
+    private final ClientCutsceneLayerRegistry cutsceneLayerRegistry;
 
     private NarrativeCraftClientAPI(
             ClientInkTagDispatcher inkTagDispatcher,
             ClientSignalRegistry signalRegistry,
-            ClientSignalEmitter signalEmitter) {
+            ClientSignalEmitter signalEmitter,
+            ClientCutsceneLayerRegistry cutsceneLayerRegistry) {
         this.inkTagDispatcher = inkTagDispatcher;
         this.signalRegistry = signalRegistry;
         this.signalEmitter = signalEmitter;
+        this.cutsceneLayerRegistry = cutsceneLayerRegistry;
     }
 
     static void initialize(
             ClientInkTagDispatcher inkTagDispatcher,
             ClientSignalRegistry signalRegistry,
-            ClientSignalEmitter signalEmitter) {
-        INSTANCE = new NarrativeCraftClientAPI(inkTagDispatcher, signalRegistry, signalEmitter);
+            ClientSignalEmitter signalEmitter,
+            ClientCutsceneLayerRegistry cutsceneLayerRegistry) {
+        INSTANCE = new NarrativeCraftClientAPI(inkTagDispatcher, signalRegistry, signalEmitter, cutsceneLayerRegistry);
     }
 
     public static boolean isAvailable() {
@@ -76,5 +81,9 @@ public class NarrativeCraftClientAPI {
 
     public ClientSignalEmitter getSignalEmitter() {
         return signalEmitter;
+    }
+
+    public ClientCutsceneLayerRegistry getCutsceneLayerRegistry() {
+        return cutsceneLayerRegistry;
     }
 }

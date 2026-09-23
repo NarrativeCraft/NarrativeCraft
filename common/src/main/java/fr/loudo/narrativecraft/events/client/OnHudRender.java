@@ -25,22 +25,13 @@ package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
-import fr.loudo.narrativecraft.editors.EditorMaker;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class OnHudRender {
-
-    public static void editorHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker != null) {
-            editorMaker.render(graphics, deltaTracker);
-        }
-    }
 
     public static void dialogHudRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();

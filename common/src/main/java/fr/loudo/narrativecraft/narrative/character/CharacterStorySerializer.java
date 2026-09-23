@@ -27,8 +27,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
+import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import java.lang.reflect.Type;
 import net.minecraft.core.registries.BuiltInRegistries;
 

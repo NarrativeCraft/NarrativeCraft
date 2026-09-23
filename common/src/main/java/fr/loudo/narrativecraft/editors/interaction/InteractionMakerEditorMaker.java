@@ -100,7 +100,6 @@ public class InteractionMakerEditorMaker implements EditorMaker {
         }
     }
 
-    @Override
     public void teleportToEditorOrigin() {
         ServerPlayer player = playerSession.getPlayer();
         Vec3 position = resolveOrigin();

@@ -27,6 +27,8 @@ import fr.loudo.narrativecraft.api.client.ClientAPISetup;
 import fr.loudo.narrativecraft.api.utils.Side;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
+import fr.loudo.narrativecraft.client.editors.cutscene.layers.ClientCutsceneLayerRegister;
+import fr.loudo.narrativecraft.client.editors.cutscene.layers.ClientCutsceneLayerRegistryImpl;
 import fr.loudo.narrativecraft.client.editors.interaction.ClientInteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.client.inkTag.ClientInkActionRegister;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEditorsRegister;
@@ -52,6 +54,7 @@ public class ClientNarrativeCraftMod {
     private final SignalRegistryImpl signalRegistry = new SignalRegistryImpl(Side.CLIENT);
     private final ClientSignalEmitterImpl signalEmitter = new ClientSignalEmitterImpl();
     private final ClientPlayerStateSignalWatcher playerStateSignalWatcher = new ClientPlayerStateSignalWatcher();
+    private final ClientCutsceneLayerRegistryImpl cutsceneLayerRegistry = new ClientCutsceneLayerRegistryImpl();
     private CameraAngle mainScreenData;
 
     public static void commonInit() {
@@ -59,6 +62,11 @@ public class ClientNarrativeCraftMod {
         ClientNarrativeEditorsRegister.register();
         ClientInkActionRegister.register();
         ClientSignalRegistryRegister.register();
+        ClientCutsceneLayerRegister.register(getInstance().getCutsceneLayerRegistry());
+    }
+
+    public ClientCutsceneLayerRegistryImpl getCutsceneLayerRegistry() {
+        return cutsceneLayerRegistry;
     }
 
     public ChapterManager getChapterManager() {

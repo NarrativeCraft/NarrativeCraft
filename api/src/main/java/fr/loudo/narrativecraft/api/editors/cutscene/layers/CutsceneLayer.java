@@ -39,8 +39,6 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
         this.layerType = layerType;
     }
 
-    public abstract Keyframe createDefaultKeyframe(int tick);
-
     public void addKeyframe(Keyframe keyframe) {
         keyframes.add(keyframe);
     }
@@ -63,7 +61,7 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
         return layerType;
     }
 
-    protected <K extends Keyframe> List<K> getSortedKeyframes(Class<K> type) {
+    public <K extends Keyframe> List<K> getSortedKeyframes(Class<K> type) {
         return keyframes.stream()
                 .filter(type::isInstance)
                 .map(type::cast)
@@ -100,19 +98,19 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
      * @param tick current tick of the cutscene
      * @return if the current tick is between 2 keyframes on the timeline of his layer
      */
-    protected boolean isTickCoveredBy(float tick) {
+    public boolean isTickCoveredBy(float tick) {
         if (keyframes.isEmpty()) return false;
         int first = getFirstKeyframeTick();
         int last = getLastKeyframeTick();
         return tick >= first && tick <= last;
     }
 
-    protected int getFirstKeyframeTick() {
+    public int getFirstKeyframeTick() {
         if (keyframes.isEmpty()) return -1;
         return keyframes.stream().mapToInt(Keyframe::getTick).min().getAsInt();
     }
 
-    protected int getLastKeyframeTick() {
+    public int getLastKeyframeTick() {
         if (keyframes.isEmpty()) return -1;
         return keyframes.stream().mapToInt(Keyframe::getTick).max().getAsInt();
     }
@@ -122,7 +120,7 @@ public abstract class CutsceneLayer implements ICutsceneLayer {
      * @param tick current tick of the cutscene
      * @return if the tick match exactly a keyframe tick on the timeline of his layer
      */
-    protected boolean isExactTick(float tick) {
+    public boolean isExactTick(float tick) {
         if (keyframes.isEmpty()) return false;
         return keyframes.stream().mapToInt(Keyframe::getTick).max().getAsInt() == (int) tick;
     }

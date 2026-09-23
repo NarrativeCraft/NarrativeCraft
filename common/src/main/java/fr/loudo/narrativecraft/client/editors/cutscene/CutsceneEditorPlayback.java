@@ -23,10 +23,14 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
+import fr.loudo.narrativecraft.api.client.editors.cutscene.ClientCutsceneLayerPlayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
+import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -34,6 +38,7 @@ import net.minecraft.client.Minecraft;
 public class CutsceneEditorPlayback {
 
     private final List<CutsceneLayer> layers;
+    private final Map<CutsceneLayer, ClientCutsceneLayerPlayer> layerPlayers = new IdentityHashMap<>();
     private final ClientPlayerSession playerSession;
 
     private float currentTick = 0f;
@@ -56,9 +61,23 @@ public class CutsceneEditorPlayback {
         playing = false;
         playerSession.getCutsceneDataSession().setFov(-1f);
         playerSession.getCutsceneDataSession().setKeyframePosition(null);
-        for (CutsceneLayer layer : layers) {
-            layer.stop();
+        for (ClientCutsceneLayerPlayer layerPlayer : layerPlayers.values()) {
+            layerPlayer.stop();
         }
+    }
+
+    public void releaseLayer(CutsceneLayer layer) {
+        ClientCutsceneLayerPlayer layerPlayer = layerPlayers.remove(layer);
+        if (layerPlayer != null) {
+            layerPlayer.stop();
+        }
+    }
+
+    public void releaseLayers() {
+        for (ClientCutsceneLayerPlayer layerPlayer : layerPlayers.values()) {
+            layerPlayer.stop();
+        }
+        layerPlayers.clear();
     }
 
     public void tick(DeltaTracker delta) {
@@ -80,10 +99,17 @@ public class CutsceneEditorPlayback {
         for (CutsceneLayer layer : layers) {
             String typeId = layer.getTypeId();
             if (executedTypes.contains(typeId)) continue;
-            if (layer.execute(currentTick)) {
+            ClientCutsceneLayerPlayer layerPlayer = getLayerPlayer(layer);
+            if (layerPlayer != null && layerPlayer.execute(currentTick)) {
                 executedTypes.add(typeId);
             }
         }
+    }
+
+    private ClientCutsceneLayerPlayer getLayerPlayer(CutsceneLayer layer) {
+        return layerPlayers.computeIfAbsent(layer, unplayedLayer -> ClientNarrativeCraftMod.getInstance()
+                .getCutsceneLayerRegistry()
+                .createPlayer(unplayedLayer));
     }
 
     public void seekTo(float tick) {

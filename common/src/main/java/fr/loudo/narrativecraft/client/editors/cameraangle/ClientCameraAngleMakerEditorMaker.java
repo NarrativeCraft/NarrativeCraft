@@ -25,10 +25,11 @@ package fr.loudo.narrativecraft.client.editors.cameraangle;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogPreviewEntry;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
@@ -39,7 +40,6 @@ import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenSave;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -66,7 +66,6 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private CameraView previewCameraView;
     private PreviewMode previewMode = PreviewMode.CAMERA;
-    private boolean renderingHud = true;
     private boolean editingCameraViewPosition = false;
     private final Map<UUID, Integer> placementEntityIds = new HashMap<>();
     private DialogRenderer3D activeDialogRenderer;
@@ -114,9 +113,6 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
             minecraft.setCameraEntity(minecraft.player);
         }
     }
-
-    @Override
-    public void teleportToEditorOrigin() {}
 
     @Override
     public NarrativeEnvironment getEnvironment() {
@@ -417,24 +413,12 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         return previewCameraView;
     }
 
-    public void toggleHud() {
-        renderingHud = !renderingHud;
-    }
-
     public CameraAngle getCameraAngle() {
         return cameraAngle;
     }
 
     public ClientPlayerSession getPlayerSession() {
         return playerSession;
-    }
-
-    public boolean isRenderingHud() {
-        return renderingHud;
-    }
-
-    public void setRenderingHud(boolean renderingHud) {
-        this.renderingHud = renderingHud;
     }
 
     public boolean isEditingCameraViewPosition() {

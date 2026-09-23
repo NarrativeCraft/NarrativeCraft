@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.client.studio;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import fr.loudo.narrativecraft.utils.UtilsClient;
+import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;

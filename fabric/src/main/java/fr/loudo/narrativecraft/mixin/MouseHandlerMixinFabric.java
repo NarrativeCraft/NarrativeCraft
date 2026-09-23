@@ -25,16 +25,11 @@ package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.events.client.OnMouseInputEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenMouseDragEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenMouseScrollEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -42,10 +37,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MouseHandler.class)
 public abstract class MouseHandlerMixinFabric {
-
-    @Shadow
-    @Final
-    private Minecraft minecraft;
 
     @Redirect(
             method = "onButton",
@@ -56,20 +47,8 @@ public abstract class MouseHandlerMixinFabric {
                                     "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"))
     private boolean narrativecraft$onScreenMouseClick(
             Screen instance, MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
-        OnScreenMouseClickEvent.cutsceneHudClick(mouseButtonEvent, isDoubleClick);
+        OnScreenMouseClickEvent.onMouseClicked();
         return instance.mouseClicked(mouseButtonEvent, isDoubleClick);
-    }
-
-    @Redirect(
-            method = "onButton",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target =
-                                    "Lnet/minecraft/client/gui/screens/Screen;mouseReleased(Lnet/minecraft/client/input/MouseButtonEvent;)Z"))
-    private boolean narrativecraft$onScreenMouseRelease(Screen instance, MouseButtonEvent mouseButtonEvent) {
-        OnScreenMouseClickEvent.cutsceneHudRelease(mouseButtonEvent);
-        return instance.mouseReleased(mouseButtonEvent);
     }
 
     @Inject(
@@ -85,29 +64,5 @@ public abstract class MouseHandlerMixinFabric {
         if (OnMouseInputEvent.preMouseInput()) {
             ci.cancel();
         }
-    }
-
-    @Inject(
-            method = "onScroll",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseScrolled(DDDD)Z"))
-    private void narrativecraft$onMouseScroll(long windowPointer, double xOffset, double yOffset, CallbackInfo ci) {
-        boolean flag = this.minecraft.options.discreteMouseScroll().get();
-        double d0 = this.minecraft.options.mouseWheelSensitivity().get();
-        double deltaX = (flag ? Math.signum(xOffset) : xOffset) * d0;
-        double deltaY = (flag ? Math.signum(yOffset) : yOffset) * d0;
-
-        OnScreenMouseScrollEvent.onCutsceneLayerMouseScroll(deltaX, deltaY);
-    }
-
-    @Redirect(
-            method = "handleAccumulatedMovement",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target =
-                                    "Lnet/minecraft/client/gui/screens/Screen;mouseDragged(Lnet/minecraft/client/input/MouseButtonEvent;DD)Z"))
-    private boolean narrativecraft$onMouseDragged(Screen instance, MouseButtonEvent event, double dragX, double dragY) {
-        OnScreenMouseDragEvent.onCutsceneTimelineDrag(event, dragX, dragY);
-        return instance.mouseDragged(event, dragX, dragY);
     }
 }

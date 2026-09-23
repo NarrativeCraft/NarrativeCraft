@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.mixin;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.audio.Channel;
 import fr.loudo.narrativecraft.client.inkTag.actions.sound.SoundInkInstance;
-import fr.loudo.narrativecraft.utils.VolumeAudio;
+import fr.loudo.narrativecraft.client.utils.VolumeAudio;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import net.minecraft.client.resources.sounds.SoundInstance;

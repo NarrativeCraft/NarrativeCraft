@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.mixin;
 import fr.loudo.narrativecraft.events.client.OnKeyInputEvent;
 import fr.loudo.narrativecraft.events.client.OnScreenKeyEvent;
 import net.minecraft.client.KeyboardHandler;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -54,16 +53,5 @@ public class KeyboardHandlerMixinFabric {
         if (action == 1) {
             OnScreenKeyEvent.onKeyPressed(event);
         }
-    }
-
-    @Inject(
-            method = "charTyped",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target =
-                                    "Lnet/minecraft/client/gui/screens/Screen;charTyped(Lnet/minecraft/client/input/CharacterEvent;)Z"))
-    private void narrativecraft$onCharTyped(long handle, CharacterEvent event, CallbackInfo ci) {
-        OnScreenKeyEvent.onCharTyped(event);
     }
 }

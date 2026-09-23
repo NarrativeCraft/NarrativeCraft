@@ -24,12 +24,12 @@
 package fr.loudo.narrativecraft.client.session;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer2D;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.client.editors.cutscene.CutsceneDataSession;
 import fr.loudo.narrativecraft.client.narrative.story.StorySaveIconRenderer;
 import fr.loudo.narrativecraft.client.screens.story.ChoiceScreen;
-import fr.loudo.narrativecraft.dialog.DialogRenderer;
-import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
-import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -42,7 +42,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 
-public class ClientPlayerSession extends AbstractPlayerSession {
+public class ClientPlayerSession extends AbstractPlayerSession<EditorMaker> {
 
     private final CutsceneDataSession cutsceneDataSession = new CutsceneDataSession();
     private final StorySaveIconRenderer saveIconRenderer = new StorySaveIconRenderer();

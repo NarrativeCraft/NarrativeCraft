@@ -38,7 +38,7 @@ import fr.loudo.narrativecraft.api.signals.SignalRegistry;
 
 public class NarrativeCraftAPI {
 
-    public static final int VERSION = 4;
+    public static final int VERSION = 5;
 
     private static volatile NarrativeCraftAPI INSTANCE;
 

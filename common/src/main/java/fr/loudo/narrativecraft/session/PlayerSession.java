@@ -42,7 +42,7 @@ import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 
-public class PlayerSession extends AbstractPlayerSession {
+public class PlayerSession extends AbstractPlayerSession<EditorMaker> {
 
     private static final String USER_PLACEHOLDER = "%user%";
 

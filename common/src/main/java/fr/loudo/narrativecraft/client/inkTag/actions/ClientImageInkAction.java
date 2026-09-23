@@ -26,8 +26,8 @@ package fr.loudo.narrativecraft.client.inkTag.actions;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
 import fr.loudo.narrativecraft.client.rendering.ImageTexture;
+import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.ImageInkAction;
-import fr.loudo.narrativecraft.utils.UtilsClient;
 import javax.annotation.Nullable;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 

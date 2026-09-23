@@ -34,14 +34,9 @@ import net.neoforged.neoforge.common.NeoForge;
 public class OnScreenMouseClickEventNeoForge {
     public OnScreenMouseClickEventNeoForge(IEventBus bus) {
         NeoForge.EVENT_BUS.addListener(OnScreenMouseClickEventNeoForge::onMouseClick);
-        NeoForge.EVENT_BUS.addListener(OnScreenMouseClickEventNeoForge::onMouseRelease);
     }
 
     private static void onMouseClick(ScreenEvent.MouseButtonPressed.Pre event) {
-        OnScreenMouseClickEvent.cutsceneHudClick(event.getMouseButtonEvent(), event.isDoubleClick());
-    }
-
-    private static void onMouseRelease(ScreenEvent.MouseButtonReleased.Post event) {
-        OnScreenMouseClickEvent.cutsceneHudRelease(event.getMouseButtonEvent());
+        OnScreenMouseClickEvent.onMouseClicked();
     }
 }

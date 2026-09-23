@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.dialog;
 
 import com.google.gson.JsonObject;
-import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import net.minecraft.resources.Identifier;
 
 public final class DialogDataIO {

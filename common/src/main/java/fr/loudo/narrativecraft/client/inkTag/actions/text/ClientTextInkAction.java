@@ -25,11 +25,11 @@ package fr.loudo.narrativecraft.client.inkTag.actions.text;
 
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.client.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.TextInkAction;
-import fr.loudo.narrativecraft.utils.UtilsClient;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;

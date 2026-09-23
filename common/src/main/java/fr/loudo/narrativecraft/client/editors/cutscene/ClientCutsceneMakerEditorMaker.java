@@ -23,11 +23,15 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
+import com.google.gson.JsonObject;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
+import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.EditorAction;
+import fr.loudo.narrativecraft.client.editors.EditorHistory;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
@@ -37,21 +41,24 @@ import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.input.KeyEvent;
 
 public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
-    private final Minecraft mc = Minecraft.getInstance();
+    private record KeyframeCopy(CutsceneLayer layer, int tickOffset, JsonObject data) {}
+
+    private final Minecraft minecraft = Minecraft.getInstance();
     private final List<CutsceneLayer> layers = new ArrayList<>();
     private final Cutscene cutscene;
     private final ClientPlayerSession playerSession =
             ClientNarrativeCraftMod.getInstance().getPlayerSession();
     private final CutsceneEditorPlayback playback;
-    private final CutsceneMakerEditorShortcuts shortcuts = new CutsceneMakerEditorShortcuts(this);
+    private final EditorHistory history = new EditorHistory();
+    private final List<KeyframeCopy> clipboard = new ArrayList<>();
     private final NarrativeEnvironment environment;
 
     private final List<Keyframe> selectedKeyframes = new ArrayList<>();
@@ -59,7 +66,6 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     private int totalTick;
     private int playHeadTick = 0;
     private float previewRoll = 0f;
-    private boolean renderingHud = true;
 
     public ClientCutsceneMakerEditorMaker(Cutscene cutscene, NarrativeEnvironment environment) {
         this.cutscene = cutscene;
@@ -107,19 +113,17 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     @Override
     public void close() {
         playback.pause();
+        playback.releaseLayers();
         playerSession.getCutsceneDataSession().reset();
         UtilsClient.setHudHidden(false);
-        for (CutsceneLayer layer : layers) {
-            layer.stop();
-        }
         if (environment != NarrativeEnvironment.DEVELOPMENT) return;
-        mc.gui.setScreen(null);
+        minecraft.gui.setScreen(null);
         playerSession.stopAllClientInkActions();
     }
 
     @Override
     public void tick() {
-        boolean hideGui = Minecraft.getInstance().gui.hud.isHidden();
+        boolean hideGui = minecraft.gui.hud.isHidden();
         if (playback.isPlaying() && !hideGui) {
             UtilsClient.setHudHidden(true);
         } else if (!playback.isPlaying() && hideGui) {
@@ -127,17 +131,12 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
     }
 
-    @Override
-    public void teleportToEditorOrigin() {}
-
-    @Override
-    public void keyPressed(KeyEvent event) {
-        if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
-        shortcuts.handleKeyPressed(event);
-    }
-
     public void loadLayers(String layersJson) {
+        playback.releaseLayers();
         layers.clear();
+        selectedKeyframes.clear();
+        history.clear();
+        clipboard.clear();
         CutsceneDeserializer.deserializeLayers(layersJson, cutscene);
         if (cutscene.getLayers() != null) {
             layers.addAll(cutscene.getLayers());
@@ -152,13 +151,117 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         rebuildSortIndices();
     }
 
-    public void removeLayer(ICutsceneLayer layer) {
+    public void removeLayer(CutsceneLayer layer) {
         layers.remove(layer);
+        playback.releaseLayer(layer);
         rebuildSortIndices();
     }
 
-    public void toggleHud() {
-        renderingHud = !renderingHud;
+    public void undo() {
+        history.undo();
+    }
+
+    public void redo() {
+        history.redo();
+    }
+
+    public void recordKeyframeMove(Map<Keyframe, Integer> originalTicks) {
+        Map<Keyframe, Integer> finalTicks = new HashMap<>();
+        for (Keyframe keyframe : originalTicks.keySet()) {
+            finalTicks.put(keyframe, keyframe.getTick());
+        }
+        if (finalTicks.equals(originalTicks)) return;
+
+        Map<Keyframe, Integer> snapshotOriginal = Map.copyOf(originalTicks);
+        Map<Keyframe, Integer> snapshotFinal = Map.copyOf(finalTicks);
+
+        history.record(new EditorAction() {
+            @Override
+            public void undo() {
+                snapshotOriginal.forEach(Keyframe::setTick);
+            }
+
+            @Override
+            public void redo() {
+                snapshotFinal.forEach(Keyframe::setTick);
+            }
+        });
+    }
+
+    public void copySelection() {
+        if (selectedKeyframes.isEmpty()) return;
+
+        int earliestTick =
+                selectedKeyframes.stream().mapToInt(Keyframe::getTick).min().getAsInt();
+        clipboard.clear();
+
+        for (Keyframe keyframe : selectedKeyframes) {
+            ICutsceneLayerType layerType = keyframe.getLayer().getType();
+            JsonObject data = layerType.serializeKeyframe(keyframe);
+            if (data == null) continue;
+            clipboard.add(new KeyframeCopy(keyframe.getLayer(), keyframe.getTick() - earliestTick, data));
+        }
+    }
+
+    public void paste() {
+        if (clipboard.isEmpty()) return;
+        List<Keyframe> pastedKeyframes = new ArrayList<>();
+
+        for (KeyframeCopy copy : clipboard) {
+            if (!layers.contains(copy.layer())) continue;
+            JsonObject json = copy.data().deepCopy();
+            json.addProperty("tick", playHeadTick + copy.tickOffset());
+
+            Keyframe pasted = copy.layer().getType().deserializeKeyframe(copy.layer(), json);
+            if (pasted == null) continue;
+
+            copy.layer().addKeyframe(pasted);
+            pastedKeyframes.add(pasted);
+        }
+
+        if (pastedKeyframes.isEmpty()) return;
+
+        history.record(new EditorAction() {
+            @Override
+            public void undo() {
+                for (Keyframe keyframe : pastedKeyframes) {
+                    keyframe.getLayer().removeKeyframe(keyframe);
+                }
+            }
+
+            @Override
+            public void redo() {
+                for (Keyframe keyframe : pastedKeyframes) {
+                    keyframe.getLayer().addKeyframe(keyframe);
+                }
+            }
+        });
+    }
+
+    public void deleteSelection() {
+        if (selectedKeyframes.isEmpty()) return;
+
+        List<Keyframe> deletedKeyframes = new ArrayList<>(selectedKeyframes);
+        for (Keyframe keyframe : deletedKeyframes) {
+            keyframe.getLayer().removeKeyframe(keyframe);
+        }
+        clearSelection();
+
+        history.record(new EditorAction() {
+            @Override
+            public void undo() {
+                for (Keyframe keyframe : deletedKeyframes) {
+                    keyframe.getLayer().addKeyframe(keyframe);
+                }
+            }
+
+            @Override
+            public void redo() {
+                for (Keyframe keyframe : deletedKeyframes) {
+                    keyframe.getLayer().removeKeyframe(keyframe);
+                }
+            }
+        });
     }
 
     public void clearSelection() {
@@ -181,8 +284,8 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     private void rebuildSortIndices() {
-        for (int i = 0; i < layers.size(); i++) {
-            layers.get(i).setSortIndex(i);
+        for (int index = 0; index < layers.size(); index++) {
+            layers.get(index).setSortIndex(index);
         }
     }
 
@@ -212,16 +315,12 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         return playback;
     }
 
-    public CutsceneMakerEditorShortcuts getShortcuts() {
-        return shortcuts;
+    public EditorHistory getHistory() {
+        return history;
     }
 
-    public boolean isRenderingHud() {
-        return renderingHud;
-    }
-
-    public void setRenderingHud(boolean renderingHud) {
-        this.renderingHud = renderingHud;
+    public boolean hasClipboard() {
+        return !clipboard.isEmpty();
     }
 
     public float getPreviewRoll() {

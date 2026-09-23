@@ -25,13 +25,13 @@ package fr.loudo.narrativecraft.editors.cutscene;
 
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
-import fr.loudo.narrativecraft.client.editors.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.editors.EditorMaker;
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.CameraKeyframe;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
+import fr.loudo.narrativecraft.narrative.cutscene.layers.camera.CameraKeyframe;
+import fr.loudo.narrativecraft.narrative.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;

@@ -72,9 +72,6 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     public void tick() {}
 
     @Override
-    public void teleportToEditorOrigin() {}
-
-    @Override
     public NarrativeEnvironment getEnvironment() {
         return environment;
     }

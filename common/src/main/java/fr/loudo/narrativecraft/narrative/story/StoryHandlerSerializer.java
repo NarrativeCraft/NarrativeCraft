@@ -25,9 +25,9 @@ package fr.loudo.narrativecraft.narrative.story;
 
 import com.google.gson.*;
 import fr.loudo.narrativecraft.api.utils.UserPosition;
-import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
+import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.UUID;

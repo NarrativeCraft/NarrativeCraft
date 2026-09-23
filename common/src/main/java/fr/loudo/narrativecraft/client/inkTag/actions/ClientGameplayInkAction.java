@@ -25,8 +25,8 @@ package fr.loudo.narrativecraft.client.inkTag.actions;
 
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.session.IPlayerSession;
+import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.narrative.inkTag.actions.GameplayInkAction;
-import fr.loudo.narrativecraft.utils.UtilsClient;
 
 public class ClientGameplayInkAction extends GameplayInkAction {
 

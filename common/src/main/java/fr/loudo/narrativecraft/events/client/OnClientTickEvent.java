@@ -25,10 +25,10 @@ package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer2D;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.dialog.DialogRenderer;
-import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
-import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.keys.PressKeyListener;

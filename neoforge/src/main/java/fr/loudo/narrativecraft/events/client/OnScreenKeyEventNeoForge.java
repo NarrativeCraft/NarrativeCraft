@@ -35,14 +35,9 @@ public class OnScreenKeyEventNeoForge {
 
     public OnScreenKeyEventNeoForge(IEventBus bus) {
         NeoForge.EVENT_BUS.addListener(OnScreenKeyEventNeoForge::onKeyPressed);
-        NeoForge.EVENT_BUS.addListener(OnScreenKeyEventNeoForge::onCharTyped);
     }
 
     private static void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
         OnScreenKeyEvent.onKeyPressed(event.getKeyEvent());
-    }
-
-    private static void onCharTyped(ScreenEvent.CharacterTyped.Pre event) {
-        OnScreenKeyEvent.onCharTyped(event.getCharacterEvent());
     }
 }

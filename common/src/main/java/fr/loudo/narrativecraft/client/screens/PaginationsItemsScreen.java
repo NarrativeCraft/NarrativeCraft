@@ -24,10 +24,10 @@
 package fr.loudo.narrativecraft.client.screens;
 
 import com.mojang.blaze3d.Blaze3D;
+import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
-import fr.loudo.narrativecraft.utils.UtilsClient;
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;

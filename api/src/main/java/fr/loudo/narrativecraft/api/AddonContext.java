@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.api;
 
 import fr.loudo.narrativecraft.api.client.NarrativeCraftClientAPI;
+import fr.loudo.narrativecraft.api.client.editors.cutscene.ClientCutsceneLayerType;
 import fr.loudo.narrativecraft.api.dialog.ITextEffect;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.api.events.Event;
@@ -109,6 +110,11 @@ public class AddonContext {
     public void registerCutsceneLayer(ICutsceneLayerType type) {
         if (state == State.DISABLED) return;
         api.getCutsceneLayerRegistry().register(type);
+    }
+
+    public void registerClientCutsceneLayer(ClientCutsceneLayerType<?> type) {
+        if (state == State.DISABLED) return;
+        NarrativeCraftClientAPI.getInstance().getCutsceneLayerRegistry().register(type);
     }
 
     public void registerTextEffect(String name, ITextEffect effect) {

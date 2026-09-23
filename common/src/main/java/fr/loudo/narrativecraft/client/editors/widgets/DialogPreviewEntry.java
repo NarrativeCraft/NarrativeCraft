@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.client.editors.widgets;
 
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 
 public class DialogPreviewEntry {
 

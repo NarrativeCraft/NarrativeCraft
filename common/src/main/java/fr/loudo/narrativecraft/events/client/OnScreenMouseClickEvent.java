@@ -23,32 +23,15 @@
 
 package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
-import fr.loudo.narrativecraft.dialog.DialogRenderer;
-import fr.loudo.narrativecraft.editors.EditorMaker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.input.MouseButtonEvent;
 
 public class OnScreenMouseClickEvent {
 
-    public static void cutsceneHudClick(MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker != null) {
-            editorMaker.mouseClicked(mouseButtonEvent, isDoubleClick);
-        }
-
+    public static void onMouseClicked() {
         if (Minecraft.getInstance().gui.screen() instanceof UnRemovableScreen) {
             DialogRenderer.advanceNextDialog();
-        }
-    }
-
-    public static void cutsceneHudRelease(MouseButtonEvent mouseButtonEvent) {
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker != null) {
-            editorMaker.mouseReleased(mouseButtonEvent);
         }
     }
 }

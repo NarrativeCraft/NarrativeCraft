@@ -25,9 +25,9 @@ package fr.loudo.narrativecraft.narrative.cameraangle;
 
 import com.google.gson.*;
 import com.mojang.serialization.DataResult;
-import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
+import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import java.lang.reflect.Type;
 import java.util.Map;
 import net.minecraft.nbt.CompoundTag;

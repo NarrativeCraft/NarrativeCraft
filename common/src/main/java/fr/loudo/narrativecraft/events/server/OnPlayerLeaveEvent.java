@@ -24,8 +24,6 @@
 package fr.loudo.narrativecraft.events.server;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
@@ -55,10 +53,5 @@ public class OnPlayerLeaveEvent {
             recording.stop();
             recordingManager.remove(recording);
         }
-    }
-
-    public static void onClientLeave() {
-        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        session.clear();
     }
 }

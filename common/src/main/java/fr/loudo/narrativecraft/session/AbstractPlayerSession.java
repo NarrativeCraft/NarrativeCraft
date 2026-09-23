@@ -39,13 +39,13 @@ import java.util.Map;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 
-public class AbstractPlayerSession implements IPlayerSession {
+public class AbstractPlayerSession<E extends EditorMaker> implements IPlayerSession {
 
     protected Chapter chapter;
     protected Scene scene;
-    protected EditorMaker editorMaker;
+    protected E editorMaker;
     protected int editorSessionId = BiEditorClose.UNIDENTIFIED_SESSION;
-    protected final Map<UUID, EditorMaker> interactionSessions = new LinkedHashMap<>();
+    protected final Map<UUID, E> interactionSessions = new LinkedHashMap<>();
 
     public AbstractPlayerSession(Chapter chapter, Scene scene) {
         this.chapter = chapter;
@@ -85,11 +85,11 @@ public class AbstractPlayerSession implements IPlayerSession {
         this.scene = scene;
     }
 
-    public EditorMaker getEditor() {
+    public E getEditor() {
         return editorMaker;
     }
 
-    public void setEditor(EditorMaker editorMaker) {
+    public void setEditor(E editorMaker) {
         this.editorMaker = editorMaker;
     }
 
@@ -97,8 +97,8 @@ public class AbstractPlayerSession implements IPlayerSession {
         setEditor(null);
     }
 
-    public void addInteractionSession(UUID interactionId, EditorMaker interactionSession) {
-        EditorMaker previousSession = interactionSessions.put(interactionId, interactionSession);
+    public void addInteractionSession(UUID interactionId, E interactionSession) {
+        E previousSession = interactionSessions.put(interactionId, interactionSession);
         if (previousSession != null && previousSession != interactionSession) {
             previousSession.close();
         }
@@ -106,7 +106,7 @@ public class AbstractPlayerSession implements IPlayerSession {
     }
 
     public void removeInteractionSession(UUID interactionId) {
-        EditorMaker interactionSession = interactionSessions.remove(interactionId);
+        E interactionSession = interactionSessions.remove(interactionId);
         if (interactionSession == null) return;
         interactionSession.close();
     }
@@ -117,11 +117,11 @@ public class AbstractPlayerSession implements IPlayerSession {
         }
     }
 
-    public EditorMaker getInteractionSession(UUID interactionId) {
+    public E getInteractionSession(UUID interactionId) {
         return interactionSessions.get(interactionId);
     }
 
-    public Collection<EditorMaker> getInteractionSessions() {
+    public Collection<E> getInteractionSessions() {
         return Collections.unmodifiableCollection(interactionSessions.values());
     }
 

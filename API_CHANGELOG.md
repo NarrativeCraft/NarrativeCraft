@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.0.0]
+
+### Break Changes
+- Removed `KeyframeMenu` and every UI member of `Keyframe` (`KEYFRAME_SPRITE`, `KEYFRAME_SELECTED_SPRITE`, `SIZE`, `x`, `y`, `click`, `drag`, `render`, `createMenu`, `isHovered`, `setLayerPosition`, `getX`, `setX`, `getY`, `setY`): the authoring UI is being rebuilt
+- A cutscene layer is now data only, so it can be loaded on a dedicated server: `execute(float)` and `stop()` were removed from `ICutsceneLayer`, and `createDefaultKeyframe(int)` from `CutsceneLayer`. Their client behavior moved to `ClientCutsceneLayerType`
+- An addon registering an `ICutsceneLayerType` must now also register a `ClientCutsceneLayerType` from its client initializer, otherwise its layer is loaded and saved but never played
+
+### Features
+- `ClientCutsceneLayerType<L>` in `fr.loudo.narrativecraft.api.client.editors.cutscene`, holding the client side of a layer type: `getTypeId()`, `getLayerClass()`, `createDefaultKeyframe(L, int)` and `createPlayer(L)`
+- `ClientCutsceneLayerPlayer` with `execute(float)` and `stop()`, created once per layer and per playback, so the playback state no longer lives in the layer
+- `ClientCutsceneLayerRegistry`, reachable through `NarrativeCraftClientAPI.getInstance().getCutsceneLayerRegistry()`, and `registerClientCutsceneLayer(ClientCutsceneLayerType)` in `AddonContext`
+- `getSortedKeyframes`, `isTickCoveredBy`, `getFirstKeyframeTick`, `getLastKeyframeTick` and `isExactTick` in `CutsceneLayer` are now public
+
 ## [4.0.0]
 
 ### Break Changes

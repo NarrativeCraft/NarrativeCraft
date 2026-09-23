@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.client.screens.components;
 
+import fr.loudo.narrativecraft.client.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogScrollText;
 import fr.loudo.narrativecraft.utils.CustomFont;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;

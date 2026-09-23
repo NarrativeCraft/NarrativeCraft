@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
-import fr.loudo.narrativecraft.editors.cutscene.keyframes.KeyframePosition;
+import fr.loudo.narrativecraft.narrative.cutscene.layers.camera.KeyframePosition;
 
 public class CutsceneDataSession {
 

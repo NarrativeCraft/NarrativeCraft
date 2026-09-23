@@ -109,9 +109,6 @@ public class DialogEditorMaker implements EditorMaker {
     }
 
     @Override
-    public void teleportToEditorOrigin() {}
-
-    @Override
     public NarrativeEnvironment getEnvironment() {
         return NarrativeEnvironment.DEVELOPMENT;
     }

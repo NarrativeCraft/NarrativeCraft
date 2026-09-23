@@ -29,6 +29,9 @@ public class ClientAPISetup {
 
     public static void init(ClientNarrativeCraftMod clientMod) {
         NarrativeCraftClientAPI.initialize(
-                clientMod.getInkTagDispatcher(), clientMod.getSignalRegistry(), clientMod.getSignalEmitter());
+                clientMod.getInkTagDispatcher(),
+                clientMod.getSignalRegistry(),
+                clientMod.getSignalEmitter(),
+                clientMod.getCutsceneLayerRegistry());
     }
 }

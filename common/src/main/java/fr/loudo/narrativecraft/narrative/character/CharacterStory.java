@@ -24,9 +24,9 @@
 package fr.loudo.narrativecraft.narrative.character;
 
 import com.google.gson.Gson;
-import fr.loudo.narrativecraft.client.editors.widgets.DialogFieldSet;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.dialog.DialogDataIO;
+import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;

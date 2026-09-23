@@ -23,32 +23,15 @@
 
 package fr.loudo.narrativecraft.events.client;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.client.screens.UnRemovableScreen;
-import fr.loudo.narrativecraft.dialog.DialogRenderer;
-import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.keys.ModKeys;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 
 public class OnScreenKeyEvent {
 
-    public static void onCharTyped(CharacterEvent event) {
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker != null) {
-            editorMaker.charTyped(event);
-        }
-    }
-
     public static void onKeyPressed(KeyEvent event) {
-        EditorMaker editorMaker =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (editorMaker != null) {
-            editorMaker.keyPressed(event);
-        }
-
         if (ModKeys.DIALOG_ADVANCE.matches(event)
                 && Minecraft.getInstance().gui.screen() instanceof UnRemovableScreen) {
             DialogRenderer.advanceNextDialog();

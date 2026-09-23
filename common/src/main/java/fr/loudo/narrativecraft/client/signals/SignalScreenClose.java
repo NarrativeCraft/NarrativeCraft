@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.client.signals;
 import fr.loudo.narrativecraft.api.signals.Signal;
 import fr.loudo.narrativecraft.api.signals.SignalType;
 import fr.loudo.narrativecraft.api.utils.Side;
-import fr.loudo.narrativecraft.utils.UtilsClient;
+import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import net.minecraft.client.gui.screens.Screen;
 
 public class SignalScreenClose extends Signal {

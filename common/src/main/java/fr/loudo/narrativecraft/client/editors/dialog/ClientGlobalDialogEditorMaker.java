@@ -25,10 +25,10 @@ package fr.loudo.narrativecraft.client.editors.dialog;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogPreviewEntry;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import java.io.IOException;
@@ -76,9 +76,6 @@ public class ClientGlobalDialogEditorMaker implements EditorMaker {
 
     @Override
     public void tick() {}
-
-    @Override
-    public void teleportToEditorOrigin() {}
 
     @Override
     public NarrativeEnvironment getEnvironment() {
