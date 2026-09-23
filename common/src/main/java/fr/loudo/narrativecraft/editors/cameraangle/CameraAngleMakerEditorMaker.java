@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.editors.cameraangle;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.playback.IPlaybackContext;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -38,8 +39,8 @@ import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
+import fr.loudo.narrativecraft.network.S2CNarrativeEntryDetail;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleCharacterCaptured;
-import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAngleEditorData;
 import fr.loudo.narrativecraft.network.cameraangle.S2CCameraAnglePlacementEntitySpawned;
 import fr.loudo.narrativecraft.network.story.S2CCharacterStoryAction;
 import fr.loudo.narrativecraft.platform.Services;
@@ -98,7 +99,9 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         }
         playerSession.changeGameMode(GameType.SPECTATOR);
         for (CharacterPlacement characterPlacement : cameraAngle.getCharacterPlacements()) {
-            UtilsServer.sendCharacterSkin(playerSession.getPlayer(), characterPlacement.getCharacterStory());
+            ICharacterStory characterStory = resolveCharacter(characterPlacement);
+            if (characterStory == null) continue;
+            UtilsServer.sendCharacterSkin(playerSession.getPlayer(), characterStory);
             spawnEntity(characterPlacement);
             if (characterPlacement.isTemplate() && characterPlacement.getTemplateReferenceId() != null) {
                 placementsByTemplateReference
@@ -107,8 +110,16 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             }
         }
         teleportToEditorOrigin();
-        String dataJson = CameraAngleSerializer.serializeData(cameraAngle);
-        Services.PACKET.sendToPlayer(playerSession.getPlayer(), new S2CCameraAngleEditorData(dataJson));
+        sendData();
+    }
+
+    protected void sendData() {
+        Services.PACKET.sendToPlayer(playerSession.getPlayer(), S2CNarrativeEntryDetail.of(cameraAngle));
+    }
+
+    public ICharacterStory resolveCharacter(CharacterPlacement placement) {
+        return placement.resolveCharacter(
+                NarrativeCraftMod.getInstance().getCharacterManager(), cameraAngle.getScene());
     }
 
     public void teleportToEditorOrigin() {
@@ -158,8 +169,9 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
 
     public void spawnEntity(CharacterPlacement characterPlacement) {
         if (characterPlacement.isTemplate() && environment != NarrativeEnvironment.DEVELOPMENT) return;
-        UtilsServer.sendCharacterSkin(playerSession.getPlayer(), characterPlacement.getCharacterStory());
-        ICharacterStory characterStory = characterPlacement.getCharacterStory();
+        ICharacterStory characterStory = resolveCharacter(characterPlacement);
+        if (characterStory == null) return;
+        UtilsServer.sendCharacterSkin(playerSession.getPlayer(), characterStory);
         ServerPlayer player = playerSession.getPlayer();
         ServerLevel level = player.level();
         Entity entity;
@@ -209,14 +221,12 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             if (placement == null) continue;
             spawnTemplateEntity(placement, animation);
             createdIds.add(placement.getId());
-            String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
-            Services.PACKET.sendToPlayer(
-                    player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placementJson));
-            UtilsServer.sendCharacterSkin(player, placement.getCharacterStory());
+            Services.PACKET.sendToPlayer(player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placement));
+            UtilsServer.sendCharacterSkin(player, animation.getCharacterStory());
             Services.PACKET.sendToPlayer(
                     player,
                     new S2CCharacterStoryAction(
-                            placement.getCharacterStory().getId(),
+                            placement.getCharacterId(),
                             Utils.resolveProfileId(characterEntities.get(placement.getId())),
                             S2CCharacterStoryAction.Action.ADD));
         }
@@ -265,7 +275,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
 
         return new CharacterPlacement(
                 UUID.randomUUID(),
-                characterStory,
+                characterStory.getId(),
                 position,
                 rotation,
                 new EnumMap<>(EquipmentSlot.class),
@@ -276,7 +286,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
 
     private void spawnTemplateEntity(CharacterPlacement placement, Animation animation) {
         if (!animation.initialize()) return;
-        ICharacterStory characterStory = placement.getCharacterStory();
+        ICharacterStory characterStory = animation.getCharacterStory();
 
         RecordingData mainData = animation.getRecordingDataList().stream()
                 .filter(data -> data.getRecordingId() == 0)

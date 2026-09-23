@@ -21,22 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.chapter;
+package fr.loudo.narrativecraft.narrative;
 
-import com.google.gson.*;
-import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
-import java.lang.reflect.Type;
-import java.util.UUID;
+public interface DetailedNarrativeEntry<D extends NarrativeEntryDetail> {
 
-public class ChapterDeserializer extends NarrativeDeserializer<Chapter> {
-    @Override
-    public Chapter deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-            throws JsonParseException {
-        JsonObject jsonObject = json.getAsJsonObject();
+    D getDetail();
 
-        UUID id = parseId(jsonObject);
-        String name = parseName(jsonObject);
-        int chapterIndex = jsonObject.get("chapterIndex").getAsInt();
-        return new Chapter(id, name, chapterIndex);
-    }
+    void setDetail(D detail);
 }

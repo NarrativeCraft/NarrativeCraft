@@ -35,9 +35,8 @@ import fr.loudo.narrativecraft.api.utils.Side;
 import fr.loudo.narrativecraft.editors.interaction.InteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
+import fr.loudo.narrativecraft.network.S2CNarrativeEntryDetail;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.session.PlayerSession;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -76,9 +75,7 @@ public class InteractionInkAction extends InkAction {
             InteractionMakerEditorMaker interactionSession =
                     new InteractionMakerEditorMaker(interaction, session, NarrativeEnvironment.PRODUCTION);
             session.addInteractionSession(interaction.getId(), interactionSession);
-            String dataJson = InteractionSerializer.serializeData(interaction);
-            Services.PACKET.sendToPlayer(
-                    session.getPlayer(), new S2CInteractionEditorData(interaction.getId(), dataJson));
+            Services.PACKET.sendToPlayer(session.getPlayer(), S2CNarrativeEntryDetail.of(interaction));
         } else if (action.equals("remove")) {
             session.removeInteractionSession(interaction.getId());
         }

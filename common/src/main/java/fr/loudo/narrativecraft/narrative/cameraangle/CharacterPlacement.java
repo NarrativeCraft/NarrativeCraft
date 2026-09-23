@@ -23,19 +23,62 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.phys.Vec3;
 
 public class CharacterPlacement {
 
+    private static final Codec<Map<EquipmentSlot, ItemStack>> ITEMS_CODEC = Codec.either(
+                    Codec.unboundedMap(Codec.STRING, Codec.STRING), Codec.STRING.listOf())
+            .xmap(CharacterPlacement::readItems, items -> Either.left(writeItems(items)));
+
+    public static final Codec<CharacterPlacement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                    NarrativeCodecs.ID.forGetter(CharacterPlacement::getId),
+                    NarrativeCodecs.UUID_CODEC.fieldOf("characterId").forGetter(CharacterPlacement::getCharacterId),
+                    NarrativeCodecs.POSITION.forGetter(CharacterPlacement::getPosition),
+                    NarrativeCodecs.ROTATION.forGetter(CharacterPlacement::getRotation),
+                    NarrativeCodecs.field(NarrativeCodecs.enumByName(Pose.class), "pose", Pose.STANDING)
+                            .forGetter(CharacterPlacement::getPose),
+                    NarrativeCodecs.field(Codec.BOOL, "onGround", true).forGetter(CharacterPlacement::isOnGround),
+                    NarrativeCodecs.field(Codec.BOOL, "isTemplate", false).forGetter(CharacterPlacement::isTemplate),
+                    NarrativeCodecs.optionalField(NarrativeCodecs.UUID_CODEC, "templateReferenceId")
+                            .forGetter(placement -> Optional.ofNullable(placement.getTemplateReferenceId())),
+                    NarrativeCodecs.field(ITEMS_CODEC, "items", Map.of()).forGetter(CharacterPlacement::getItemsBySlot))
+            .apply(
+                    instance,
+                    (id, characterId, position, rotation, pose, onGround, isTemplate, templateReferenceId, items) -> {
+                        CharacterPlacement placement = new CharacterPlacement(
+                                id,
+                                characterId,
+                                position,
+                                rotation,
+                                items,
+                                onGround,
+                                isTemplate,
+                                templateReferenceId.orElse(null));
+                        placement.setPose(pose);
+                        return placement;
+                    }));
+
     private final UUID id;
-    private final ICharacterStory characterStory;
+    private final UUID characterId;
     private Vec3 position;
     private Vec3 rotation;
     private final Map<EquipmentSlot, ItemStack> itemsBySlot = new EnumMap<>(EquipmentSlot.class);
@@ -46,7 +89,7 @@ public class CharacterPlacement {
 
     public CharacterPlacement(
             UUID id,
-            ICharacterStory characterStory,
+            UUID characterId,
             Vec3 position,
             Vec3 rotation,
             Map<EquipmentSlot, ItemStack> itemsBySlot,
@@ -54,7 +97,7 @@ public class CharacterPlacement {
             boolean isTemplate,
             UUID templateReferenceId) {
         this.id = id;
-        this.characterStory = characterStory;
+        this.characterId = characterId;
         this.position = position;
         this.rotation = rotation;
         this.onGround = onGround;
@@ -68,30 +111,67 @@ public class CharacterPlacement {
     }
 
     public CharacterPlacement(
-            UUID id,
-            ICharacterStory characterStory,
+            UUID characterId,
             Vec3 position,
             Vec3 rotation,
             Map<EquipmentSlot, ItemStack> itemsBySlot,
             boolean onGround) {
-        this(id, characterStory, position, rotation, itemsBySlot, onGround, false, null);
+        this(UUID.randomUUID(), characterId, position, rotation, itemsBySlot, onGround, false, null);
     }
 
-    public CharacterPlacement(
-            ICharacterStory characterStory,
-            Vec3 position,
-            Vec3 rotation,
-            Map<EquipmentSlot, ItemStack> itemsBySlot,
-            boolean onGround) {
-        this(UUID.randomUUID(), characterStory, position, rotation, itemsBySlot, onGround, false, null);
+    private static Map<EquipmentSlot, ItemStack> readItems(Either<Map<String, String>, List<String>> items) {
+        Map<EquipmentSlot, ItemStack> itemsBySlot = new EnumMap<>(EquipmentSlot.class);
+        items.ifLeft(itemsBySlotName -> {
+            for (Map.Entry<String, String> entry : itemsBySlotName.entrySet()) {
+                EquipmentSlot slot = EquipmentSlot.CODEC.byName(entry.getKey());
+                if (slot == null) continue;
+                NarrativeCodecs.parseItemStack(entry.getValue())
+                        .result()
+                        .filter(itemStack -> !itemStack.isEmpty())
+                        .ifPresent(itemStack -> itemsBySlot.put(slot, itemStack));
+            }
+        });
+        items.ifRight(legacyItems -> {
+            for (String legacyItem : legacyItems) {
+                NarrativeCodecs.parseItemStack(legacyItem)
+                        .result()
+                        .filter(itemStack -> !itemStack.isEmpty())
+                        .ifPresent(itemStack -> {
+                            EquipmentSlot slot = resolveLegacySlot(itemStack, itemsBySlot);
+                            if (slot != null) itemsBySlot.put(slot, itemStack);
+                        });
+            }
+        });
+        return itemsBySlot;
+    }
+
+    private static Map<String, String> writeItems(Map<EquipmentSlot, ItemStack> itemsBySlot) {
+        Map<String, String> itemsBySlotName = new LinkedHashMap<>();
+        for (Map.Entry<EquipmentSlot, ItemStack> entry : itemsBySlot.entrySet()) {
+            if (entry.getValue().isEmpty()) continue;
+            itemsBySlotName.put(entry.getKey().getSerializedName(), NarrativeCodecs.writeItemStack(entry.getValue()));
+        }
+        return itemsBySlotName;
+    }
+
+    private static EquipmentSlot resolveLegacySlot(ItemStack stack, Map<EquipmentSlot, ItemStack> alreadyResolved) {
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        if (equippable != null && !alreadyResolved.containsKey(equippable.slot())) return equippable.slot();
+        if (!alreadyResolved.containsKey(EquipmentSlot.MAINHAND)) return EquipmentSlot.MAINHAND;
+        if (!alreadyResolved.containsKey(EquipmentSlot.OFFHAND)) return EquipmentSlot.OFFHAND;
+        return null;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public ICharacterStory getCharacterStory() {
-        return characterStory;
+    public UUID getCharacterId() {
+        return characterId;
+    }
+
+    public ICharacterStory resolveCharacter(CharacterManager characters, Scene scene) {
+        return characters.resolveCharacter(characterId, scene);
     }
 
     public Vec3 getPosition() {

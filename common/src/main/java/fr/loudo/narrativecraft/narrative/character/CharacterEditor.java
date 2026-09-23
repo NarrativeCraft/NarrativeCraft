@@ -24,15 +24,12 @@
 package fr.loudo.narrativecraft.narrative.character;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.dialog.DialogDataIO;
-import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.AbstractNarrativeEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
-import fr.loudo.narrativecraft.utils.Utils;
 import fr.loudo.narrativecraft.utils.UtilsServer;
 import java.util.UUID;
 
@@ -53,16 +50,7 @@ public class CharacterEditor extends AbstractNarrativeEntryEditor<CharacterStory
 
     @Override
     protected CharacterStory build(UUID entryId, CharacterStoryPayload payload, CharacterStory existing) {
-        CharacterStory character = new CharacterStory(entryId, payload.getName());
-        if (!payload.getModelType().isEmpty()) {
-            character.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
-        }
-        character.setEntityType(Utils.resolveEntityType(payload.getEntityTypeId()));
-        character.setMainCharacterAttribute(new MainCharacterAttribute(payload.getMainCharacterAttribute()));
-        character.setCustomNbt(payload.getCustomNbt());
-        DialogDataIO.parse(payload.getDialogDataJson(), DialogFieldSet.CHARACTER)
-                .ifPresent(character::setDialogData);
-        return character;
+        return CharacterStory.fromPayload(entryId, payload);
     }
 
     @Override

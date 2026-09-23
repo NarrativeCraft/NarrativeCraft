@@ -21,22 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.chapter;
+package fr.loudo.narrativecraft.client.editors;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import java.lang.reflect.Type;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 
-public class ChapterSerializer implements JsonSerializer<Chapter> {
+public interface ClientEntryDetailListener {
 
-    @Override
-    public JsonElement serialize(Chapter src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
-        json.addProperty("id", src.getId().toString());
-        json.addProperty("name", src.getName());
-        json.addProperty("chapterIndex", src.getChapterIndex());
-        return json;
-    }
+    void onEntryDetailLoaded(NarrativeEntry<?> entry);
 }

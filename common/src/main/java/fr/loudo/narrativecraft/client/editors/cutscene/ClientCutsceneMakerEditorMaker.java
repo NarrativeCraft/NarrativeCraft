@@ -23,33 +23,34 @@
 
 package fr.loudo.narrativecraft.client.editors.cutscene;
 
-import com.google.gson.JsonObject;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.ClientEntryDetailListener;
 import fr.loudo.narrativecraft.client.editors.EditorAction;
 import fr.loudo.narrativecraft.client.editors.EditorHistory;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneTimeline;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailSave;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.platform.Services;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 
-public class ClientCutsceneMakerEditorMaker implements EditorMaker {
+public class ClientCutsceneMakerEditorMaker implements EditorMaker, ClientEntryDetailListener {
 
-    private record KeyframeCopy(CutsceneLayer layer, int tickOffset, JsonObject data) {}
+    private record KeyframeCopy(CutsceneLayer layer, int tickOffset, Tag data) {}
 
     private final Minecraft minecraft = Minecraft.getInstance();
     private final List<CutsceneLayer> layers = new ArrayList<>();
@@ -98,8 +99,8 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
     }
 
     public void save() {
-        String layersJson = CutsceneSerializer.serializeLayers(layers);
-        Services.PACKET.sendToServer(new C2SCutsceneSave(cutscene, layersJson));
+        Services.PACKET.sendToServer(
+                C2SNarrativeEntryDetailSave.of(cutscene, new CutsceneTimeline(layers, cutscene.getManualMaxTick())));
     }
 
     public void quit(boolean saveBeforeQuit) {
@@ -131,19 +132,19 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         }
     }
 
-    public void loadLayers(String layersJson) {
+    @Override
+    public void onEntryDetailLoaded(NarrativeEntry<?> entry) {
+        if (entry != cutscene) return;
         playback.releaseLayers();
         layers.clear();
         selectedKeyframes.clear();
         history.clear();
         clipboard.clear();
-        cutscene.setLayers(CutsceneDeserializer.parseLayers(layersJson));
-        if (cutscene.getLayers() != null) {
-            layers.addAll(cutscene.getLayers());
-        }
+        layers.addAll(cutscene.getLayers());
         totalTick = cutscene.getMaxTick();
         playback.setTotalTick(totalTick);
         startProductionPlayback();
+        applyManualMaxTick(cutscene.getManualMaxTick());
     }
 
     public void addLayer(CutsceneLayer layer) {
@@ -196,10 +197,12 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         clipboard.clear();
 
         for (Keyframe keyframe : selectedKeyframes) {
-            ICutsceneLayerType layerType = keyframe.getLayer().getType();
-            JsonObject data = layerType.serializeKeyframe(keyframe);
-            if (data == null) continue;
-            clipboard.add(new KeyframeCopy(keyframe.getLayer(), keyframe.getTick() - earliestTick, data));
+            CutsceneLayer layer = keyframe.getLayer();
+            layer.getType()
+                    .keyframeCodec(layer)
+                    .encodeStart(NbtOps.INSTANCE, keyframe)
+                    .result()
+                    .ifPresent(data -> clipboard.add(new KeyframeCopy(layer, keyframe.getTick() - earliestTick, data)));
         }
     }
 
@@ -209,12 +212,15 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
 
         for (KeyframeCopy copy : clipboard) {
             if (!layers.contains(copy.layer())) continue;
-            JsonObject json = copy.data().deepCopy();
-            json.addProperty("tick", playHeadTick + copy.tickOffset());
-
-            Keyframe pasted = copy.layer().getType().deserializeKeyframe(copy.layer(), json);
+            Keyframe pasted = copy.layer()
+                    .getType()
+                    .keyframeCodec(copy.layer())
+                    .parse(NbtOps.INSTANCE, copy.data())
+                    .result()
+                    .orElse(null);
             if (pasted == null) continue;
 
+            pasted.setTick(playHeadTick + copy.tickOffset());
             copy.layer().addKeyframe(pasted);
             pastedKeyframes.add(pasted);
         }

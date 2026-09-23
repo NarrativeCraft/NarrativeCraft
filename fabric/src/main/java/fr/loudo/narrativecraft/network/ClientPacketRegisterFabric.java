@@ -26,13 +26,11 @@ package fr.loudo.narrativecraft.network;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
-import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
@@ -45,25 +43,22 @@ public class ClientPacketRegisterFabric {
     public static void register() {
         PayloadTypeRegistry.clientboundPlay().register(BiCutsceneEnter.TYPE, BiCutsceneEnter.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BiCameraAngleEnter.TYPE, BiCameraAngleEnter.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeDataClear.TYPE, S2CNarrativeDataClear.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CNarrativeSnapshot.TYPE, S2CNarrativeSnapshot.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay()
+                .register(S2CNarrativeEntryDetail.TYPE, S2CNarrativeEntryDetail.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CToastMessage.TYPE, S2CToastMessage.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CNarrativeEntryRejected.TYPE, S2CNarrativeEntryRejected.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(S2CCutsceneEditorData.TYPE, S2CCutsceneEditorData.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(BiCutscenePlayHeadPacket.TYPE, BiCutscenePlayHeadPacket.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CDialogTest.TYPE, S2CDialogTest.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(S2CCameraAngleEditorData.TYPE, S2CCameraAngleEditorData.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CCameraAngleCharacterCaptured.TYPE, S2CCameraAngleCharacterCaptured.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(S2CCameraAnglePlacementEntitySpawned.TYPE, S2CCameraAnglePlacementEntitySpawned.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CEnterCameraView.TYPE, S2CEnterCameraView.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay()
-                .register(S2CInteractionEditorData.TYPE, S2CInteractionEditorData.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CInteractionLeave.TYPE, S2CInteractionLeave.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CRunInkAction.TYPE, S2CRunInkAction.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CStopAllInkActions.TYPE, S2CStopAllInkActions.STREAM_CODEC);

@@ -40,9 +40,7 @@ import fr.loudo.narrativecraft.api.narrative.IStoryHandler;
 import fr.loudo.narrativecraft.api.narrative.character.ICharacter;
 import fr.loudo.narrativecraft.api.utils.UserPosition;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogDataIO;
 import fr.loudo.narrativecraft.dialog.DialogEntityBobbing;
-import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
@@ -474,11 +472,9 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
         if (dialogData == null) {
             dialogData = NarrativeCraftMod.getInstance().getGlobalDialogData();
         }
-        String dialogDataJson =
-                DialogDataIO.serialize(dialogData, DialogFieldSet.ALL).toString();
         Services.PACKET.sendToPlayer(
                 playerSession.getPlayer(),
-                new S2CShowDialogue(speaker.toLowerCase(), dialogueText, entityId, dialogDataJson));
+                new S2CShowDialogue(speaker.toLowerCase(), dialogueText, entityId, dialogData));
 
         lastCharacterSpoke = speaker;
         dialogVisible = true;

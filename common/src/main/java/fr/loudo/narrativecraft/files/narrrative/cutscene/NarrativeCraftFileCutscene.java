@@ -25,14 +25,12 @@ package fr.loudo.narrativecraft.files.narrrative.cutscene;
 
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 
 public class NarrativeCraftFileCutscene extends AbstractNarrativeCraftFileSceneJsonEntry<Cutscene> {
 
     public NarrativeCraftFileCutscene() {
-        super(Cutscene.class, new CutsceneSerializer(), new CutsceneDeserializer());
+        super(Cutscene::codec);
     }
 
     @Override

@@ -23,14 +23,13 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
-import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.AbstractDetailedSceneEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
-import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.UUID;
 
-public class InteractionEditor extends AbstractSceneEntryEditor<InteractionPayload, Interaction> {
+public class InteractionEditor
+        extends AbstractDetailedSceneEntryEditor<InteractionPayload, InteractionData, Interaction> {
 
     @Override
     protected String getTypeKey() {
@@ -43,29 +42,10 @@ public class InteractionEditor extends AbstractSceneEntryEditor<InteractionPaylo
     }
 
     @Override
-    protected Interaction build(UUID entryId, InteractionPayload payload, Scene scene, Interaction existing) {
-        Interaction interaction = new Interaction(entryId, payload.getName(), scene);
-        if (existing != null) {
-            interaction.copyDataFrom(existing);
-        }
-        return interaction;
+    protected Interaction create(UUID entryId, InteractionPayload payload, Scene scene) {
+        return Interaction.fromPayload(entryId, payload, scene);
     }
 
     @Override
     protected void copyAttributes(Interaction target, Interaction source) {}
-
-    public OperationResult saveData(Interaction interaction, String dataJson) {
-        Interaction updated = new Interaction(interaction.getId(), interaction.getName(), interaction.getScene());
-        try {
-            InteractionDeserializer.deserializeInto(dataJson, updated);
-        } catch (RuntimeException e) {
-            return OperationResult.failure("error.invalid_data", interaction.getName());
-        }
-
-        OperationResult storage = NarrativeCraftFileRegistry.getInstance().edit(interaction, updated);
-        if (storage.isFailure()) return storage;
-
-        interaction.copyDataFrom(updated);
-        return OperationResult.success();
-    }
 }

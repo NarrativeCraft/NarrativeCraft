@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
-import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.UUID;
 
@@ -41,18 +40,12 @@ public class ClientAnimationEditor extends ClientSceneEntryEditor<AnimationPaylo
 
     @Override
     protected Animation create(UUID entryId, AnimationPayload payload, Scene scene) {
-        return new Animation(
-                entryId, payload.getName(), scene, payload.getTotalTick(), resolveCharacter(payload, scene));
+        return Animation.fromPayload(
+                entryId, payload, scene, ClientNarrativeCraftMod.getInstance().getCharacterManager());
     }
 
     @Override
-    protected void update(Animation animation, AnimationPayload payload) {
-        animation.setCharacterStory(resolveCharacter(payload, animation.getScene()));
-    }
-
-    private ICharacterStory resolveCharacter(AnimationPayload payload, Scene scene) {
-        return ClientNarrativeCraftMod.getInstance()
-                .getCharacterManager()
-                .resolveCharacter(payload.getCharacterId(), scene);
+    protected void copyAttributes(Animation target, Animation source) {
+        target.copyAttributesFrom(source);
     }
 }

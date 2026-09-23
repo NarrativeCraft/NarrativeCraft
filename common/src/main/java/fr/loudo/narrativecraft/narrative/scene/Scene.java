@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.scene;
 
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.api.narrative.scene.IScene;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.managers.AnimationManager;
@@ -57,6 +58,14 @@ public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
         super(name);
         this.chapter = chapter;
         this.rank = rank;
+    }
+
+    public static Codec<Scene> codec(Chapter chapter) {
+        return entryCodec(ScenePayload.CODEC, (id, payload) -> fromPayload(id, payload, chapter));
+    }
+
+    public static Scene fromPayload(UUID id, ScenePayload payload, Chapter chapter) {
+        return new Scene(id, payload.getName(), chapter, payload.getRank());
     }
 
     public String knotName() {

@@ -30,7 +30,6 @@ import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
@@ -56,10 +55,11 @@ public class AnimationEditor extends AbstractSceneEntryEditor<AnimationPayload, 
 
     @Override
     protected Animation build(UUID entryId, AnimationPayload payload, Scene scene, Animation existing) {
-        ICharacterStory characterStory =
-                NarrativeCraftMod.getInstance().getCharacterManager().resolveCharacter(payload.getCharacterId(), scene);
-        int totalTick = existing == null ? payload.getTotalTick() : existing.getTotalTick();
-        return new Animation(entryId, payload.getName(), scene, totalTick, characterStory);
+        Animation animation = Animation.fromPayload(
+                entryId, payload, scene, NarrativeCraftMod.getInstance().getCharacterManager());
+        if (existing == null) return animation;
+        return new Animation(
+                entryId, animation.getName(), scene, existing.getTotalTick(), animation.getCharacterStory());
     }
 
     @Override
@@ -74,7 +74,7 @@ public class AnimationEditor extends AbstractSceneEntryEditor<AnimationPayload, 
 
     @Override
     protected void copyAttributes(Animation target, Animation source) {
-        target.setCharacterStory(source.getCharacterStory());
+        target.copyAttributesFrom(source);
     }
 
     public OperationResult saveRecording(

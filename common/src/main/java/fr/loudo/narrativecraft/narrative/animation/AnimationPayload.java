@@ -23,30 +23,25 @@
 
 package fr.loudo.narrativecraft.narrative.animation;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class AnimationPayload extends SceneEntryPayload {
 
+    public static final MapCodec<AnimationPayload> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    nameField(),
+                    sceneIdField(),
+                    chapterIdField(),
+                    Codec.INT.fieldOf("totalTick").forGetter(AnimationPayload::getTotalTick),
+                    NarrativeCodecs.UUID_CODEC.fieldOf("characterId").forGetter(AnimationPayload::getCharacterId))
+            .apply(instance, AnimationPayload::new));
+
     private final int totalTick;
     private final UUID characterId;
-
-    public static final StreamCodec<ByteBuf, AnimationPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            AnimationPayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            AnimationPayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            AnimationPayload::getChapterId,
-            ByteBufCodecs.INT,
-            AnimationPayload::getTotalTick,
-            UUIDUtil.STREAM_CODEC,
-            AnimationPayload::getCharacterId,
-            AnimationPayload::new);
 
     public AnimationPayload(String name, UUID sceneId, UUID chapterId, int totalTick, UUID characterId) {
         super(name, sceneId, chapterId);

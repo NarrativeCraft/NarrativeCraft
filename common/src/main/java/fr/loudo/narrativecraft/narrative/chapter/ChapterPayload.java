@@ -23,19 +23,16 @@
 
 package fr.loudo.narrativecraft.narrative.chapter;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class ChapterPayload extends NarrativeEntryPayload {
 
-    public static final StreamCodec<ByteBuf, ChapterPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ChapterPayload::getName,
-            ByteBufCodecs.VAR_INT,
-            ChapterPayload::getChapterIndex,
-            ChapterPayload::new);
+    public static final MapCodec<ChapterPayload> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    nameField(), Codec.INT.fieldOf("chapterIndex").forGetter(ChapterPayload::getChapterIndex))
+            .apply(instance, ChapterPayload::new));
 
     private final int chapterIndex;
 

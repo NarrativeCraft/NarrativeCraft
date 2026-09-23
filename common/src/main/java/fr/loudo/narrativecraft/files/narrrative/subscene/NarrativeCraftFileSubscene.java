@@ -26,13 +26,11 @@ package fr.loudo.narrativecraft.files.narrrative.subscene;
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import fr.loudo.narrativecraft.narrative.subscene.SubsceneDeserializer;
-import fr.loudo.narrativecraft.narrative.subscene.SubsceneSerializer;
 
 public class NarrativeCraftFileSubscene extends AbstractNarrativeCraftFileSceneJsonEntry<Subscene> {
 
     public NarrativeCraftFileSubscene() {
-        super(Subscene.class, new SubsceneSerializer(), new SubsceneDeserializer());
+        super(Subscene::codec);
     }
 
     @Override

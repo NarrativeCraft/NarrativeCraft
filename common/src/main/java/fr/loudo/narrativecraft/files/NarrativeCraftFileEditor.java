@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.OperationResult;
-import java.util.List;
 
 public interface NarrativeCraftFileEditor<T extends NarrativeEntry<?>> {
 
@@ -34,8 +33,6 @@ public interface NarrativeCraftFileEditor<T extends NarrativeEntry<?>> {
     OperationResult edit(T existing, T updated);
 
     OperationResult delete(T entry);
-
-    List<DeserializationResult<T>> deserialize();
 
     static OperationResult storageFailure(NarrativeEntry<?> entry) {
         return OperationResult.failure("error.storage", entry.getName());

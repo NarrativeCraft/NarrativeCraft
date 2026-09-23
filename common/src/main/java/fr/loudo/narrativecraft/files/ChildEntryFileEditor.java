@@ -21,30 +21,13 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.subscene;
+package fr.loudo.narrativecraft.files;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
-import java.lang.reflect.Type;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import java.util.List;
 
-public class SubsceneSerializer implements JsonSerializer<Subscene> {
+public interface ChildEntryFileEditor<T extends NarrativeEntry<?>, P extends NarrativeEntry<?>>
+        extends NarrativeCraftFileEditor<T> {
 
-    @Override
-    public JsonElement serialize(Subscene src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
-        json.addProperty("id", src.getId().toString());
-        json.addProperty("name", src.getName());
-        json.addProperty("sceneId", src.getScene().getId().toString());
-        json.addProperty("chapterId", src.getScene().getChapter().getId().toString());
-        JsonArray animationIds = new JsonArray();
-        for (Animation animation : src.getAnimations()) {
-            animationIds.add(animation.getId().toString());
-        }
-        json.add("animationIds", animationIds);
-        return json;
-    }
+    List<DeserializationResult<T>> load(P parent);
 }

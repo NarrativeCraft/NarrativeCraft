@@ -23,13 +23,27 @@
 
 package fr.loudo.narrativecraft.api.editors.cutscene.keyframes;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 
 public abstract class Keyframe {
 
+    public static final MapCodec<Integer> TICK = Codec.INT.fieldOf("tick");
+
     protected int tick;
     protected boolean isSelected;
     protected final CutsceneLayer layer;
+
+    public static <K extends Keyframe> Codec<Keyframe> typedCodec(Class<K> keyframeClass, Codec<K> codec) {
+        return codec.flatComapMap(
+                keyframe -> keyframe,
+                keyframe -> keyframeClass.isInstance(keyframe)
+                        ? DataResult.success(keyframeClass.cast(keyframe))
+                        : DataResult.error(() ->
+                                keyframe.getClass().getSimpleName() + " is not a " + keyframeClass.getSimpleName()));
+    }
 
     public Keyframe(CutsceneLayer layer, int tick) {
         this.layer = layer;

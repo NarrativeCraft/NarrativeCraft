@@ -24,22 +24,37 @@
 package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import io.netty.buffer.ByteBuf;
+import java.util.List;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public class S2CNarrativeDataClear implements CustomPacketPayload {
+public record S2CNarrativeSnapshot(List<Entry> entries) implements CustomPacketPayload {
 
-    public static final S2CNarrativeDataClear INSTANCE = new S2CNarrativeDataClear();
+    public static final Type<S2CNarrativeSnapshot> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "narrative_snapshot"));
 
-    public static final Type<S2CNarrativeDataClear> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "clear_narrative_data"));
-
-    public static final StreamCodec<ByteBuf, S2CNarrativeDataClear> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, S2CNarrativeSnapshot> STREAM_CODEC = StreamCodec.composite(
+            Entry.STREAM_CODEC.apply(ByteBufCodecs.list()), S2CNarrativeSnapshot::entries, S2CNarrativeSnapshot::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
+    }
+
+    public record Entry(UUID entryId, NarrativeEntryPayload payload) {
+
+        public static final StreamCodec<ByteBuf, Entry> STREAM_CODEC = StreamCodec.composite(
+                UUIDUtil.STREAM_CODEC, Entry::entryId, NarrativeEntryPayload.STREAM_CODEC, Entry::payload, Entry::new);
+
+        public static Entry of(NarrativeEntry<?> entry) {
+            return new Entry(entry.getId(), entry.toPayload());
+        }
     }
 }

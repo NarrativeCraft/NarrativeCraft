@@ -23,14 +23,13 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFileRegistry;
-import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
+import fr.loudo.narrativecraft.narrative.AbstractDetailedSceneEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
-import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.UUID;
 
-public class CameraAngleEditor extends AbstractSceneEntryEditor<CameraAnglePayload, CameraAngle> {
+public class CameraAngleEditor
+        extends AbstractDetailedSceneEntryEditor<CameraAnglePayload, CameraAngleData, CameraAngle> {
 
     @Override
     protected String getTypeKey() {
@@ -43,29 +42,10 @@ public class CameraAngleEditor extends AbstractSceneEntryEditor<CameraAnglePaylo
     }
 
     @Override
-    protected CameraAngle build(UUID entryId, CameraAnglePayload payload, Scene scene, CameraAngle existing) {
-        CameraAngle cameraAngle = new CameraAngle(entryId, payload.getName(), scene);
-        if (existing != null) {
-            cameraAngle.copyDataFrom(existing);
-        }
-        return cameraAngle;
+    protected CameraAngle create(UUID entryId, CameraAnglePayload payload, Scene scene) {
+        return CameraAngle.fromPayload(entryId, payload, scene);
     }
 
     @Override
     protected void copyAttributes(CameraAngle target, CameraAngle source) {}
-
-    public OperationResult saveData(CameraAngle cameraAngle, String dataJson) {
-        CameraAngle updated = new CameraAngle(cameraAngle.getId(), cameraAngle.getName(), cameraAngle.getScene());
-        try {
-            CameraAngleDeserializer.deserializeInto(dataJson, updated);
-        } catch (RuntimeException e) {
-            return OperationResult.failure("error.invalid_data", cameraAngle.getName());
-        }
-
-        OperationResult storage = NarrativeCraftFileRegistry.getInstance().edit(cameraAngle, updated);
-        if (storage.isFailure()) return storage;
-
-        cameraAngle.copyDataFrom(updated);
-        return OperationResult.success();
-    }
 }

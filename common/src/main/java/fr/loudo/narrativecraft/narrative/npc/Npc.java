@@ -23,19 +23,18 @@
 
 package fr.loudo.narrativecraft.narrative.npc;
 
-import com.google.gson.Gson;
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogDataIO;
-import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.io.File;
 import java.util.UUID;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.PlayerModelType;
@@ -52,6 +51,19 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
     public Npc(UUID id, String name, Scene scene) {
         super(id, name);
         this.scene = scene;
+    }
+
+    public static Codec<Npc> codec(Scene scene) {
+        return entryCodec(NpcPayload.CODEC, (id, payload) -> fromPayload(id, payload, scene));
+    }
+
+    public static Npc fromPayload(UUID id, NpcPayload payload, Scene scene) {
+        Npc npc = new Npc(id, payload.getName(), scene);
+        npc.dialogData = payload.getDialogData();
+        npc.modelType = CharacterStory.parseModelType(payload.getModelType());
+        npc.entityType = Utils.resolveEntityType(payload.getEntityTypeId());
+        npc.customNbt = payload.getCustomNbt();
+        return npc;
     }
 
     public void copyAttributesFrom(Npc source) {
@@ -121,17 +133,13 @@ public class Npc extends NarrativeEntry<NpcPayload> implements ICharacterStory {
 
     @Override
     public NpcPayload toPayload() {
-        String modelTypeName = modelType != null ? modelType.name() : "";
-        String entityTypeIdStr =
-                BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
-        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData, DialogFieldSet.CHARACTER));
         return new NpcPayload(
                 name,
-                modelTypeName,
-                entityTypeIdStr,
                 scene.getId(),
                 scene.getChapter().getId(),
-                dialogDataJson,
+                dialogData,
+                CharacterStory.modelTypeName(modelType),
+                CharacterStory.entityTypeId(entityType),
                 customNbt);
     }
 

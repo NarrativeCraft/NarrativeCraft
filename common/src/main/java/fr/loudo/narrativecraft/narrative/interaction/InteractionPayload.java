@@ -23,23 +23,15 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class InteractionPayload extends SceneEntryPayload {
 
-    public static final StreamCodec<ByteBuf, InteractionPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            InteractionPayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            InteractionPayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            InteractionPayload::getChapterId,
-            InteractionPayload::new);
+    public static final MapCodec<InteractionPayload> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(nameField(), sceneIdField(), chapterIdField()).apply(instance, InteractionPayload::new));
 
     public InteractionPayload(String name, UUID sceneId, UUID chapterId) {
         super(name, sceneId, chapterId);

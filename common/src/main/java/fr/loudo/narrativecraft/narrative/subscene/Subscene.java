@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.subscene;
 
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.api.narrative.subscene.ISubscene;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
@@ -45,6 +46,19 @@ public class Subscene extends NarrativeEntry<SubscenePayload> implements ISubsce
 
     public Subscene(UUID id, String name, Scene scene) {
         this(id, name, scene, List.of());
+    }
+
+    public static Codec<Subscene> codec(Scene scene) {
+        return entryCodec(SubscenePayload.CODEC, (id, payload) -> fromPayload(id, payload, scene));
+    }
+
+    public static Subscene fromPayload(UUID id, SubscenePayload payload, Scene scene) {
+        return new Subscene(
+                id, payload.getName(), scene, scene.getAnimationManager().getAllById(payload.getAnimationIds()));
+    }
+
+    public void copyAttributesFrom(Subscene source) {
+        setAnimations(source.animations);
     }
 
     public Scene getScene() {

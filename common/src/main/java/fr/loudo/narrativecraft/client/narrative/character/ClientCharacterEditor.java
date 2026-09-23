@@ -25,12 +25,9 @@ package fr.loudo.narrativecraft.client.narrative.character;
 
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.narrative.ClientNarrativeEntryEditor;
-import fr.loudo.narrativecraft.dialog.DialogDataIO;
-import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryPayload;
-import fr.loudo.narrativecraft.utils.Utils;
 import java.util.UUID;
 
 public class ClientCharacterEditor implements ClientNarrativeEntryEditor<CharacterStoryPayload, CharacterStory> {
@@ -45,9 +42,7 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
 
     @Override
     public void add(UUID entryId, CharacterStoryPayload payload) {
-        CharacterStory character = new CharacterStory(entryId, payload.getName());
-        update(character, payload);
-        characterManager.add(character);
+        characterManager.add(CharacterStory.fromPayload(entryId, payload));
     }
 
     @Override
@@ -55,7 +50,7 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
         CharacterStory character = resolve(entryId, payload);
         if (character == null) return;
         character.setName(payload.getName());
-        update(character, payload);
+        character.copyAttributesFrom(CharacterStory.fromPayload(entryId, payload));
     }
 
     @Override
@@ -63,16 +58,5 @@ public class ClientCharacterEditor implements ClientNarrativeEntryEditor<Charact
         CharacterStory character = resolve(entryId, payload);
         if (character == null) return;
         characterManager.remove(character);
-    }
-
-    private void update(CharacterStory character, CharacterStoryPayload payload) {
-        if (!payload.getModelType().isEmpty()) {
-            character.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
-        }
-        character.setEntityType(Utils.resolveEntityType(payload.getEntityTypeId()));
-        character.setMainCharacterAttribute(payload.getMainCharacterAttribute());
-        character.setCustomNbt(payload.getCustomNbt());
-        DialogDataIO.parse(payload.getDialogDataJson(), DialogFieldSet.CHARACTER)
-                .ifPresent(character::setDialogData);
     }
 }

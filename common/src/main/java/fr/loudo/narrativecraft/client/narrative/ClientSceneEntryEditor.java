@@ -41,7 +41,7 @@ public abstract class ClientSceneEntryEditor<T extends SceneEntryPayload, E exte
 
     protected abstract E create(UUID entryId, T payload, Scene scene);
 
-    protected abstract void update(E entry, T payload);
+    protected abstract void copyAttributes(E target, E source);
 
     @Override
     public void add(UUID entryId, T payload) {
@@ -52,10 +52,12 @@ public abstract class ClientSceneEntryEditor<T extends SceneEntryPayload, E exte
 
     @Override
     public void edit(UUID entryId, T payload) {
-        E entry = resolve(entryId, payload);
+        Scene scene = resolver.scene(payload);
+        if (scene == null) return;
+        E entry = getManager(scene).getById(entryId);
         if (entry == null) return;
         entry.setName(payload.getName());
-        update(entry, payload);
+        copyAttributes(entry, create(entryId, payload, scene));
     }
 
     @Override

@@ -39,9 +39,9 @@ public class ClientInteractionEditor extends ClientSceneEntryEditor<InteractionP
 
     @Override
     protected Interaction create(UUID entryId, InteractionPayload payload, Scene scene) {
-        return new Interaction(entryId, payload.getName(), scene);
+        return Interaction.fromPayload(entryId, payload, scene);
     }
 
     @Override
-    protected void update(Interaction interaction, InteractionPayload payload) {}
+    protected void copyAttributes(Interaction target, Interaction source) {}
 }

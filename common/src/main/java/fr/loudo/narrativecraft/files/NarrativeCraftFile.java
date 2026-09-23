@@ -23,17 +23,9 @@
 
 package fr.loudo.narrativecraft.files;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogDataIO;
-import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import java.io.*;
 import java.nio.file.Files;
 
@@ -46,15 +38,10 @@ public class NarrativeCraftFile {
     }
 
     public CameraAngle getMainScreenData() {
-        File dataFolder = init.getDataDirectory();
-        File mainScreenDataFile = new File(dataFolder, NarrativeCraftFileInit.MAIN_SCREEN_DATA_NAME);
+        File mainScreenDataFile = new File(init.getDataDirectory(), NarrativeCraftFileInit.MAIN_SCREEN_DATA_NAME);
         if (mainScreenDataFile.exists()) {
             try {
-                String data = Files.readString(mainScreenDataFile.toPath());
-                Gson gson = new GsonBuilder()
-                        .registerTypeAdapter(CameraAngle.class, new CameraAngleDeserializer())
-                        .create();
-                return gson.fromJson(data, CameraAngle.class);
+                return JsonCodecFile.read(mainScreenDataFile, CameraAngle.MAIN_SCREEN_CODEC);
             } catch (IOException e) {
                 NarrativeCraftMod.LOGGER.error("Failed to init main screen data!", e);
             }
@@ -63,12 +50,8 @@ public class NarrativeCraftFile {
     }
 
     public void saveMainScreenData(CameraAngle mainScreenData) throws IOException {
-        File dataFolder = init.getDataDirectory();
-        File mainScreenDataFile = new File(dataFolder, NarrativeCraftFileInit.MAIN_SCREEN_DATA_NAME);
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(CameraAngle.class, new CameraAngleSerializer())
-                .create();
-        NarrativeCraftFileWriter.write(mainScreenDataFile, writer -> gson.toJson(mainScreenData, writer));
+        File mainScreenDataFile = new File(init.getDataDirectory(), NarrativeCraftFileInit.MAIN_SCREEN_DATA_NAME);
+        JsonCodecFile.write(mainScreenDataFile, CameraAngle.MAIN_SCREEN_CODEC, mainScreenData);
     }
 
     public void writeCompiledStory(String compiledStoryJson) throws IOException {
@@ -82,13 +65,10 @@ public class NarrativeCraftFile {
     }
 
     public DialogData getGlobalDialogData() {
-        File dataFolder = init.getDataDirectory();
-        File globalDialogFile = new File(dataFolder, NarrativeCraftFileInit.GLOBAL_DIALOG_DATA_NAME);
+        File globalDialogFile = new File(init.getDataDirectory(), NarrativeCraftFileInit.GLOBAL_DIALOG_DATA_NAME);
         if (globalDialogFile.exists()) {
             try {
-                String content = Files.readString(globalDialogFile.toPath());
-                JsonObject json = JsonParser.parseString(content).getAsJsonObject();
-                return DialogDataIO.deserialize(json, DialogFieldSet.ALL);
+                return JsonCodecFile.read(globalDialogFile, DialogData.CODEC);
             } catch (IOException e) {
                 NarrativeCraftMod.LOGGER.error("Failed to load global dialog data!", e);
             }
@@ -97,10 +77,8 @@ public class NarrativeCraftFile {
     }
 
     public void saveGlobalDialogData(DialogData data) throws IOException {
-        File dataFolder = init.getDataDirectory();
-        File globalDialogFile = new File(dataFolder, NarrativeCraftFileInit.GLOBAL_DIALOG_DATA_NAME);
-        JsonObject json = DialogDataIO.serialize(data, DialogFieldSet.ALL);
-        NarrativeCraftFileWriter.write(globalDialogFile, writer -> new Gson().toJson(json, writer));
+        File globalDialogFile = new File(init.getDataDirectory(), NarrativeCraftFileInit.GLOBAL_DIALOG_DATA_NAME);
+        JsonCodecFile.write(globalDialogFile, DialogData.CODEC, data);
     }
 
     public File getPrecompiledStoryFile() {

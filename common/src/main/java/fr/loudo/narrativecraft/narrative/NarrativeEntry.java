@@ -23,12 +23,41 @@
 
 package fr.loudo.narrativecraft.narrative;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.function.BiFunction;
 
 public abstract class NarrativeEntry<T extends NarrativeEntryPayload> {
     protected final UUID id;
     protected String name;
+
+    protected static <P extends NarrativeEntryPayload, E extends NarrativeEntry<P>> Codec<E> entryCodec(
+            MapCodec<P> payloadCodec, BiFunction<UUID, P, E> factory) {
+        return NarrativeCodecs.versioned(RecordCodecBuilder.mapCodec(instance -> instance.group(
+                        NarrativeCodecs.ID.forGetter(NarrativeEntry::getId),
+                        payloadCodec.forGetter(NarrativeEntry::toPayload))
+                .apply(instance, factory::apply)));
+    }
+
+    protected static <
+                    P extends NarrativeEntryPayload,
+                    D extends NarrativeEntryDetail,
+                    E extends NarrativeEntry<P> & DetailedNarrativeEntry<D>>
+            Codec<E> entryCodec(MapCodec<P> payloadCodec, MapCodec<D> detailCodec, BiFunction<UUID, P, E> factory) {
+        return NarrativeCodecs.versioned(RecordCodecBuilder.mapCodec(instance -> instance.group(
+                        NarrativeCodecs.ID.forGetter(NarrativeEntry::getId),
+                        payloadCodec.forGetter(NarrativeEntry::toPayload),
+                        detailCodec.forGetter(DetailedNarrativeEntry::getDetail))
+                .apply(instance, (entryId, payload, detail) -> {
+                    E entry = factory.apply(entryId, payload);
+                    entry.setDetail(detail);
+                    return entry;
+                })));
+    }
 
     public NarrativeEntry(UUID id, String name) {
         this.id = id;

@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.narrative.animation.IAnimation;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
@@ -59,6 +60,15 @@ public class Animation extends NarrativeEntry<AnimationPayload> implements IAnim
     public Animation(UUID id, String name, Scene scene) {
         super(id, name);
         this.scene = scene;
+    }
+
+    public static Animation fromPayload(UUID id, AnimationPayload payload, Scene scene, CharacterManager characters) {
+        ICharacterStory characterStory = characters.resolveCharacter(payload.getCharacterId(), scene);
+        return new Animation(id, payload.getName(), scene, payload.getTotalTick(), characterStory);
+    }
+
+    public void copyAttributesFrom(Animation source) {
+        characterStory = source.characterStory;
     }
 
     // Why deserialization's here : to not have all animations in memory when the server start.

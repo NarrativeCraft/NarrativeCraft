@@ -29,13 +29,11 @@ import fr.loudo.narrativecraft.network.S2CEditorOpened;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
-import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
@@ -51,8 +49,12 @@ public class ClientPacketHandlerNeoForge {
         });
     }
 
-    public static void clearNarrativeData(S2CNarrativeDataClear packet, IPayloadContext context) {
-        context.enqueueWork(ClientPacketHandler::clearNarrativeData);
+    public static void narrativeSnapshot(S2CNarrativeSnapshot packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.narrativeSnapshot(packet));
+    }
+
+    public static void narrativeEntryDetail(S2CNarrativeEntryDetail packet, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandler.narrativeEntryDetail(packet));
     }
 
     public static void clearScreen(S2CScreenClear packet, IPayloadContext context) {
@@ -77,12 +79,6 @@ public class ClientPacketHandlerNeoForge {
         });
     }
 
-    public static void loadCutsceneEditorData(S2CCutsceneEditorData packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            ClientPacketHandler.loadCutsceneEditorData(packet);
-        });
-    }
-
     public static void updatePlayHeadCutscene(BiCutscenePlayHeadPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.updatePlayHeadCutscene(packet);
@@ -92,12 +88,6 @@ public class ClientPacketHandlerNeoForge {
     public static void handleDialogTest(S2CDialogTest packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.handleDialogTest(packet);
-        });
-    }
-
-    public static void loadCameraAngleEditorData(S2CCameraAngleEditorData packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            ClientPacketHandler.loadCameraAngleEditorData(packet);
         });
     }
 
@@ -119,10 +109,6 @@ public class ClientPacketHandlerNeoForge {
 
     public static void enterCameraView(S2CEnterCameraView packet, IPayloadContext context) {
         context.enqueueWork(() -> ClientPacketHandler.enterCameraView(packet));
-    }
-
-    public static void loadInteractionEditorData(S2CInteractionEditorData packet, IPayloadContext context) {
-        context.enqueueWork(() -> ClientPacketHandler.loadInteractionEditorData(packet));
     }
 
     public static void interactionLeave(S2CInteractionLeave packet, IPayloadContext context) {

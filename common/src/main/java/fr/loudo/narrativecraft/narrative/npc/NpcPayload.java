@@ -23,50 +23,51 @@
 
 package fr.loudo.narrativecraft.narrative.npc;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class NpcPayload extends SceneEntryPayload {
 
-    public static final StreamCodec<ByteBuf, NpcPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getModelType,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getEntityTypeId,
-            UUIDUtil.STREAM_CODEC,
-            NpcPayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            NpcPayload::getChapterId,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getDialogDataJson,
-            ByteBufCodecs.STRING_UTF8,
-            NpcPayload::getCustomNbt,
-            NpcPayload::new);
+    public static final MapCodec<NpcPayload> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    nameField(),
+                    sceneIdField(),
+                    chapterIdField(),
+                    NarrativeCodecs.fieldOrElseGet(DialogData.CHARACTER_CODEC, "dialogData", DialogData::new)
+                            .forGetter(NpcPayload::getDialogData),
+                    NarrativeCodecs.field(Codec.STRING, "modelType", "").forGetter(NpcPayload::getModelType),
+                    NarrativeCodecs.field(Codec.STRING, "entityTypeId", CharacterStory.DEFAULT_ENTITY_TYPE_ID)
+                            .forGetter(NpcPayload::getEntityTypeId),
+                    NarrativeCodecs.field(Codec.STRING, "customNbt", "").forGetter(NpcPayload::getCustomNbt))
+            .apply(instance, NpcPayload::new));
 
+    private final DialogData dialogData;
     private final String modelType;
     private final String entityTypeId;
-    private final String dialogDataJson;
     private final String customNbt;
 
     public NpcPayload(
             String name,
-            String modelType,
-            String entityTypeId,
             UUID sceneId,
             UUID chapterId,
-            String dialogDataJson,
+            DialogData dialogData,
+            String modelType,
+            String entityTypeId,
             String customNbt) {
         super(name, sceneId, chapterId);
+        this.dialogData = dialogData != null ? dialogData : new DialogData();
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
-        this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
         this.customNbt = customNbt != null ? customNbt : "";
+    }
+
+    public DialogData getDialogData() {
+        return dialogData;
     }
 
     public String getModelType() {
@@ -75,10 +76,6 @@ public class NpcPayload extends SceneEntryPayload {
 
     public String getEntityTypeId() {
         return entityTypeId;
-    }
-
-    public String getDialogDataJson() {
-        return dialogDataJson;
     }
 
     public String getCustomNbt() {

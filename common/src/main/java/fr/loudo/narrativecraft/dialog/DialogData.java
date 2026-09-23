@@ -23,7 +23,13 @@
 
 package fr.loudo.narrativecraft.dialog;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.utils.codec.FieldMapCodec;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 
 public class DialogData {
@@ -32,6 +38,70 @@ public class DialogData {
         LEFT,
         CENTER,
         RIGHT
+    }
+
+    public static final Codec<DialogData> CODEC = mapCodec(DialogFieldSet.ALL).codec();
+    public static final Codec<DialogData> CHARACTER_CODEC =
+            mapCodec(DialogFieldSet.CHARACTER).codec();
+    public static final Codec<DialogData> CAMERA_VIEW_CODEC =
+            mapCodec(DialogFieldSet.CAMERA_VIEW).codec();
+    public static final StreamCodec<ByteBuf, DialogData> STREAM_CODEC = NarrativeCodecs.streamCodec(CODEC);
+    public static final StreamCodec<ByteBuf, DialogData> CHARACTER_STREAM_CODEC =
+            NarrativeCodecs.streamCodec(CHARACTER_CODEC);
+
+    private static MapCodec<DialogData> mapCodec(DialogFieldSet fieldSet) {
+        boolean all = fieldSet == DialogFieldSet.ALL;
+        FieldMapCodec.Builder<DialogData> builder = FieldMapCodec.builder(DialogData::new);
+        if (all || fieldSet == DialogFieldSet.CAMERA_VIEW) {
+            builder.field("offsetX", Codec.FLOAT, DialogData::getOffsetX, DialogData::setOffsetX)
+                    .field("offsetY", Codec.FLOAT, DialogData::getOffsetY, DialogData::setOffsetY)
+                    .field("ancOffsetX", Codec.FLOAT, DialogData::getAncOffsetX, DialogData::setAncOffsetX)
+                    .field("ancOffsetY", Codec.FLOAT, DialogData::getAncOffsetY, DialogData::setAncOffsetY)
+                    .field("scale", Codec.FLOAT, DialogData::getScale, DialogData::setScale);
+        }
+        if (all || fieldSet == DialogFieldSet.CHARACTER) {
+            builder.field("backgroundColor", Codec.INT, DialogData::getBackgroundColor, DialogData::setBackgroundColor)
+                    .field("textColor", Codec.INT, DialogData::getTextColor, DialogData::setTextColor)
+                    .field(
+                            "backgroundImage",
+                            Identifier.CODEC,
+                            DialogData::getBackgroundImage,
+                            DialogData::setBackgroundImage)
+                    .field("letterSound", Identifier.CODEC, DialogData::getLetterSound, DialogData::setLetterSound)
+                    .field("tailVisible", Codec.BOOL, DialogData::isTailVisible, DialogData::setTailVisible)
+                    .field("textShadow", Codec.BOOL, DialogData::isTextShadow, DialogData::setTextShadow);
+        }
+        if (all) {
+            builder.field("width", Codec.FLOAT, DialogData::getWidth, DialogData::setWidth)
+                    .field("paddingX", Codec.FLOAT, DialogData::getPaddingX, DialogData::setPaddingX)
+                    .field("paddingY", Codec.FLOAT, DialogData::getPaddingY, DialogData::setPaddingY)
+                    .field("letterSpacing", Codec.FLOAT, DialogData::getLetterSpacing, DialogData::setLetterSpacing)
+                    .field("lineGap", Codec.FLOAT, DialogData::getLineGap, DialogData::setLineGap)
+                    .field("scrollSpeed", Codec.FLOAT, DialogData::getScrollSpeed, DialogData::setScrollSpeed)
+                    .field("soundMuted", Codec.BOOL, DialogData::isSoundMuted, DialogData::setSoundMuted)
+                    .field("autoSkipEnabled", Codec.BOOL, DialogData::isAutoSkipEnabled, DialogData::setAutoSkipEnabled)
+                    .field(
+                            "autoSkipSeconds",
+                            Codec.FLOAT,
+                            DialogData::getAutoSkipSeconds,
+                            DialogData::setAutoSkipSeconds)
+                    .field(
+                            "textAlignment",
+                            NarrativeCodecs.enumByName(TextAlignment.class),
+                            DialogData::getTextAlignment,
+                            DialogData::setTextAlignment)
+                    .field(
+                            "bobbingSpeed",
+                            Codec.FLOAT,
+                            DialogData::getBobbingNoiseShakeSpeed,
+                            DialogData::setBobbingNoiseShakeSpeed)
+                    .field(
+                            "bobbingShake",
+                            Codec.FLOAT,
+                            DialogData::getBobbingNoiseShakeStrength,
+                            DialogData::setBobbingNoiseShakeStrength);
+        }
+        return builder.build();
     }
 
     private float offsetX = 0f;

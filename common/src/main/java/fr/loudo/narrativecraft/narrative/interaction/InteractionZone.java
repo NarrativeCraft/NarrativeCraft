@@ -23,12 +23,24 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.api.narrative.interaction.IInteractionZone;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.UUID;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class InteractionZone implements IInteractionZone {
+
+    public static final Codec<InteractionZone> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                    NarrativeCodecs.ID.forGetter(InteractionZone::getId),
+                    Codec.STRING.fieldOf("name").forGetter(InteractionZone::getName),
+                    NarrativeCodecs.field(Codec.STRING, "path", "").forGetter(InteractionZone::getStitchName),
+                    NarrativeCodecs.vec3("x1", "y1", "z1").forGetter(InteractionZone::getCorner1),
+                    NarrativeCodecs.vec3("x2", "y2", "z2").forGetter(InteractionZone::getCorner2),
+                    NarrativeCodecs.field(Codec.BOOL, "oneTime", false).forGetter(InteractionZone::isOneTime))
+            .apply(instance, InteractionZone::new));
 
     private final UUID id;
     private String name;

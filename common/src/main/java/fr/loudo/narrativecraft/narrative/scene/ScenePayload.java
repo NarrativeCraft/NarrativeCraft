@@ -23,23 +23,20 @@
 
 package fr.loudo.narrativecraft.narrative.scene;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class ScenePayload extends NarrativeEntryPayload {
 
-    public static final StreamCodec<ByteBuf, ScenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ScenePayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            ScenePayload::getChapterId,
-            ByteBufCodecs.INT,
-            ScenePayload::getRank,
-            ScenePayload::new);
+    public static final MapCodec<ScenePayload> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    nameField(),
+                    NarrativeCodecs.UUID_CODEC.fieldOf("chapterId").forGetter(ScenePayload::getChapterId),
+                    Codec.INT.fieldOf("rank").forGetter(ScenePayload::getRank))
+            .apply(instance, ScenePayload::new));
 
     private final UUID chapterId;
     private final int rank;

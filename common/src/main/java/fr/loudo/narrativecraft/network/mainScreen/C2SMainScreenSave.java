@@ -24,19 +24,20 @@
 package fr.loudo.narrativecraft.network.mainScreen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleData;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record C2SMainScreenSave(String dataJson) implements CustomPacketPayload {
+public record C2SMainScreenSave(CameraAngleData data) implements CustomPacketPayload {
 
     public static final Type<C2SMainScreenSave> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_save"));
 
-    public static final StreamCodec<ByteBuf, C2SMainScreenSave> STREAM_CODEC =
-            StreamCodec.composite(ByteBufCodecs.STRING_UTF8, C2SMainScreenSave::dataJson, C2SMainScreenSave::new);
+    public static final StreamCodec<ByteBuf, C2SMainScreenSave> STREAM_CODEC = StreamCodec.composite(
+            NarrativeCodecs.streamCodec(CameraAngleData.CODEC), C2SMainScreenSave::data, C2SMainScreenSave::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

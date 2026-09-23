@@ -23,14 +23,13 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
-import com.google.gson.Gson;
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogDataIO;
-import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.utils.Utils;
 import java.io.File;
 import java.util.UUID;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -41,6 +40,10 @@ import net.minecraft.world.entity.player.PlayerModelType;
 public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implements ICharacterStory {
 
     public static final String USERNAME_VARIABLE = "user";
+    public static final String DEFAULT_ENTITY_TYPE_ID = "minecraft:player";
+
+    public static final Codec<CharacterStory> CODEC =
+            entryCodec(CharacterStoryPayload.CODEC, CharacterStory::fromPayload);
 
     private final CharacterType characterType = CharacterType.NORMAL;
     private DialogData dialogData = new DialogData();
@@ -51,6 +54,28 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
 
     public CharacterStory(UUID id, String name) {
         super(id, name);
+    }
+
+    public static CharacterStory fromPayload(UUID id, CharacterStoryPayload payload) {
+        CharacterStory character = new CharacterStory(id, payload.getName());
+        character.dialogData = payload.getDialogData();
+        character.modelType = parseModelType(payload.getModelType());
+        character.entityType = Utils.resolveEntityType(payload.getEntityTypeId());
+        character.customNbt = payload.getCustomNbt();
+        character.mainCharacterAttribute = new MainCharacterAttribute(payload.getMainCharacterAttribute());
+        return character;
+    }
+
+    public static PlayerModelType parseModelType(String modelTypeName) {
+        return modelTypeName.isEmpty() ? null : Utils.parsePlayerModelType(modelTypeName);
+    }
+
+    public static String modelTypeName(PlayerModelType modelType) {
+        return modelType != null ? modelType.name() : "";
+    }
+
+    public static String entityTypeId(EntityType<?> entityType) {
+        return BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
     }
 
     public void copyAttributesFrom(CharacterStory source) {
@@ -128,11 +153,13 @@ public class CharacterStory extends NarrativeEntry<CharacterStoryPayload> implem
 
     @Override
     public CharacterStoryPayload toPayload() {
-        String modelTypeName = modelType != null ? modelType.name() : "";
-        String entityTypeId = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString();
-        String dialogDataJson = new Gson().toJson(DialogDataIO.serialize(dialogData, DialogFieldSet.CHARACTER));
         return new CharacterStoryPayload(
-                name, modelTypeName, entityTypeId, customNbt, mainCharacterAttribute, dialogDataJson);
+                name,
+                dialogData,
+                modelTypeName(modelType),
+                entityTypeId(entityType),
+                customNbt,
+                mainCharacterAttribute);
     }
 
     @Override

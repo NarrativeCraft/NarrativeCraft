@@ -21,23 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.mainScreen;
+package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleData;
-import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
+import fr.loudo.narrativecraft.narrative.DetailedNarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryDetail;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import io.netty.buffer.ByteBuf;
+import java.util.UUID;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CMainScreenData(CameraAngleData data) implements CustomPacketPayload {
+public record S2CNarrativeEntryDetail(UUID entryId, NarrativeEntryPayload entry, NarrativeEntryDetail detail)
+        implements CustomPacketPayload {
 
-    public static final Type<S2CMainScreenData> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen_data"));
+    public static final Type<S2CNarrativeEntryDetail> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "narrative_entry_detail"));
 
-    public static final StreamCodec<ByteBuf, S2CMainScreenData> STREAM_CODEC = StreamCodec.composite(
-            NarrativeCodecs.streamCodec(CameraAngleData.CODEC), S2CMainScreenData::data, S2CMainScreenData::new);
+    public static final StreamCodec<ByteBuf, S2CNarrativeEntryDetail> STREAM_CODEC = NarrativeEntryDetailCodec.create(
+            S2CNarrativeEntryDetail::new,
+            S2CNarrativeEntryDetail::entryId,
+            S2CNarrativeEntryDetail::entry,
+            S2CNarrativeEntryDetail::detail);
+
+    public static <E extends NarrativeEntry<?> & DetailedNarrativeEntry<?>> S2CNarrativeEntryDetail of(E entry) {
+        return new S2CNarrativeEntryDetail(entry.getId(), entry.toPayload(), entry.getDetail());
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

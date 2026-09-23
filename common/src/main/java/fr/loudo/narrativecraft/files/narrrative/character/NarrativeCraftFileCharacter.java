@@ -23,34 +23,24 @@
 
 package fr.loudo.narrativecraft.files.narrrative.character;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.FileTransaction;
+import fr.loudo.narrativecraft.files.JsonCodecFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
+import fr.loudo.narrativecraft.files.RootEntryFileEditor;
 import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.CharacterStoryDeserializer;
-import fr.loudo.narrativecraft.narrative.character.CharacterStorySerializer;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NarrativeCraftFileCharacter extends NarrativeCraftFileDefault
-        implements NarrativeCraftFileEditor<CharacterStory> {
-
-    private static final Gson SERIALIZER = new GsonBuilder()
-            .registerTypeAdapter(CharacterStory.class, new CharacterStorySerializer())
-            .create();
-    private static final Gson DESERIALIZER = new GsonBuilder()
-            .registerTypeAdapter(CharacterStory.class, new CharacterStoryDeserializer())
-            .create();
+        implements RootEntryFileEditor<CharacterStory> {
 
     @Override
     public OperationResult create(CharacterStory entry) {
@@ -109,31 +99,25 @@ public class NarrativeCraftFileCharacter extends NarrativeCraftFileDefault
     }
 
     private void writeData(FileTransaction transaction, CharacterStory character) throws IOException {
-        transaction.write(
-                new File(getCharacterFolder(character), DATA_FILE_NAME),
-                writer -> SERIALIZER.toJson(character, writer));
+        JsonCodecFile.write(
+                transaction, new File(getCharacterFolder(character), DATA_FILE_NAME), CharacterStory.CODEC, character);
     }
 
     @Override
-    public List<DeserializationResult<CharacterStory>> deserialize() {
+    public List<DeserializationResult<CharacterStory>> load() {
         List<DeserializationResult<CharacterStory>> deserializationResults = new ArrayList<>();
 
-        File[] allContents = NarrativeCraftFileUtil.getCharactersFolder().listFiles();
-        if (allContents == null) {
+        File[] characterFolders = NarrativeCraftFileUtil.getCharactersFolder().listFiles(File::isDirectory);
+        if (characterFolders == null) {
             return deserializationResults;
         }
 
-        for (File file : allContents) {
+        for (File file : characterFolders) {
             if (NarrativeCraftFileWriter.isTemporary(file)) continue;
             try {
-                File dataFile = new File(file, DATA_FILE_NAME);
-                String content = Files.readString(dataFile.toPath());
-                CharacterStory character = DESERIALIZER.fromJson(content, CharacterStory.class);
-                if (character == null) {
-                    throw new Exception(String.format("Character %s deserialization returned null", file.getName()));
-                }
+                CharacterStory character = JsonCodecFile.read(new File(file, DATA_FILE_NAME), CharacterStory.CODEC);
                 deserializationResults.add(new DeserializationResult<>(character, false, file.getName()));
-            } catch (Exception e) {
+            } catch (IOException e) {
                 NarrativeCraftMod.LOGGER.error("Failed to init character {}", file.getName(), e);
                 deserializationResults.add(new DeserializationResult<>(null, true, file.getName()));
             }

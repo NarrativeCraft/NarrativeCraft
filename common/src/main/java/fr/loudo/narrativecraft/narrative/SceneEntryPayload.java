@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative;
 
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.UUID;
 
 public abstract class SceneEntryPayload extends NarrativeEntryPayload {
@@ -34,6 +36,14 @@ public abstract class SceneEntryPayload extends NarrativeEntryPayload {
         super(name);
         this.sceneId = sceneId;
         this.chapterId = chapterId;
+    }
+
+    protected static <P extends SceneEntryPayload> RecordCodecBuilder<P, UUID> sceneIdField() {
+        return NarrativeCodecs.UUID_CODEC.fieldOf("sceneId").forGetter(SceneEntryPayload::getSceneId);
+    }
+
+    protected static <P extends SceneEntryPayload> RecordCodecBuilder<P, UUID> chapterIdField() {
+        return NarrativeCodecs.UUID_CODEC.fieldOf("chapterId").forGetter(SceneEntryPayload::getChapterId);
     }
 
     public UUID getSceneId() {

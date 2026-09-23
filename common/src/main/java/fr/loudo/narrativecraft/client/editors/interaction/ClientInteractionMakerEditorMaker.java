@@ -28,7 +28,7 @@ import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.interaction.*;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailSave;
 import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -77,8 +77,7 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
     }
 
     public void save() {
-        String dataJson = InteractionSerializer.serializeData(interaction);
-        Services.PACKET.sendToServer(new C2SInteractionSave(interaction, dataJson));
+        Services.PACKET.sendToServer(C2SNarrativeEntryDetailSave.of(interaction, interaction.getDetail()));
     }
 
     public void quit(boolean saveBeforeQuit) {
@@ -154,10 +153,6 @@ public class ClientInteractionMakerEditorMaker implements EditorMaker {
         this.inPointPlacementMode = false;
         this.pointBeingPlaced = null;
         this.tempPointPosition = null;
-    }
-
-    public void loadData(String json) {
-        InteractionDeserializer.deserializeInto(json, interaction);
     }
 
     public void quit() {

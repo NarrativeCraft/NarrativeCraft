@@ -23,9 +23,10 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 
 public class MainCharacterAttribute {
 
@@ -35,12 +36,16 @@ public class MainCharacterAttribute {
         CLIENT_HAS_CHARACTER_SKIN
     }
 
-    public static final StreamCodec<ByteBuf, MainCharacterAttribute> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.BOOL,
-            MainCharacterAttribute::isMainCharacter,
-            ByteBufCodecs.idMapper(i -> SkinMode.values()[i], SkinMode::ordinal),
-            MainCharacterAttribute::getSkin,
-            MainCharacterAttribute::new);
+    public static final MapCodec<MainCharacterAttribute> MAP_CODEC =
+            RecordCodecBuilder.mapCodec(instance -> instance.group(
+                            NarrativeCodecs.field(Codec.BOOL, "mainCharacter", false)
+                                    .forGetter(MainCharacterAttribute::isMainCharacter),
+                            NarrativeCodecs.field(
+                                            NarrativeCodecs.enumByName(SkinMode.class),
+                                            "skinMode",
+                                            SkinMode.SKIN_FROM_FILE)
+                                    .forGetter(MainCharacterAttribute::getSkin))
+                    .apply(instance, MainCharacterAttribute::new));
 
     private boolean mainCharacter;
     private SkinMode skin;

@@ -21,31 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative;
+package fr.loudo.narrativecraft.narrative.interaction;
 
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonObject;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.util.UUID;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryDetail;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
+import java.util.List;
 
-public abstract class NarrativeDeserializer<T> implements JsonDeserializer<T> {
+public record InteractionData(List<InteractionZone> zones, List<InteractionPoint> points)
+        implements NarrativeEntryDetail {
 
-    protected UUID parseId(JsonObject json) {
-        return UUID.fromString(json.get("id").getAsString());
-    }
+    public static final MapCodec<InteractionData> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    NarrativeCodecs.field(NarrativeCodecs.lenientList(InteractionZone.CODEC), "zones", List.of())
+                            .forGetter(InteractionData::zones),
+                    NarrativeCodecs.field(NarrativeCodecs.lenientList(InteractionPoint.CODEC), "points", List.of())
+                            .forGetter(InteractionData::points))
+            .apply(instance, InteractionData::new));
 
-    protected String parseName(JsonObject json) {
-        return json.get("name").getAsString();
-    }
+    public static final Codec<InteractionData> CODEC = MAP_CODEC.codec();
 
-    protected boolean hasSceneReference(JsonObject json) {
-        return json.has("chapterId") && json.has("sceneId");
-    }
-
-    protected Scene resolveScene(JsonObject json) {
-        UUID chapterId = UUID.fromString(json.get("chapterId").getAsString());
-        UUID sceneId = UUID.fromString(json.get("sceneId").getAsString());
-        return NarrativeCraftMod.getInstance().getEntryResolver().scene(chapterId, sceneId);
+    public InteractionData {
+        zones = List.copyOf(zones);
+        points = List.copyOf(points);
     }
 }

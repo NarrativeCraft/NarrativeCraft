@@ -75,10 +75,20 @@ public class NarrativeCraftFileRegistry {
         return editor.delete(entry);
     }
 
-    public <T extends NarrativeEntry<?>> List<DeserializationResult<T>> deserialize(Class<T> entryClass) {
-        NarrativeCraftFileEditor<T> editor = getEditor(entryClass);
-        if (editor != null) return editor.deserialize();
-        return null;
+    public <T extends NarrativeEntry<?>> List<DeserializationResult<T>> load(Class<T> entryClass) {
+        if (getEditor(entryClass) instanceof RootEntryFileEditor<T> rootEditor) {
+            return rootEditor.load();
+        }
+        throw new IllegalStateException(entryClass.getSimpleName() + " has no root file editor");
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends NarrativeEntry<?>, P extends NarrativeEntry<?>> List<DeserializationResult<T>> load(
+            Class<T> entryClass, P parent) {
+        if (getEditor(entryClass) instanceof ChildEntryFileEditor<?, ?> childEditor) {
+            return ((ChildEntryFileEditor<T, P>) childEditor).load(parent);
+        }
+        throw new IllegalStateException(entryClass.getSimpleName() + " has no child file editor");
     }
 
     public static NarrativeCraftFileRegistry getInstance() {

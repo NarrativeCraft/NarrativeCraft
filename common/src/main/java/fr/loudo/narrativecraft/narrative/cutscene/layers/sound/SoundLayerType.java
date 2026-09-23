@@ -23,10 +23,12 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene.layers.sound;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 
 public class SoundLayerType implements ICutsceneLayerType {
 
@@ -48,32 +50,18 @@ public class SoundLayerType implements ICutsceneLayerType {
     }
 
     @Override
-    public JsonObject serializeKeyframe(Keyframe keyframe) {
-        if (!(keyframe instanceof SoundKeyframe soundKeyframe)) return null;
-
-        JsonObject json = new JsonObject();
-        json.addProperty("tick", soundKeyframe.getTick());
-        json.addProperty("soundId", soundKeyframe.getSoundId());
-        json.addProperty("volume", soundKeyframe.getVolume());
-        json.addProperty("pitch", soundKeyframe.getPitch());
-        return json;
-    }
-
-    @Override
-    public Keyframe deserializeKeyframe(CutsceneLayer layer, JsonObject json) {
-        if (!json.has("tick")) return null;
-
-        SoundKeyframe soundKeyframe = new SoundKeyframe(layer, json.get("tick").getAsInt());
-        if (json.has("soundId")) {
-            soundKeyframe.setSoundId(json.get("soundId").getAsString());
-        }
-        if (json.has("volume")) {
-            soundKeyframe.setVolume(json.get("volume").getAsFloat());
-        }
-        if (json.has("pitch")) {
-            soundKeyframe.setPitch(json.get("pitch").getAsFloat());
-        }
-
-        return soundKeyframe;
+    public Codec<Keyframe> keyframeCodec(CutsceneLayer layer) {
+        return Keyframe.typedCodec(SoundKeyframe.class, RecordCodecBuilder.create(instance -> instance.group(
+                        Keyframe.TICK.forGetter(SoundKeyframe::getTick),
+                        NarrativeCodecs.field(Codec.STRING, "soundId", "").forGetter(SoundKeyframe::getSoundId),
+                        NarrativeCodecs.field(Codec.FLOAT, "volume", 1f).forGetter(SoundKeyframe::getVolume),
+                        NarrativeCodecs.field(Codec.FLOAT, "pitch", 1f).forGetter(SoundKeyframe::getPitch))
+                .apply(instance, (tick, soundId, volume, pitch) -> {
+                    SoundKeyframe keyframe = new SoundKeyframe(layer, tick);
+                    keyframe.setSoundId(soundId);
+                    keyframe.setVolume(volume);
+                    keyframe.setPitch(pitch);
+                    return keyframe;
+                })));
     }
 }

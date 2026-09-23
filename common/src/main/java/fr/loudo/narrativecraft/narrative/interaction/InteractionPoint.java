@@ -23,6 +23,9 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.UUID;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -31,6 +34,20 @@ public class InteractionPoint {
 
     public static final double DEFAULT_MAX_DISTANCE = 8.0;
     public static final double DEFAULT_AIM_RADIUS = 1.0;
+
+    public static final Codec<InteractionPoint> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                    NarrativeCodecs.ID.forGetter(InteractionPoint::getId),
+                    Codec.STRING.fieldOf("name").forGetter(InteractionPoint::getName),
+                    NarrativeCodecs.field(Codec.STRING, "path", "").forGetter(InteractionPoint::getStitchName),
+                    NarrativeCodecs.POSITION.forGetter(InteractionPoint::getPosition),
+                    NarrativeCodecs.field(Codec.DOUBLE, "maxDistance", DEFAULT_MAX_DISTANCE)
+                            .forGetter(InteractionPoint::getMaxDistance),
+                    NarrativeCodecs.field(Codec.BOOL, "useAimRadius", true).forGetter(InteractionPoint::isUseAimRadius),
+                    NarrativeCodecs.field(Codec.DOUBLE, "aimRadius", DEFAULT_AIM_RADIUS)
+                            .forGetter(InteractionPoint::getAimRadius),
+                    NarrativeCodecs.field(Codec.BOOL, "neverShow", false).forGetter(InteractionPoint::isNeverShow),
+                    NarrativeCodecs.field(Codec.BOOL, "oneTime", false).forGetter(InteractionPoint::isOneTimeClick))
+            .apply(instance, InteractionPoint::new));
 
     private final UUID id;
     private String name;

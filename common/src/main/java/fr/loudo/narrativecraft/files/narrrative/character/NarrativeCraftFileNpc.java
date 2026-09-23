@@ -25,14 +25,12 @@ package fr.loudo.narrativecraft.files.narrrative.character;
 
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.npc.Npc;
-import fr.loudo.narrativecraft.narrative.npc.NpcDeserializer;
-import fr.loudo.narrativecraft.narrative.npc.NpcSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 
 public class NarrativeCraftFileNpc extends AbstractNarrativeCraftFileSceneJsonEntry<Npc> {
 
     public NarrativeCraftFileNpc() {
-        super(Npc.class, new NpcSerializer(), new NpcDeserializer());
+        super(Npc::codec);
     }
 
     @Override

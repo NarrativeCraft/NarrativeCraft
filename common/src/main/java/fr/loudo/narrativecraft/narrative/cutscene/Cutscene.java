@@ -23,10 +23,12 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene;
 
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.narrative.cutscene.ICutscene;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
+import fr.loudo.narrativecraft.narrative.DetailedNarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.layers.camera.CameraKeyframe;
@@ -36,12 +38,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutscene {
+public class Cutscene extends NarrativeEntry<CutscenePayload>
+        implements ICutscene, DetailedNarrativeEntry<CutsceneTimeline> {
 
     private final Scene scene;
     private List<Animation> animations;
     private List<Subscene> subscenes;
-    private List<CutsceneLayer> layers;
+    private List<CutsceneLayer> layers = new ArrayList<>();
     private int manualMaxTick = 0;
 
     public Cutscene(UUID id, String name, Scene scene, List<Animation> animations, List<Subscene> subscenes) {
@@ -49,6 +52,36 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutsce
         this.scene = scene;
         this.animations = new ArrayList<>(animations);
         this.subscenes = new ArrayList<>(subscenes);
+    }
+
+    public static Codec<Cutscene> codec(Scene scene) {
+        return entryCodec(
+                CutscenePayload.CODEC, CutsceneTimeline.MAP_CODEC, (id, payload) -> fromPayload(id, payload, scene));
+    }
+
+    public static Cutscene fromPayload(UUID id, CutscenePayload payload, Scene scene) {
+        return new Cutscene(
+                id,
+                payload.getName(),
+                scene,
+                scene.getAnimationManager().getAllById(payload.getAnimationIds()),
+                scene.getSubsceneManager().getAllById(payload.getSubsceneIds()));
+    }
+
+    public void copyAttributesFrom(Cutscene source) {
+        setAnimations(source.animations);
+        setSubscenes(source.subscenes);
+    }
+
+    @Override
+    public CutsceneTimeline getDetail() {
+        return new CutsceneTimeline(layers, manualMaxTick);
+    }
+
+    @Override
+    public void setDetail(CutsceneTimeline timeline) {
+        layers = new ArrayList<>(timeline.layers());
+        manualMaxTick = timeline.manualMaxTick();
     }
 
     public Cutscene(UUID id, String name, Scene scene) {
@@ -125,10 +158,6 @@ public class Cutscene extends NarrativeEntry<CutscenePayload> implements ICutsce
 
     public List<CutsceneLayer> getLayers() {
         return layers;
-    }
-
-    public void setLayers(List<CutsceneLayer> layers) {
-        this.layers = layers;
     }
 
     @Override

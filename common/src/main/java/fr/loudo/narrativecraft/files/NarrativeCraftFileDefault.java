@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.files;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import java.io.*;
+import java.nio.file.Files;
 
 public class NarrativeCraftFileDefault {
 
@@ -68,6 +69,23 @@ public class NarrativeCraftFileDefault {
             }
         }
         return file;
+    }
+
+    protected String migrateFolderName(File folder, String expectedName) throws IOException {
+        if (folder.getName().equals(expectedName)) {
+            return folder.getName();
+        }
+        File normalizedFolder = new File(folder.getParentFile(), expectedName);
+        if (normalizedFolder.exists()) {
+            NarrativeCraftMod.LOGGER.warn(
+                    "Directory {} should be named {} but that directory already exists",
+                    folder.getName(),
+                    normalizedFolder.getName());
+            return folder.getName();
+        }
+        Files.move(folder.toPath(), normalizedFolder.toPath());
+        NarrativeCraftMod.LOGGER.info("Renamed directory {} to {}", folder.getName(), normalizedFolder.getName());
+        return normalizedFolder.getName();
     }
 
     protected boolean deleteDirectory(File directoryToBeDeleted) {

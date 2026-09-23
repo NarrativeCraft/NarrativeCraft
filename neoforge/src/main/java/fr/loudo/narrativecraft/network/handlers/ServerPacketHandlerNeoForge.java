@@ -25,22 +25,21 @@ package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiEditorClose;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailRequest;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailSave;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSetEntityPose;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
@@ -74,10 +73,12 @@ public class ServerPacketHandlerNeoForge {
         });
     }
 
-    public static void cutsceneSave(C2SCutsceneSave packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            ServerPacketHandler.cutsceneSave(packet, context.player());
-        });
+    public static void narrativeEntryDetailRequest(C2SNarrativeEntryDetailRequest packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.narrativeEntryDetailRequest(packet, context.player()));
+    }
+
+    public static void narrativeEntryDetailSave(C2SNarrativeEntryDetailSave packet, IPayloadContext context) {
+        context.enqueueWork(() -> ServerPacketHandler.narrativeEntryDetailSave(packet, context.player()));
     }
 
     public static void playHeadUpdate(BiCutscenePlayHeadPacket packet, IPayloadContext context) {
@@ -96,10 +97,6 @@ public class ServerPacketHandlerNeoForge {
 
     public static void enterDialogEditor(C2SEnterDialogEditor packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.enterDialogEditor(packet, context.player()));
-    }
-
-    public static void cameraAngleSave(C2SCameraAngleSave packet, IPayloadContext context) {
-        context.enqueueWork(() -> ServerPacketHandler.cameraAngleSave(packet, context.player()));
     }
 
     public static void cameraAngleCaptureCharacter(C2SCameraAngleCaptureCharacter packet, IPayloadContext context) {
@@ -130,10 +127,6 @@ public class ServerPacketHandlerNeoForge {
 
     public static void interactionEnter(BiInteractionEnter packet, IPayloadContext context) {
         context.enqueueWork(() -> ServerPacketHandler.interactionEnter(packet, context.player()));
-    }
-
-    public static void interactionSave(C2SInteractionSave packet, IPayloadContext context) {
-        context.enqueueWork(() -> ServerPacketHandler.interactionSave(packet, context.player()));
     }
 
     public static void inkActionFinished(C2SInkActionFinished packet, IPayloadContext context) {

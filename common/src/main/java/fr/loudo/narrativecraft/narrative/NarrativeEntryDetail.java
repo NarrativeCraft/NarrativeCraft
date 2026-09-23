@@ -21,33 +21,6 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.scene;
+package fr.loudo.narrativecraft.narrative;
 
-import com.google.gson.*;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.NarrativeDeserializer;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import java.lang.reflect.Type;
-import java.util.UUID;
-
-public class SceneDeserializer extends NarrativeDeserializer<Scene> {
-    @Override
-    public Scene deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-            throws JsonParseException {
-        JsonObject jsonObject = json.getAsJsonObject();
-
-        if (!jsonObject.has("chapterId")) {
-            return null;
-        }
-
-        UUID id = parseId(jsonObject);
-        String name = parseName(jsonObject);
-        UUID chapterId = UUID.fromString(jsonObject.get("chapterId").getAsString());
-        int rank = Integer.parseInt(jsonObject.get("rank").getAsString());
-        Chapter chapter = NarrativeCraftMod.getInstance().getEntryResolver().chapter(chapterId);
-        if (chapter == null) {
-            return null;
-        }
-        return new Scene(id, name, chapter, rank);
-    }
-}
+public interface NarrativeEntryDetail {}

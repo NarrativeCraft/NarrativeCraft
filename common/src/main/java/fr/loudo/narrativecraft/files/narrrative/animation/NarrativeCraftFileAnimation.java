@@ -25,14 +25,15 @@ package fr.loudo.narrativecraft.files.narrrative.animation;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.recording.action.AbstractAction;
+import fr.loudo.narrativecraft.files.ChildEntryFileEditor;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.animation.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.recording.Recording;
@@ -45,9 +46,15 @@ import java.util.List;
 import java.util.Map;
 
 public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
-        implements NarrativeCraftFileEditor<Animation> {
+        implements ChildEntryFileEditor<Animation, Scene> {
 
     private record EntityData(RecordingReader.EntityHeader header, List<AbstractAction> actions) {}
+
+    private final CharacterManager characterManager;
+
+    public NarrativeCraftFileAnimation(CharacterManager characterManager) {
+        this.characterManager = characterManager;
+    }
 
     @Override
     public OperationResult create(Animation entry) {
@@ -188,44 +195,32 @@ public class NarrativeCraftFileAnimation extends NarrativeCraftFileDefault
     }
 
     @Override
-    public List<DeserializationResult<Animation>> deserialize() {
-
+    public List<DeserializationResult<Animation>> load(Scene scene) {
         List<DeserializationResult<Animation>> deserializationResults = new ArrayList<>();
 
-        for (Chapter chapter :
-                NarrativeCraftMod.getInstance().getChapterManager().getList()) {
-            for (Scene scene : chapter.getSceneManager().getList()) {
+        File[] animations = NarrativeCraftFileUtil.getAnimationsFolder(scene).listFiles();
+        if (animations == null) {
+            return deserializationResults;
+        }
 
-                File animationsFolder = NarrativeCraftFileUtil.getAnimationsFolder(scene);
-                File[] animations = animationsFolder.listFiles();
-                if (animations == null) {
+        for (File file : animations) {
+            if (!file.getName().endsWith(Recording.RECORDING_EXTENSION)) continue;
+            try (DataInputStream stream = new DataInputStream(new FileInputStream(file))) {
+                RecordingReader reader = new RecordingReader(stream);
+                RecordingReader.RecordingHeader header = reader.readHeader();
+                ICharacterStory characterStory = characterManager.resolveCharacter(header.characterId(), scene);
+                if (characterStory == null) {
+                    characterStory = characterManager.get(0);
+                }
+                if (characterStory == null) {
                     continue;
                 }
+                Animation animation =
+                        new Animation(header.recordingId(), header.name(), scene, header.totalTick(), characterStory);
 
-                for (File file : animations) {
-                    if (!file.getName().endsWith(Recording.RECORDING_EXTENSION)) continue;
-                    try (DataInputStream stream = new DataInputStream(new FileInputStream(file))) {
-                        RecordingReader reader = new RecordingReader(stream);
-                        RecordingReader.RecordingHeader header = reader.readHeader();
-                        ICharacterStory characterStory = NarrativeCraftMod.getInstance()
-                                .getCharacterManager()
-                                .resolveCharacter(header.characterId(), scene);
-                        if (characterStory == null) {
-                            characterStory = NarrativeCraftMod.getInstance()
-                                    .getCharacterManager()
-                                    .get(0);
-                        }
-                        if (characterStory == null) {
-                            continue;
-                        }
-                        Animation animation = new Animation(
-                                header.recordingId(), header.name(), scene, header.totalTick(), characterStory);
-
-                        deserializationResults.add(new DeserializationResult<>(animation, false, file.getName()));
-                    } catch (IOException e) {
-                        deserializationResults.add(new DeserializationResult<>(null, true, file.getName()));
-                    }
-                }
+                deserializationResults.add(new DeserializationResult<>(animation, false, file.getName()));
+            } catch (IOException e) {
+                deserializationResults.add(new DeserializationResult<>(null, true, file.getName()));
             }
         }
 

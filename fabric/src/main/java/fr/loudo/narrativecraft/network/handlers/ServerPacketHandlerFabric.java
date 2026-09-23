@@ -25,22 +25,21 @@ package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.network.BiEditorClose;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailRequest;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailSave;
 import fr.loudo.narrativecraft.network.cameraangle.BiCameraAngleEnter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleAddTemplateReference;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleCaptureCharacter;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemovePlacement;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleRemoveTemplateReference;
-import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSave;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleSetEntityPose;
 import fr.loudo.narrativecraft.network.cameraangle.C2SCameraAngleTeleportToTemplate;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
 import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneControl;
-import fr.loudo.narrativecraft.network.cutscene.C2SCutsceneSave;
 import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
@@ -66,8 +65,11 @@ public class ServerPacketHandlerFabric {
         ServerPlayNetworking.registerGlobalReceiver(C2SCutsceneControl.TYPE, (packet, context) -> {
             ServerPacketHandler.cutsceneControl(packet, context.player());
         });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCutsceneSave.TYPE, (packet, context) -> {
-            ServerPacketHandler.cutsceneSave(packet, context.player());
+        ServerPlayNetworking.registerGlobalReceiver(C2SNarrativeEntryDetailRequest.TYPE, (packet, context) -> {
+            ServerPacketHandler.narrativeEntryDetailRequest(packet, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2SNarrativeEntryDetailSave.TYPE, (packet, context) -> {
+            ServerPacketHandler.narrativeEntryDetailSave(packet, context.player());
         });
         ServerPlayNetworking.registerGlobalReceiver(BiCutscenePlayHeadPacket.TYPE, (packet, context) -> {
             ServerPacketHandler.playHeadUpdate(packet, context.player());
@@ -77,9 +79,6 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(BiEditorClose.TYPE, (packet, context) -> {
             ServerPacketHandler.editorCloseRequest(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleSave.TYPE, (packet, context) -> {
-            ServerPacketHandler.cameraAngleSave(packet, context.player());
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SCameraAngleCaptureCharacter.TYPE, (packet, context) -> {
             ServerPacketHandler.cameraAngleCaptureCharacter(packet, context.player());
@@ -101,9 +100,6 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(BiInteractionEnter.TYPE, (packet, context) -> {
             ServerPacketHandler.interactionEnter(packet, context.player());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(C2SInteractionSave.TYPE, (packet, context) -> {
-            ServerPacketHandler.interactionSave(packet, context.player());
         });
         ServerPlayNetworking.registerGlobalReceiver(C2SInkActionFinished.TYPE, (packet, context) -> {
             ServerPacketHandler.inkActionFinished(packet, context.player());

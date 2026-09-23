@@ -23,12 +23,31 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.world.phys.Vec3;
 
 public class CameraView {
+
+    public static final Codec<CameraView> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                    NarrativeCodecs.fieldOrElseGet(NarrativeCodecs.UUID_CODEC, "id", UUID::randomUUID)
+                            .forGetter(CameraView::getId),
+                    Codec.STRING.fieldOf("name").forGetter(CameraView::getName),
+                    NarrativeCodecs.POSITION.forGetter(CameraView::getPosition),
+                    NarrativeCodecs.ROTATION.forGetter(CameraView::getRotation),
+                    NarrativeCodecs.field(Codec.FLOAT, "fov", 70f).forGetter(CameraView::getFov),
+                    NarrativeCodecs.field(
+                                    NarrativeCodecs.lenientList(CameraViewDialogSetup.CODEC), "dialogSetups", List.of())
+                            .forGetter(CameraView::getDialogSetups))
+            .apply(instance, (id, name, position, rotation, fov, dialogSetups) -> {
+                CameraView cameraView = new CameraView(id, name, position, rotation, fov);
+                cameraView.getDialogSetups().addAll(dialogSetups);
+                return cameraView;
+            }));
 
     private final UUID id;
     private String name;

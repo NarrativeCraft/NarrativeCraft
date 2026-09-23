@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.signals.SignalArgument;
 import fr.loudo.narrativecraft.commands.LocaleCommand;
 import fr.loudo.narrativecraft.editors.EditorMaker;
@@ -33,25 +32,26 @@ import fr.loudo.narrativecraft.editors.cutscene.CutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.editors.dialog.DialogEditorMaker;
 import fr.loudo.narrativecraft.editors.interaction.InteractionMakerEditorMaker;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryEditor;
+import fr.loudo.narrativecraft.narrative.DetailedNarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryEditorRegistry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryResolver;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryType;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneEditor;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneSerializer;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionEditor;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.mainScreen.MainScreenMakerEditor;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.locale.StoryLocaleManager;
 import fr.loudo.narrativecraft.network.BiEditorClose;
 import fr.loudo.narrativecraft.network.BiSyncNarrativeEntryPacket;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailRequest;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailSave;
+import fr.loudo.narrativecraft.network.S2CNarrativeEntryDetail;
 import fr.loudo.narrativecraft.network.S2CNarrativeEntryRejected;
 import fr.loudo.narrativecraft.network.S2CToastMessage;
 import fr.loudo.narrativecraft.network.cameraangle.*;
@@ -59,8 +59,6 @@ import fr.loudo.narrativecraft.network.cutscene.*;
 import fr.loudo.narrativecraft.network.dialog.C2SEnterDialogEditor;
 import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
-import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
@@ -88,10 +86,6 @@ public class ServerPacketHandler {
 
     private static NarrativeEntryResolver resolver() {
         return NarrativeCraftMod.getInstance().getEntryResolver();
-    }
-
-    private static <E extends NarrativeEntryEditor<?, ?>> E editor(Class<E> editorClass) {
-        return NarrativeEntryEditorRegistry.getInstance().getEditor(editorClass);
     }
 
     private static void sendSaveResult(Player player, String typeKey, OperationResult result) {
@@ -143,19 +137,20 @@ public class ServerPacketHandler {
         }
     }
 
-    public static void cutsceneSave(C2SCutsceneSave packet, Player player) {
+    public static void narrativeEntryDetailRequest(C2SNarrativeEntryDetailRequest packet, Player player) {
         if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
-        Cutscene cutscene = resolver().cutscene(packet.getChapterId(), packet.getSceneId(), packet.getCutsceneId());
-        if (cutscene == null) return;
-
-        OperationResult result =
-                editor(CutsceneEditor.class).saveLayers(cutscene, packet.getLayersJson(), packet.getManualMaxTick());
-        List<CutsceneLayer> layers = cutscene.getLayers() == null ? List.of() : cutscene.getLayers();
+        NarrativeEntry<?> entry = NarrativeEntryEditorRegistry.getInstance().resolve(packet.entryId(), packet.entry());
+        if (!(entry instanceof DetailedNarrativeEntry<?> detailedEntry)) return;
         Services.PACKET.sendToPlayer(
                 (ServerPlayer) player,
-                new S2CCutsceneEditorData(
-                        cutscene.getId(), CutsceneSerializer.serializeLayers(layers), cutscene.getManualMaxTick()));
-        sendSaveResult(player, "cutscene", result);
+                new S2CNarrativeEntryDetail(entry.getId(), entry.toPayload(), detailedEntry.getDetail()));
+    }
+
+    public static void narrativeEntryDetailSave(C2SNarrativeEntryDetailSave packet, Player player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
+        OperationResult result = NarrativeEntryEditorRegistry.getInstance()
+                .saveDetail(packet.entryId(), packet.entry(), packet.detail());
+        sendSaveResult(player, NarrativeEntryType.fromPayload(packet.entry()).getKey(), result);
     }
 
     public static void playHeadUpdate(BiCutscenePlayHeadPacket packet, Player player) {
@@ -224,16 +219,6 @@ public class ServerPacketHandler {
                             Utils.resolveProfileId(editor.getFakePlayer()),
                             S2CCharacterStoryAction.Action.ADD));
         }
-    }
-
-    public static void cameraAngleSave(C2SCameraAngleSave packet, Player player) {
-        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
-        CameraAngle cameraAngle =
-                resolver().cameraAngle(packet.getChapterId(), packet.getSceneId(), packet.getCameraAngleId());
-        if (cameraAngle == null) return;
-
-        OperationResult result = editor(CameraAngleEditor.class).saveData(cameraAngle, packet.getDataJson());
-        sendSaveResult(player, "camera_angle", result);
     }
 
     public static void cameraAngleRemovePlacement(C2SCameraAngleRemovePlacement packet, Player player) {
@@ -307,9 +292,7 @@ public class ServerPacketHandler {
         InteractionMakerEditorMaker editor = new InteractionMakerEditorMaker(interaction, session);
         session.openEditor(editor);
 
-        String dataJson = InteractionSerializer.serializeData(interaction);
-        Services.PACKET.sendToPlayer(
-                (ServerPlayer) player, new S2CInteractionEditorData(interaction.getId(), dataJson));
+        Services.PACKET.sendToPlayer((ServerPlayer) player, S2CNarrativeEntryDetail.of(interaction));
     }
 
     public static void inkActionFinished(C2SInkActionFinished packet, Player player) {
@@ -391,16 +374,6 @@ public class ServerPacketHandler {
         }
     }
 
-    public static void interactionSave(C2SInteractionSave packet, Player player) {
-        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
-        Interaction interaction =
-                resolver().interaction(packet.getChapterId(), packet.getSceneId(), packet.getInteractionId());
-        if (interaction == null) return;
-
-        OperationResult result = editor(InteractionEditor.class).saveData(interaction, packet.getDataJson());
-        sendSaveResult(player, "interaction", result);
-    }
-
     public static void cameraAngleSetEntityPose(C2SCameraAngleSetEntityPose packet, Player player) {
         if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
         PlayerSession session =
@@ -433,10 +406,9 @@ public class ServerPacketHandler {
         if (characterStory == null) return;
 
         CharacterPlacement placement =
-                new CharacterPlacement(characterStory, position, rotation, itemsBySlot, player.onGround());
-        String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
+                new CharacterPlacement(characterStory.getId(), position, rotation, itemsBySlot, player.onGround());
         Services.PACKET.sendToPlayer(
-                (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placementJson));
+                (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(cameraAngle.getId(), placement));
 
         cameraAngleMakerEditor.spawnEntity(placement);
     }
@@ -462,10 +434,9 @@ public class ServerPacketHandler {
         Map<EquipmentSlot, ItemStack> itemsBySlot = captureEquipment(player);
 
         CharacterPlacement placement =
-                new CharacterPlacement(characterStory, position, rotation, itemsBySlot, player.onGround());
-        String placementJson = CameraAngleSerializer.serializeSingleCharacterPlacement(placement);
+                new CharacterPlacement(characterStory.getId(), position, rotation, itemsBySlot, player.onGround());
         Services.PACKET.sendToPlayer(
-                (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(mainScreenAngle.getId(), placementJson));
+                (ServerPlayer) player, new S2CCameraAngleCharacterCaptured(mainScreenAngle.getId(), placement));
 
         editor.spawnEntity(placement);
     }
@@ -498,11 +469,11 @@ public class ServerPacketHandler {
         CameraAngle mainScreenData = NarrativeCraftMod.getInstance().getMainScreenData();
         if (mainScreenData == null) return;
         CameraAngle updated = new CameraAngle(mainScreenData.getId(), mainScreenData.getName(), null);
+        updated.setDetail(packet.data());
         OperationResult result;
         try {
-            CameraAngleDeserializer.deserializeInto(packet.dataJson(), updated);
             NarrativeCraftMod.getInstance().getFile().saveMainScreenData(updated);
-            mainScreenData.copyDataFrom(updated);
+            mainScreenData.setDetail(packet.data());
             result = OperationResult.success();
         } catch (Exception e) {
             NarrativeCraftMod.LOGGER.error("Failed to save main screen data!", e);

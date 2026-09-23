@@ -107,7 +107,9 @@ public class CameraAngleInkAction extends InkAction {
                     if (characterPlacement.isTemplate()) continue;
                     Entity entity = editor.getEntityForPlacement(characterPlacement.getId());
                     if (entity == null) continue;
-                    storyHandler.registerEntity(characterPlacement.getCharacterStory(), entity);
+                    ICharacterStory characterStory = editor.resolveCharacter(characterPlacement);
+                    if (characterStory == null) continue;
+                    storyHandler.registerEntity(characterStory, entity);
                 }
             }
         }
@@ -119,7 +121,9 @@ public class CameraAngleInkAction extends InkAction {
     private void registerDialogData(StoryHandler storyHandler) {
         DialogData global = NarrativeCraftMod.getInstance().getGlobalDialogData();
         for (CharacterPlacement placement : cameraAngle.getCharacterPlacements()) {
-            if (!(placement.getCharacterStory() instanceof ICharacterStory character)) continue;
+            ICharacterStory character = placement.resolveCharacter(
+                    NarrativeCraftMod.getInstance().getCharacterManager(), cameraAngle.getScene());
+            if (character == null) continue;
             CameraViewDialogSetup setup = findSetupForPlacement(placement.getId());
             DialogData cameraData = setup != null ? setup.getDialogData() : null;
             DialogData resolved = DialogData.resolve(global, character.getDialogData(), cameraData);

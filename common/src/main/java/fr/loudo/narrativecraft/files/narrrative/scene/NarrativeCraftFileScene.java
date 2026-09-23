@@ -23,30 +23,29 @@
 
 package fr.loudo.narrativecraft.files.narrrative.scene;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.ChildEntryFileEditor;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.EntryChange;
 import fr.loudo.narrativecraft.files.FileTransaction;
 import fr.loudo.narrativecraft.files.InkFileGenerator;
+import fr.loudo.narrativecraft.files.JsonCodecFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
 import fr.loudo.narrativecraft.files.RankedNarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.narrative.OperationResult;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.narrative.scene.SceneDeserializer;
-import fr.loudo.narrativecraft.narrative.scene.SceneSerializer;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NarrativeCraftFileScene extends NarrativeCraftFileDefault
-        implements RankedNarrativeCraftFileEditor<Scene> {
+        implements RankedNarrativeCraftFileEditor<Scene>, ChildEntryFileEditor<Scene, Chapter> {
 
     private static final List<String> SCENE_SUB_FOLDERS = List.of(
             ANIMATIONS_FOLDER_NAME,
@@ -55,13 +54,6 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault
             CAMERA_ANGLES_FOLDER_NAME,
             NPC_FOLDER_NAME,
             INTERACTIONS_FOLDER_NAME);
-
-    private static final Gson SERIALIZER = new GsonBuilder()
-            .registerTypeAdapter(Scene.class, new SceneSerializer())
-            .create();
-    private static final Gson DESERIALIZER = new GsonBuilder()
-            .registerTypeAdapter(Scene.class, new SceneDeserializer())
-            .create();
 
     @Override
     public OperationResult create(Scene entry) {
@@ -140,42 +132,29 @@ public class NarrativeCraftFileScene extends NarrativeCraftFileDefault
     }
 
     private void writeData(FileTransaction transaction, File sceneFolder, Scene scene) throws IOException {
-        transaction.write(new File(sceneFolder, DATA_FILE_NAME), writer -> SERIALIZER.toJson(scene, writer));
+        JsonCodecFile.write(transaction, new File(sceneFolder, DATA_FILE_NAME), Scene.codec(scene.getChapter()), scene);
     }
 
     @Override
-    public List<DeserializationResult<Scene>> deserialize() {
+    public List<DeserializationResult<Scene>> load(Chapter chapter) {
         List<DeserializationResult<Scene>> deserializationResults = new ArrayList<>();
 
-        File[] chapterFolders = NarrativeCraftFileUtil.getChaptersFolder().listFiles();
-        if (chapterFolders == null) {
+        File[] sceneFolders = NarrativeCraftFileUtil.getScenesFolder(chapter).listFiles(File::isDirectory);
+        if (sceneFolders == null) {
             return deserializationResults;
         }
 
-        for (File chapterFolder : chapterFolders) {
-            if (NarrativeCraftFileWriter.isTemporary(chapterFolder)) continue;
-            File[] sceneFolders = new File(chapterFolder, SCENES_FOLDER_NAME).listFiles();
-            if (sceneFolders == null) {
-                continue;
-            }
-
-            for (File sceneFolder : sceneFolders) {
-                if (NarrativeCraftFileWriter.isTemporary(sceneFolder)) continue;
-                File dataFile = new File(sceneFolder, DATA_FILE_NAME);
-                try {
-                    String content = Files.readString(dataFile.toPath());
-                    Scene scene = DESERIALIZER.fromJson(content, Scene.class);
-                    if (scene == null) {
-                        throw new Exception(String.format(
-                                "Scene %s of chapter %s deserialization returned null",
-                                sceneFolder.getName(), chapterFolder.getName()));
-                    }
-                    deserializationResults.add(new DeserializationResult<>(scene, false, sceneFolder.getName()));
-                } catch (Exception e) {
-                    NarrativeCraftMod.LOGGER.error(
-                            "Failed to init scene {} of chapter {}", sceneFolder.getName(), chapterFolder.getName(), e);
-                    deserializationResults.add(new DeserializationResult<>(null, true, sceneFolder.getName()));
-                }
+        Codec<Scene> codec = Scene.codec(chapter);
+        for (File sceneFolder : sceneFolders) {
+            if (NarrativeCraftFileWriter.isTemporary(sceneFolder)) continue;
+            try {
+                Scene scene = JsonCodecFile.read(new File(sceneFolder, DATA_FILE_NAME), codec);
+                String folderName = migrateFolderName(sceneFolder, scene.toFileName());
+                deserializationResults.add(new DeserializationResult<>(scene, false, folderName));
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error(
+                        "Failed to init scene {} of chapter {}", sceneFolder.getName(), chapter.getName(), e);
+                deserializationResults.add(new DeserializationResult<>(null, true, sceneFolder.getName()));
             }
         }
 

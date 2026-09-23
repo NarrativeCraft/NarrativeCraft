@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
@@ -39,7 +41,7 @@ public class NarrativeEntryPayload {
 
         @Override
         public void encode(ByteBuf buffer, NarrativeEntryPayload value) {
-            NarrativeEntryType type = NarrativeEntryType.fromClass(value.getClass());
+            NarrativeEntryType type = NarrativeEntryType.fromPayload(value);
             buffer.writeInt(type.ordinal());
             type.getCodec().encode(buffer, value);
         }
@@ -47,6 +49,10 @@ public class NarrativeEntryPayload {
 
     public NarrativeEntryPayload(String name) {
         this.name = name;
+    }
+
+    protected static <P extends NarrativeEntryPayload> RecordCodecBuilder<P, String> nameField() {
+        return Codec.STRING.fieldOf("name").forGetter(NarrativeEntryPayload::getName);
     }
 
     public String getName() {

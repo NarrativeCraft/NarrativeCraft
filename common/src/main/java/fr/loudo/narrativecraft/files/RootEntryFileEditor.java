@@ -21,34 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.cutscene;
+package fr.loudo.narrativecraft.files;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import java.util.List;
 
-public record S2CCutsceneEditorData(UUID cutsceneId, String layersJson, int manualMaxTick)
-        implements CustomPacketPayload {
+public interface RootEntryFileEditor<T extends NarrativeEntry<?>> extends NarrativeCraftFileEditor<T> {
 
-    public static final Type<S2CCutsceneEditorData> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "cutscene_editor_data"));
-
-    public static final StreamCodec<ByteBuf, S2CCutsceneEditorData> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            S2CCutsceneEditorData::cutsceneId,
-            ByteBufCodecs.STRING_UTF8,
-            S2CCutsceneEditorData::layersJson,
-            ByteBufCodecs.VAR_INT,
-            S2CCutsceneEditorData::manualMaxTick,
-            S2CCutsceneEditorData::new);
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
+    List<DeserializationResult<T>> load();
 }

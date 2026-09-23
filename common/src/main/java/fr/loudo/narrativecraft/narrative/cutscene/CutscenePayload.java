@@ -23,31 +23,27 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.List;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class CutscenePayload extends SceneEntryPayload {
 
+    public static final MapCodec<CutscenePayload> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    nameField(),
+                    sceneIdField(),
+                    chapterIdField(),
+                    NarrativeCodecs.field(NarrativeCodecs.UUID_CODEC.listOf(), "animationIds", List.of())
+                            .forGetter(CutscenePayload::getAnimationIds),
+                    NarrativeCodecs.field(NarrativeCodecs.UUID_CODEC.listOf(), "subsceneIds", List.of())
+                            .forGetter(CutscenePayload::getSubsceneIds))
+            .apply(instance, CutscenePayload::new));
+
     private final List<UUID> animationIds;
     private final List<UUID> subsceneIds;
-
-    public static final StreamCodec<ByteBuf, CutscenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            CutscenePayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            CutscenePayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            CutscenePayload::getChapterId,
-            UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
-            CutscenePayload::getAnimationIds,
-            UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
-            CutscenePayload::getSubsceneIds,
-            CutscenePayload::new);
 
     public CutscenePayload(String name, UUID sceneId, UUID chapterId, List<UUID> animationIds, List<UUID> subsceneIds) {
         super(name, sceneId, chapterId);

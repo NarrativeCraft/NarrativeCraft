@@ -25,14 +25,12 @@ package fr.loudo.narrativecraft.files.narrrative.cameraangle;
 
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 
 public class NarrativeCraftFileCameraAngle extends AbstractNarrativeCraftFileSceneJsonEntry<CameraAngle> {
 
     public NarrativeCraftFileCameraAngle() {
-        super(CameraAngle.class, new CameraAngleSerializer(), new CameraAngleDeserializer());
+        super(CameraAngle::codec);
     }
 
     @Override

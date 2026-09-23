@@ -23,15 +23,19 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene.layers.fov;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.EasingType;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 
 public class FovLayerType implements ICutsceneLayerType {
 
     public static final String ID = "fov";
+
+    private static final Codec<EasingType> EASING = NarrativeCodecs.enumByName(EasingType.class);
 
     @Override
     public String getId() {
@@ -49,32 +53,16 @@ public class FovLayerType implements ICutsceneLayerType {
     }
 
     @Override
-    public JsonObject serializeKeyframe(Keyframe keyframe) {
-        if (!(keyframe instanceof FovKeyframe fovKeyframe)) return null;
-
-        JsonObject json = new JsonObject();
-        json.addProperty("tick", fovKeyframe.getTick());
-        json.addProperty("fov", fovKeyframe.getFov());
-        json.addProperty("easing", fovKeyframe.getEasing().name());
-        return json;
-    }
-
-    @Override
-    public Keyframe deserializeKeyframe(CutsceneLayer layer, JsonObject json) {
-        if (!json.has("tick") || !json.has("fov")) return null;
-
-        int tick = json.get("tick").getAsInt();
-        float fov = json.get("fov").getAsFloat();
-        String easing = json.get("easing").getAsString();
-        EasingType easingType;
-        try {
-            easingType = EasingType.valueOf(easing.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            easingType = EasingType.LINEAR;
-        }
-        FovKeyframe fovKeyframe = new FovKeyframe(layer, tick, fov);
-        fovKeyframe.setEasing(easingType);
-
-        return fovKeyframe;
+    public Codec<Keyframe> keyframeCodec(CutsceneLayer layer) {
+        return Keyframe.typedCodec(FovKeyframe.class, RecordCodecBuilder.create(instance -> instance.group(
+                        Keyframe.TICK.forGetter(FovKeyframe::getTick),
+                        Codec.FLOAT.fieldOf("fov").forGetter(FovKeyframe::getFov),
+                        NarrativeCodecs.field(EASING, "easing", EasingType.LINEAR)
+                                .forGetter(FovKeyframe::getEasing))
+                .apply(instance, (tick, fov, easing) -> {
+                    FovKeyframe keyframe = new FovKeyframe(layer, tick, fov);
+                    keyframe.setEasing(easing);
+                    return keyframe;
+                })));
     }
 }

@@ -21,43 +21,32 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.interaction;
+package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public class S2CInteractionEditorData implements CustomPacketPayload {
+public record C2SNarrativeEntryDetailRequest(UUID entryId, NarrativeEntryPayload entry) implements CustomPacketPayload {
 
-    private final UUID interactionId;
-    private final String dataJson;
+    public static final Type<C2SNarrativeEntryDetailRequest> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "narrative_entry_detail_request"));
 
-    public S2CInteractionEditorData(UUID interactionId, String dataJson) {
-        this.interactionId = interactionId;
-        this.dataJson = dataJson;
-    }
-
-    public static final Type<S2CInteractionEditorData> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "interaction_editor_data"));
-
-    public static final StreamCodec<ByteBuf, S2CInteractionEditorData> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, C2SNarrativeEntryDetailRequest> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            S2CInteractionEditorData::getInteractionId,
-            ByteBufCodecs.STRING_UTF8,
-            S2CInteractionEditorData::getDataJson,
-            S2CInteractionEditorData::new);
+            C2SNarrativeEntryDetailRequest::entryId,
+            NarrativeEntryPayload.STREAM_CODEC,
+            C2SNarrativeEntryDetailRequest::entry,
+            C2SNarrativeEntryDetailRequest::new);
 
-    public UUID getInteractionId() {
-        return interactionId;
-    }
-
-    public String getDataJson() {
-        return dataJson;
+    public static C2SNarrativeEntryDetailRequest of(NarrativeEntry<?> entry) {
+        return new C2SNarrativeEntryDetailRequest(entry.getId(), entry.toPayload());
     }
 
     @Override

@@ -29,13 +29,11 @@ import fr.loudo.narrativecraft.network.S2CEditorOpened;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
-import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
@@ -52,8 +50,11 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(BiCutsceneEnter.TYPE, (packet, context) -> {
             ClientPacketHandler.cutsceneState(packet);
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CNarrativeDataClear.TYPE, (packet, context) -> {
-            ClientPacketHandler.clearNarrativeData();
+        ClientPlayNetworking.registerGlobalReceiver(S2CNarrativeSnapshot.TYPE, (packet, context) -> {
+            ClientPacketHandler.narrativeSnapshot(packet);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CNarrativeEntryDetail.TYPE, (packet, context) -> {
+            ClientPacketHandler.narrativeEntryDetail(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CScreenClear.TYPE, (packet, context) -> {
             ClientPacketHandler.clearScreen();
@@ -67,17 +68,11 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CNarrativeEntryRejected.TYPE, (packet, context) -> {
             ClientPacketHandler.narrativeEntryRejected(packet);
         });
-        ClientPlayNetworking.registerGlobalReceiver(S2CCutsceneEditorData.TYPE, (packet, context) -> {
-            ClientPacketHandler.loadCutsceneEditorData(packet);
-        });
         ClientPlayNetworking.registerGlobalReceiver(BiCutscenePlayHeadPacket.TYPE, (packet, context) -> {
             ClientPacketHandler.updatePlayHeadCutscene(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CDialogTest.TYPE, (packet, context) -> {
             ClientPacketHandler.handleDialogTest(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CCameraAngleEditorData.TYPE, (packet, context) -> {
-            ClientPacketHandler.loadCameraAngleEditorData(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CCameraAngleCharacterCaptured.TYPE, (packet, context) -> {
             ClientPacketHandler.addCameraAngleCharacter(packet);
@@ -90,9 +85,6 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CEnterCameraView.TYPE, (packet, context) -> {
             ClientPacketHandler.enterCameraView(packet);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CInteractionEditorData.TYPE, (packet, context) -> {
-            ClientPacketHandler.loadInteractionEditorData(packet);
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CInteractionLeave.TYPE, (packet, context) -> {
             ClientPacketHandler.interactionLeave(packet);

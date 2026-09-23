@@ -36,8 +36,6 @@ import fr.loudo.narrativecraft.network.inkAction.C2SInkActionFinished;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.inkAction.S2CStopAllInkActions;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
-import fr.loudo.narrativecraft.network.interaction.C2SInteractionSave;
-import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
@@ -76,21 +74,17 @@ public class OnPacketRegisterEventNeoForge {
                 S2CNarrativeEntryRejected.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::narrativeEntryRejected);
         registrar.playToClient(
-                S2CCutsceneEditorData.TYPE,
-                S2CCutsceneEditorData.STREAM_CODEC,
-                ClientPacketHandlerNeoForge::loadCutsceneEditorData);
+                S2CNarrativeSnapshot.TYPE,
+                S2CNarrativeSnapshot.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::narrativeSnapshot);
         registrar.playToClient(
-                S2CNarrativeDataClear.TYPE,
-                S2CNarrativeDataClear.STREAM_CODEC,
-                ClientPacketHandlerNeoForge::clearNarrativeData);
+                S2CNarrativeEntryDetail.TYPE,
+                S2CNarrativeEntryDetail.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::narrativeEntryDetail);
         registrar.playToClient(
                 S2CScreenClear.TYPE, S2CScreenClear.STREAM_CODEC, ClientPacketHandlerNeoForge::clearScreen);
         registrar.playToClient(
                 S2CPlayerSession.TYPE, S2CPlayerSession.STREAM_CODEC, ClientPacketHandlerNeoForge::setSession);
-        registrar.playToClient(
-                S2CCameraAngleEditorData.TYPE,
-                S2CCameraAngleEditorData.STREAM_CODEC,
-                ClientPacketHandlerNeoForge::loadCameraAngleEditorData);
         registrar.playToClient(
                 S2CCameraAngleCharacterCaptured.TYPE,
                 S2CCameraAngleCharacterCaptured.STREAM_CODEC,
@@ -101,10 +95,6 @@ public class OnPacketRegisterEventNeoForge {
                 ClientPacketHandlerNeoForge::onPlacementEntitySpawned);
         registrar.playToClient(
                 S2CEnterCameraView.TYPE, S2CEnterCameraView.STREAM_CODEC, ClientPacketHandlerNeoForge::enterCameraView);
-        registrar.playToClient(
-                S2CInteractionEditorData.TYPE,
-                S2CInteractionEditorData.STREAM_CODEC,
-                ClientPacketHandlerNeoForge::loadInteractionEditorData);
         registrar.playToClient(
                 S2CInteractionLeave.TYPE,
                 S2CInteractionLeave.STREAM_CODEC,
@@ -169,9 +159,13 @@ public class OnPacketRegisterEventNeoForge {
         registrar.playToServer(
                 C2SCutsceneControl.TYPE, C2SCutsceneControl.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneControl);
         registrar.playToServer(
-                C2SCutsceneSave.TYPE, C2SCutsceneSave.STREAM_CODEC, ServerPacketHandlerNeoForge::cutsceneSave);
+                C2SNarrativeEntryDetailRequest.TYPE,
+                C2SNarrativeEntryDetailRequest.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::narrativeEntryDetailRequest);
         registrar.playToServer(
-                C2SCameraAngleSave.TYPE, C2SCameraAngleSave.STREAM_CODEC, ServerPacketHandlerNeoForge::cameraAngleSave);
+                C2SNarrativeEntryDetailSave.TYPE,
+                C2SNarrativeEntryDetailSave.STREAM_CODEC,
+                ServerPacketHandlerNeoForge::narrativeEntryDetailSave);
         registrar.playToServer(
                 C2SCameraAngleCaptureCharacter.TYPE,
                 C2SCameraAngleCaptureCharacter.STREAM_CODEC,
@@ -196,8 +190,6 @@ public class OnPacketRegisterEventNeoForge {
                 C2SCameraAngleSetEntityPose.TYPE,
                 C2SCameraAngleSetEntityPose.STREAM_CODEC,
                 ServerPacketHandlerNeoForge::cameraAngleSetEntityPose);
-        registrar.playToServer(
-                C2SInteractionSave.TYPE, C2SInteractionSave.STREAM_CODEC, ServerPacketHandlerNeoForge::interactionSave);
         registrar.playToServer(
                 C2SInkActionFinished.TYPE,
                 C2SInkActionFinished.STREAM_CODEC,

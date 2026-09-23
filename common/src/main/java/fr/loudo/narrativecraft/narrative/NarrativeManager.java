@@ -24,9 +24,15 @@
 package fr.loudo.narrativecraft.narrative;
 
 import fr.loudo.narrativecraft.managers.Manager;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class NarrativeManager<T extends NarrativeEntry<?>> extends Manager<T> {
+
+    public List<T> getAllById(List<UUID> ids) {
+        return ids.stream().map(this::getById).filter(Objects::nonNull).toList();
+    }
 
     public T getById(UUID id) {
         for (T entry : list) {

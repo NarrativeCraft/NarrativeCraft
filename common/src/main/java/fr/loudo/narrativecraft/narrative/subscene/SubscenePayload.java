@@ -23,28 +23,24 @@
 
 package fr.loudo.narrativecraft.narrative.subscene;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.narrative.SceneEntryPayload;
-import io.netty.buffer.ByteBuf;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.List;
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class SubscenePayload extends SceneEntryPayload {
 
-    private final List<UUID> animationIds;
+    public static final MapCodec<SubscenePayload> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    nameField(),
+                    sceneIdField(),
+                    chapterIdField(),
+                    NarrativeCodecs.field(NarrativeCodecs.UUID_CODEC.listOf(), "animationIds", List.of())
+                            .forGetter(SubscenePayload::getAnimationIds))
+            .apply(instance, SubscenePayload::new));
 
-    public static final StreamCodec<ByteBuf, SubscenePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            SubscenePayload::getName,
-            UUIDUtil.STREAM_CODEC,
-            SubscenePayload::getSceneId,
-            UUIDUtil.STREAM_CODEC,
-            SubscenePayload::getChapterId,
-            UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
-            SubscenePayload::getAnimationIds,
-            SubscenePayload::new);
+    private final List<UUID> animationIds;
 
     public SubscenePayload(String name, UUID sceneId, UUID chapterId, List<UUID> animationIds) {
         super(name, sceneId, chapterId);

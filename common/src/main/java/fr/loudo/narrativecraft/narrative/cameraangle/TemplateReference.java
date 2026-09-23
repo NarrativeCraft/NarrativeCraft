@@ -23,9 +23,21 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.UUID;
 
 public record TemplateReference(UUID id, TemplateSourceType sourceType, UUID refId, String displayName) {
+
+    public static final Codec<TemplateReference> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                    NarrativeCodecs.ID.forGetter(TemplateReference::id),
+                    NarrativeCodecs.enumByName(TemplateSourceType.class)
+                            .fieldOf("sourceType")
+                            .forGetter(TemplateReference::sourceType),
+                    NarrativeCodecs.UUID_CODEC.fieldOf("characterId").forGetter(TemplateReference::refId),
+                    NarrativeCodecs.field(Codec.STRING, "displayName", "").forGetter(TemplateReference::displayName))
+            .apply(instance, TemplateReference::new));
 
     public TemplateReference(TemplateSourceType sourceType, UUID refId, String displayName) {
         this(UUID.randomUUID(), sourceType, refId, displayName);

@@ -24,10 +24,9 @@
 package fr.loudo.narrativecraft.narrative.story;
 
 import com.google.gson.*;
+import com.mojang.serialization.JsonOps;
 import fr.loudo.narrativecraft.api.utils.UserPosition;
 import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.DialogDataIO;
-import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.UUID;
@@ -52,7 +51,11 @@ public class StoryHandlerSerializer implements JsonSerializer<StoryHandler> {
 
         JsonObject characterDialogData = new JsonObject();
         for (Map.Entry<String, DialogData> entry : src.getCharacterDialogData().entrySet()) {
-            characterDialogData.add(entry.getKey(), DialogDataIO.serialize(entry.getValue(), DialogFieldSet.CHARACTER));
+            characterDialogData.add(
+                    entry.getKey(),
+                    DialogData.CHARACTER_CODEC
+                            .encodeStart(JsonOps.INSTANCE, entry.getValue())
+                            .getOrThrow());
         }
         json.add("characterDialogData", characterDialogData);
 

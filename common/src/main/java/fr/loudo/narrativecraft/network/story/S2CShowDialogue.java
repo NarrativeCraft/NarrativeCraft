@@ -24,13 +24,14 @@
 package fr.loudo.narrativecraft.network.story;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.dialog.DialogData;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CShowDialogue(String speaker, String text, int entityId, String dialogDataJson)
+public record S2CShowDialogue(String speaker, String text, int entityId, DialogData dialogData)
         implements CustomPacketPayload {
 
     public static final int NO_ENTITY = -1;
@@ -45,8 +46,8 @@ public record S2CShowDialogue(String speaker, String text, int entityId, String 
             S2CShowDialogue::text,
             ByteBufCodecs.INT,
             S2CShowDialogue::entityId,
-            ByteBufCodecs.STRING_UTF8,
-            S2CShowDialogue::dialogDataJson,
+            DialogData.STREAM_CODEC,
+            S2CShowDialogue::dialogData,
             S2CShowDialogue::new);
 
     @Override

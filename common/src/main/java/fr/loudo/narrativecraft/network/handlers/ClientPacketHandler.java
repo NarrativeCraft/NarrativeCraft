@@ -23,8 +23,6 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.NativeImage;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
@@ -34,6 +32,7 @@ import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.client.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.client.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.client.editors.ClientEntryDetailListener;
 import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
 import fr.loudo.narrativecraft.client.editors.dialog.ClientCharacterDialogEditorMaker;
@@ -52,9 +51,10 @@ import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.dialog.*;
 import fr.loudo.narrativecraft.editors.EditorMaker;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.DetailedNarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleDeserializer;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
 import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
@@ -64,12 +64,10 @@ import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.cutscene.BiCutsceneEnter;
 import fr.loudo.narrativecraft.network.cutscene.BiCutscenePlayHeadPacket;
-import fr.loudo.narrativecraft.network.cutscene.S2CCutsceneEditorData;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogEditorEntitySpawned;
 import fr.loudo.narrativecraft.network.dialog.S2CDialogTest;
 import fr.loudo.narrativecraft.network.inkAction.S2CRunInkAction;
 import fr.loudo.narrativecraft.network.interaction.BiInteractionEnter;
-import fr.loudo.narrativecraft.network.interaction.S2CInteractionEditorData;
 import fr.loudo.narrativecraft.network.interaction.S2CInteractionLeave;
 import fr.loudo.narrativecraft.network.mainScreen.BiMainScreenEnter;
 import fr.loudo.narrativecraft.network.mainScreen.S2CMainScreenData;
@@ -127,9 +125,24 @@ public class ClientPacketHandler {
         session.setEditor(cutsceneEditor);
     }
 
-    public static void clearNarrativeData() {
+    public static void narrativeSnapshot(S2CNarrativeSnapshot packet) {
         ClientNarrativeCraftMod.getInstance().getChapterManager().clear();
         ClientNarrativeCraftMod.getInstance().getCharacterManager().clear();
+        for (S2CNarrativeSnapshot.Entry entry : packet.entries()) {
+            ClientNarrativeEntryEditorRegistry.getInstance().add(entry.entryId(), entry.payload());
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static void narrativeEntryDetail(S2CNarrativeEntryDetail packet) {
+        NarrativeEntry<?> entry =
+                ClientNarrativeEntryEditorRegistry.getInstance().resolve(packet.entryId(), packet.entry());
+        if (!(entry instanceof DetailedNarrativeEntry detailedEntry)) return;
+        detailedEntry.setDetail(packet.detail());
+        if (ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor()
+                instanceof ClientEntryDetailListener listener) {
+            listener.onEntryDetailLoaded(entry);
+        }
     }
 
     public static void clearScreen() {
@@ -148,26 +161,11 @@ public class ClientPacketHandler {
         UtilsClient.sendToast(packet.title(), packet.message());
     }
 
-    public static void loadCutsceneEditorData(S2CCutsceneEditorData packet) {
-        ClientCutsceneMakerEditorMaker cutsceneMakerEditor =
-                ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
-        if (!(cutsceneMakerEditor instanceof ClientCutsceneMakerEditorMaker editor)) return;
-        editor.loadLayers(packet.layersJson());
-        editor.applyManualMaxTick(packet.manualMaxTick());
-    }
-
-    public static void loadCameraAngleEditorData(S2CCameraAngleEditorData packet) {
-        EditorMaker editor =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor();
-        if (!(editor instanceof ClientCameraAngleMakerEditorMaker editorMaker)) return;
-        editorMaker.loadData(packet.dataJson());
-    }
-
     public static void addCameraAngleCharacter(S2CCameraAngleCharacterCaptured packet) {
         ClientCameraAngleMakerEditorMaker editor =
                 ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
         if (editor == null) return;
-        editor.addCharacterPlacementFromJson(packet.placementJson());
+        editor.addCharacterPlacement(packet.placement());
     }
 
     public static void onPlacementEntitySpawned(S2CCameraAnglePlacementEntitySpawned packet) {
@@ -185,13 +183,6 @@ public class ClientPacketHandler {
         } else if (editor instanceof ClientCharacterDialogEditorMaker characterEditor) {
             characterEditor.registerEntityId(packet.entityId());
         }
-    }
-
-    public static void loadInteractionEditorData(S2CInteractionEditorData packet) {
-        ClientInteractionMakerEditorMaker editor =
-                ClientNarrativeCraftMod.getInstance().getInteractionMakerEditor(packet.getInteractionId());
-        if (editor == null) return;
-        editor.loadData(packet.getDataJson());
     }
 
     public static void handleDialogTest(S2CDialogTest packet) {
@@ -378,7 +369,7 @@ public class ClientPacketHandler {
     private static void displayDialogue(S2CShowDialogue packet) {
         ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
 
-        DialogData resolvedData = resolveDialogData(packet.dialogDataJson());
+        DialogData resolvedData = packet.dialogData();
 
         if (session.getMainDialog() != null) {
             DialogRenderer dialogRenderer = session.getMainDialog();
@@ -394,8 +385,7 @@ public class ClientPacketHandler {
         if (packet.entityId() != S2CShowDialogue.NO_ENTITY && MINECRAFT.level != null) {
             Entity entity = MINECRAFT.level.getEntity(packet.entityId());
             if (entity != null) {
-                DialogData data = resolvedData != null ? resolvedData : new DialogData();
-                DialogRenderer3D renderer = new DialogRenderer3D(data, entity);
+                DialogRenderer3D renderer = new DialogRenderer3D(resolvedData, entity);
                 session.setMainDialog(renderer);
                 renderer.onStopped(() -> {
                     session.removeDialog3D(renderer);
@@ -421,16 +411,6 @@ public class ClientPacketHandler {
         });
         renderer.start(packet.text());
         session.addDialog2D(renderer);
-    }
-
-    private static DialogData resolveDialogData(String dialogDataJson) {
-        if (dialogDataJson == null || dialogDataJson.isEmpty()) return null;
-        try {
-            JsonObject json = JsonParser.parseString(dialogDataJson).getAsJsonObject();
-            return DialogDataIO.deserialize(json, DialogFieldSet.ALL);
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     public static void characterStoryAction(S2CCharacterStoryAction packet) {
@@ -555,9 +535,16 @@ public class ClientPacketHandler {
     }
 
     public static void receiveMainScreenData(S2CMainScreenData packet) {
-        CameraAngle cameraAngle = new CameraAngle("", null);
-        CameraAngleDeserializer.deserializeInto(packet.dataJson(), cameraAngle);
-        ClientNarrativeCraftMod.getInstance().setMainScreenData(cameraAngle);
+        CameraAngle mainScreenData = ClientNarrativeCraftMod.getInstance().getMainScreenData();
+        if (mainScreenData == null) {
+            mainScreenData = new CameraAngle("", null);
+            ClientNarrativeCraftMod.getInstance().setMainScreenData(mainScreenData);
+        }
+        mainScreenData.setDetail(packet.data());
+        if (ClientNarrativeCraftMod.getInstance().getPlayerSession().getEditor()
+                instanceof ClientEntryDetailListener listener) {
+            listener.onEntryDetailLoaded(mainScreenData);
+        }
     }
 
     public static void openMainScreen(S2COpenMainScreen packet) {

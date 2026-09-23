@@ -25,13 +25,9 @@ package fr.loudo.narrativecraft.client.narrative.cutscene;
 
 import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.narrative.subscene.Subscene;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class ClientCutsceneEditor extends ClientSceneEntryEditor<CutscenePayload, Cutscene> {
@@ -43,27 +39,11 @@ public class ClientCutsceneEditor extends ClientSceneEntryEditor<CutscenePayload
 
     @Override
     protected Cutscene create(UUID entryId, CutscenePayload payload, Scene scene) {
-        return new Cutscene(
-                entryId, payload.getName(), scene, resolveAnimations(payload, scene), resolveSubscenes(payload, scene));
+        return Cutscene.fromPayload(entryId, payload, scene);
     }
 
     @Override
-    protected void update(Cutscene cutscene, CutscenePayload payload) {
-        cutscene.setAnimations(resolveAnimations(payload, cutscene.getScene()));
-        cutscene.setSubscenes(resolveSubscenes(payload, cutscene.getScene()));
-    }
-
-    private List<Animation> resolveAnimations(CutscenePayload payload, Scene scene) {
-        return payload.getAnimationIds().stream()
-                .map(animationId -> scene.getAnimationManager().getById(animationId))
-                .filter(Objects::nonNull)
-                .toList();
-    }
-
-    private List<Subscene> resolveSubscenes(CutscenePayload payload, Scene scene) {
-        return payload.getSubsceneIds().stream()
-                .map(subsceneId -> scene.getSubsceneManager().getById(subsceneId))
-                .filter(Objects::nonNull)
-                .toList();
+    protected void copyAttributes(Cutscene target, Cutscene source) {
+        target.copyAttributesFrom(source);
     }
 }

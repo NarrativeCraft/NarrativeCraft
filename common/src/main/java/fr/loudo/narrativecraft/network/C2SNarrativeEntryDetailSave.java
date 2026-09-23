@@ -21,22 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.cameraangle;
+package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryDetail;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
+import java.util.UUID;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CCameraAngleEditorData(String dataJson) implements CustomPacketPayload {
+public record C2SNarrativeEntryDetailSave(UUID entryId, NarrativeEntryPayload entry, NarrativeEntryDetail detail)
+        implements CustomPacketPayload {
 
-    public static final Type<S2CCameraAngleEditorData> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "camera_angle_editor_data"));
+    public static final Type<C2SNarrativeEntryDetailSave> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "narrative_entry_detail_save"));
 
-    public static final StreamCodec<ByteBuf, S2CCameraAngleEditorData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, S2CCameraAngleEditorData::dataJson, S2CCameraAngleEditorData::new);
+    public static final StreamCodec<ByteBuf, C2SNarrativeEntryDetailSave> STREAM_CODEC =
+            NarrativeEntryDetailCodec.create(
+                    C2SNarrativeEntryDetailSave::new,
+                    C2SNarrativeEntryDetailSave::entryId,
+                    C2SNarrativeEntryDetailSave::entry,
+                    C2SNarrativeEntryDetailSave::detail);
+
+    public static C2SNarrativeEntryDetailSave of(NarrativeEntry<?> entry, NarrativeEntryDetail detail) {
+        return new C2SNarrativeEntryDetailSave(entry.getId(), entry.toPayload(), detail);
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

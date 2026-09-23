@@ -34,4 +34,8 @@ public interface NarrativeEntryEditor<T extends NarrativeEntryPayload, E extends
     OperationResult delete(UUID entryId, T payload);
 
     E resolve(UUID entryId, T payload);
+
+    default OperationResult saveDetail(UUID entryId, T payload, NarrativeEntryDetail detail) {
+        return OperationResult.failure("error.unsupported_entry");
+    }
 }

@@ -23,13 +23,12 @@
 
 package fr.loudo.narrativecraft.narrative.cutscene.layers.text;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayerType;
-import java.util.ArrayList;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.List;
 
 public class TextLayerType implements ICutsceneLayerType {
@@ -52,34 +51,15 @@ public class TextLayerType implements ICutsceneLayerType {
     }
 
     @Override
-    public JsonObject serializeKeyframe(Keyframe keyframe) {
-        if (!(keyframe instanceof TextKeyframe textKeyframe)) return null;
-
-        JsonArray tagsArray = new JsonArray();
-        for (String tag : textKeyframe.getTags()) {
-            tagsArray.add(tag);
-        }
-
-        JsonObject json = new JsonObject();
-        json.addProperty("tick", textKeyframe.getTick());
-        json.add("tags", tagsArray);
-        return json;
-    }
-
-    @Override
-    public Keyframe deserializeKeyframe(CutsceneLayer layer, JsonObject json) {
-        if (!json.has("tick")) return null;
-
-        TextKeyframe textKeyframe = new TextKeyframe(layer, json.get("tick").getAsInt());
-
-        if (json.has("tags")) {
-            List<String> tags = new ArrayList<>();
-            for (JsonElement tagElement : json.getAsJsonArray("tags")) {
-                tags.add(tagElement.getAsString());
-            }
-            textKeyframe.setTags(tags);
-        }
-
-        return textKeyframe;
+    public Codec<Keyframe> keyframeCodec(CutsceneLayer layer) {
+        return Keyframe.typedCodec(TextKeyframe.class, RecordCodecBuilder.create(instance -> instance.group(
+                        Keyframe.TICK.forGetter(TextKeyframe::getTick),
+                        NarrativeCodecs.field(Codec.STRING.listOf(), "tags", List.<String>of())
+                                .forGetter(TextKeyframe::getTags))
+                .apply(instance, (tick, tags) -> {
+                    TextKeyframe keyframe = new TextKeyframe(layer, tick);
+                    keyframe.setTags(tags);
+                    return keyframe;
+                })));
     }
 }

@@ -78,4 +78,10 @@ public class ClientNarrativeEntryEditorRegistry {
         ClientNarrativeEntryEditor<T, E> editor = getClientEditor(entry);
         if (editor != null) editor.delete(entryId, entry);
     }
+
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> E resolve(UUID entryId, T entry) {
+        ClientNarrativeEntryEditor<T, E> editor = getClientEditor(entry);
+        if (editor == null) return null;
+        return editor.resolve(entryId, entry);
+    }
 }

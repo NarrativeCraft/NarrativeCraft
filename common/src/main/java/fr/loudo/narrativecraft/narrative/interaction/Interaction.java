@@ -23,15 +23,18 @@
 
 package fr.loudo.narrativecraft.narrative.interaction;
 
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.api.narrative.interaction.IInteraction;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
+import fr.loudo.narrativecraft.narrative.DetailedNarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Interaction extends NarrativeEntry<InteractionPayload> implements IInteraction {
+public class Interaction extends NarrativeEntry<InteractionPayload>
+        implements IInteraction, DetailedNarrativeEntry<InteractionData> {
 
     private final Scene scene;
     private final List<InteractionZone> zones = new ArrayList<>();
@@ -40,6 +43,28 @@ public class Interaction extends NarrativeEntry<InteractionPayload> implements I
     public Interaction(UUID id, String name, Scene scene) {
         super(id, name);
         this.scene = scene;
+    }
+
+    public static Codec<Interaction> codec(Scene scene) {
+        return entryCodec(
+                InteractionPayload.CODEC, InteractionData.MAP_CODEC, (id, payload) -> fromPayload(id, payload, scene));
+    }
+
+    public static Interaction fromPayload(UUID id, InteractionPayload payload, Scene scene) {
+        return new Interaction(id, payload.getName(), scene);
+    }
+
+    @Override
+    public InteractionData getDetail() {
+        return new InteractionData(zones, points);
+    }
+
+    @Override
+    public void setDetail(InteractionData data) {
+        zones.clear();
+        zones.addAll(data.zones());
+        points.clear();
+        points.addAll(data.points());
     }
 
     public Scene getScene() {
@@ -52,13 +77,6 @@ public class Interaction extends NarrativeEntry<InteractionPayload> implements I
 
     public List<InteractionPoint> getPoints() {
         return points;
-    }
-
-    public void copyDataFrom(Interaction source) {
-        zones.clear();
-        zones.addAll(source.getZones());
-        points.clear();
-        points.addAll(source.getPoints());
     }
 
     @Override

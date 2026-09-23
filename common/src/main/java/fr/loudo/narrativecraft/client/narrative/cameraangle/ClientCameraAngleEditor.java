@@ -39,9 +39,9 @@ public class ClientCameraAngleEditor extends ClientSceneEntryEditor<CameraAngleP
 
     @Override
     protected CameraAngle create(UUID entryId, CameraAnglePayload payload, Scene scene) {
-        return new CameraAngle(entryId, payload.getName(), scene);
+        return CameraAngle.fromPayload(entryId, payload, scene);
     }
 
     @Override
-    protected void update(CameraAngle cameraAngle, CameraAnglePayload payload) {}
+    protected void copyAttributes(CameraAngle target, CameraAngle source) {}
 }

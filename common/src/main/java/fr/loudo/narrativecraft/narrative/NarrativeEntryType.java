@@ -23,48 +23,88 @@
 
 package fr.loudo.narrativecraft.narrative;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import fr.loudo.narrativecraft.narrative.animation.AnimationPayload;
+import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleData;
 import fr.loudo.narrativecraft.narrative.cameraangle.CameraAnglePayload;
 import fr.loudo.narrativecraft.narrative.chapter.ChapterPayload;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryPayload;
 import fr.loudo.narrativecraft.narrative.cutscene.CutscenePayload;
+import fr.loudo.narrativecraft.narrative.cutscene.CutsceneTimeline;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionData;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionPayload;
 import fr.loudo.narrativecraft.narrative.npc.NpcPayload;
 import fr.loudo.narrativecraft.narrative.scene.ScenePayload;
 import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import io.netty.buffer.ByteBuf;
+import java.util.Locale;
 import net.minecraft.network.codec.StreamCodec;
 
 public enum NarrativeEntryType {
-    CHAPTER(ChapterPayload.class, ChapterPayload.STREAM_CODEC),
-    SCENE(ScenePayload.class, ScenePayload.STREAM_CODEC),
-    ANIMATION(AnimationPayload.class, AnimationPayload.STREAM_CODEC),
-    SUBSCENE(SubscenePayload.class, SubscenePayload.STREAM_CODEC),
-    CUTSCENE(CutscenePayload.class, CutscenePayload.STREAM_CODEC),
-    CAMERA_ANGLE(CameraAnglePayload.class, CameraAnglePayload.STREAM_CODEC),
-    INTERACTION(InteractionPayload.class, InteractionPayload.STREAM_CODEC),
-    CHARACTER(CharacterStoryPayload.class, CharacterStoryPayload.STREAM_CODEC),
-    NPC(NpcPayload.class, NpcPayload.STREAM_CODEC);
+    CHAPTER(ChapterPayload.class, ChapterPayload.CODEC),
+    SCENE(ScenePayload.class, ScenePayload.CODEC),
+    ANIMATION(AnimationPayload.class, AnimationPayload.CODEC),
+    SUBSCENE(SubscenePayload.class, SubscenePayload.CODEC),
+    CUTSCENE(CutscenePayload.class, CutscenePayload.CODEC, CutsceneTimeline.class, CutsceneTimeline.CODEC),
+    CAMERA_ANGLE(CameraAnglePayload.class, CameraAnglePayload.CODEC, CameraAngleData.class, CameraAngleData.CODEC),
+    INTERACTION(InteractionPayload.class, InteractionPayload.CODEC, InteractionData.class, InteractionData.CODEC),
+    CHARACTER(CharacterStoryPayload.class, CharacterStoryPayload.CODEC),
+    NPC(NpcPayload.class, NpcPayload.CODEC);
 
-    private final Class<? extends NarrativeEntryPayload> clazz;
-    private final StreamCodec<? super ByteBuf, ? extends NarrativeEntryPayload> codec;
+    private final Class<? extends NarrativeEntryPayload> payloadClass;
+    private final StreamCodec<ByteBuf, ? extends NarrativeEntryPayload> codec;
+    private final Class<? extends NarrativeEntryDetail> detailClass;
+    private final StreamCodec<ByteBuf, ? extends NarrativeEntryDetail> detailCodec;
 
-    <T extends NarrativeEntryPayload> NarrativeEntryType(Class<T> clazz, StreamCodec<? super ByteBuf, T> codec) {
-        this.clazz = clazz;
-        this.codec = codec;
+    <P extends NarrativeEntryPayload> NarrativeEntryType(Class<P> payloadClass, MapCodec<P> codec) {
+        this.payloadClass = payloadClass;
+        this.codec = NarrativeCodecs.streamCodec(codec.codec());
+        this.detailClass = null;
+        this.detailCodec = null;
     }
 
-    public static NarrativeEntryType fromClass(Class<? extends NarrativeEntryPayload> clazz) {
+    <P extends NarrativeEntryPayload, D extends NarrativeEntryDetail> NarrativeEntryType(
+            Class<P> payloadClass, MapCodec<P> codec, Class<D> detailClass, Codec<D> detailCodec) {
+        this.payloadClass = payloadClass;
+        this.codec = NarrativeCodecs.streamCodec(codec.codec());
+        this.detailClass = detailClass;
+        this.detailCodec = NarrativeCodecs.streamCodec(detailCodec);
+    }
+
+    public static NarrativeEntryType fromPayload(NarrativeEntryPayload payload) {
         for (NarrativeEntryType type : values()) {
-            if (type.clazz.equals(clazz)) {
+            if (type.payloadClass.equals(payload.getClass())) {
                 return type;
             }
         }
-        throw new IllegalArgumentException("Unknown NarrativeEntry type: " + clazz.getName());
+        throw new IllegalArgumentException(
+                "Unknown NarrativeEntry type: " + payload.getClass().getName());
+    }
+
+    public String getKey() {
+        return name().toLowerCase(Locale.ROOT);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends NarrativeEntryPayload> StreamCodec<? super ByteBuf, T> getCodec() {
-        return (StreamCodec<? super ByteBuf, T>) codec;
+    public <P extends NarrativeEntryPayload> StreamCodec<ByteBuf, P> getCodec() {
+        return (StreamCodec<ByteBuf, P>) codec;
+    }
+
+    public boolean hasDetail() {
+        return detailCodec != null;
+    }
+
+    public boolean acceptsDetail(NarrativeEntryDetail detail) {
+        return detailClass != null && detailClass.isInstance(detail);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <D extends NarrativeEntryDetail> StreamCodec<ByteBuf, D> getDetailCodec() {
+        if (detailCodec == null) {
+            throw new IllegalStateException(name() + " entries have no detail");
+        }
+        return (StreamCodec<ByteBuf, D>) detailCodec;
     }
 }

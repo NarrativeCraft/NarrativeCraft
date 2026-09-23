@@ -23,38 +23,28 @@
 
 package fr.loudo.narrativecraft.files.narrrative.chapter;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.EntryChange;
 import fr.loudo.narrativecraft.files.FileTransaction;
 import fr.loudo.narrativecraft.files.InkFileGenerator;
+import fr.loudo.narrativecraft.files.JsonCodecFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileWriter;
 import fr.loudo.narrativecraft.files.RankedNarrativeCraftFileEditor;
+import fr.loudo.narrativecraft.files.RootEntryFileEditor;
 import fr.loudo.narrativecraft.narrative.OperationResult;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.ChapterDeserializer;
-import fr.loudo.narrativecraft.narrative.chapter.ChapterSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault
-        implements RankedNarrativeCraftFileEditor<Chapter> {
-
-    private static final Gson SERIALIZER = new GsonBuilder()
-            .registerTypeAdapter(Chapter.class, new ChapterSerializer())
-            .create();
-    private static final Gson DESERIALIZER = new GsonBuilder()
-            .registerTypeAdapter(Chapter.class, new ChapterDeserializer())
-            .create();
+        implements RankedNarrativeCraftFileEditor<Chapter>, RootEntryFileEditor<Chapter> {
 
     @Override
     public OperationResult create(Chapter entry) {
@@ -150,54 +140,30 @@ public class NarrativeCraftFileChapter extends NarrativeCraftFileDefault
     }
 
     private void writeData(FileTransaction transaction, File chapterFolder, Chapter chapter) throws IOException {
-        transaction.write(new File(chapterFolder, DATA_FILE_NAME), writer -> SERIALIZER.toJson(chapter, writer));
+        JsonCodecFile.write(transaction, new File(chapterFolder, DATA_FILE_NAME), Chapter.CODEC, chapter);
     }
 
     @Override
-    public List<DeserializationResult<Chapter>> deserialize() {
+    public List<DeserializationResult<Chapter>> load() {
         List<DeserializationResult<Chapter>> deserializationResults = new ArrayList<>();
 
-        File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
-        File[] allContents = chaptersFolder.listFiles();
-        if (allContents == null) {
+        File[] chapterFolders = NarrativeCraftFileUtil.getChaptersFolder().listFiles(File::isDirectory);
+        if (chapterFolders == null) {
             return deserializationResults;
         }
 
-        for (File file : allContents) {
-            if (NarrativeCraftFileWriter.isTemporary(file)) continue;
+        for (File chapterFolder : chapterFolders) {
+            if (NarrativeCraftFileWriter.isTemporary(chapterFolder)) continue;
             try {
-                File dataFile = new File(file, DATA_FILE_NAME);
-                String content = Files.readString(dataFile.toPath());
-                Chapter chapter = DESERIALIZER.fromJson(content, Chapter.class);
-                if (chapter == null) {
-                    throw new Exception(String.format("Chapter %s deserialization returned null", file.getName()));
-                }
-                String folderName = migrateFolderName(chaptersFolder, file, chapter);
+                Chapter chapter = JsonCodecFile.read(new File(chapterFolder, DATA_FILE_NAME), Chapter.CODEC);
+                String folderName = migrateFolderName(chapterFolder, chapter.toFileName());
                 deserializationResults.add(new DeserializationResult<>(chapter, false, folderName));
-            } catch (Exception e) {
-                NarrativeCraftMod.LOGGER.error("Failed to init chapter {}", file.getName(), e);
-                deserializationResults.add(new DeserializationResult<>(null, true, file.getName()));
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Failed to init chapter {}", chapterFolder.getName(), e);
+                deserializationResults.add(new DeserializationResult<>(null, true, chapterFolder.getName()));
             }
         }
 
         return deserializationResults;
-    }
-
-    private String migrateFolderName(File chaptersFolder, File chapterFolder, Chapter chapter) throws IOException {
-        if (chapterFolder.getName().equals(chapter.toFileName())) {
-            return chapterFolder.getName();
-        }
-        File normalizedFolder = new File(chaptersFolder, chapter.toFileName());
-        if (normalizedFolder.exists()) {
-            NarrativeCraftMod.LOGGER.warn(
-                    "Chapter directory {} should be named {} but that directory already exists",
-                    chapterFolder.getName(),
-                    normalizedFolder.getName());
-            return chapterFolder.getName();
-        }
-        Files.move(chapterFolder.toPath(), normalizedFolder.toPath());
-        NarrativeCraftMod.LOGGER.info(
-                "Renamed chapter directory {} to {}", chapterFolder.getName(), normalizedFolder.getName());
-        return normalizedFolder.getName();
     }
 }

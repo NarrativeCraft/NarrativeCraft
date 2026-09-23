@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.api.editors.cutscene.layers;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.Keyframe;
 
 /**
@@ -51,19 +51,5 @@ public interface ICutsceneLayerType {
      */
     CutsceneLayer createLayer();
 
-    /**
-     * Serializes a keyframe of this layer type to JSON. The {@code tick} must be stored under that
-     * exact property name, since it is rewritten when keyframes are pasted at a new playhead position.
-     *
-     * @return the JSON object, or {@code null} if the keyframe type is not supported
-     */
-    JsonObject serializeKeyframe(Keyframe keyframe);
-
-    /**
-     * Deserializes a keyframe of this layer type from JSON. The keyframe must be created against the
-     * given layer without being added to it: the caller adds the returned keyframe itself.
-     *
-     * @return the created keyframe, or {@code null} if the JSON is invalid
-     */
-    Keyframe deserializeKeyframe(CutsceneLayer layer, JsonObject json);
+    Codec<Keyframe> keyframeCodec(CutsceneLayer layer);
 }

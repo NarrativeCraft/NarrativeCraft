@@ -23,12 +23,15 @@
 
 package fr.loudo.narrativecraft.narrative.chapter;
 
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.api.narrative.chapter.IChapter;
 import fr.loudo.narrativecraft.managers.SceneManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import java.util.UUID;
 
 public class Chapter extends NarrativeEntry<ChapterPayload> implements IChapter {
+
+    public static final Codec<Chapter> CODEC = entryCodec(ChapterPayload.CODEC, Chapter::fromPayload);
 
     private int chapterIndex;
     private final SceneManager sceneManager = new SceneManager();
@@ -41,6 +44,10 @@ public class Chapter extends NarrativeEntry<ChapterPayload> implements IChapter 
     public Chapter(String name, int chapterIndex) {
         super(name);
         this.chapterIndex = chapterIndex;
+    }
+
+    public static Chapter fromPayload(UUID id, ChapterPayload payload) {
+        return new Chapter(id, payload.getName(), payload.getChapterIndex());
     }
 
     public int getChapterIndex() {

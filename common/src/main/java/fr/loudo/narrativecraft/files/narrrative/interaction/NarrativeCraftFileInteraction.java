@@ -25,14 +25,12 @@ package fr.loudo.narrativecraft.files.narrrative.interaction;
 
 import fr.loudo.narrativecraft.files.narrrative.AbstractNarrativeCraftFileSceneJsonEntry;
 import fr.loudo.narrativecraft.narrative.interaction.Interaction;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionDeserializer;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 
 public class NarrativeCraftFileInteraction extends AbstractNarrativeCraftFileSceneJsonEntry<Interaction> {
 
     public NarrativeCraftFileInteraction() {
-        super(Interaction.class, new InteractionSerializer(), new InteractionDeserializer());
+        super(Interaction::codec);
     }
 
     @Override

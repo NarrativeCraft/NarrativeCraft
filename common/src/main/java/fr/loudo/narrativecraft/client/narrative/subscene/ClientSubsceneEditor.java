@@ -25,12 +25,9 @@ package fr.loudo.narrativecraft.client.narrative.subscene;
 
 import fr.loudo.narrativecraft.client.narrative.ClientSceneEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.narrative.subscene.Subscene;
 import fr.loudo.narrativecraft.narrative.subscene.SubscenePayload;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class ClientSubsceneEditor extends ClientSceneEntryEditor<SubscenePayload, Subscene> {
@@ -42,18 +39,11 @@ public class ClientSubsceneEditor extends ClientSceneEntryEditor<SubscenePayload
 
     @Override
     protected Subscene create(UUID entryId, SubscenePayload payload, Scene scene) {
-        return new Subscene(entryId, payload.getName(), scene, resolveAnimations(payload, scene));
+        return Subscene.fromPayload(entryId, payload, scene);
     }
 
     @Override
-    protected void update(Subscene subscene, SubscenePayload payload) {
-        subscene.setAnimations(resolveAnimations(payload, subscene.getScene()));
-    }
-
-    private List<Animation> resolveAnimations(SubscenePayload payload, Scene scene) {
-        return payload.getAnimationIds().stream()
-                .map(animationId -> scene.getAnimationManager().getById(animationId))
-                .filter(Objects::nonNull)
-                .toList();
+    protected void copyAttributes(Subscene target, Subscene source) {
+        target.copyAttributesFrom(source);
     }
 }

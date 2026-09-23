@@ -23,10 +23,22 @@
 
 package fr.loudo.narrativecraft.narrative.cameraangle;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.loudo.narrativecraft.dialog.DialogData;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 import java.util.UUID;
 
 public class CameraViewDialogSetup {
+
+    public static final Codec<CameraViewDialogSetup> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                    NarrativeCodecs.ID.forGetter(CameraViewDialogSetup::getId),
+                    NarrativeCodecs.UUID_CODEC
+                            .fieldOf("characterPlacementId")
+                            .forGetter(CameraViewDialogSetup::getCharacterPlacementId),
+                    NarrativeCodecs.fieldOrElseGet(DialogData.CAMERA_VIEW_CODEC, "dialogData", DialogData::new)
+                            .forGetter(CameraViewDialogSetup::getDialogData))
+            .apply(instance, CameraViewDialogSetup::new));
 
     private final UUID id;
     private final UUID characterPlacementId;

@@ -23,13 +23,12 @@
 
 package fr.loudo.narrativecraft.files.narrrative;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
+import com.mojang.serialization.Codec;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.ChildEntryFileEditor;
 import fr.loudo.narrativecraft.files.DeserializationResult;
 import fr.loudo.narrativecraft.files.FileTransaction;
+import fr.loudo.narrativecraft.files.JsonCodecFile;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileEditor;
 import fr.loudo.narrativecraft.files.NarrativeCraftFileUtil;
@@ -42,24 +41,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends NarrativeEntry<?>>
-        extends NarrativeCraftFileDefault implements NarrativeCraftFileEditor<T> {
+        extends NarrativeCraftFileDefault implements ChildEntryFileEditor<T, Scene> {
 
-    private final Class<T> entryClass;
-    private final Gson serializer;
-    private final Gson deserializer;
+    private final Function<Scene, Codec<T>> codecFactory;
 
-    protected AbstractNarrativeCraftFileSceneJsonEntry(
-            Class<T> entryClass, JsonSerializer<T> jsonSerializer, JsonDeserializer<T> jsonDeserializer) {
-        this.entryClass = entryClass;
-        this.serializer = new GsonBuilder()
-                .registerTypeAdapter(entryClass, jsonSerializer)
-                .create();
-        this.deserializer = new GsonBuilder()
-                .registerTypeAdapter(entryClass, jsonDeserializer)
-                .create();
+    protected AbstractNarrativeCraftFileSceneJsonEntry(Function<Scene, Codec<T>> codecFactory) {
+        this.codecFactory = codecFactory;
     }
 
     protected abstract String getSubFolderName();
@@ -70,17 +60,16 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
         return false;
     }
 
-    private File getEntriesFolder(T entry) {
-        return new File(NarrativeCraftFileUtil.getSceneFolder(getScene(entry)), getSubFolderName());
+    private File getEntriesFolder(Scene scene) {
+        return new File(NarrativeCraftFileUtil.getSceneFolder(scene), getSubFolderName());
     }
 
     private File getEntryTarget(T entry) {
-        return new File(getEntriesFolder(entry), entry.toFileName());
+        return new File(getEntriesFolder(getScene(entry)), entry.toFileName());
     }
 
-    private File getDataFile(T entry) {
-        File target = getEntryTarget(entry);
-        return entryHasOwnFolder() ? new File(target, DATA_FILE_NAME) : target;
+    private File getDataFile(File entryTarget) {
+        return entryHasOwnFolder() ? new File(entryTarget, DATA_FILE_NAME) : entryTarget;
     }
 
     @Override
@@ -91,7 +80,7 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
             if (target.exists()) {
                 throw new IOException(target + " already exists");
             }
-            transaction.createDirectories(entryHasOwnFolder() ? target : getEntriesFolder(entry));
+            transaction.createDirectories(entryHasOwnFolder() ? target : getEntriesFolder(getScene(entry)));
             writeData(transaction, entry);
             transaction.commit();
         } catch (IOException e) {
@@ -136,101 +125,68 @@ public abstract class AbstractNarrativeCraftFileSceneJsonEntry<T extends Narrati
     }
 
     private void writeData(FileTransaction transaction, T entry) throws IOException {
-        transaction.write(getDataFile(entry), writer -> serializer.toJson(entry, writer));
+        JsonCodecFile.write(
+                transaction, getDataFile(getEntryTarget(entry)), codecFactory.apply(getScene(entry)), entry);
     }
 
     @Override
-    public List<DeserializationResult<T>> deserialize() {
+    public List<DeserializationResult<T>> load(Scene scene) {
         List<DeserializationResult<T>> results = new ArrayList<>();
+        File entriesFolder = getEntriesFolder(scene);
+        migrateLooseEntries(entriesFolder);
 
-        migrateLooseEntries();
+        File[] entryFiles = entriesFolder.listFiles();
+        if (entryFiles == null) return results;
 
-        forEachEntryFolder(entryFolder -> {
-            File[] entryFiles = entryFolder.listFiles();
-            if (entryFiles == null) return;
-
-            for (File entryFile : entryFiles) {
-                if (NarrativeCraftFileWriter.isTemporary(entryFile)) continue;
-                File dataFile;
-                if (entryHasOwnFolder()) {
-                    if (!entryFile.isDirectory()) continue;
-                    dataFile = new File(entryFile, DATA_FILE_NAME);
-                } else {
-                    dataFile = entryFile;
-                }
-                try {
-                    String content = Files.readString(dataFile.toPath());
-                    T entry = deserializer.fromJson(content, entryClass);
-                    if (entry == null) {
-                        throw new Exception(String.format("Deserialization of %s returned null", entryFile.getName()));
-                    }
-                    results.add(new DeserializationResult<>(entry, false, entryFile.getName()));
-                } catch (Exception e) {
-                    NarrativeCraftMod.LOGGER.error("Failed to init {}", entryFile.getName(), e);
-                    results.add(new DeserializationResult<>(null, true, entryFile.getName()));
-                }
+        Codec<T> codec = codecFactory.apply(scene);
+        for (File entryFile : entryFiles) {
+            if (NarrativeCraftFileWriter.isTemporary(entryFile)) continue;
+            if (entryHasOwnFolder() != entryFile.isDirectory()) continue;
+            if (!entryHasOwnFolder() && !entryFile.getName().endsWith(EXTENSION_DATA_FILE)) continue;
+            try {
+                T entry = JsonCodecFile.read(getDataFile(entryFile), codec);
+                results.add(new DeserializationResult<>(entry, false, entryFile.getName()));
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Failed to init {}", entryFile.getName(), e);
+                results.add(new DeserializationResult<>(null, true, entryFile.getName()));
             }
-        });
-
+        }
         return results;
     }
 
-    private void migrateLooseEntries() {
+    private void migrateLooseEntries(File entriesFolder) {
         if (!entryHasOwnFolder()) return;
 
-        forEachEntryFolder(entryFolder -> {
-            File[] children = entryFolder.listFiles();
-            if (children == null) return;
+        File[] children = entriesFolder.listFiles();
+        if (children == null) return;
 
-            for (File child : children) {
-                if (!child.isFile() || !child.getName().endsWith(EXTENSION_DATA_FILE)) continue;
+        for (File child : children) {
+            if (!child.isFile() || !child.getName().endsWith(EXTENSION_DATA_FILE)) continue;
 
-                String folderName =
-                        child.getName().substring(0, child.getName().length() - EXTENSION_DATA_FILE.length());
-                File entryDirectory = new File(entryFolder, folderName);
-                if (entryDirectory.exists() && !entryDirectory.isDirectory()) {
-                    NarrativeCraftMod.LOGGER.warn(
-                            "Skipping migration of {} because {} exists and is not a directory",
-                            child.getName(),
-                            entryDirectory.getName());
-                    continue;
-                }
-                File dataFile = new File(entryDirectory, DATA_FILE_NAME);
-                if (dataFile.exists()) {
-                    NarrativeCraftMod.LOGGER.warn(
-                            "Skipping migration of {} because {} already exists", child.getName(), dataFile.getPath());
-                    continue;
-                }
-                if (!entryDirectory.exists() && !entryDirectory.mkdir()) {
-                    NarrativeCraftMod.LOGGER.error("Failed to create migration directory {}", entryDirectory.getPath());
-                    continue;
-                }
-                try {
-                    Files.move(child.toPath(), dataFile.toPath());
-                    NarrativeCraftMod.LOGGER.info("Migrated {} to {}", child.getName(), dataFile.getPath());
-                } catch (IOException e) {
-                    NarrativeCraftMod.LOGGER.error("Failed to migrate {}", child.getName(), e);
-                }
+            String folderName = child.getName().substring(0, child.getName().length() - EXTENSION_DATA_FILE.length());
+            File entryDirectory = new File(entriesFolder, folderName);
+            if (entryDirectory.exists() && !entryDirectory.isDirectory()) {
+                NarrativeCraftMod.LOGGER.warn(
+                        "Skipping migration of {} because {} exists and is not a directory",
+                        child.getName(),
+                        entryDirectory.getName());
+                continue;
             }
-        });
-    }
-
-    private void forEachEntryFolder(Consumer<File> consumer) {
-        File chaptersFolder = NarrativeCraftFileUtil.getChaptersFolder();
-        File[] chapterDirs = chaptersFolder.listFiles();
-        if (chapterDirs == null) return;
-
-        for (File chapterDir : chapterDirs) {
-            if (NarrativeCraftFileWriter.isTemporary(chapterDir)) continue;
-            File scenesFolder = new File(chapterDir, SCENES_FOLDER_NAME);
-            File[] sceneDirs = scenesFolder.listFiles();
-            if (sceneDirs == null) continue;
-
-            for (File sceneDir : sceneDirs) {
-                if (NarrativeCraftFileWriter.isTemporary(sceneDir)) continue;
-                File entryFolder = new File(sceneDir, getSubFolderName());
-                if (!entryFolder.exists()) continue;
-                consumer.accept(entryFolder);
+            File dataFile = new File(entryDirectory, DATA_FILE_NAME);
+            if (dataFile.exists()) {
+                NarrativeCraftMod.LOGGER.warn(
+                        "Skipping migration of {} because {} already exists", child.getName(), dataFile.getPath());
+                continue;
+            }
+            if (!entryDirectory.exists() && !entryDirectory.mkdir()) {
+                NarrativeCraftMod.LOGGER.error("Failed to create migration directory {}", entryDirectory.getPath());
+                continue;
+            }
+            try {
+                Files.move(child.toPath(), dataFile.toPath());
+                NarrativeCraftMod.LOGGER.info("Migrated {} to {}", child.getName(), dataFile.getPath());
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Failed to migrate {}", child.getName(), e);
             }
         }
     }

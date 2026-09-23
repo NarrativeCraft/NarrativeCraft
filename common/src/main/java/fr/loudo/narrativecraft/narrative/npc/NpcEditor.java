@@ -23,12 +23,9 @@
 
 package fr.loudo.narrativecraft.narrative.npc;
 
-import fr.loudo.narrativecraft.dialog.DialogDataIO;
-import fr.loudo.narrativecraft.dialog.DialogFieldSet;
 import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import fr.loudo.narrativecraft.utils.Utils;
 import java.util.UUID;
 
 public class NpcEditor extends AbstractSceneEntryEditor<NpcPayload, Npc> {
@@ -45,15 +42,7 @@ public class NpcEditor extends AbstractSceneEntryEditor<NpcPayload, Npc> {
 
     @Override
     protected Npc build(UUID entryId, NpcPayload payload, Scene scene, Npc existing) {
-        Npc npc = new Npc(entryId, payload.getName(), scene);
-        if (!payload.getModelType().isEmpty()) {
-            npc.setModelType(Utils.parsePlayerModelType(payload.getModelType()));
-        }
-        npc.setEntityType(Utils.resolveEntityType(payload.getEntityTypeId()));
-        DialogDataIO.parse(payload.getDialogDataJson(), DialogFieldSet.CHARACTER)
-                .ifPresent(npc::setDialogData);
-        npc.setCustomNbt(payload.getCustomNbt());
-        return npc;
+        return Npc.fromPayload(entryId, payload, scene);
     }
 
     @Override

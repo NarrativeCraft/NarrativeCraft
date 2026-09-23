@@ -23,48 +23,50 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryPayload;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import fr.loudo.narrativecraft.utils.codec.NarrativeCodecs;
 
 public class CharacterStoryPayload extends NarrativeEntryPayload {
 
-    public static final StreamCodec<ByteBuf, CharacterStoryPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getName,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getModelType,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getEntityTypeId,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getCustomNbt,
-            MainCharacterAttribute.STREAM_CODEC,
-            CharacterStoryPayload::getMainCharacterAttribute,
-            ByteBufCodecs.STRING_UTF8,
-            CharacterStoryPayload::getDialogDataJson,
-            CharacterStoryPayload::new);
+    public static final MapCodec<CharacterStoryPayload> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    nameField(),
+                    NarrativeCodecs.fieldOrElseGet(DialogData.CHARACTER_CODEC, "dialogData", DialogData::new)
+                            .forGetter(CharacterStoryPayload::getDialogData),
+                    NarrativeCodecs.field(Codec.STRING, "modelType", "").forGetter(CharacterStoryPayload::getModelType),
+                    NarrativeCodecs.field(Codec.STRING, "entityTypeId", CharacterStory.DEFAULT_ENTITY_TYPE_ID)
+                            .forGetter(CharacterStoryPayload::getEntityTypeId),
+                    NarrativeCodecs.field(Codec.STRING, "customNbt", "").forGetter(CharacterStoryPayload::getCustomNbt),
+                    MainCharacterAttribute.MAP_CODEC.forGetter(CharacterStoryPayload::getMainCharacterAttribute))
+            .apply(instance, CharacterStoryPayload::new));
 
+    private final DialogData dialogData;
     private final String modelType;
     private final String entityTypeId;
     private final String customNbt;
     private final MainCharacterAttribute mainCharacterAttribute;
-    private final String dialogDataJson;
 
     public CharacterStoryPayload(
             String name,
+            DialogData dialogData,
             String modelType,
             String entityTypeId,
             String customNbt,
-            MainCharacterAttribute mainCharacterAttribute,
-            String dialogDataJson) {
+            MainCharacterAttribute mainCharacterAttribute) {
         super(name);
+        this.dialogData = dialogData != null ? dialogData : new DialogData();
         this.modelType = modelType != null ? modelType : "";
         this.entityTypeId = entityTypeId;
         this.customNbt = customNbt != null ? customNbt : "";
         this.mainCharacterAttribute =
                 mainCharacterAttribute != null ? mainCharacterAttribute : new MainCharacterAttribute();
-        this.dialogDataJson = dialogDataJson != null ? dialogDataJson : "{}";
+    }
+
+    public DialogData getDialogData() {
+        return dialogData;
     }
 
     public String getModelType() {
@@ -75,15 +77,11 @@ public class CharacterStoryPayload extends NarrativeEntryPayload {
         return entityTypeId;
     }
 
-    public MainCharacterAttribute getMainCharacterAttribute() {
-        return mainCharacterAttribute;
-    }
-
-    public String getDialogDataJson() {
-        return dialogDataJson;
-    }
-
     public String getCustomNbt() {
         return customNbt;
+    }
+
+    public MainCharacterAttribute getMainCharacterAttribute() {
+        return mainCharacterAttribute;
     }
 }

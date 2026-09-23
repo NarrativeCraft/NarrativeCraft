@@ -26,14 +26,18 @@ package fr.loudo.narrativecraft.client.editors.cameraangle;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
 import fr.loudo.narrativecraft.client.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.client.editors.ClientEntryDetailListener;
 import fr.loudo.narrativecraft.client.editors.widgets.DialogPreviewEntry;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.client.utils.UtilsClient;
 import fr.loudo.narrativecraft.dialog.DialogData;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cameraangle.*;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.narrative.character.ICharacterStory;
+import fr.loudo.narrativecraft.network.C2SNarrativeEntryDetailSave;
 import fr.loudo.narrativecraft.network.cameraangle.*;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenCaptureCharacter;
 import fr.loudo.narrativecraft.network.mainScreen.C2SMainScreenRemovePlacement;
@@ -49,7 +53,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 
-public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
+public class ClientCameraAngleMakerEditorMaker implements EditorMaker, ClientEntryDetailListener {
 
     public static final String DEFAULT_DIALOG_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
 
@@ -119,21 +123,26 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
         return environment;
     }
 
-    public void loadData(String json) {
-        CameraAngleDeserializer.deserializeInto(json, cameraAngle);
+    @Override
+    public void onEntryDetailLoaded(NarrativeEntry<?> entry) {
+        if (entry != cameraAngle) return;
+        characterPlacements.clear();
         characterPlacements.addAll(cameraAngle.getCharacterPlacements());
+        templateReferences.clear();
         templateReferences.addAll(cameraAngle.getTemplateReferences());
+        cameraViews.clear();
         cameraViews.addAll(cameraAngle.getCameras());
         syncDialogSetups();
     }
 
-    public void addCharacterPlacementFromJson(String placementJson) {
-        CharacterPlacement placement =
-                CameraAngleDeserializer.deserializeCharacterPlacementFromJson(placementJson, cameraAngle.getScene());
-        if (placement != null) {
-            characterPlacements.add(placement);
-            syncDialogSetups();
-        }
+    public void addCharacterPlacement(CharacterPlacement placement) {
+        characterPlacements.add(placement);
+        syncDialogSetups();
+    }
+
+    private ICharacterStory resolveCharacter(CharacterPlacement placement) {
+        return placement.resolveCharacter(
+                ClientNarrativeCraftMod.getInstance().getCharacterManager(), cameraAngle.getScene());
     }
 
     private void syncDialogSetups() {
@@ -247,20 +256,12 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     }
 
     public void save() {
-        cameraAngle.getCharacterPlacements().clear();
-        cameraAngle.getCharacterPlacements().addAll(characterPlacements);
-
-        cameraAngle.getTemplateReferences().clear();
-        cameraAngle.getTemplateReferences().addAll(templateReferences);
-
-        cameraAngle.getCameras().clear();
-        cameraAngle.getCameras().addAll(cameraViews);
-
-        String dataJson = CameraAngleSerializer.serializeData(cameraAngle);
+        CameraAngleData data = new CameraAngleData(cameraViews, characterPlacements, templateReferences);
+        cameraAngle.setDetail(data);
         if (cameraAngle.getScene() != null) {
-            Services.PACKET.sendToServer(new C2SCameraAngleSave(cameraAngle, dataJson));
+            Services.PACKET.sendToServer(C2SNarrativeEntryDetailSave.of(cameraAngle, data));
         } else {
-            Services.PACKET.sendToServer(new C2SMainScreenSave(dataJson));
+            Services.PACKET.sendToServer(new C2SMainScreenSave(data));
         }
     }
 
@@ -375,9 +376,9 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
 
     private DialogData resolveCharacterDialogData(UUID placementId) {
         for (CharacterPlacement placement : characterPlacements) {
-            if (placement.getId().equals(placementId) && placement.getCharacterStory() != null) {
-                return placement.getCharacterStory().getDialogData();
-            }
+            if (!placement.getId().equals(placementId)) continue;
+            ICharacterStory characterStory = resolveCharacter(placement);
+            return characterStory != null ? characterStory.getDialogData() : null;
         }
         return null;
     }
@@ -385,7 +386,8 @@ public class ClientCameraAngleMakerEditorMaker implements EditorMaker {
     private String resolvePlacementLabel(UUID placementId) {
         for (CharacterPlacement placement : characterPlacements) {
             if (placement.getId().equals(placementId)) {
-                return placement.getCharacterStory().getName();
+                ICharacterStory characterStory = resolveCharacter(placement);
+                if (characterStory != null) return characterStory.getName();
             }
         }
         return placementId.toString().substring(0, 8);

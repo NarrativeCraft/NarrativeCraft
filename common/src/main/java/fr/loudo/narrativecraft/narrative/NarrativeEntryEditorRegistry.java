@@ -84,4 +84,17 @@ public class NarrativeEntryEditorRegistry {
         if (editor == null) return OperationResult.failure("error.unsupported_entry");
         return editor.delete(entryId, entry);
     }
+
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> OperationResult saveDetail(
+            UUID entryId, T entry, NarrativeEntryDetail detail) {
+        NarrativeEntryEditor<T, E> editor = getEditor(entry);
+        if (editor == null) return OperationResult.failure("error.unsupported_entry");
+        return editor.saveDetail(entryId, entry, detail);
+    }
+
+    public <T extends NarrativeEntryPayload, E extends NarrativeEntry<T>> E resolve(UUID entryId, T entry) {
+        NarrativeEntryEditor<T, E> editor = getEditor(entry);
+        if (editor == null) return null;
+        return editor.resolve(entryId, entry);
+    }
 }

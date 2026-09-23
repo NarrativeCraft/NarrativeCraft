@@ -25,10 +25,7 @@ package fr.loudo.narrativecraft.narrative.subscene;
 
 import fr.loudo.narrativecraft.narrative.AbstractSceneEntryEditor;
 import fr.loudo.narrativecraft.narrative.NarrativeManager;
-import fr.loudo.narrativecraft.narrative.animation.Animation;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class SubsceneEditor extends AbstractSceneEntryEditor<SubscenePayload, Subscene> {
@@ -45,15 +42,11 @@ public class SubsceneEditor extends AbstractSceneEntryEditor<SubscenePayload, Su
 
     @Override
     protected Subscene build(UUID entryId, SubscenePayload payload, Scene scene, Subscene existing) {
-        List<Animation> animations = payload.getAnimationIds().stream()
-                .map(animationId -> scene.getAnimationManager().getById(animationId))
-                .filter(Objects::nonNull)
-                .toList();
-        return new Subscene(entryId, payload.getName(), scene, animations);
+        return Subscene.fromPayload(entryId, payload, scene);
     }
 
     @Override
     protected void copyAttributes(Subscene target, Subscene source) {
-        target.setAnimations(source.getAnimations());
+        target.copyAttributesFrom(source);
     }
 }

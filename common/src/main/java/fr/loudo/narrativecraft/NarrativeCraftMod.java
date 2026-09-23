@@ -94,7 +94,7 @@ public class NarrativeCraftMod {
     }
 
     public static void commonInit() {
-        NarrativeCraftFileEditorsRegister.register();
+        NarrativeCraftFileEditorsRegister.register(getInstance().getCharacterManager());
         NarrativeEditorsRegister.register();
         ActionRegister.register(getInstance().getActionRegistry());
         CutsceneLayerRegister.register(getInstance().getCutsceneLayerRegistry());
