@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.client.imgui.ClientImGui;
 import fr.loudo.narrativecraft.client.inkTag.actions.ClientShakeScreenInkAction;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.client.studio.NarrativeStudio;
+import fr.loudo.narrativecraft.events.client.OnClientFrameEvent;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -41,6 +42,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void narrativecraft$frame(CallbackInfo ci) {
+        OnClientFrameEvent.frame(Minecraft.getInstance().getDeltaTracker());
+    }
 
     @Inject(method = "render", at = @At("RETURN"))
     private void narrativecraft$renderStudio(CallbackInfo ci) {

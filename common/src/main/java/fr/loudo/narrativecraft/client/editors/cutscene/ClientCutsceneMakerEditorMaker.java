@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -277,16 +278,31 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker, ClientEntryD
         selectedKeyframes.clear();
     }
 
+    public void frameTick(DeltaTracker deltaTracker) {
+        boolean wasPlaying = playback.isPlaying();
+        playback.tick(deltaTracker);
+        if (wasPlaying && !playback.isPlaying()) {
+            sendControl(C2SCutsceneControl.State.PAUSE);
+        }
+    }
+
     public void startPlayback() {
         if (playback.getCurrentTick() >= totalTick) {
             setPlayHeadTick(0);
         }
         playback.play(playback.getCurrentTick());
+        sendControl(C2SCutsceneControl.State.PLAY);
     }
 
     public void pausePlayback() {
         playback.pause();
         setPreviewRoll(0f);
+        sendControl(C2SCutsceneControl.State.PAUSE);
+    }
+
+    private void sendControl(C2SCutsceneControl.State state) {
+        if (environment != NarrativeEnvironment.DEVELOPMENT) return;
+        Services.PACKET.sendToServer(new C2SCutsceneControl(state));
     }
 
     private void rebuildSortIndices() {

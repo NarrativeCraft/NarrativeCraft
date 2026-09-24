@@ -29,14 +29,11 @@ import fr.loudo.narrativecraft.narrative.cutscene.layers.camera.CameraLayer;
 import fr.loudo.narrativecraft.narrative.cutscene.layers.camera.KeyframePosition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.phys.Vec3;
 
 public class ClientCameraLayerPlayer implements ClientCutsceneLayerPlayer {
 
     private final CameraLayer layer;
-    private int lastSentChunkX = Integer.MIN_VALUE;
-    private int lastSentChunkZ = Integer.MIN_VALUE;
 
     public ClientCameraLayerPlayer(CameraLayer layer) {
         this.layer = layer;
@@ -60,15 +57,6 @@ public class ClientCameraLayerPlayer implements ClientCutsceneLayerPlayer {
         localPlayer.setXRot((float) rotation.x);
         localPlayer.setYRot((float) rotation.y);
         localPlayer.setYHeadRot((float) rotation.y);
-
-        int chunkX = (int) position.x >> 4;
-        int chunkZ = (int) position.z >> 4;
-        if (chunkX != lastSentChunkX || chunkZ != lastSentChunkZ) {
-            localPlayer.connection.send(new ServerboundMovePlayerPacket.PosRot(
-                    position, (float) rotation.y, (float) rotation.x, localPlayer.onGround(), false));
-            lastSentChunkX = chunkX;
-            lastSentChunkZ = chunkZ;
-        }
         return true;
     }
 }

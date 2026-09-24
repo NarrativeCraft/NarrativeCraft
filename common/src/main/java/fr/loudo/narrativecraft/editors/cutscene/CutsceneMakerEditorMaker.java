@@ -150,6 +150,7 @@ public class CutsceneMakerEditorMaker implements EditorMaker {
             if (firstCameraTick > 0 && firstCameraTick < lastKeyframeTick) {
                 moveTo(firstCameraTick);
             }
+            play();
         }
     }
 
