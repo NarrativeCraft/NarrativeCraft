@@ -28,10 +28,12 @@ import fr.loudo.narrativecraft.api.editors.cutscene.keyframes.KeyframeMenu;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.CutsceneLayer;
 import fr.loudo.narrativecraft.api.editors.cutscene.layers.ICutsceneLayer;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.layers.dialogue.DialogLayer;
 import fr.loudo.narrativecraft.client.editors.widgets.RollSliderWidget;
 import fr.loudo.narrativecraft.client.screens.InputScreen;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.editors.EditorMaker;
+import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.narrative.NarrativeEnvironment;
 import fr.loudo.narrativecraft.narrative.cutscene.Cutscene;
 import fr.loudo.narrativecraft.narrative.cutscene.CutsceneDeserializer;
@@ -573,6 +575,10 @@ public class ClientCutsceneMakerEditorMaker implements EditorMaker {
         if (!renderingHud || environment != NarrativeEnvironment.DEVELOPMENT) return;
         if (openMenu != null && openMenu.isVisible() && openMenu.keyPressed(keyCode, scanCode, modifiers)) return;
         shortcuts.handleKeyPressed(keyCode, scanCode, modifiers);
+
+        if (ModKeys.DIALOG_ADVANCE.matches(keyCode, scanCode)) {
+            DialogLayer.advanceDialogue();
+        }
     }
 
     @Override

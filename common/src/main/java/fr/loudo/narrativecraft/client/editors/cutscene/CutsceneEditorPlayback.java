@@ -53,9 +53,12 @@ public class CutsceneEditorPlayback {
     }
 
     public void pause() {
+        pause(false);
+    }
+
+    public void pause(boolean maintainFraming) {
         playing = false;
-        playerSession.getCutsceneDataSession().setFov(-1f);
-        playerSession.getCutsceneDataSession().setKeyframePosition(null);
+        if (!maintainFraming) playerSession.getCutsceneDataSession().reset();
         for (CutsceneMakerEditorLayer editorLayer : editorLayers) {
             editorLayer.getLayer().stop();
         }

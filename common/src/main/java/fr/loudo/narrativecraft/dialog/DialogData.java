@@ -176,183 +176,206 @@ public class DialogData {
         return offsetX;
     }
 
-    public void setOffsetX(float offsetX) {
+    public DialogData setOffsetX(float offsetX) {
         this.offsetX = offsetX;
+        return this;
     }
 
     public float getOffsetY() {
         return offsetY;
     }
 
-    public void setOffsetY(float offsetY) {
+    public DialogData setOffsetY(float offsetY) {
         this.offsetY = offsetY;
+        return this;
     }
 
     public float getAncOffsetX() {
         return ancOffsetX;
     }
 
-    public void setAncOffsetX(float ancOffsetX) {
+    public DialogData setAncOffsetX(float ancOffsetX) {
         this.ancOffsetX = ancOffsetX;
+        return this;
     }
 
     public float getAncOffsetY() {
         return ancOffsetY;
     }
 
-    public void setAncOffsetY(float ancOffsetY) {
+    public DialogData setAncOffsetY(float ancOffsetY) {
         this.ancOffsetY = ancOffsetY;
+        return this;
     }
 
     public float getWidth() {
         return width;
     }
 
-    public void setWidth(float width) {
+    public DialogData setWidth(float width) {
         this.width = width;
+        return this;
     }
 
     public float getPaddingX() {
         return paddingX;
     }
 
-    public void setPaddingX(float paddingX) {
+    public DialogData setPaddingX(float paddingX) {
         this.paddingX = paddingX;
+        return this;
     }
 
     public float getPaddingY() {
         return paddingY;
     }
 
-    public void setPaddingY(float paddingY) {
+    public DialogData setPaddingY(float paddingY) {
         this.paddingY = paddingY;
+        return this;
     }
 
     public float getScale() {
         return scale;
     }
 
-    public void setScale(float scale) {
+    public DialogData setScale(float scale) {
         this.scale = scale;
+        return this;
     }
 
     public float getLetterSpacing() {
         return letterSpacing;
     }
 
-    public void setLetterSpacing(float letterSpacing) {
+    public DialogData setLetterSpacing(float letterSpacing) {
         this.letterSpacing = letterSpacing;
+        return this;
     }
 
     public float getLineGap() {
         return lineGap;
     }
 
-    public void setLineGap(float lineGap) {
+    public DialogData setLineGap(float lineGap) {
         this.lineGap = lineGap;
+        return this;
     }
 
     public int getBackgroundColor() {
         return backgroundColor;
     }
 
-    public void setBackgroundColor(int backgroundColor) {
+    public DialogData setBackgroundColor(int backgroundColor) {
         this.backgroundColor = backgroundColor;
+        return this;
     }
 
     public int getTextColor() {
         return textColor;
     }
 
-    public void setTextColor(int textColor) {
+    public DialogData setTextColor(int textColor) {
         this.textColor = textColor;
+        return this;
     }
 
     public ResourceLocation getBackgroundImage() {
         return backgroundImage;
     }
 
-    public void setBackgroundImage(ResourceLocation backgroundImage) {
+    public DialogData setBackgroundImage(ResourceLocation backgroundImage) {
         this.backgroundImage = backgroundImage;
+        return this;
     }
 
     public float getScrollSpeed() {
         return scrollSpeed;
     }
 
-    public void setScrollSpeed(float scrollSpeed) {
+    public DialogData setScrollSpeed(float scrollSpeed) {
         this.scrollSpeed = scrollSpeed;
+        return this;
     }
 
     public ResourceLocation getLetterSound() {
         return letterSound;
     }
 
-    public void setLetterSound(ResourceLocation letterSound) {
+    public DialogData setLetterSound(ResourceLocation letterSound) {
         this.letterSound = letterSound;
+        return this;
     }
 
     public boolean isSoundMuted() {
         return soundMuted;
     }
 
-    public void setSoundMuted(boolean soundMuted) {
+    public DialogData setSoundMuted(boolean soundMuted) {
         this.soundMuted = soundMuted;
+        return this;
     }
 
     public boolean isTailVisible() {
         return tailVisible;
     }
 
-    public void setTailVisible(boolean tailVisible) {
+    public DialogData setTailVisible(boolean tailVisible) {
         this.tailVisible = tailVisible;
+        return this;
     }
 
     public boolean isAutoSkipEnabled() {
         return autoSkipEnabled;
     }
 
-    public void setAutoSkipEnabled(boolean autoSkipEnabled) {
+    public DialogData setAutoSkipEnabled(boolean autoSkipEnabled) {
         this.autoSkipEnabled = autoSkipEnabled;
+        return this;
     }
 
     public float getAutoSkipSeconds() {
         return autoSkipSeconds;
     }
 
-    public void setAutoSkipSeconds(float autoSkipSeconds) {
+    public DialogData setAutoSkipSeconds(float autoSkipSeconds) {
         this.autoSkipSeconds = autoSkipSeconds;
+        return this;
     }
 
     public TextAlignment getTextAlignment() {
         return textAlignment;
     }
 
-    public void setTextAlignment(TextAlignment textAlignment) {
+    public DialogData setTextAlignment(TextAlignment textAlignment) {
         this.textAlignment = textAlignment;
+        return this;
     }
 
     public boolean isTextShadow() {
         return textShadow;
     }
 
-    public void setTextShadow(boolean textShadow) {
+    public DialogData setTextShadow(boolean textShadow) {
         this.textShadow = textShadow;
+        return this;
     }
 
     public float getBobbingNoiseShakeSpeed() {
         return bobbingNoiseShakeSpeed;
     }
 
-    public void setBobbingNoiseShakeSpeed(float bobbingNoiseShakeSpeed) {
+    public DialogData setBobbingNoiseShakeSpeed(float bobbingNoiseShakeSpeed) {
         this.bobbingNoiseShakeSpeed = bobbingNoiseShakeSpeed;
+        return this;
     }
 
     public float getBobbingNoiseShakeStrength() {
         return bobbingNoiseShakeStrength;
     }
 
-    public void setBobbingNoiseShakeStrength(float bobbingNoiseShakeStrength) {
+    public DialogData setBobbingNoiseShakeStrength(float bobbingNoiseShakeStrength) {
         this.bobbingNoiseShakeStrength = bobbingNoiseShakeStrength;
+        return this;
     }
 }

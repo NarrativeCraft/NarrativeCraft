@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.events.client;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
+import fr.loudo.narrativecraft.client.editors.cutscene.layers.dialogue.DialogLayer;
 import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
 import fr.loudo.narrativecraft.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.dialog.DialogRenderer2D;
@@ -42,7 +43,8 @@ import net.minecraft.client.Minecraft;
 public class OnClientTickEvent {
 
     public static void tick(Minecraft minecraft) {
-        ClientNarrativeCraftMod.getInstance().getPlayerStateSignalWatcher().tick(minecraft);
+        ClientNarrativeCraftMod clientNarrativeCraftMod = ClientNarrativeCraftMod.getInstance();
+        clientNarrativeCraftMod.getPlayerStateSignalWatcher().tick(minecraft);
 
         if (Minecraft.getInstance().isPaused()) return;
 
@@ -50,7 +52,7 @@ public class OnClientTickEvent {
 
         ClientPacketHandler.tickPendingDialogue();
 
-        ClientPlayerSession session = ClientNarrativeCraftMod.getInstance().getPlayerSession();
+        ClientPlayerSession session = clientNarrativeCraftMod.getPlayerSession();
         new ArrayList<>(session.getActiveDialog2DRenderers()).forEach(DialogRenderer2D::tick);
         new ArrayList<>(session.getActiveDialog3DRenderers()).forEach(DialogRenderer3D::tick);
 
@@ -63,6 +65,7 @@ public class OnClientTickEvent {
 
         if (ModKeys.DIALOG_ADVANCE.consumeClick()) {
             DialogRenderer.advanceNextDialog();
+            DialogLayer.advanceDialogue();
         }
     }
 
