@@ -132,6 +132,15 @@ public class Playback implements IPlaybackSession {
         NarrativeCraftMod.EVENT_BUS.post(new PlaybackPauseEvent(this));
     }
 
+    public void waitForSiblingsAndStop() {
+        if (areSiblingsPlaying()) {
+            pause();
+            return;
+        }
+        notifySiblings();
+        stop();
+    }
+
     public void stop() {
         isPlaying = false;
         if (killOnEnd) {
@@ -154,19 +163,19 @@ public class Playback implements IPlaybackSession {
             }
         }
         NarrativeCraftMod.EVENT_BUS.post(new PlaybackEndEvent(this));
+        ended = true;
     }
 
     public void stopAndKill() {
         killOnEnd = true;
-        stop();
+        waitForSiblingsAndStop();
     }
 
     public void tick() {
         if (!isPlaying) return;
 
         if (tick >= maxTick) {
-            stop();
-            ended = true;
+            waitForSiblingsAndStop();
             return;
         }
 
@@ -334,5 +343,44 @@ public class Playback implements IPlaybackSession {
 
     public boolean isPlaying() {
         return isPlaying;
+    }
+
+    /**
+     * Get all "sibling" playbacks.
+     * @return a list of all playbacks containing an animation that is from a shared subscene, that are also targeting the same set of players.
+     */
+    private List<Playback> getSiblings() {
+        List<Animation> siblingAnims = this.animation.getLinkedSubscenes().stream()
+                .flatMap(subscene -> subscene.getAnimations().stream())
+                .filter(anim -> anim.getId() != this.animation.getId())
+                .distinct()
+                .toList();
+        return NarrativeCraftMod.getInstance().getPlaybackManager().getList().stream()
+                .filter(playback -> siblingAnims.contains(playback.animation)
+                        && playback.targetedPlayers.equals(this.targetedPlayers))
+                .toList();
+    }
+
+    /**
+     * @return <code>true</code> if any <strong>sibling</strong> playbacks are still playing.
+     * @see #getSiblings()
+     */
+    private boolean areSiblingsPlaying() {
+        for (Playback sibling : getSiblings()) {
+            if (sibling.isPlaying()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * <code>stop</code>s all <strong>siblings</strong>.
+     * @see #getSiblings()
+     */
+    private void notifySiblings() {
+        for (Playback sibling : getSiblings()) {
+            sibling.stop();
+        }
     }
 }
