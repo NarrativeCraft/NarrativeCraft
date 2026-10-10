@@ -143,7 +143,6 @@ public class RecordCommand {
 
         for (Animation animation : animationsToPlay) {
             Playback playback = new Playback(animation, player);
-            playback.setKillOnEnd(true);
             NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
             playback.start();
             recording.addSubscenePlayback(playback);
