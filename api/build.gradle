@@ -11,6 +11,10 @@ neoForge {
     neoFormVersion = neo_form_version
 }
 
+dependencies {
+    compileOnlyApi "io.github.spair:imgui-java-binding:${imgui_version}"
+}
+
 configurations {
     apiJava {
         canBeResolved = false
@@ -32,7 +36,8 @@ tasks.register('checkApiVersion') {
     def declaredApiVersion = api_version.toString()
     def declaredMajor = declaredApiVersion.tokenize('.').first()
 
-    inputs.file(apiVersionSourceFile)
+    inputs.files(apiVersionSourceFile).optional()
+    onlyIf { apiVersionSourceFile.exists() }
     inputs.property('apiVersion', declaredApiVersion)
 
     doLast {

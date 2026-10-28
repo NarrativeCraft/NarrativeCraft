@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,195 +23,14 @@
 
 package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.api.APISetup;
-import fr.loudo.narrativecraft.api.utils.Side;
-import fr.loudo.narrativecraft.dialog.DialogData;
-import fr.loudo.narrativecraft.dialog.effects.TextEffectRegister;
-import fr.loudo.narrativecraft.dialog.effects.TextEffectRegistry;
-import fr.loudo.narrativecraft.files.DeserializationResult;
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileEditorsRegister;
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.managers.CharacterManager;
-import fr.loudo.narrativecraft.managers.PlayerSessionManager;
-import fr.loudo.narrativecraft.managers.RecordingManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEditorsRegister;
-import fr.loudo.narrativecraft.narrative.NarrativeEntryResolver;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.cutscene.layers.CutsceneLayerRegister;
-import fr.loudo.narrativecraft.narrative.cutscene.layers.CutsceneLayerRegistry;
-import fr.loudo.narrativecraft.narrative.events.EventBus;
-import fr.loudo.narrativecraft.narrative.inkTag.InkActionRegister;
-import fr.loudo.narrativecraft.narrative.inkTag.InkTagDispatcherImpl;
-import fr.loudo.narrativecraft.narrative.save.SaveFileManager;
-import fr.loudo.narrativecraft.narrative.story.StoryHandlerManager;
-import fr.loudo.narrativecraft.playback.PlaybackManager;
-import fr.loudo.narrativecraft.recording.actions.ActionRegister;
-import fr.loudo.narrativecraft.recording.actions.ActionRegistry;
-import fr.loudo.narrativecraft.signals.SignalEmitterImpl;
-import fr.loudo.narrativecraft.signals.SignalRegistryImpl;
-import fr.loudo.narrativecraft.signals.SignalRegistryRegister;
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NarrativeCraftMod {
+
     public static final String MOD_ID = "narrativecraft";
     public static final String MOD_NAME = "NarrativeCraft";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
-    public static final EventBus EVENT_BUS = new EventBus();
-    private static final NarrativeCraftMod instance = new NarrativeCraftMod();
 
-    private final SignalEmitterImpl signalEmitter = new SignalEmitterImpl();
-    private final ChapterManager chapterManager = new ChapterManager();
-    private final NarrativeEntryResolver entryResolver = new NarrativeEntryResolver(chapterManager);
-    private final CharacterManager characterManager = new CharacterManager();
-    private final RecordingManager recordingManager = new RecordingManager();
-    private final PlaybackManager playbackManager = new PlaybackManager();
-    private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
-    private final StoryHandlerManager storyHandlerManager = new StoryHandlerManager();
-    private final ActionRegistry actionRegistry = new ActionRegistry();
-    private final CutsceneLayerRegistry cutsceneLayerRegistry = new CutsceneLayerRegistry();
-    private final TextEffectRegistry textEffectRegistry = new TextEffectRegistry();
-    private DialogData globalDialogData = new DialogData();
-    private final List<DeserializationResult<?>> corruptedDeserialization = new ArrayList<>();
-    private final InkTagDispatcherImpl inkTagDispatcher = new InkTagDispatcherImpl();
-    private final SaveFileManager saveFileManager = new SaveFileManager();
-    private final SignalRegistryImpl signalRegistry = new SignalRegistryImpl(Side.SERVER);
-    private CameraAngle mainScreenData;
-
-    private String compiledStoryJson;
-    private String preCompiledStoryJson;
-
-    private final NarrativeCraftFile file = new NarrativeCraftFile();
-
-    private MinecraftServer server;
-
-    private NarrativeCraftMod() {
-        APISetup.init(this);
-    }
-
-    public static void commonInit() {
-        NarrativeCraftFileEditorsRegister.register(getInstance().getCharacterManager());
-        NarrativeEditorsRegister.register();
-        ActionRegister.register(getInstance().getActionRegistry());
-        CutsceneLayerRegister.register(getInstance().getCutsceneLayerRegistry());
-        TextEffectRegister.register(getInstance().getTextEffectRegistry());
-        InkActionRegister.register();
-        SignalRegistryRegister.register();
-    }
-
-    public ChapterManager getChapterManager() {
-        return chapterManager;
-    }
-
-    public NarrativeEntryResolver getEntryResolver() {
-        return entryResolver;
-    }
-
-    public CharacterManager getCharacterManager() {
-        return characterManager;
-    }
-
-    public PlaybackManager getPlaybackManager() {
-        return playbackManager;
-    }
-
-    public RecordingManager getRecordingManager() {
-        return recordingManager;
-    }
-
-    public PlayerSessionManager getPlayerSessionManager() {
-        return playerSessionManager;
-    }
-
-    public ActionRegistry getActionRegistry() {
-        return actionRegistry;
-    }
-
-    public CutsceneLayerRegistry getCutsceneLayerRegistry() {
-        return cutsceneLayerRegistry;
-    }
-
-    public TextEffectRegistry getTextEffectRegistry() {
-        return textEffectRegistry;
-    }
-
-    public StoryHandlerManager getStoryHandlerManager() {
-        return storyHandlerManager;
-    }
-
-    public DialogData getGlobalDialogData() {
-        return globalDialogData;
-    }
-
-    public void setGlobalDialogData(DialogData globalDialogData) {
-        this.globalDialogData = globalDialogData;
-    }
-
-    public NarrativeCraftFile getFile() {
-        return file;
-    }
-
-    public MinecraftServer getServer() {
-        return server;
-    }
-
-    public CameraAngle getMainScreenData() {
-        return mainScreenData;
-    }
-
-    public void setMainScreenData(CameraAngle mainScreenData) {
-        this.mainScreenData = mainScreenData;
-    }
-
-    public List<DeserializationResult<?>> getCorruptedDeserialization() {
-        return corruptedDeserialization;
-    }
-
-    public InkTagDispatcherImpl getInkTagDispatcher() {
-        return inkTagDispatcher;
-    }
-
-    public String getCompiledStoryJson() {
-        return compiledStoryJson;
-    }
-
-    public void setCompiledStoryJson(String compiledStoryJson) {
-        this.compiledStoryJson = compiledStoryJson;
-    }
-
-    public String getPreCompiledStoryJson() {
-        return preCompiledStoryJson;
-    }
-
-    public void setPreCompiledStoryJson(String preCompiledStoryJson) {
-        this.preCompiledStoryJson = preCompiledStoryJson;
-    }
-
-    public boolean hasCompiledStory() {
-        return compiledStoryJson != null;
-    }
-
-    public void setServer(MinecraftServer server) {
-        this.server = server;
-    }
-
-    public SaveFileManager getSaveFileManager() {
-        return saveFileManager;
-    }
-
-    public SignalRegistryImpl getSignalRegistry() {
-        return signalRegistry;
-    }
-
-    public SignalEmitterImpl getSignalEmitter() {
-        return signalEmitter;
-    }
-
-    public static NarrativeCraftMod getInstance() {
-        return instance;
-    }
+    public static void commonInit() {}
 }

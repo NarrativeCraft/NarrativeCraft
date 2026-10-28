@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,23 +23,47 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import com.mojang.blaze3d.platform.Window;
+import fr.loudo.narrativecraft.client.events.OnGrabClient;
+import fr.loudo.narrativecraft.client.events.OnMouseClickClient;
+import fr.loudo.narrativecraft.client.studio.layout.LayoutWindowsClient;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
 
-    @Inject(method = "turnPlayer", at = @At("HEAD"), cancellable = true)
-    private void narrativecraft$turnPlayer(double mousea, CallbackInfo ci) {
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession.isInStory() && playerSession.inCamera()) {
+    @Inject(method = "onButton", at = @At("RETURN"))
+    private void narrativecraft$onMouseClickPost(
+            long handle, MouseButtonInfo rawButtonInfo, int action, CallbackInfo ci) {
+        OnMouseClickClient.onClickPost(handle, rawButtonInfo, action);
+    }
+
+    @Inject(method = "grabMouse", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$onGrabPre(CallbackInfo ci) {
+        if (OnGrabClient.onGrabPre()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "getScaledXPos(Lcom/mojang/blaze3d/platform/Window;D)D", at = @At("HEAD"), cancellable = true)
+    private static void narrativecraft$studioScaledXPos(Window window, double x, CallbackInfoReturnable<Double> cir) {
+        LayoutWindowsClient layout = LayoutWindowsClient.getInstance();
+        if (!layout.hasGameArea()) return;
+        double framebufferX = x * window.getWidth() / window.getScreenWidth();
+        cir.setReturnValue((framebufferX - layout.getGameX()) / window.getGuiScale());
+    }
+
+    @Inject(method = "getScaledYPos(Lcom/mojang/blaze3d/platform/Window;D)D", at = @At("HEAD"), cancellable = true)
+    private static void narrativecraft$studioScaledYPos(Window window, double y, CallbackInfoReturnable<Double> cir) {
+        LayoutWindowsClient layout = LayoutWindowsClient.getInstance();
+        if (!layout.hasGameArea()) return;
+        double framebufferY = y * window.getHeight() / window.getScreenHeight();
+        cir.setReturnValue((framebufferY - layout.getGameY()) / window.getGuiScale());
     }
 }

@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,14 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean isModLoaded(String modId) {
         return ModList.get().isLoaded(modId);
+    }
+
+    @Override
+    public String getModName(String modId) {
+        return ModList.get()
+                .getModContainerById(modId)
+                .map(mod -> mod.getModInfo().getDisplayName())
+                .orElse(modId);
     }
 
     @Override

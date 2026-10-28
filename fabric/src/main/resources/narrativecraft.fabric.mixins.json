@@ -2,26 +2,10 @@
   "required": true,
   "minVersion": "0.8",
   "package": "fr.loudo.narrativecraft.mixin",
-  "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "BedItemMixinFabric",
-    "BlockItemMixinFabric",
-    "DoubleHighBlockItemFabricMixin",
-    "LivingEntityMixinFabric",
-    "PlayerMixinFabric",
-    "ServerPlayerGameModeMixinFabric",
-    "ServerPlayerMixinFabric"
-  ],
+  "mixins": [],
   "client": [
-    "EntityRendererMixinFabric",
-    "GuiGraphicsExtractorMixinFabric",
-    "GuiMixinFabric",
-    "HuiMixinFabric",
-    "KeyboardHandlerMixinFabric",
-    "LevelRendererMixinFabric",
-    "MouseHandlerMixinFabric",
-    "ScreenshotMixinFabric"
+    "MouseHandlerMixinFabric"
   ],
   "server": [],
   "injectors": {

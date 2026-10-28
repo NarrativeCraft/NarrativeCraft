@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,170 +23,25 @@
 
 package fr.loudo.narrativecraft.api;
 
-import fr.loudo.narrativecraft.api.dialog.ITextEffectRegistry;
-import fr.loudo.narrativecraft.api.editors.ICutsceneLayerRegistry;
-import fr.loudo.narrativecraft.api.events.IEventBus;
-import fr.loudo.narrativecraft.api.inkAction.InkTagDispatcher;
-import fr.loudo.narrativecraft.api.managers.IChapterManager;
-import fr.loudo.narrativecraft.api.managers.ICharacterManager;
-import fr.loudo.narrativecraft.api.managers.IPlayerSessionManager;
-import fr.loudo.narrativecraft.api.managers.IRecordingManager;
-import fr.loudo.narrativecraft.api.narrative.IStoryHandlerManager;
-import fr.loudo.narrativecraft.api.recording.action.IActionRegistry;
-import fr.loudo.narrativecraft.api.signals.SignalEmitter;
-import fr.loudo.narrativecraft.api.signals.SignalRegistry;
+import fr.loudo.narrativecraft.api.client.NarrativeCraftClientAPI;
+import java.util.ServiceLoader;
 
 public class NarrativeCraftAPI {
 
-    public static final int VERSION = 5;
+    public static final Integer VERSION = 5;
 
-    private static volatile NarrativeCraftAPI INSTANCE;
-
-    private final String modId;
-    private final IActionRegistry actionRegistry;
-    private final ICutsceneLayerRegistry cutsceneLayerRegistry;
-    private final ITextEffectRegistry textEffectRegistry;
-    private final IStoryHandlerManager storyHandlerManager;
-    private final IEventBus eventBus;
-    private final IRecordingManager recordingManager;
-    private final IPlayerSessionManager playerSessionManager;
-    private final IChapterManager chapterManager;
-    private final ICharacterManager characterManager;
-    private final InkTagDispatcher inkTagDispatcher;
-    private final AddonRegistry addonRegistry;
-    private final SignalRegistry signalRegistry;
-    private final SignalEmitter signalEmitter;
-
-    private NarrativeCraftAPI(
-            String modId,
-            IActionRegistry actionRegistry,
-            ICutsceneLayerRegistry cutsceneLayerRegistry,
-            ITextEffectRegistry textEffectRegistry,
-            IStoryHandlerManager storyHandlerManager,
-            IEventBus eventBus,
-            IRecordingManager recordingManager,
-            IPlayerSessionManager playerSessionManager,
-            IChapterManager chapterManager,
-            ICharacterManager characterManager,
-            InkTagDispatcher inkTagDispatcher,
-            SignalRegistry signalRegistry,
-            SignalEmitter signalEmitter) {
-        this.modId = modId;
-        this.actionRegistry = actionRegistry;
-        this.cutsceneLayerRegistry = cutsceneLayerRegistry;
-        this.textEffectRegistry = textEffectRegistry;
-        this.storyHandlerManager = storyHandlerManager;
-        this.eventBus = eventBus;
-        this.recordingManager = recordingManager;
-        this.playerSessionManager = playerSessionManager;
-        this.chapterManager = chapterManager;
-        this.characterManager = characterManager;
-        this.inkTagDispatcher = inkTagDispatcher;
-        this.signalRegistry = signalRegistry;
-        this.signalEmitter = signalEmitter;
-        this.addonRegistry = new AddonRegistry();
+    /**
+     * Only call it on the client.
+     *
+     * @return the client side API
+     */
+    public static NarrativeCraftClientAPI client() {
+        return ClientHolder.INSTANCE;
     }
 
-    static void initialize(
-            String modId,
-            IActionRegistry actionRegistry,
-            ICutsceneLayerRegistry cutsceneLayerRegistry,
-            ITextEffectRegistry textEffectRegistry,
-            IStoryHandlerManager storyHandlerManager,
-            IEventBus eventBus,
-            IRecordingManager recordingManager,
-            IPlayerSessionManager playerSessionManager,
-            IChapterManager chapterManager,
-            ICharacterManager characterManager,
-            InkTagDispatcher inkTagDispatcher,
-            SignalRegistry signalRegistry,
-            SignalEmitter signalEmitter) {
-        INSTANCE = new NarrativeCraftAPI(
-                modId,
-                actionRegistry,
-                cutsceneLayerRegistry,
-                textEffectRegistry,
-                storyHandlerManager,
-                eventBus,
-                recordingManager,
-                playerSessionManager,
-                chapterManager,
-                characterManager,
-                inkTagDispatcher,
-                signalRegistry,
-                signalEmitter);
-    }
-
-    public static NarrativeCraftAPI getInstance() {
-        NarrativeCraftAPI instance = INSTANCE;
-        if (instance == null) {
-            throw new IllegalStateException(
-                    "NarrativeCraft API is not initialized yet. "
-                            + "Make sure your mod declares a dependency on NarrativeCraft and accesses the API in your mod initializer.");
-        }
-        return instance;
-    }
-
-    public AddonContext createAddon(
-            String modId, String name, String description, String author, String homeLink, int apiVersion) {
-        AddonContext context = new AddonContext(modId, name, description, author, homeLink, apiVersion);
-        addonRegistry.add(context);
-        return context;
-    }
-
-    public AddonRegistry getAddonRegistry() {
-        return addonRegistry;
-    }
-
-    public String getModId() {
-        return modId;
-    }
-
-    IActionRegistry getActionRegistry() {
-        return actionRegistry;
-    }
-
-    ICutsceneLayerRegistry getCutsceneLayerRegistry() {
-        return cutsceneLayerRegistry;
-    }
-
-    ITextEffectRegistry getTextEffectRegistry() {
-        return textEffectRegistry;
-    }
-
-    public IStoryHandlerManager getStoryHandlerManager() {
-        return storyHandlerManager;
-    }
-
-    IEventBus getEventBus() {
-        return eventBus;
-    }
-
-    public IRecordingManager getRecordingManager() {
-        return recordingManager;
-    }
-
-    public IPlayerSessionManager getPlayerSessionManager() {
-        return playerSessionManager;
-    }
-
-    public IChapterManager getChapterManager() {
-        return chapterManager;
-    }
-
-    public ICharacterManager getCharacterManager() {
-        return characterManager;
-    }
-
-    InkTagDispatcher getInkTagDispatcher() {
-        return inkTagDispatcher;
-    }
-
-    public SignalRegistry getSignalRegistry() {
-        return signalRegistry;
-    }
-
-    public SignalEmitter getSignalEmitter() {
-        return signalEmitter;
+    private static final class ClientHolder {
+        private static final NarrativeCraftClientAPI INSTANCE = ServiceLoader.load(NarrativeCraftClientAPI.class)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No NarrativeCraft client API implementation found"));
     }
 }

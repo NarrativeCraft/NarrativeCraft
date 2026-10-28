@@ -5,28 +5,13 @@ third-party work and remain subject to their original license terms in addition 
 
 ## fabric-mod-ImGui
 
-- Source: https://github.com/Enaium/fabric-mod-ImGui
+- Source: https://github.com/Enaium/fabric-mod-ImGui (version 1.2.1, module `game/26.3`, imgui 1.92.7.1)
 - Copyright 2026 Enaium
 - License: Apache License, Version 2.0
 
-Derived files:
-
-- `common/src/main/java/fr/loudo/narrativecraft/client/imgui/ClientImGuiBlaze3DRenderer.java`
-  (from `game/26.3/src/main/java/cn/enaium/fabric/imgui/blaze3d/ImGuiImplBlaze3D.java`)
-- `common/src/main/java/fr/loudo/narrativecraft/client/imgui/ClientImGui.java`
-  (from `game/26.3/src/main/java/cn/enaium/fabric/imgui/DefaultImGui.java` and
-  `core/src/main/java/cn/enaium/fabric/imgui/ImGuiService.java`)
-- `common/src/main/java/fr/loudo/narrativecraft/mixin/SDLEventHandlerMixin.java`
-  (from `game/26.3/src/main/java/cn/enaium/fabric/imgui/mixin/SDLEventHandlerMixin.java`)
-- `common/src/main/resources/assets/narrativecraft/shaders/core/imgui.vsh`
-- `common/src/main/resources/assets/narrativecraft/shaders/core/imgui.fsh`
-  (from `game/26.3/src/main/resources/assets/fabric-gui-imgui/shaders/core/`)
-
-Modifications: renamed to the NarrativeCraft package and identifiers, removed ImPlot, multi-viewport support,
-the OpenGL (`ImGuiImplGl3`) code path and the ImGui texture registry, kept only the Blaze3D/RenderPearl renderer
-(Vulkan), replaced the SDL event redirect with an injection, adapted naming conventions.
-
 ```
+Copyright 2026 Enaium
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at

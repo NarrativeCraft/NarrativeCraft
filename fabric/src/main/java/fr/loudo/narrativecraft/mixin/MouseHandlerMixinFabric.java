@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,45 +23,22 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.events.client.OnMouseInputEvent;
-import fr.loudo.narrativecraft.events.client.OnScreenMouseClickEvent;
+import fr.loudo.narrativecraft.client.events.OnMouseScrollClient;
 import net.minecraft.client.MouseHandler;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MouseHandler.class)
-public abstract class MouseHandlerMixinFabric {
-
-    @Redirect(
-            method = "onButton",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target =
-                                    "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"))
-    private boolean narrativecraft$onScreenMouseClick(
-            Screen instance, MouseButtonEvent mouseButtonEvent, boolean isDoubleClick) {
-        OnScreenMouseClickEvent.onMouseClicked();
-        return instance.mouseClicked(mouseButtonEvent, isDoubleClick);
-    }
+public class MouseHandlerMixinFabric {
 
     @Inject(
-            method = "onButton",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target =
-                                    "Lnet/minecraft/client/gui/Gui;overlay()Lnet/minecraft/client/gui/screens/Overlay;",
-                            ordinal = 0),
+            method = "onScroll",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z"),
             cancellable = true)
-    private void narrativecraft$preMouseInput(long handle, MouseButtonInfo rawButtonInfo, int action, CallbackInfo ci) {
-        if (OnMouseInputEvent.preMouseInput()) {
+    private void narrativecraft$fabricOnScroll(long handle, double xoffset, double yoffset, CallbackInfo ci) {
+        if (!OnMouseScrollClient.isAllowedToScroll()) {
             ci.cancel();
         }
     }

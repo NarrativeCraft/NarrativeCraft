@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,15 @@
 
 package fr.loudo.narrativecraft.platform;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.platform.services.IPacketSender;
 import fr.loudo.narrativecraft.platform.services.IPlatformHelper;
 import java.util.ServiceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Services {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Services.class);
 
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
     public static final IPacketSender PACKET = load(IPacketSender.class);
@@ -37,7 +40,7 @@ public class Services {
         final T loadedService = ServiceLoader.load(clazz)
                 .findFirst()
                 .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
-        NarrativeCraftMod.LOGGER.debug("Loaded {} for service {}", loadedService, clazz);
+        LOGGER.debug("Loaded {} for service {}", loadedService, clazz);
         return loadedService;
     }
 }

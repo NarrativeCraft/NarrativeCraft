@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,119 +23,45 @@
 
 package fr.loudo.narrativecraft.narrative.scene;
 
-import com.mojang.serialization.Codec;
-import fr.loudo.narrativecraft.api.narrative.scene.IScene;
-import fr.loudo.narrativecraft.files.NarrativeCraftFileDefault;
-import fr.loudo.narrativecraft.managers.AnimationManager;
-import fr.loudo.narrativecraft.managers.NpcManager;
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraAngleManager;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.cutscene.CutsceneManager;
-import fr.loudo.narrativecraft.narrative.interaction.InteractionManager;
-import fr.loudo.narrativecraft.narrative.subscene.SubsceneManager;
+import fr.loudo.narrativecraft.util.ModTranslation;
 import java.util.UUID;
 
-public class Scene extends NarrativeEntry<ScenePayload> implements IScene {
+public class Scene {
 
-    private final Chapter chapter;
-    private final AnimationManager animationManager = new AnimationManager();
-    private final SubsceneManager subsceneManager = new SubsceneManager();
-    private final CutsceneManager cutsceneManager = new CutsceneManager();
-    private final CameraAngleManager cameraAngleManager = new CameraAngleManager();
-    private final InteractionManager interactionManager = new InteractionManager();
-    private final NpcManager npcManager = new NpcManager();
-
-    private int rank;
-
-    public Scene(UUID id, String name, Chapter chapter, int rank) {
-        super(id, name);
-        this.chapter = chapter;
-        this.rank = rank;
+    public static Scene createNew() {
+        return new Scene(UUID.randomUUID(), "");
     }
 
-    public Scene(String name, Chapter chapter, int rank) {
-        super(name);
-        this.chapter = chapter;
-        this.rank = rank;
+    private final UUID id;
+    private final SceneData data = new SceneData();
+    private String name;
+
+    public Scene(UUID id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
-    public static Codec<Scene> codec(Chapter chapter) {
-        return entryCodec(ScenePayload.CODEC, (id, payload) -> fromPayload(id, payload, chapter));
+    public boolean isNew() {
+        return name.isEmpty();
     }
 
-    public static Scene fromPayload(UUID id, ScenePayload payload, Chapter chapter) {
-        return new Scene(id, payload.getName(), chapter, payload.getRank());
+    public UUID getId() {
+        return id;
     }
 
-    public String knotName() {
-        return knotName(chapter.getChapterIndex());
+    public String getTabName() {
+        return name.isEmpty() ? ModTranslation.message("studio.tabs.empty").getString() : name;
     }
 
-    public String knotName(int chapterIndex) {
-        return "chapter_" + chapterIndex + "_" + getNormalizedName();
-    }
-
-    public int getChapterIndex() {
-        return chapter.getChapterIndex();
-    }
-
-    public Chapter getChapter() {
-        return chapter;
-    }
-
-    public AnimationManager getAnimationManager() {
-        return animationManager;
-    }
-
-    public SubsceneManager getSubsceneManager() {
-        return subsceneManager;
-    }
-
-    public CutsceneManager getCutsceneManager() {
-        return cutsceneManager;
-    }
-
-    public CameraAngleManager getCameraAngleManager() {
-        return cameraAngleManager;
-    }
-
-    public InteractionManager getInteractionManager() {
-        return interactionManager;
-    }
-
-    public NpcManager getNpcManager() {
-        return npcManager;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
-
-    @Override
-    public String formattedName() {
+    public String getName() {
         return name;
     }
 
-    @Override
-    public ScenePayload toPayload() {
-        return new ScenePayload(name, chapter.getId(), rank);
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String inkFileName() {
-        return getNormalizedName() + NarrativeCraftFileDefault.EXTENSION_SCRIPT_FILE;
-    }
-
-    @Override
-    public String toFileName() {
-        return toFileName(chapter.getChapterIndex());
-    }
-
-    public String toFileName(int chapterIndex) {
-        return chapterIndex + "_" + rank + "_" + getNormalizedName();
+    public SceneData getData() {
+        return data;
     }
 }

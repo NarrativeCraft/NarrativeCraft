@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,27 +23,19 @@
 
 package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.network.BiPacketRegister;
-import fr.loudo.narrativecraft.network.ClientPacketRegisterFabric;
-import fr.loudo.narrativecraft.network.ServerPacketRegisterFabric;
-import fr.loudo.narrativecraft.network.handlers.ServerPacketHandlerFabric;
-import fr.loudo.narrativecraft.register.FabricEventList;
+import fr.loudo.narrativecraft.events.FabricEvents;
+import fr.loudo.narrativecraft.network.PacketRegisterFabric;
 import net.fabricmc.api.ModInitializer;
 
 public class NarrativeCraftFabric implements ModInitializer {
 
-    private final FabricEventList fabricEventList = new FabricEventList();
+    private final FabricEvents fabricEvents = new FabricEvents();
 
     @Override
     public void onInitialize() {
-
-        BiPacketRegister.register();
-        ServerPacketRegisterFabric.register();
-        ClientPacketRegisterFabric.register();
-        ServerPacketHandlerFabric.handle();
-
+        fabricEvents.init();
+        fabricEvents.register();
+        PacketRegisterFabric.serverRegister();
         NarrativeCraftMod.commonInit();
-
-        fabricEventList.register();
     }
 }

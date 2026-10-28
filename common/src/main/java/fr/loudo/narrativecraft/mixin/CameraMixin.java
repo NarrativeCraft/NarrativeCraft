@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,118 +23,27 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.editors.cameraangle.ClientCameraAngleMakerEditorMaker;
-import fr.loudo.narrativecraft.client.editors.cutscene.ClientCutsceneMakerEditorMaker;
-import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
-import fr.loudo.narrativecraft.client.utils.UtilsClient;
-import fr.loudo.narrativecraft.narrative.cameraangle.CameraView;
-import fr.loudo.narrativecraft.narrative.cutscene.layers.camera.KeyframePosition;
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
-import org.jspecify.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Camera.class)
-public abstract class CameraMixin {
+public class CameraMixin {
 
-    @Shadow
-    protected abstract void setPosition(Vec3 position);
-
-    @Shadow
-    protected abstract void setPosition(double x, double y, double z);
-
-    @Shadow
-    @Deprecated
-    protected abstract void setRotation(float yRot, float xRot);
-
-    @Shadow
-    @Final
-    private Quaternionf rotation;
-
-    @Shadow
-    private @Nullable Entity entity;
-
-    @Shadow
-    protected abstract float calculateFov(float partialTicks);
-
-    @Shadow
-    @Final
-    private Minecraft minecraft;
-
-    @Shadow
-    private float oldFovModifier;
-
-    @Shadow
-    private float fovModifier;
-
-    @Inject(method = "update", at = @At("RETURN"))
-    private void narrativecraft$camera(DeltaTracker deltaTracker, CallbackInfo ci) {
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession == null) return;
-
-        narrativecraft$handleCutsceneKeyframe(playerSession);
-        narrativecraft$handleCameraAngle(playerSession);
+    @Redirect(
+            method = {"update", "createProjectionMatrixForCulling"},
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;getWidth()I"))
+    private int narrativecraft$renderWidth(Window window) {
+        return Minecraft.getInstance().gameRenderer.gameRenderState().windowRenderState.width;
     }
 
-    private void narrativecraft$handleCutsceneKeyframe(ClientPlayerSession playerSession) {
-        KeyframePosition keyframePosition =
-                playerSession.getCutsceneDataSession().getKeyframePosition();
-        if (keyframePosition == null) {
-            ClientCutsceneMakerEditorMaker editor =
-                    ClientNarrativeCraftMod.getInstance().getCutsceneMakerEditor();
-            if (editor != null && editor.getPreviewRoll() != 0f) {
-                this.setRotation(minecraft.player.getYRot(), minecraft.player.getXRot());
-                this.rotation.rotateZ(-(float) Math.toRadians(editor.getPreviewRoll()));
-            }
-            return;
-        }
-        narrativecraft$overrideCamera(keyframePosition.getPosition(), keyframePosition.getRotation());
-    }
-
-    private void narrativecraft$handleCameraAngle(ClientPlayerSession playerSession) {
-        CameraView cameraView = playerSession.getCameraView();
-        if (cameraView == null) return;
-        ClientCameraAngleMakerEditorMaker editor =
-                ClientNarrativeCraftMod.getInstance().getCameraAngleMakerEditor();
-        if (editor != null && editor.isEditingCameraViewPosition()) return;
-
-        narrativecraft$overrideCamera(cameraView.getPosition(), cameraView.getRotation());
-    }
-
-    private void narrativecraft$overrideCamera(Vec3 position, Vec3 rotation) {
-        UtilsClient.setHudHidden(true);
-        this.setPosition(position);
-        this.setRotation((float) rotation.y, (float) rotation.x);
-        this.rotation.rotateZ((float) Math.toRadians(rotation.z()));
-    }
-
-    @Inject(method = "calculateFov", at = @At("HEAD"), cancellable = true)
-    private void narrativecraft$modifyFov(float partialTicks, CallbackInfoReturnable<Float> cir) {
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession == null) return;
-        float customFov = -1;
-
-        if (playerSession.getCutsceneDataSession() != null) {
-            customFov = playerSession.getCutsceneDataSession().getFov();
-        }
-        if (playerSession.getCameraView() != null) {
-            customFov = playerSession.getCameraView().getFov();
-        }
-        if (customFov == -1f) return;
-        cir.setReturnValue(customFov * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier));
+    @Redirect(
+            method = {"update", "createProjectionMatrixForCulling"},
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;getHeight()I"))
+    private int narrativecraft$renderHeight(Window window) {
+        return Minecraft.getInstance().gameRenderer.gameRenderState().windowRenderState.height;
     }
 }

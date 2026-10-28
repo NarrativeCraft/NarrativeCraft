@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,16 @@
 
 package fr.loudo.narrativecraft.mixin.accessor;
 
-import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(Entity.class)
 public interface EntityAccessor {
-    @Accessor
-    static EntityDataAccessor<Byte> getDATA_SHARED_FLAGS_ID() {
+
+    @Invoker("getInputVector")
+    static Vec3 getInputVector(Vec3 input, float speed, float yRot) {
         return null;
     }
 }

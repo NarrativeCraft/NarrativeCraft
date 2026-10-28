@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,45 +23,20 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.screens.mainScreen.MainScreen;
-import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.studio.NarrativeStudioClient;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Minecraft.class)
-public abstract class MinecraftMixin {
+public class MinecraftMixin {
 
-    @Shadow
-    public abstract boolean hasSingleplayerServer();
-
-    @Shadow
-    @Final
-    public Gui gui;
-
-    @Inject(method = "pauseGame", at = @At(value = "HEAD"))
-    private void narrativecraft$pauseGame(boolean suppressPauseMenuIfWeReallyArePausing, CallbackInfo ci) {
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (!playerSession.isInStory()) return;
-        if (!hasSingleplayerServer()) return;
-
-        gui.setScreen(new MainScreen(true));
-    }
-
-    @Inject(method = "startAttack", at = @At(value = "HEAD"), cancellable = true)
-    private void narrativecraft$spectate(CallbackInfoReturnable<Boolean> cir) {
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession.inCamera()) {
-            cir.cancel();
+    @Inject(method = "handleKeybinds", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$handleKeybinds(CallbackInfo ci) {
+        if (NarrativeStudioClient.getInstance().isOpened()) {
+            ci.cancel();
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,14 @@ public interface IPlatformHelper {
      * @return True if the mod is loaded, false otherwise.
      */
     boolean isModLoaded(String modId);
+
+    /**
+     * Gets the display name of a mod.
+     *
+     * @param modId The mod to get the name of.
+     * @return The display name of the mod, or its id if it is not loaded.
+     */
+    String getModName(String modId);
 
     /**
      * Check if the game is currently in a development environment.

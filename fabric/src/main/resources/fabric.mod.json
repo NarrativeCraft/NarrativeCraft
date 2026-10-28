@@ -7,6 +7,14 @@
   "authors": [
     "${mod_author}"
   ],
+  "entrypoints": {
+    "main": [
+      "fr.loudo.narrativecraft.NarrativeCraftFabric"
+    ],
+    "client": [
+      "fr.loudo.narrativecraft.client.ClientNarrativeCraftFabric"
+    ]
+  },
   "contact": {
     "homepage": "https://modrinth.com/project/narrativecraft",
     "sources": "https://github.com/LOUDO56/NarrativeCraft",
@@ -15,14 +23,6 @@
   "license": "${license}",
   "icon": "${mod_id}.png",
   "environment": "*",
-  "entrypoints": {
-    "main": [
-      "fr.loudo.narrativecraft.NarrativeCraftFabric"
-    ],
-    "client": [
-      "fr.loudo.narrativecraft.NarrativeCraftFabricClient"
-    ]
-  },
   "mixins": [
     "${mod_id}.mixins.json",
     "${mod_id}.fabric.mixins.json"
@@ -32,8 +32,5 @@
     "fabric-api": "*",
     "minecraft": "${minecraft_version}",
     "java": ">=${java_version}"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }

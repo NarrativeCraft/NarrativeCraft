@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,23 +23,20 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.client.ClientNarrativeCraftMod;
-import fr.loudo.narrativecraft.client.session.ClientPlayerSession;
+import fr.loudo.narrativecraft.client.studio.NarrativeStudioClient;
 import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LocalPlayer.class)
 public class LocalPlayerMixin {
 
-    @Inject(method = "aiStep", at = @At("HEAD"), cancellable = true)
-    private void narrativecraft$aiStep(CallbackInfo ci) {
-        ClientPlayerSession playerSession =
-                ClientNarrativeCraftMod.getInstance().getPlayerSession();
-        if (playerSession.isInStory() && playerSession.inCamera()) {
-            ci.cancel();
+    @Inject(method = "canStartSprinting", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$cancelSprintStudio(CallbackInfoReturnable<Boolean> cir) {
+        if (NarrativeStudioClient.getInstance().isOpened()) {
+            cir.setReturnValue(false);
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * NarrativeCraft - Create narrative games inside Minecraft. No coding, no game engine, only text and logic.
- * Copyright (c) 2025 LOUDO and contributors
+ * Copyright (c) 2026 LOUDO and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,67 +23,22 @@
 
 package fr.loudo.narrativecraft.api.client;
 
-import fr.loudo.narrativecraft.api.client.editors.cutscene.ClientCutsceneLayerRegistry;
-import fr.loudo.narrativecraft.api.client.inkAction.ClientInkTagDispatcher;
-import fr.loudo.narrativecraft.api.client.signals.ClientSignalEmitter;
-import fr.loudo.narrativecraft.api.client.signals.ClientSignalRegistry;
+import fr.loudo.narrativecraft.api.client.studio.menu.NarrativeMenuRegistryClient;
+import fr.loudo.narrativecraft.api.client.studio.shortcut.NarrativeShortcutRegistryClient;
 
-public class NarrativeCraftClientAPI {
+/**
+ * Client side entry point of the NarrativeCraft API, get it with
+ * {@link fr.loudo.narrativecraft.api.NarrativeCraftAPI#client()}.
+ */
+public interface NarrativeCraftClientAPI {
 
-    private static volatile NarrativeCraftClientAPI INSTANCE;
+    /**
+     * @return the registry where to register your studio menu bar menus
+     */
+    NarrativeMenuRegistryClient menus();
 
-    private final ClientInkTagDispatcher inkTagDispatcher;
-    private final ClientSignalRegistry signalRegistry;
-    private final ClientSignalEmitter signalEmitter;
-    private final ClientCutsceneLayerRegistry cutsceneLayerRegistry;
-
-    private NarrativeCraftClientAPI(
-            ClientInkTagDispatcher inkTagDispatcher,
-            ClientSignalRegistry signalRegistry,
-            ClientSignalEmitter signalEmitter,
-            ClientCutsceneLayerRegistry cutsceneLayerRegistry) {
-        this.inkTagDispatcher = inkTagDispatcher;
-        this.signalRegistry = signalRegistry;
-        this.signalEmitter = signalEmitter;
-        this.cutsceneLayerRegistry = cutsceneLayerRegistry;
-    }
-
-    static void initialize(
-            ClientInkTagDispatcher inkTagDispatcher,
-            ClientSignalRegistry signalRegistry,
-            ClientSignalEmitter signalEmitter,
-            ClientCutsceneLayerRegistry cutsceneLayerRegistry) {
-        INSTANCE = new NarrativeCraftClientAPI(inkTagDispatcher, signalRegistry, signalEmitter, cutsceneLayerRegistry);
-    }
-
-    public static boolean isAvailable() {
-        return INSTANCE != null;
-    }
-
-    public static NarrativeCraftClientAPI getInstance() {
-        NarrativeCraftClientAPI instance = INSTANCE;
-        if (instance == null) {
-            throw new IllegalStateException(
-                    "NarrativeCraft client API is not available. "
-                            + "It only exists on a physical client, and only once NarrativeCraft client initialization has run. "
-                            + "and guard the call with NarrativeCraftClientAPI.isAvailable() if the code also runs on a server.");
-        }
-        return instance;
-    }
-
-    public ClientInkTagDispatcher getInkTagDispatcher() {
-        return inkTagDispatcher;
-    }
-
-    public ClientSignalRegistry getSignalRegistry() {
-        return signalRegistry;
-    }
-
-    public ClientSignalEmitter getSignalEmitter() {
-        return signalEmitter;
-    }
-
-    public ClientCutsceneLayerRegistry getCutsceneLayerRegistry() {
-        return cutsceneLayerRegistry;
-    }
+    /**
+     * @return the registry where to register your studio keyboard shortcuts
+     */
+    NarrativeShortcutRegistryClient shortcuts();
 }
