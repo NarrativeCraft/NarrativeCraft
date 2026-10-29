@@ -27,7 +27,7 @@ import java.io.File;
 
 public class NarrativeFiles {
 
-    public static final String DEFAULT_FORMAT = "json";
+    public static final String DEFAULT_FORMAT = ".json";
 
     private static final NarrativeFiles INSTANCE = new NarrativeFiles();
 

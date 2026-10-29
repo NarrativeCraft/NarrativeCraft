@@ -37,7 +37,7 @@ import javax.annotation.Nullable;
 
 public class SceneFiles implements FileData<Scene> {
 
-    public static final String FORMAT = "nc_scene";
+    public static final String FORMAT = ".nc_scene";
 
     private final File narrativeFolder;
 
@@ -68,7 +68,7 @@ public class SceneFiles implements FileData<Scene> {
     }
 
     private File sceneFile(String sceneName, @Nullable Path path) {
-        String fileName = String.format("%s.%s.%s", sceneName, FORMAT, NarrativeFiles.DEFAULT_FORMAT);
+        String fileName = sceneName + FORMAT;
         String relative = path == null ? fileName : path.resolve(fileName).toString();
         return FileHelper.createFile(narrativeFolder, relative);
     }

@@ -23,9 +23,9 @@
 
 package fr.loudo.narrativecraft.client.studio.assets;
 
+import fr.loudo.narrativecraft.api.util.Icons;
 import fr.loudo.narrativecraft.client.imgui.ImGuiRenderableClient;
 import fr.loudo.narrativecraft.client.studio.shortcut.StudioShortcutsClient;
-import fr.loudo.narrativecraft.client.util.Icons;
 import fr.loudo.narrativecraft.studio.assets.Assets;
 import fr.loudo.narrativecraft.studio.assets.Tree;
 import imgui.ImGui;
@@ -43,7 +43,9 @@ public class AssetsClient implements ImGuiRenderableClient {
     public void render(ImGuiIO io) {
         if (root == null) return;
         renderRefreshButton();
-        renderTree(root, ImGuiTreeNodeFlags.DefaultOpen);
+        for (Tree tree : root.getChild().stream().sorted(Assets.ORDER).toList()) {
+            renderTree(tree);
+        }
     }
 
     private void renderRefreshButton() {
@@ -55,8 +57,8 @@ public class AssetsClient implements ImGuiRenderableClient {
         }
     }
 
-    private void renderTree(Tree tree, int extraFlags) {
-        int flags = BASE_FLAGS | extraFlags;
+    private void renderTree(Tree tree) {
+        int flags = BASE_FLAGS;
         if (tree.isDirectory()) {
             flags |= ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick;
             if (tree.getChild().isEmpty()) {
@@ -66,12 +68,11 @@ public class AssetsClient implements ImGuiRenderableClient {
             flags |= ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen;
         }
 
-        String label = tree.isDirectory() ? tree.getName() + "/" : tree.getName();
-        boolean open = ImGui.treeNodeEx("/" + tree.getPath(), flags, label);
+        boolean open = ImGui.treeNodeEx("/" + tree.getPath(), flags, tree.resolveName());
         if (!open || !tree.isDirectory()) return;
 
         for (Tree child : tree.getChild().stream().sorted(Assets.ORDER).toList()) {
-            renderTree(child, 0);
+            renderTree(child);
         }
         ImGui.treePop();
     }

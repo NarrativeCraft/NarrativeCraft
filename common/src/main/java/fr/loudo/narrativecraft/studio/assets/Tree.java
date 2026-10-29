@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.studio.assets;
 
+import fr.loudo.narrativecraft.api.util.Icons;
+import fr.loudo.narrativecraft.client.studio.assets.TreeIconFileRegistryImpl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +84,19 @@ public class Tree {
 
     public String getName() {
         return name;
+    }
+
+    public String resolveName() {
+        String icon = null;
+        if (directory) {
+            icon = Icons.FOLDER;
+        } else {
+            int dot = name.lastIndexOf('.');
+            if (dot != -1) {
+                icon = TreeIconFileRegistryImpl.getInstance().getIcon(name.substring(dot));
+            }
+        }
+        return (icon != null ? icon : Icons.FILE) + " " + name;
     }
 
     public boolean isDirectory() {

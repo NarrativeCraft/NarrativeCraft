@@ -23,17 +23,15 @@
 
 package fr.loudo.narrativecraft.client.events;
 
-import fr.loudo.narrativecraft.client.studio.menu.*;
+import fr.loudo.narrativecraft.client.studio.assets.TreeIconFileRegistryImpl;
 import fr.loudo.narrativecraft.client.studio.shortcut.StudioShortcutsClient;
 import fr.loudo.narrativecraft.registry.NarrativeMenuRegistryImpl;
 
 public class OnInitClient {
 
     public static void onInit() {
-        NarrativeMenuRegistryImpl.getInstance().registerBuiltIn(new FileMenu());
-        NarrativeMenuRegistryImpl.getInstance().registerBuiltIn(new EditMenu());
-        NarrativeMenuRegistryImpl.getInstance().registerBuiltIn(new WindowsMenu());
-        NarrativeMenuRegistryImpl.getInstance().registerBuiltIn(new HelpMenu());
+        NarrativeMenuRegistryImpl.initialize();
         StudioShortcutsClient.initialize();
+        TreeIconFileRegistryImpl.initialize();
     }
 }

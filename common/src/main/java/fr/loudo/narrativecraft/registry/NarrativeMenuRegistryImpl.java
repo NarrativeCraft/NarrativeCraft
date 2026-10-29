@@ -26,11 +26,11 @@ package fr.loudo.narrativecraft.registry;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.client.studio.menu.NarrativeMenuClient;
 import fr.loudo.narrativecraft.api.client.studio.menu.NarrativeMenuRegistryClient;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import fr.loudo.narrativecraft.client.studio.menu.EditMenu;
+import fr.loudo.narrativecraft.client.studio.menu.FileMenu;
+import fr.loudo.narrativecraft.client.studio.menu.HelpMenu;
+import fr.loudo.narrativecraft.client.studio.menu.WindowsMenu;
+import java.util.*;
 import net.minecraft.resources.Identifier;
 
 public class NarrativeMenuRegistryImpl implements NarrativeMenuRegistryClient {
@@ -42,6 +42,13 @@ public class NarrativeMenuRegistryImpl implements NarrativeMenuRegistryClient {
     private boolean frozen;
 
     private NarrativeMenuRegistryImpl() {}
+
+    public static void initialize() {
+        INSTANCE.registerBuiltIn(new FileMenu());
+        INSTANCE.registerBuiltIn(new EditMenu());
+        INSTANCE.registerBuiltIn(new WindowsMenu());
+        INSTANCE.registerBuiltIn(new HelpMenu());
+    }
 
     @Override
     public synchronized void register(NarrativeMenuClient menu) {

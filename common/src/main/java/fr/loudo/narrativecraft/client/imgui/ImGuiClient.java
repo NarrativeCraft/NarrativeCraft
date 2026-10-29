@@ -35,7 +35,7 @@ import com.mojang.renderpearl.api.device.GpuDevice;
 import com.mojang.renderpearl.api.textures.GpuTexture;
 import com.mojang.renderpearl.backend.api.GpuDeviceBackend;
 import com.mojang.renderpearl.backend.opengl.*;
-import fr.loudo.narrativecraft.client.util.Icons;
+import fr.loudo.narrativecraft.api.util.Icons;
 import fr.loudo.narrativecraft.mixin.imgui.FrontendGpuDeviceImGuiAccessor;
 import fr.loudo.narrativecraft.mixin.imgui.GlDeviceImGuiAccessor;
 import imgui.ImDrawData;

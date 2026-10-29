@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.util;
+package fr.loudo.narrativecraft.api.util;
 
 public final class Icons {
 
