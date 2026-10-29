@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.client.events;
 
-import fr.loudo.narrativecraft.client.studio.assets.TreeIconFileRegistryImpl;
+import fr.loudo.narrativecraft.client.registry.TreeIconFileRegistryImpl;
 import fr.loudo.narrativecraft.client.studio.shortcut.StudioShortcutsClient;
 import fr.loudo.narrativecraft.registry.NarrativeMenuRegistryImpl;
 

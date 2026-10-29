@@ -114,8 +114,11 @@ public class TabsManagerClient {
     }
 
     public void open(Scene scene) {
-        Tab tab = new Tab(scene, !scene.isNew());
-        tabs.add(tab);
+        Tab tab = getTabByScene(scene);
+        if (tab == null) {
+            tab = new Tab(scene, !scene.isNew());
+            tabs.add(tab);
+        }
         switchTo(tab);
         focusActiveTab = true;
     }

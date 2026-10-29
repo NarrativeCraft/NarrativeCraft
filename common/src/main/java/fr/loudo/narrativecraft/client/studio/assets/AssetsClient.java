@@ -25,11 +25,14 @@ package fr.loudo.narrativecraft.client.studio.assets;
 
 import fr.loudo.narrativecraft.api.util.Icons;
 import fr.loudo.narrativecraft.client.imgui.ImGuiRenderableClient;
+import fr.loudo.narrativecraft.client.network.C2SRequestOpenFile;
 import fr.loudo.narrativecraft.client.studio.shortcut.StudioShortcutsClient;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.studio.assets.Assets;
 import fr.loudo.narrativecraft.studio.assets.Tree;
 import imgui.ImGui;
 import imgui.ImGuiIO;
+import imgui.flag.ImGuiMouseButton;
 import imgui.flag.ImGuiTreeNodeFlags;
 
 public class AssetsClient implements ImGuiRenderableClient {
@@ -69,6 +72,9 @@ public class AssetsClient implements ImGuiRenderableClient {
         }
 
         boolean open = ImGui.treeNodeEx("/" + tree.getPath(), flags, tree.resolveName());
+        if (ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left) && !ImGui.isItemToggledOpen()) {
+            Services.PACKET.sendToServer(new C2SRequestOpenFile(tree.getPath()));
+        }
         if (!open || !tree.isDirectory()) return;
 
         for (Tree child : tree.getChild().stream().sorted(Assets.ORDER).toList()) {

@@ -24,11 +24,21 @@
 package fr.loudo.narrativecraft.util;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import java.io.File;
 import net.minecraft.resources.Identifier;
 
 public class Util {
 
     public static Identifier buildId(String id) {
         return Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, id);
+    }
+
+    public static String getFileExtension(File file) {
+        return getFileExtension(file.getName());
+    }
+
+    public static String getFileExtension(String fileName) {
+        int dot = fileName.lastIndexOf('.');
+        return dot == -1 ? "" : fileName.substring(dot);
     }
 }

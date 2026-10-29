@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.client.network.C2SFreezeWorld;
+import fr.loudo.narrativecraft.client.network.C2SRequestOpenFile;
 import fr.loudo.narrativecraft.client.network.C2SRequestTree;
 import fr.loudo.narrativecraft.client.network.C2SStudioToggle;
 import fr.loudo.narrativecraft.client.network.handlers.ClientPacketHandler;
@@ -50,11 +51,20 @@ public class PacketRegisterFabric {
         ServerPlayNetworking.registerGlobalReceiver(
                 C2SRequestTree.TYPE, (packet, context) -> ServerPacketHandler.requestTree(packet, context.player()));
 
+        PayloadTypeRegistry.serverboundPlay().register(C2SRequestOpenFile.TYPE, C2SRequestOpenFile.STREAM_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(
+                C2SRequestOpenFile.TYPE,
+                (packet, context) -> ServerPacketHandler.requestOpenFile(packet, context.player()));
+
         PayloadTypeRegistry.clientboundPlay().registerLarge(S2CInitTree.TYPE, S2CInitTree.STREAM_CODEC, 5_242_880);
+        PayloadTypeRegistry.clientboundPlay()
+                .registerLarge(S2COpenScene.TYPE, S2COpenScene.STREAM_CODEC, S2COpenScene.MAX_SIZE);
     }
 
     public static void clientRegister() {
         ClientPlayNetworking.registerGlobalReceiver(
                 S2CInitTree.TYPE, (packet, context) -> ClientPacketHandler.initTree(packet));
+        ClientPlayNetworking.registerGlobalReceiver(
+                S2COpenScene.TYPE, (packet, context) -> ClientPacketHandler.openScene(packet));
     }
 }

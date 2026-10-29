@@ -28,7 +28,7 @@ import java.util.ServiceLoader;
 
 public class NarrativeCraftAPI {
 
-    public static final Integer VERSION = 5;
+    public static final Integer VERSION = 1;
 
     /**
      * Only call it on the client.

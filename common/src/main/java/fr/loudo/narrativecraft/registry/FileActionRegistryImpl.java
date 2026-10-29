@@ -21,45 +21,50 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client.studio.assets;
+package fr.loudo.narrativecraft.registry;
 
-import fr.loudo.narrativecraft.api.client.studio.assets.TreeIconFileRegistry;
-import fr.loudo.narrativecraft.api.util.Icons;
+import fr.loudo.narrativecraft.api.registry.FileActionRegistry;
 import fr.loudo.narrativecraft.files.SceneFiles;
+import fr.loudo.narrativecraft.network.S2COpenScene;
+import fr.loudo.narrativecraft.platform.Services;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import net.minecraft.server.level.ServerPlayer;
 
-public class TreeIconFileRegistryImpl implements TreeIconFileRegistry {
+public class FileActionRegistryImpl implements FileActionRegistry {
 
-    private static final TreeIconFileRegistryImpl INSTANCE = new TreeIconFileRegistryImpl();
+    private static final FileActionRegistryImpl INSTANCE = new FileActionRegistryImpl();
 
-    private final Map<String, String> icons = new HashMap<>();
-
-    private TreeIconFileRegistryImpl() {}
+    private final Map<String, BiConsumer<ServerPlayer, String>> actions = new HashMap<>();
 
     public static void initialize() {
-        INSTANCE.register(SceneFiles.FORMAT, Icons.CLAPPERBOARD);
+        INSTANCE.register(SceneFiles.FORMAT, (player, data) -> {
+            Services.PACKET.sendToPlayer(player, new S2COpenScene(data));
+        });
     }
 
+    private FileActionRegistryImpl() {}
+
     @Override
-    public synchronized void register(String extension, String icon) {
+    public synchronized void register(String extension, BiConsumer<ServerPlayer, String> action) {
         Objects.requireNonNull(extension, "extension");
-        Objects.requireNonNull(icon, "icon");
-        if (icons.putIfAbsent(extension.toLowerCase(), icon) != null) {
+        Objects.requireNonNull(action, "action");
+        if (actions.putIfAbsent(extension.toLowerCase(), action) != null) {
             throw new IllegalArgumentException(
-                    "An icon is already registered for the extension " + extension.toLowerCase());
+                    "An action is already registered for the extension " + extension.toLowerCase());
         }
     }
 
     /**
-     * Returns the icon registered for this extension, or {@code null} if there is none.
+     * Returns the action registered for this extension, or {@code null} if there is none.
      */
-    public synchronized String getIcon(String extension) {
-        return icons.get(extension);
+    public synchronized BiConsumer<ServerPlayer, String> getAction(String extension) {
+        return actions.get(extension.toLowerCase());
     }
 
-    public static TreeIconFileRegistryImpl getInstance() {
+    public static FileActionRegistryImpl getInstance() {
         return INSTANCE;
     }
 }

@@ -24,15 +24,23 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import com.google.common.hash.Hashing;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.network.C2SFreezeWorld;
+import fr.loudo.narrativecraft.client.network.C2SRequestOpenFile;
 import fr.loudo.narrativecraft.client.network.C2SRequestTree;
 import fr.loudo.narrativecraft.client.network.C2SStudioToggle;
 import fr.loudo.narrativecraft.files.NarrativeFiles;
 import fr.loudo.narrativecraft.network.S2CInitTree;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.registry.FileActionRegistryImpl;
 import fr.loudo.narrativecraft.studio.NarrativeStudio;
 import fr.loudo.narrativecraft.studio.assets.TreeIO;
+import fr.loudo.narrativecraft.util.Util;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.function.BiConsumer;
 import net.minecraft.server.ServerTickRateManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
@@ -69,6 +77,19 @@ public class ServerPacketHandler {
         // for big projects tho but still worth adding)
         if (!assetsHash.equals(packet.assetsHash())) {
             Services.PACKET.sendToPlayer(player, new S2CInitTree(treeJson));
+        }
+    }
+
+    public static void requestOpenFile(C2SRequestOpenFile packet, ServerPlayer player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
+        File file = NarrativeFiles.resolveByRelative(packet.path());
+        BiConsumer<ServerPlayer, String> action =
+                FileActionRegistryImpl.getInstance().getAction(Util.getFileExtension(file));
+        if (action == null) return;
+        try {
+            action.accept(player, Files.readString(file.toPath()));
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Failed to open file {}!", file.getName());
         }
     }
 }

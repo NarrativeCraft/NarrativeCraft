@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.registry.FileActionRegistryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,5 +33,7 @@ public class NarrativeCraftMod {
     public static final String MOD_NAME = "NarrativeCraft";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
-    public static void commonInit() {}
+    public static void commonInit() {
+        FileActionRegistryImpl.initialize();
+    }
 }

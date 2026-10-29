@@ -35,6 +35,10 @@ public class NarrativeFiles {
     private SceneFiles sceneFiles;
     private AssetsFile assetsFile;
 
+    public static File resolveByRelative(String relativePath) {
+        return new File(INSTANCE.narrativeFolder, relativePath);
+    }
+
     private NarrativeFiles() {}
 
     public void init(File worldDirectory) {
