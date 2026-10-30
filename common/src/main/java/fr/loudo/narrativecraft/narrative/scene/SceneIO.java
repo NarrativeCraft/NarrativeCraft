@@ -39,6 +39,7 @@ public class SceneIO extends FileDataIO<Scene> {
         JsonObject object = new JsonObject();
         object.addProperty("id", data.getId().toString());
         object.addProperty("name", data.getName());
+        object.add("data", SceneDataIO.serialize(data.getData()));
         return object;
     }
 
@@ -46,6 +47,8 @@ public class SceneIO extends FileDataIO<Scene> {
     protected Scene deserialize(JsonObject object, int version) {
         UUID id = UUID.fromString(object.get("id").getAsString());
         String name = object.get("name").getAsString();
-        return new Scene(id, name);
+        SceneData sceneData =
+                object.has("data") ? SceneDataIO.deserialize(object.getAsJsonObject("data")) : new SceneData();
+        return new Scene(id, name, sceneData);
     }
 }

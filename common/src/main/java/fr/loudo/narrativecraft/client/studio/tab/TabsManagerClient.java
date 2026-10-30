@@ -119,6 +119,7 @@ public class TabsManagerClient {
             tab = new Tab(scene, !scene.isNew());
             tabs.add(tab);
         }
+        tab.getSession().setPosition(scene.getData().getLastPos());
         switchTo(tab);
         focusActiveTab = true;
     }

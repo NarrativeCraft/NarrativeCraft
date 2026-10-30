@@ -29,16 +29,17 @@ import java.util.UUID;
 public class Scene {
 
     public static Scene createNew() {
-        return new Scene(UUID.randomUUID(), "");
+        return new Scene(UUID.randomUUID(), "", new SceneData());
     }
 
     private final UUID id;
-    private final SceneData data = new SceneData();
+    private final SceneData data;
     private String name;
 
-    public Scene(UUID id, String name) {
+    public Scene(UUID id, String name, SceneData data) {
         this.id = id;
         this.name = name;
+        this.data = data;
     }
 
     public boolean isNew() {

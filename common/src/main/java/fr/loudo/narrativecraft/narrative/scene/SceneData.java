@@ -23,4 +23,17 @@
 
 package fr.loudo.narrativecraft.narrative.scene;
 
-public class SceneData {}
+import fr.loudo.narrativecraft.util.Position;
+
+public class SceneData {
+
+    private Position lastPos;
+
+    public Position getLastPos() {
+        return lastPos;
+    }
+
+    public void setLastPos(Position lastPos) {
+        this.lastPos = lastPos;
+    }
+}
