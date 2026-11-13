@@ -67,6 +67,19 @@ public class SceneFiles implements FileData<Scene> {
         }
     }
 
+    public boolean isValidPath(String directory, String sceneName) {
+        if (sceneName.isBlank() || sceneName.contains("/") || sceneName.contains("\\")) return false;
+        File target = new File(narrativeFolder, directory);
+        try {
+            String folderPath = narrativeFolder.getCanonicalPath();
+            String targetPath = target.getCanonicalPath();
+            boolean inside = targetPath.equals(folderPath) || targetPath.startsWith(folderPath + File.separator);
+            return inside && target.isDirectory();
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     private File sceneFile(String sceneName, @Nullable Path path) {
         String fileName = sceneName + FORMAT;
         String relative = path == null ? fileName : path.resolve(fileName).toString();

@@ -24,12 +24,12 @@
 package fr.loudo.narrativecraft.network.handlers;
 
 import com.google.common.hash.Hashing;
+import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.client.network.C2SFreezeWorld;
-import fr.loudo.narrativecraft.client.network.C2SRequestOpenFile;
-import fr.loudo.narrativecraft.client.network.C2SRequestTree;
-import fr.loudo.narrativecraft.client.network.C2SStudioToggle;
+import fr.loudo.narrativecraft.client.network.*;
 import fr.loudo.narrativecraft.files.NarrativeFiles;
+import fr.loudo.narrativecraft.files.SceneFiles;
+import fr.loudo.narrativecraft.narrative.scene.Scene;
 import fr.loudo.narrativecraft.network.S2CInitTree;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.registry.FileActionRegistryImpl;
@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.BiConsumer;
 import net.minecraft.server.ServerTickRateManager;
 import net.minecraft.server.level.ServerPlayer;
@@ -78,6 +79,33 @@ public class ServerPacketHandler {
         if (!assetsHash.equals(packet.assetsHash())) {
             Services.PACKET.sendToPlayer(player, new S2CInitTree(treeJson));
         }
+    }
+
+    public static void saveScene(C2SSaveScene packet, ServerPlayer player) {
+        if (!player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
+        SceneFiles sceneFiles = NarrativeFiles.getInstance().getSceneFiles();
+        Scene scene;
+        try {
+            scene = sceneFiles
+                    .io()
+                    .read(JsonParser.parseString(packet.sceneJson()).getAsJsonObject());
+        } catch (RuntimeException e) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Received an invalid scene from {}", player.getName().getString(), e);
+            return;
+        }
+        if (!sceneFiles.isValidPath(packet.directory(), scene.getName())) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Refused to save scene {} in {}: invalid path", scene.getName(), packet.directory());
+            return;
+        }
+        Path directory = packet.directory().isEmpty() ? null : Path.of(packet.directory());
+        if (!sceneFiles.save(scene, directory)) return;
+        Services.PACKET.sendToPlayer(
+                player,
+                new S2CInitTree(TreeIO.serialize(
+                                NarrativeFiles.getInstance().getAssets().generateTree())
+                        .toString()));
     }
 
     public static void requestOpenFile(C2SRequestOpenFile packet, ServerPlayer player) {

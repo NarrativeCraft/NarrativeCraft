@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.network;
 import fr.loudo.narrativecraft.client.network.C2SFreezeWorld;
 import fr.loudo.narrativecraft.client.network.C2SRequestOpenFile;
 import fr.loudo.narrativecraft.client.network.C2SRequestTree;
+import fr.loudo.narrativecraft.client.network.C2SSaveScene;
 import fr.loudo.narrativecraft.client.network.C2SStudioToggle;
 import fr.loudo.narrativecraft.client.network.handlers.ClientPacketHandler;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
@@ -51,6 +52,10 @@ public class ServerPacketRegisterNeoForge {
                 C2SRequestOpenFile.TYPE,
                 C2SRequestOpenFile.STREAM_CODEC,
                 (packet, context) -> ServerPacketHandler.requestOpenFile(packet, (ServerPlayer) context.player()));
+        registrar.playToServer(
+                C2SSaveScene.TYPE,
+                C2SSaveScene.STREAM_CODEC,
+                (packet, context) -> ServerPacketHandler.saveScene(packet, (ServerPlayer) context.player()));
         registrar.playToClient(
                 S2CInitTree.TYPE, S2CInitTree.STREAM_CODEC, (packet, context) -> ClientPacketHandler.initTree(packet));
         registrar.playToClient(

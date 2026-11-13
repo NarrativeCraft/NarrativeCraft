@@ -24,8 +24,11 @@
 package fr.loudo.narrativecraft.client.studio.tab;
 
 import fr.loudo.narrativecraft.api.util.NarrativeCraftAPIUtil;
-import fr.loudo.narrativecraft.files.NarrativeFiles;
+import fr.loudo.narrativecraft.client.network.C2SSaveScene;
+import fr.loudo.narrativecraft.client.screen.SaveAsSceneScreen;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.scene.SceneIO;
+import fr.loudo.narrativecraft.platform.Services;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
 import imgui.flag.ImGuiStyleVar;
@@ -33,19 +36,16 @@ import imgui.flag.ImGuiTabBarFlags;
 import imgui.flag.ImGuiTabItemFlags;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImBoolean;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 
 public class TabsManagerClient {
 
     private static final Minecraft MINECRAFT = Minecraft.getInstance();
-    private static final NarrativeFiles FILES = NarrativeFiles.getInstance();
 
     private static final int TABS_BAR_FLAGS = ImGuiWindowFlags.NoDecoration
             | ImGuiWindowFlags.NoMove
@@ -124,35 +124,27 @@ public class TabsManagerClient {
         focusActiveTab = true;
     }
 
-    public void saveCurrent(@Nullable Path path) {
+    public void saveAs(String directory, String name) {
         if (activeTab == null) return;
-
-        if (activeTab.getPath() == null) {
-            saveAs(path);
-        } else {
-            save();
-        }
-    }
-
-    public void saveAs(Path path) {
-        if (activeTab == null) return;
-
-        // TODO: move this as a packet!!!
-        if (FILES.getSceneFiles().save(activeTab.getScene(), path)) {
-            activeTab.setSaved(true);
-            activeTab.setPath(path);
-        }
+        activeTab.getScene().setName(name);
+        activeTab.setPath(directory);
+        sendSave(activeTab);
     }
 
     public void save() {
         if (activeTab == null) return;
         if (activeTab.isSaved()) return;
-        if (activeTab.getPath() == null) return;
-
-        // TODO: move this as a packet!!!
-        if (FILES.getSceneFiles().save(activeTab.getScene(), activeTab.getPath())) {
-            activeTab.setSaved(true);
+        if (activeTab.getPath() == null) {
+            MINECRAFT.gui.setScreen(new SaveAsSceneScreen());
+            return;
         }
+        sendSave(activeTab);
+    }
+
+    private void sendSave(Tab tab) {
+        String sceneJson = new SceneIO().write(tab.getScene()).toString();
+        Services.PACKET.sendToServer(new C2SSaveScene(tab.getPath(), sceneJson));
+        tab.setSaved(true);
     }
 
     private void switchTo(Tab tab) {

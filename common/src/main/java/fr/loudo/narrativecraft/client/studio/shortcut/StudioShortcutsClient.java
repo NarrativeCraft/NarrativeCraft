@@ -35,7 +35,9 @@ import net.minecraft.resources.Identifier;
 public final class StudioShortcutsClient {
 
     public static final NarrativeShortcutClient SAVE =
-            register(Util.buildId("shortcut.save"), ImGuiKey.ImGuiMod_Ctrl | ImGuiKey.S, () -> {});
+            register(Util.buildId("shortcut.save"), ImGuiKey.ImGuiMod_Ctrl | ImGuiKey.S, () -> {
+                NarrativeStudioClient.getInstance().getTabsManager().save();
+            });
 
     public static final NarrativeShortcutClient UNDO =
             register(Util.buildId("shortcut.undo"), ImGuiKey.ImGuiMod_Ctrl | ImGuiKey.Z, () -> {});

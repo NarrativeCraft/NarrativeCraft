@@ -26,8 +26,8 @@ package fr.loudo.narrativecraft.client.network.handlers;
 import com.google.common.hash.Hashing;
 import com.google.gson.JsonParser;
 import fr.loudo.narrativecraft.client.studio.NarrativeStudioClient;
-import fr.loudo.narrativecraft.files.NarrativeFiles;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
+import fr.loudo.narrativecraft.narrative.scene.SceneIO;
 import fr.loudo.narrativecraft.network.S2CInitTree;
 import fr.loudo.narrativecraft.network.S2COpenScene;
 import fr.loudo.narrativecraft.studio.assets.TreeIO;
@@ -46,10 +46,7 @@ public class ClientPacketHandler {
     }
 
     public static void openScene(S2COpenScene packet) {
-        Scene scene = NarrativeFiles.getInstance()
-                .getSceneFiles()
-                .io()
-                .read(JsonParser.parseString(packet.data()).getAsJsonObject());
+        Scene scene = new SceneIO().read(JsonParser.parseString(packet.data()).getAsJsonObject());
         if (scene == null) return;
 
         NarrativeStudioClient.getInstance().getTabsManager().open(scene);

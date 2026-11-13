@@ -25,13 +25,12 @@ package fr.loudo.narrativecraft.client.studio.tab;
 
 import fr.loudo.narrativecraft.client.studio.session.StudioSessionClient;
 import fr.loudo.narrativecraft.narrative.scene.Scene;
-import java.nio.file.Path;
 
 public class Tab {
 
     private final Scene scene;
     private final StudioSessionClient session = new StudioSessionClient();
-    private Path path;
+    private String path;
     private boolean isSaved;
 
     public Tab(Scene scene, boolean isSaved) {
@@ -55,11 +54,11 @@ public class Tab {
         isSaved = saved;
     }
 
-    public Path getPath() {
+    public String getPath() {
         return path;
     }
 
-    public void setPath(Path path) {
+    public void setPath(String path) {
         this.path = path;
     }
 }

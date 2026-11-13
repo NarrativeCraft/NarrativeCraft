@@ -21,5 +21,12 @@
   "narrativecraft.studio.layout.console": "Console",
   "narrativecraft.studio.layout.inspector": "Inspector",
 
-  "narrativecraft.studio.tabs.empty": "[empty]"
+  "narrativecraft.studio.tabs.empty": "[empty]",
+
+  "narrativecraft.studio.save_scene.title": "Save Scene As...",
+  "narrativecraft.studio.save_scene.path": "Path:",
+  "narrativecraft.studio.save_scene.entries": "Directories & Files:",
+  "narrativecraft.studio.save_scene.file": "File:",
+  "narrativecraft.studio.save_scene.save": "Save",
+  "narrativecraft.studio.save_scene.cancel": "Cancel"
 }
