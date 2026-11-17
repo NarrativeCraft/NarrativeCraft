@@ -28,5 +28,8 @@
   "narrativecraft.studio.save_scene.entries": "Directories & Files:",
   "narrativecraft.studio.save_scene.file": "File:",
   "narrativecraft.studio.save_scene.save": "Save",
-  "narrativecraft.studio.save_scene.cancel": "Cancel"
+  "narrativecraft.studio.save_scene.cancel": "Cancel",
+  "narrativecraft.studio.save_scene.overwrite.title": "Overwrite Scene",
+  "narrativecraft.studio.save_scene.overwrite.message": "A scene named \"%s\" already exists in this folder. Do you want to overwrite it?",
+  "narrativecraft.studio.save_scene.overwrite.confirm": "Overwrite"
 }

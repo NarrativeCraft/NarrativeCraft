@@ -47,6 +47,7 @@ import net.minecraft.client.gui.screens.Screen;
 public class SaveAsSceneScreen extends Screen implements ImGuiRenderableClient {
 
     private static final String POPUP_ID = "###save_scene_as";
+    private static final String OVERWRITE_ID = "###overwrite_scene";
     private static final float WIDTH = 600.0F;
     private static final float HEIGHT = 400.0F;
     private static final int POPUP_FLAGS =
@@ -57,6 +58,7 @@ public class SaveAsSceneScreen extends Screen implements ImGuiRenderableClient {
     private final ImString fileName = new ImString(DEFAULT_NAME + SceneFiles.FORMAT, 256);
     private final ImString pathDisplay = new ImString(256);
     private String currentPath = "";
+    private boolean overwrite = false;
 
     public SaveAsSceneScreen() {
         super(ModTranslation.message("studio.save_scene.title"));
@@ -79,9 +81,46 @@ public class SaveAsSceneScreen extends Screen implements ImGuiRenderableClient {
         confirmed |= renderFileName();
         confirmed |= renderButtons();
         if (confirmed && isNameValid()) {
+            if (sceneExists(directory)) {
+                overwrite = true;
+            } else {
+                save();
+            }
+        }
+        if (renderOverwritePopup()) {
             save();
         }
         ImGui.endPopup();
+    }
+
+    private boolean renderOverwritePopup() {
+        if (!overwrite) return false;
+        String overwriteId = translate("overwrite.title") + OVERWRITE_ID;
+        if (!ImGui.isPopupOpen(overwriteId)) {
+            ImGui.openPopup(overwriteId);
+        }
+        ImGuiViewport viewport = ImGui.getMainViewport();
+        ImGui.setNextWindowPos(viewport.getCenterX(), viewport.getCenterY(), ImGuiCond.Always, 0.5F, 0.5F);
+        if (!ImGui.beginPopupModal(overwriteId, POPUP_FLAGS | ImGuiWindowFlags.AlwaysAutoResize)) return false;
+
+        ImGui.text(ModTranslation.message("studio.save_scene.overwrite.message", sceneName() + SceneFiles.FORMAT)
+                .getString());
+        ImGui.spacing();
+        boolean confirmed = ImGui.button(translate("overwrite.confirm") + "###overwrite_confirm");
+        ImGui.sameLine();
+        boolean cancelled = ImGui.button(translate("cancel") + "###overwrite_cancel");
+        if (confirmed || cancelled) {
+            overwrite = false;
+            ImGui.closeCurrentPopup();
+        }
+        ImGui.endPopup();
+        return confirmed;
+    }
+
+    private boolean sceneExists(Tree directory) {
+        if (directory == null) return false;
+        String name = sceneName() + SceneFiles.FORMAT;
+        return directory.getChild().stream().anyMatch(tree -> !tree.isDirectory() && tree.getName().equals(name));
     }
 
     private void renderPathBar(Tree directory) {
