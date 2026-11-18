@@ -27,6 +27,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -43,8 +44,10 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
+import net.minecraft.util.Util;
 
 public class RecordCommand {
 
@@ -58,18 +61,33 @@ public class RecordCommand {
                         commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("record")
                         .then(Commands.literal("start")
-                                .executes(RecordCommand::startRecord)
+                                .executes(logged(RecordCommand::startRecord))
                                 .then(Commands.literal("with")
                                         .then(Commands.argument("subscene_names", StringArgumentType.greedyString())
                                                 .suggests(RecordCommand::suggestSubscenes)
-                                                .executes(RecordCommand::startRecordWithSubscenes)))))
-                .then(Commands.literal("record").then(Commands.literal("stop").executes(RecordCommand::stopRecord)))
+                                                .executes(logged(RecordCommand::startRecordWithSubscenes))))))
                 .then(Commands.literal("record")
-                        .then(Commands.literal("discard").executes(RecordCommand::discardRecord)))
+                        .then(Commands.literal("stop").executes(logged(RecordCommand::stopRecord))))
+                .then(Commands.literal("record")
+                        .then(Commands.literal("discard").executes(logged(RecordCommand::discardRecord))))
                 .then(Commands.literal("record")
                         .then(Commands.literal("save")
                                 .then(Commands.argument("record_name", StringArgumentType.string())
-                                        .executes(RecordCommand::saveRecord)))));
+                                        .executes(logged(RecordCommand::saveRecord))))));
+    }
+
+    private static Command<CommandSourceStack> logged(Command<CommandSourceStack> command) {
+        return context -> {
+            try {
+                return command.run(context);
+            } catch (CommandSyntaxException exception) {
+                throw exception;
+            } catch (Exception exception) {
+                NarrativeCraftMod.LOGGER.error("Command '/{}' failed", context.getInput(), exception);
+                context.getSource().sendFailure(Component.literal(Util.describeError(exception)));
+                return 0;
+            }
+        };
     }
 
     private static int startRecord(CommandContext<CommandSourceStack> context) {
@@ -143,14 +161,20 @@ public class RecordCommand {
         recording = new Recording(playerSession);
         RECORDING_MANAGER.add(recording);
 
-        for (Animation animation : animationsToPlay) {
-            Playback playback = new Playback(animation, player);
-            NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
-            playback.start();
-            recording.addSubscenePlayback(playback);
+        try {
+            for (Animation animation : animationsToPlay) {
+                Playback playback = new Playback(animation, player);
+                NarrativeCraftMod.getInstance().getPlaybackManager().add(playback);
+                recording.addSubscenePlayback(playback);
+                playback.start();
+            }
+            recording.start();
+        } catch (RuntimeException exception) {
+            recording.stop();
+            RECORDING_MANAGER.remove(recording);
+            throw exception;
         }
 
-        recording.start();
         context.getSource().sendSuccess(() -> Translation.message("record.start"), false);
 
         return Command.SINGLE_SUCCESS;

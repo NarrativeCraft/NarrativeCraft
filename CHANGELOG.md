@@ -1,7 +1,7 @@
 # Changelog
 
-## [2.3.2]
+## [2.3.3]
 
-### Feature
-- Upgraded NeoForge and Fabric loaders version for 26.2
-- Sync playbacks interactions state when recording a subscene #46 @awakaxis
+### Fix
+
+- Small crash with another mod when starting a playback
