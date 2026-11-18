@@ -190,7 +190,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
             ((LivingEntityAccessor) livingEntity).callDetectEquipmentUpdates();
         }
 
-        entity.getTags().add(ENTITY_TAG);
+        entity.addTag(ENTITY_TAG);
         characterPlacements.add(characterPlacement);
         characterEntities.put(characterPlacement.getId(), entity);
         Services.PACKET.sendToPlayer(
@@ -327,7 +327,7 @@ public class CameraAngleMakerEditorMaker implements EditorMaker {
         }
 
         addEntityToWorld(entity, player, level, characterStory);
-        entity.getTags().add(ENTITY_TAG);
+        entity.addTag(ENTITY_TAG);
         characterPlacements.add(placement);
         characterEntities.put(placement.getId(), entity);
         Services.PACKET.sendToPlayer(

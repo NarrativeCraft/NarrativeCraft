@@ -161,7 +161,7 @@ public class PlaybackContext implements IPlaybackContext {
         }
 
         entity.setInvulnerable(true);
-        entity.getTags().add(Playback.ENTITY_TAG);
+        entity.addTag(Playback.ENTITY_TAG);
     }
 
     private void addEntityToWorld() {
@@ -181,7 +181,7 @@ public class PlaybackContext implements IPlaybackContext {
                 if (masterEntity instanceof ServerPlayer player) {
                     entity = player.drop(itemEntity.getItem(), false, false);
                     entity.setInvulnerable(true);
-                    entity.getTags().add(Playback.ENTITY_TAG);
+                    entity.addTag(Playback.ENTITY_TAG);
                     level.addFreshEntity(entity);
                 }
                 return;
