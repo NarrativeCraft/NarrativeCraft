@@ -64,6 +64,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -279,17 +280,16 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
 
     @Override
     public void onError(InkTagHandlerException exception) {
+        String message = Objects.requireNonNullElseGet(exception.getMessage(), () -> Util.describeError(exception));
         NarrativeCraftMod.LOGGER.error(
                 "Story error for player {}: {}",
                 playerSession.getPlayer().getName().getString(),
-                exception.getMessage(),
+                message,
                 exception);
         playerSession
                 .getPlayer()
                 .sendSystemMessage(Translation.message("error.story").withStyle(ChatFormatting.RED));
-        playerSession
-                .getPlayer()
-                .sendSystemMessage(Component.literal(exception.getMessage()).withStyle(ChatFormatting.RED));
+        playerSession.getPlayer().sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.RED));
         stop();
     }
 
@@ -299,11 +299,7 @@ public final class StoryHandler implements InkTagHandler.Lifecycle, IStoryHandle
             story.choosePathString(stitch);
             advance();
         } catch (Exception e) {
-            NarrativeCraftMod.LOGGER.error(
-                    "Story error for player {}: {}",
-                    playerSession.getPlayer().getName().getString(),
-                    e);
-            stop();
+            onError(new InkTagHandlerException(e.getMessage(), e));
         }
     }
 
